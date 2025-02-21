@@ -685,7 +685,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942975878109959372, guid: d31d0b778898c5048bf1f4930482ce94, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2496606448798162180, guid: d31d0b778898c5048bf1f4930482ce94, type: 3}
       propertyPath: Damage
@@ -975,7 +975,6 @@ MonoBehaviour:
   _fallSpeedYDampingChangeThreshold: -15
   _framingTransposer: {fileID: 0}
   _normYPanAmount: 0
-  pixelCameraComp: {fileID: 0}
   mainCam: {fileID: 0}
   askForSwitchPixelPerfectCamera: 0
   desiredOrthographicSizeThreshold: {x: 1, y: 1}
@@ -1855,7 +1854,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 6
+  orthographic size: 0.140625
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

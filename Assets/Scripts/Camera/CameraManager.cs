@@ -27,8 +27,9 @@ public class CameraManager : MonoBehaviour
     [HideInInspector] public CinemachineFramingTransposer _framingTransposer;
     [HideInInspector] public float _normYPanAmount;
 
-    [Header("PixelPerfectCameraSetting")][HideInInspector] public PixelPerfectCamera pixelCameraComp;
+    [Header("PixelPerfectCameraSetting")]
     [HideInInspector] public Camera mainCam;
+
     public bool askForSwitchPixelPerfectCamera = false;
     private List<float> pixelCameraOrthographicSizes = new List<float> { 1.534091f, 1.6875f, 1.875f, 2.109375f, 2.410714f, 2.8125f, 3.375f, 4.21875f, 5.625f, 8.4375f, 16.875f };
     public Vector2 desiredOrthographicSizeThreshold = Vector2.one;
@@ -40,16 +41,17 @@ public class CameraManager : MonoBehaviour
         if (instance == null) { instance = this; }
         else { Destroy(this.gameObject); }
         mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-        pixelCameraComp = mainCam.GetComponent<PixelPerfectCamera>();
     }
 
     private void Update()
     {
-        if (pixelCameraComp.enabled != desiredPixelPerfectCamState)
+        if (mainCam == null) { mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>(); }
+        if (mainCam == null) { return; }
+        if (mainCam.GetComponent<PixelPerfectCamera>().enabled != desiredPixelPerfectCamState)
         {
             if (mainCam.orthographicSize <= desiredOrthographicSizeThreshold.x || mainCam.orthographicSize >= desiredOrthographicSizeThreshold.y)
             {
-                pixelCameraComp.enabled = desiredPixelPerfectCamState;
+                mainCam.GetComponent<PixelPerfectCamera>().enabled = desiredPixelPerfectCamState;
             }
         }
     }
@@ -83,7 +85,7 @@ public class CameraManager : MonoBehaviour
 
     public void SwtichToNormalCam()
     {
-        pixelCameraComp.enabled = true;
+        mainCam.GetComponent<PixelPerfectCamera>().enabled = true;
         if (playerNormalCam == null)
         {
             GameObject cam = GameObject.Find("CM_normalCam");

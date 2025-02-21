@@ -55,17 +55,17 @@ public class CharacterController2D : MonoBehaviour
     [SerializeField, HideInInspector, Range(0f, 4f)] private float DoubleJumpForceTime = 1f;
     [SerializeField, HideInInspector, Range(0f, 20f)] private float floatingSpeed;
     [SerializeField, HideInInspector, MinMaxSlider(0, 1, true)] public Vector2 floatingRumblingSpeed;
-    [HideInInspector] public bool input_floating;
+    public bool input_floating;
     [HideInInspector] public float floatingTime = 0f;
     [HideInInspector] public bool resetRumbleJump = false;
-    [HideInInspector] public bool isJumping = false;
-    [HideInInspector] public bool isFloating;
+    public bool isJumping = false;
+    public bool isFloating;
 
     [HideInInspector] public bool floatTriggered = false;
 
     //new
 
-    [HideInInspector] public bool isFalling = false;
+    public bool isFalling = false;
     [HideInInspector] public bool isRunning = false;
 
     private float _fallSpeedYDampingChangeThreshold;
@@ -348,7 +348,7 @@ public class CharacterController2D : MonoBehaviour
         {
             if (!floatTriggered) { SoundManager.PlaySound("sword_jump_floating"); floatTriggered = true; }
             if (!energy.FloatingConsume()) { return false; }
-            playerAttack.RetreiveBoomerang();
+
             float x = rb.velocity.x;
             rb.velocity = new Vector2(x, -floatingSpeed * Time.deltaTime);
             if (!isFloating)
@@ -419,7 +419,6 @@ public class CharacterController2D : MonoBehaviour
     public void DoubleJump(float holdTime)
     {
         if (!canDoubleJump) { return; }
-        playerAttack.RetreiveBoomerang();
         float x = rb.velocity.x;
         float strength = holdTime / DoubleJumpForceTime;
         strength = Mathf.Clamp(strength, MinDoubleJumpForceMultiplier, DoubleJumpForceMultiplier);
@@ -429,6 +428,9 @@ public class CharacterController2D : MonoBehaviour
             rb.velocity = new Vector2(x, m_JumpForce * strength);
             canDoubleJump = false;
             isFloating = false;
+            isFalling = false;
+            isJumping = true;
+
             //counter attack
             PlayAnimClipInCombat("sword_jump_after", "sword_jump_after_combat");
             bool hit = playerAttack.JumpAttack();
