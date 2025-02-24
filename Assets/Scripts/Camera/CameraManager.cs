@@ -58,6 +58,7 @@ public class CameraManager : MonoBehaviour
 
     public static void SwitchPixelPerfectCamera(bool ask)
     {
+        if (instance.mainCam == null) { return; }
         instance.desiredPixelPerfectCamState = ask;
         float currentOrthoSize = instance.mainCam.orthographicSize;
         List<float> tempOrthoList = instance.pixelCameraOrthographicSizes;
@@ -85,6 +86,8 @@ public class CameraManager : MonoBehaviour
 
     public void SwtichToNormalCam()
     {
+        if (mainCam == null) { mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>(); }
+        if (mainCam == null) { return; }
         mainCam.GetComponent<PixelPerfectCamera>().enabled = true;
         if (playerNormalCam == null)
         {

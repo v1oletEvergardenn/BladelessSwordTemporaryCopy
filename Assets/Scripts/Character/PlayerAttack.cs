@@ -85,7 +85,7 @@ public class PlayerAttack : MonoBehaviour
 
     #region STORM VARIABLES
 
-    [FoldoutGroup("Barrier Variables", nameof(storm), nameof(prepareStormTime), nameof(stormDuration), nameof(storm_radius), nameof(repelLayer), nameof(repelForce))]
+    [FoldoutGroup("Barrier Variables", nameof(storm), nameof(prepareStormTime), nameof(stormDuration), nameof(storm_radius), nameof(repelLayer), nameof(repelForce), nameof(stormEffectPos))]
     [SerializeField] private Void barrierGroupHold;
 
     [SerializeField, HideInInspector] private GameObject storm;
@@ -100,6 +100,7 @@ public class PlayerAttack : MonoBehaviour
     private bool stormReady = false;
     [HideInInspector] public float prepareStormTimer = 0f;
     private Vector3 originalStormPos;
+    public Transform stormEffectPos;
 
     #endregion STORM VARIABLES
 
@@ -144,7 +145,7 @@ public class PlayerAttack : MonoBehaviour
         UpdateHS();
         if (isPreparingStorm) { prepareStormTimer += Time.deltaTime; }
         else { prepareStormTimer = 0f; stormReady = false; }
-        if (isPreparingStorm && prepareStormTimer >= prepareStormTime && !stormReady) { stormReady = true; SoundManager.PlaySound("defend_block2"); }
+        if (isPreparingStorm && prepareStormTimer >= prepareStormTime && !stormReady) { stormReady = true; SoundManager.PlaySound("defend_block2"); vfx.SpawnSlashEffect(stormEffectPos.position); }
         if (combatTimer <= 0) { anim.SetBool("isCombat", false); isInCombat = false; combatTimer = 0; }
         if (comboTimer >= 0.9f) { attackIndex = 2; }
         if (attackAnimTimer <= attackAnimDuration) { isInAttackAnim = true; }
@@ -422,7 +423,7 @@ public class PlayerAttack : MonoBehaviour
 
     #endregion Defend
 
-    #region Barrier
+    #region Storm
 
     public void OnStorm()
     {
@@ -442,18 +443,10 @@ public class PlayerAttack : MonoBehaviour
 
                 anim.SetBool("isCombat", true);
                 isInCombat = true;
-
-                //if (controller.isJumping && !isBoomeranging)
-                //{
-                //    rb.velocity = Vector3.zero;
-                //    rb.isKinematic = true;
-                //    controller.canMove = false;
-                //}
-
                 isOnStorm = true;
                 SoundManager.PlaySound("storm");
                 storm.SetActive(true);
-                Invoke("EndBarrier", stormDuration);
+                Invoke("EndStorm", stormDuration);
                 Collider2D[] colliders = Physics2D.OverlapCircleAll(storm.transform.position, storm_radius, repelLayer);
                 foreach (Collider2D collider in colliders)
                 {
@@ -470,7 +463,7 @@ public class PlayerAttack : MonoBehaviour
         }
     }
 
-    private void EndBarrier()
+    public void EndStorm()
     {
         if (controller.isJumping)
         {
@@ -483,7 +476,7 @@ public class PlayerAttack : MonoBehaviour
         isOnStorm = false;
     }
 
-    #endregion Barrier
+    #endregion Storm
 
     #region Boomerang
 

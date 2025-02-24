@@ -152,9 +152,15 @@ public class CharacterController2D : MonoBehaviour
                     float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
                     anim.Play("storm_pre_fall", 0, duration);
                 }
+                else if ((anim.GetCurrentAnimatorStateInfo(0).IsName("tele_pre_jump")))
+                {
+                    float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
+                    anim.Play("tele_pre_fall", 0, duration);
+                }
                 else
                 {
-                    PlayAnimClipInCombat("pre_fall", "pre_fall_combat");
+                    if (playerAttack.isPreparingStorm) { anim.Play("storm_ready_fall"); }
+                    else { PlayAnimClipInCombat("pre_fall", "pre_fall_combat"); }
                 }//play normal falling animation if not attacking
             }
 
@@ -466,6 +472,7 @@ public class CharacterController2D : MonoBehaviour
     {
         if (teleportTimer <= teleportCD) { return; }
         teleported = false;
+
         StartCoroutine(TeleportCoroutine(m_FacingRight));
     }
 
@@ -476,6 +483,7 @@ public class CharacterController2D : MonoBehaviour
             if (inputPlayer.rightPointLeft == m_FacingRight) { Flip(); }
         }
         else if (inputPlayer.leftAttackDir != Vector2.zero) { if (inputPlayer.leftPointLeft == m_FacingRight) { Flip(); } }
+        gameObject.layer = 14; //player_dash
         AnimSetBool.instance.Anim_Teleport(0);
         if (isFalling) { anim.Play("tele_pre_fall"); }
         else if (isJumping) { anim.Play("tele_pre_jump"); }
@@ -494,6 +502,7 @@ public class CharacterController2D : MonoBehaviour
             yield return null;
         }
         TeleportToSword();
+        gameObject.layer = 6; //player_dash
         yield return null;
     }
 

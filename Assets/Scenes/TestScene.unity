@@ -150,7 +150,7 @@ PrefabInstance:
     - target: {fileID: 512692318975722012, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -211820173159450430, guid: 31db5849f8fc2de428e51264e74089f2, type: 3}
+      objectReference: {fileID: -5566859763538226104, guid: 31db5849f8fc2de428e51264e74089f2, type: 3}
     - target: {fileID: 512692318975722012, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
       propertyPath: m_WasSpriteAssigned
       value: 1
@@ -243,6 +243,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: 0.12
       objectReference: {fileID: 0}
+    - target: {fileID: 8173309371137226772, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
+      propertyPath: stormEffectPos
+      value: 
+      objectReference: {fileID: 1716539408}
     - target: {fileID: 8409464861545523512, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
       propertyPath: m_Controller
       value: 
@@ -264,11 +268,15 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7481438752793323117, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 2959508685687309300, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
       insertIndex: 2
       addedObject: {fileID: 773182556}
+    - targetCorrespondingSourceObject: {fileID: 1977391573695511326, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1716539408}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
 --- !u!1 &136823325
@@ -1037,6 +1045,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &656064577 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1977391573695511326, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
+  m_PrefabInstance: {fileID: 117795621}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &748390238
 GameObject:
   m_ObjectHideFlags: 0
@@ -1734,6 +1747,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 249451229}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1716539407
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1716539408}
+  m_Layer: 6
+  m_Name: StormEffectPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1716539408
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1716539407}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.24, y: 0.872, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 656064577}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1855061286
 GameObject:
   m_ObjectHideFlags: 0
@@ -1854,7 +1898,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 0.140625
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
