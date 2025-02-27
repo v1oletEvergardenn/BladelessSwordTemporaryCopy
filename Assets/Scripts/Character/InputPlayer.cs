@@ -156,6 +156,13 @@ public class InputPlayer : MonoBehaviour
         if (learnedDefend && control.Defend.WasPressedThisFrame() &&
             !playerAttack.isPreparingStorm) { playerAttack.OnDefend(); }//defend
         if (learnedTeleport && control.Teleport.WasPressedThisFrame()) { controller.SwordTeleport(); }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            WaveController wave = ObjectPooler.instance.SpawnFromPool("wave", transform.position).GetComponent<WaveController>();
+            print(wave);
+            wave.CallWave();
+        }
     }
 
     private void FixedUpdate()
