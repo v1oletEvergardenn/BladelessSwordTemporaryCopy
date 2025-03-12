@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.U2D;
 using UnityEngine;
 
 public class DamageFlash : MonoBehaviour
@@ -17,12 +18,19 @@ public class DamageFlash : MonoBehaviour
         flashMaterial = GameManager.instance.FlashEffectMat;
     }
 
-    public void OnDamageFlash()
+    public void OnDamageFlash(SpriteRenderer spriteInput = null)
     {
-        StartCoroutine(IEDamageFlasher());
+        if (spriteInput != null)
+        {
+            StartCoroutine(IEDamageFlasher(spriteInput));
+        }
+        else
+        {
+            StartCoroutine(IEDamageFlasher(sprite));
+        }
     }
 
-    private IEnumerator IEDamageFlasher()
+    private IEnumerator IEDamageFlasher(SpriteRenderer sprite)
     {
         sprite.material = flashMaterial;
         sprite.material.SetColor("_FlashColor", _color);
