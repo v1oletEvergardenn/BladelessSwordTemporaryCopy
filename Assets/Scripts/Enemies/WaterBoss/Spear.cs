@@ -68,7 +68,6 @@ public class Spear : IProjectile
             {
                 vfx.SpawnHitEffect(false, GetPivot());
                 target.Damage(damage, transform, stunDuration);
-                target.Repel(150f, this.transform.right);
                 Die();
             }
         }
@@ -88,10 +87,15 @@ public class Spear : IProjectile
     public override void Die()
     {
         GetComponent<SpriteRenderer>().sprite = null;
-        GetComponent<Animator>().Play("hit");
+        GetComponent<Animator>().Play("spear_hit");
         rb.velocity = Vector3.zero;
         rb.isKinematic = true;
         collided = true;
-        Destroy(this.gameObject, 0.1f);
+        Invoke("SetFalseActive", 0.3f);
+    }
+
+    public void SetFalseActive()
+    {
+        gameObject.SetActive(false);
     }
 }

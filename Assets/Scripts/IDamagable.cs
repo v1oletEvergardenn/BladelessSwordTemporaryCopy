@@ -12,6 +12,11 @@ public abstract class IDamagable : MonoBehaviour
         return 0;
     }
 
+    public virtual int SubObjectDamage(int damageAmount, Transform sender = null, float stunDuration = 0f)
+    {
+        return 0;
+    }
+
     public virtual void Repel(float force, Vector3 dir)
     {
         GetComponent<Rigidbody2D>().AddForce(dir * force, ForceMode2D.Impulse);

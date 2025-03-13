@@ -123,6 +123,37 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &74164514
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 74164515}
+  m_Layer: 13
+  m_Name: water_spear_pos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &74164515
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74164514}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.152, y: 1.625, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1375437895}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &99531527
 GameObject:
   m_ObjectHideFlags: 0
@@ -1197,6 +1228,9 @@ MonoBehaviour:
   - tag: wave
     prefab: {fileID: 7676289916162547982, guid: 2db63e2f7abd3b44097d8bd2057ebff5, type: 3}
     size: 10
+  - tag: water_Spear
+    prefab: {fileID: 1820414133887720108, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+    size: 10
 --- !u!4 &590806789
 Transform:
   m_ObjectHideFlags: 0
@@ -1393,6 +1427,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &801437554
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 801437555}
+  m_Layer: 13
+  m_Name: water_spear_pos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &801437555
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 801437554}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.152, y: 1.625, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1821158729}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &873781651
 GameObject:
   m_ObjectHideFlags: 0
@@ -1402,11 +1467,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 873781652}
-  - component: {fileID: 873781653}
   - component: {fileID: 873781655}
   - component: {fileID: 873781654}
   - component: {fileID: 873781657}
+  - component: {fileID: 873781653}
   - component: {fileID: 873781656}
+  - component: {fileID: 873781658}
   m_Layer: 13
   m_Name: YingYangFish
   m_TagString: Untagged
@@ -1488,18 +1554,25 @@ MonoBehaviour:
   m_Velocity: {x: 0, y: 0}
   distanceToPlayer: 0
   nextAction: {fileID: 0}
-  GFX: {fileID: 0}
-  actions: 0
+  GFX: {fileID: 1069790320}
   center: {fileID: 1069790321}
   blackFish: {fileID: 1375437895}
   whiteFish: {fileID: 1821158729}
   idleRotateSpeed: 50
-  sprintRotateSpeed: 100
+  sprintRotateSpeed: 120
   Dir: {x: 0, y: 0, z: -1}
+  blackSprite: {fileID: 0}
+  whiteSprite: {fileID: 0}
+  blackAnim: {fileID: 0}
+  whiteAnim: {fileID: 0}
   black_idling: 1
   white_idling: 1
   black_sprint_startPoint: 0
   white_sprint_startPoint: 0
+  black_sprint_back: 0
+  white_sprint_back: 0
+  actions: 1
+  waterSpear: {fileID: 873781658}
 --- !u!58 &873781654
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -1625,6 +1698,33 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &873781658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873781651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afdffe181259c4047bc48ccb81d7c5be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anim: {fileID: 0}
+  controller: {fileID: 0}
+  sprite: {fileID: 0}
+  player: {fileID: 0}
+  playerIDamagable: {fileID: 0}
+  pooler: {fileID: 0}
+  vfx: {fileID: 0}
+  rb: {fileID: 0}
+  action_time: 1
+  isThisActing: 0
+  waterSpearPos_black: {fileID: 74164515}
+  waterSpearPos_white: {fileID: 801437555}
+  spearDamage: 1
+  spearSpeed: 500
+  spear_stunDuration: 1
 --- !u!1 &939681109
 GameObject:
   m_ObjectHideFlags: 0
@@ -2351,7 +2451,7 @@ PrefabInstance:
       objectReference: {fileID: 148959308}
     - target: {fileID: 7600662033407475541, guid: 6de10fca9cbc0974abae617101dbe514, type: 3}
       propertyPath: maxZoom
-      value: 11.3
+      value: 18.5
       objectReference: {fileID: 0}
     - target: {fileID: 7600662033407475541, guid: 6de10fca9cbc0974abae617101dbe514, type: 3}
       propertyPath: minZoom
@@ -2371,7 +2471,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7600662033407475541, guid: 6de10fca9cbc0974abae617101dbe514, type: 3}
       propertyPath: zoomLimiter_x
-      value: 27.6
+      value: 33.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7600662033407475541, guid: 6de10fca9cbc0974abae617101dbe514, type: 3}
+      propertyPath: zoomLimiter_y
+      value: 16.7
       objectReference: {fileID: 0}
     - target: {fileID: 7600662033407475541, guid: 6de10fca9cbc0974abae617101dbe514, type: 3}
       propertyPath: targets.Array.size
@@ -2487,6 +2591,8 @@ GameObject:
   - component: {fileID: 1375437896}
   - component: {fileID: 1375437897}
   - component: {fileID: 1375437899}
+  - component: {fileID: 1375437901}
+  - component: {fileID: 1375437900}
   m_Layer: 13
   m_Name: black_fish
   m_TagString: Untagged
@@ -2506,7 +2612,8 @@ Transform:
   m_LocalPosition: {x: 0, y: -3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 74164515}
   m_Father: {fileID: 873781652}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
 --- !u!212 &1375437896
@@ -2547,8 +2654,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1968539179
+  m_SortingLayer: -4
   m_SortingOrder: 0
   m_Sprite: {fileID: -1511515373092920141, guid: 6230d807d74c0b145bc89821669549e4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2617,6 +2724,62 @@ CapsuleCollider2D:
   m_Offset: {x: 0.38387492, y: -0.09196684}
   m_Size: {x: 2.908245, y: 0.80704623}
   m_Direction: 1
+--- !u!114 &1375437900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1375437894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b24ed006f14a3c4e919c8ba5523a07e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashMaterial: {fileID: 0}
+  _color: {r: 1, g: 0, b: 0, a: 1}
+  flashTime: 0.2
+  sprite: {fileID: 1375437896}
+  flashCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -5
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.2
+      value: 0
+      inSlope: -5
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1375437901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1375437894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2f06b4d6a1b5654093c5bd999bc4f44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  getHitPosition: {x: 0, y: 0, z: 0}
+  color: {r: 1, g: 0, b: 0, a: 1}
+  ParentDamageable: {fileID: 873781653}
+  flash: {fileID: 1375437900}
 --- !u!1 &1379001847
 GameObject:
   m_ObjectHideFlags: 0
@@ -3071,6 +3234,8 @@ GameObject:
   - component: {fileID: 1821158730}
   - component: {fileID: 1821158731}
   - component: {fileID: 1821158732}
+  - component: {fileID: 1821158734}
+  - component: {fileID: 1821158733}
   m_Layer: 13
   m_Name: white_fish
   m_TagString: Untagged
@@ -3090,7 +3255,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 801437555}
   m_Father: {fileID: 873781652}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1821158730
@@ -3131,8 +3297,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1968539179
+  m_SortingLayer: -4
   m_SortingOrder: 0
   m_Sprite: {fileID: -8807828786171002864, guid: 6230d807d74c0b145bc89821669549e4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3201,6 +3367,62 @@ CapsuleCollider2D:
   m_Offset: {x: 0.38387492, y: -0.09196684}
   m_Size: {x: 2.908245, y: 0.80704623}
   m_Direction: 1
+--- !u!114 &1821158733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1821158728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b24ed006f14a3c4e919c8ba5523a07e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashMaterial: {fileID: 0}
+  _color: {r: 1, g: 0, b: 0, a: 1}
+  flashTime: 0.2
+  sprite: {fileID: 1821158730}
+  flashCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -5
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.2
+      value: 0
+      inSlope: -5
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1821158734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1821158728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2f06b4d6a1b5654093c5bd999bc4f44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  getHitPosition: {x: 0, y: 0, z: 0}
+  color: {r: 1, g: 0, b: 0, a: 1}
+  ParentDamageable: {fileID: 873781653}
+  flash: {fileID: 1821158733}
 --- !u!1 &1840298885
 GameObject:
   m_ObjectHideFlags: 0
@@ -4217,6 +4439,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &8391526128929790162
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1820414133887720108, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+      propertyPath: m_Name
+      value: water_spear
+      objectReference: {fileID: 0}
+    - target: {fileID: 6006503064589673031, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 6006503064589673031, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6006503064589673031, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6006503064589673031, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6006503064589673031, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6006503064589673031, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6006503064589673031, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6006503064589673031, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6006503064589673031, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6006503064589673031, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: afa6fe09885fe934eb4900e632493d4c, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -4239,3 +4518,4 @@ SceneRoots:
   - {fileID: 1201888115}
   - {fileID: 873781652}
   - {fileID: 1316465655}
+  - {fileID: 8391526128929790162}

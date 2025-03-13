@@ -86,7 +86,6 @@ public class CameraManager : MonoBehaviour
 
     public void SwtichToNormalCam()
     {
-        if (mainCam == null) { mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>(); }
         if (mainCam == null) { return; }
         mainCam.GetComponent<PixelPerfectCamera>().enabled = true;
         if (playerNormalCam == null)
