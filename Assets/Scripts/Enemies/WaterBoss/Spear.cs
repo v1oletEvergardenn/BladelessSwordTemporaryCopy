@@ -75,13 +75,7 @@ public class Spear : IProjectile
         {
             rb.velocity = Vector3.zero;
             rb.isKinematic = true;
-            Invoke("Collided", 0.1f);
         }
-    }
-
-    private void Collided()
-    {
-        collided = true;
     }
 
     public override void Die()

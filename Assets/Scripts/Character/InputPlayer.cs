@@ -215,6 +215,8 @@ public class InputPlayer : MonoBehaviour
             //if (!controller.m_FacingRight) { z += 180; }
             //pointer.eulerAngles = new Vector3(0, 0, z);//the target rotation
 
+            float tempMinimumAngle = lockOnTargetAngle;
+            float closestTargetZ = Mathf.Infinity;
             Collider2D[] colliders = Physics2D.OverlapCircleAll(pointer.position, pointerLength, rightPointerLayerMask);
             foreach (Collider2D col in colliders)
             {
@@ -223,9 +225,10 @@ public class InputPlayer : MonoBehaviour
                 {
                     float _tempAngle = Vector3.Angle(pointer.right, (damagable.GetHitPos() - pointer.position).normalized);
                     float TargetZ = GetRotZFromDirection(damagable.GetHitPos() - pointer.position);
-                    if (_tempAngle <= lockOnTargetAngle) { pointer.eulerAngles = new Vector3(0, 0, TargetZ); }
+                    if (_tempAngle <= tempMinimumAngle) { closestTargetZ = TargetZ; tempMinimumAngle = _tempAngle; }
                 }
             }//check angle, if small enough, snap on it.
+            if (closestTargetZ != Mathf.Infinity) { pointer.eulerAngles = new Vector3(0, 0, closestTargetZ); }
 
             float dist = pointerLength;
             RaycastHit2D hit = Physics2D.Raycast(pointer.position, pointer.right, 100f, rightPointerLayerMask);
