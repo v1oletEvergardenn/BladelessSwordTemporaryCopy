@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class YYF_WaterSpear : IEnemyAction
@@ -15,6 +14,7 @@ public class YYF_WaterSpear : IEnemyAction
     public float spear_stunDuration = 1f;
 
     private Spear spear;
+    private Spear secondSpear;
     private bool shooted = false;
 
     public override void Start()
@@ -27,41 +27,70 @@ public class YYF_WaterSpear : IEnemyAction
     {
         base.CancelAct();
         if (!shooted && spear != null) { Destroy(spear); }
+        if (!shooted && secondSpear != null) { Destroy(secondSpear); }
     }
 
     public override IEnumerator Act_coroutine()
     {
         bool isWhiteActing = false;
         shooted = false;
+
+        int i = UnityEngine.Random.Range(0, 2);
+        bool second = false;
+        if (i == 0) { second = true; }
+
         if (!bossAI.white_idling)
         {
             isWhiteActing = true;
-            bossAI.whiteAnim.Play("white_spear");
+            bossAI.whiteAnim.Play("spear_pre");
+            bossAI.whiteAnim.SetBool("secondSpear", second);
             spear = pooler.SpawnFromPool("water_Spear", waterSpearPos_white.position).GetComponent<Spear>();
         }
         else
         {
-            bossAI.blackAnim.Play("black_spear");
+            bossAI.blackAnim.Play("spear_pre");
+            bossAI.blackAnim.SetBool("secondSpear", second);
             spear = pooler.SpawnFromPool("water_Spear", waterSpearPos_black.position).GetComponent<Spear>();
         }
 
         spear.SetUp(transform.right, this.gameObject, 0, _followTarget: true, _target: playerIDamagable, false, spearDamage, 0);
         spear.collisionActive = false;
 
-        yield return new WaitForSeconds(2.6f);
+        yield return new WaitForSeconds(1.8f);
+        if (second)
+        {
+            if (!bossAI.white_idling) { secondSpear = pooler.SpawnFromPool("water_Spear", waterSpearPos_white.position).GetComponent<Spear>(); }
+            else { secondSpear = pooler.SpawnFromPool("water_Spear", waterSpearPos_black.position).GetComponent<Spear>(); }
 
+            secondSpear.SetUp(transform.right, this.gameObject, 0, _followTarget: true, _target: playerIDamagable, false, spearDamage, 0);
+            secondSpear.collisionActive = false;
+        }
+        yield return new WaitForSeconds(0.8f);
+
+        ShootSpear(spear);
+
+        if (second)
+        {
+            yield return new WaitForSeconds(1.3f);
+            ShootSpear(secondSpear);
+        }
         //launch waterspear
 
+        yield return new WaitForSeconds(0.5f);
+        if (isWhiteActing) { bossAI.white_sprint_back = true; }
+        else { bossAI.black_sprint_back = true; }
+        spear = null;
+        secondSpear = null;
+        bossAI.nextAction = null;
+        yield return null;
+    }
+
+    public void ShootSpear(Spear spear)
+    {
         spear.collisionActive = true;
         spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed);
         spear.stunDuration = spear_stunDuration;
         spear.facingRight = bossAI.isFacingRight;
         shooted = true;
-
-        yield return new WaitForSeconds(0.5f);
-        if (isWhiteActing) { bossAI.white_sprint_back = true; }
-        else { bossAI.black_sprint_back = true; }
-
-        yield return null;
     }
 }

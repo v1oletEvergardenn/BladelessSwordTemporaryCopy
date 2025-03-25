@@ -5,24 +5,31 @@ using EditorAttributes;
 
 public class YingYangFish_AI : IEnemyController
 {
-    [FoldoutGroup("Attributes", nameof(center), nameof(blackFish), nameof(whiteFish),
-        nameof(idleRotateSpeed), nameof(sprintRotateSpeed), nameof(Dir))]
+    [FoldoutGroup("Attributes", nameof(center), nameof(blackFish), nameof(blackFishGFX),
+        nameof(whiteFish), nameof(whiteFishGFX),
+        nameof(idleRotateSpeed), nameof(sprintRotateSpeed), nameof(Dir),
+        nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter))
+        ]
     public Void void2;
 
     [SerializeField, HideInInspector] public Transform center;
     [SerializeField, HideInInspector] public Transform blackFish;
     [SerializeField, HideInInspector] public Transform whiteFish;
+    [SerializeField, HideInInspector] public Transform blackFishGFX;
+    [SerializeField, HideInInspector] public Transform whiteFishGFX;
     [SerializeField, HideInInspector] public float idleRotateSpeed;
     [SerializeField, HideInInspector] public float sprintRotateSpeed;
     [SerializeField, HideInInspector] public Vector3 Dir;
-
+    [SerializeField, HideInInspector] public float swimToCenterSpeed = 2f;
+    [SerializeField, HideInInspector, MinMaxSlider(1f, 3f)] public Vector2 minMaxDistanceTocenter;
     [HideInInspector] public SpriteRenderer blackSprite;
     [HideInInspector] public SpriteRenderer whiteSprite;
     [HideInInspector] public Animator blackAnim;
     [HideInInspector] public Animator whiteAnim;
 
     [FoldoutGroup("Debug", nameof(black_idling), nameof(white_idling),
-        nameof(black_sprint_startPoint), nameof(white_sprint_startPoint))]
+        nameof(black_sprint_startPoint), nameof(white_sprint_startPoint), nameof(white_distanceToCenter),
+        nameof(black_distanceToCenter))]
     public Void void3;
 
     [SerializeField, HideInInspector] public bool black_idling = true;
@@ -31,10 +38,17 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector] public bool white_sprint_startPoint = false;
     [SerializeField, HideInInspector] public bool black_sprint_back = false;
     [SerializeField, HideInInspector] public bool white_sprint_back = false;
+    [SerializeField, HideInInspector] public float white_distanceToCenter = 0f;
+    [SerializeField, HideInInspector] public float black_distanceToCenter = 0f;
+    public bool isCloseSwimming;
 
     public bool actions = true;
+    [ShowField(nameof(actions)), ButtonField("CloseSwim", "CloseSwim"), SerializeField] private Void void6;
+    [ShowField(nameof(actions)), ButtonField("FarSwim", "FarSwim"), SerializeField] private Void void7;
     [ShowField(nameof(actions)), ButtonField("WaterSpear", "WaterSpear"), SerializeField] private Void void1;
+    [ShowField(nameof(actions)), ButtonField("Swing", "Swing"), SerializeField] private Void void8;
     [SerializeField, ShowField(nameof(actions))] public IEnemyAction waterSpear;
+    [SerializeField, ShowField(nameof(actions))] public IEnemyAction swing;
 
     // Update is called once per frame
 
@@ -43,12 +57,17 @@ public class YingYangFish_AI : IEnemyController
         base.Start();
         blackSprite = blackFish.GetComponent<SpriteRenderer>();
         whiteSprite = whiteFish.GetComponent<SpriteRenderer>();
-        blackAnim = blackFish.GetComponent<Animator>();
-        whiteAnim = whiteFish.GetComponent<Animator>();
+        blackAnim = blackFishGFX.GetComponent<Animator>();
+        whiteAnim = whiteFishGFX.GetComponent<Animator>();
     }
 
     private void Update()
     {
+        white_distanceToCenter = Vector2.Distance(whiteFish.position, center.position);
+        black_distanceToCenter = Vector2.Distance(blackFish.position, center.position);
+
+        float tempRotateSpeed = (minMaxDistanceTocenter.y / white_distanceToCenter) * idleRotateSpeed;
+        if (tempRotateSpeed >= idleRotateSpeed * 2) { tempRotateSpeed = idleRotateSpeed * 2; }
         if (black_sprint_startPoint)
         {
             blackAnim.SetFloat("swim_speed", sprintRotateSpeed / idleRotateSpeed);
@@ -70,7 +89,7 @@ public class YingYangFish_AI : IEnemyController
                 black_idling = true;
             }
         }
-        else if (black_idling) { blackFish.RotateAround(transform.position, Dir, idleRotateSpeed * Time.deltaTime); blackAnim.SetFloat("swim_speed", 1f); }
+        else if (black_idling) { blackFish.RotateAround(transform.position, Dir, tempRotateSpeed * Time.deltaTime); blackAnim.SetFloat("swim_speed", 1f); }
 
         if (white_sprint_startPoint)
         {
@@ -93,7 +112,7 @@ public class YingYangFish_AI : IEnemyController
                 white_idling = true;
             }
         }
-        else if (white_idling) { whiteFish.RotateAround(transform.position, Dir, idleRotateSpeed * Time.deltaTime); whiteAnim.SetFloat("swim_speed", 1f); }
+        else if (white_idling) { whiteFish.RotateAround(transform.position, Dir, tempRotateSpeed * Time.deltaTime); whiteAnim.SetFloat("swim_speed", 1f); }
     }
 
     public Quaternion CalculateWantedRotation(Vector3 _targetPos)
@@ -105,7 +124,6 @@ public class YingYangFish_AI : IEnemyController
 
     public void WaterSpear()
     {
-        print("water spear test");
         nextAction = waterSpear;
         Transform closerFish = CheckCloserFish();
         if (closerFish == blackFish)
@@ -117,6 +135,76 @@ public class YingYangFish_AI : IEnemyController
         {
             white_idling = false;
             white_sprint_startPoint = true;
+        }
+    }
+
+    public void Swing()
+    {
+        nextAction = swing;
+        if (!isCloseSwimming)
+        {
+            CloseSwim();
+        }
+        else
+        {
+            swing.Act();
+        }
+    }
+
+    public void CloseSwim()
+    {
+        StartCoroutine(IECloseSwim(true));
+    }
+
+    public void FarSwim()
+    {
+        StartCoroutine(IECloseSwim(false));
+    }
+
+    public IEnumerator IECloseSwim(bool close)
+    {
+        if (close)
+        {
+            float elapsedTime = 0f;
+            whiteAnim.Play("close_swim_pre");
+            blackAnim.Play("close_swim_pre");
+            while (white_distanceToCenter > minMaxDistanceTocenter.x)
+            {
+                whiteFish.position -= whiteFish.up * swimToCenterSpeed * Time.deltaTime;
+                blackFish.position -= blackFish.up * swimToCenterSpeed * Time.deltaTime;
+                whiteFishGFX.localEulerAngles = Vector3.Lerp(new Vector3(0, 0, 0), new Vector3(0, 0, -25), elapsedTime / 0.5f);
+                whiteFishGFX.localPosition = Vector3.Lerp(new Vector3(0, 0, 0), new Vector3(1, 0, 0), elapsedTime / 0.5f);
+                blackFishGFX.localEulerAngles = Vector3.Lerp(new Vector3(0, 0, 0), new Vector3(0, 0, -25), elapsedTime / 0.5f);
+                blackFishGFX.localPosition = Vector3.Lerp(new Vector3(0, 0, 0), new Vector3(1, 0, 0), elapsedTime / 0.5f);
+
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            nextAction.Act();
+        }
+        else
+        {
+            float elapsedTime = 0f;
+            float originalRotateSpeed = idleRotateSpeed;
+            idleRotateSpeed *= 1.5f;
+            whiteAnim.Play("white_idle");
+            blackAnim.Play("black_idle");
+            while (elapsedTime < 2f)
+            {
+                if (white_distanceToCenter < minMaxDistanceTocenter.y)
+                {
+                    whiteFish.position += whiteFish.up * swimToCenterSpeed * Time.deltaTime;
+                    blackFish.position += blackFish.up * swimToCenterSpeed * Time.deltaTime;
+                }
+                whiteFishGFX.localEulerAngles = Vector3.Lerp(new Vector3(0, 0, -25), new Vector3(0, 0, 0), elapsedTime / 0.5f);
+                whiteFishGFX.localPosition = Vector3.Lerp(new Vector3(1, 0, 0), new Vector3(0, 0, 0), elapsedTime / 2f);
+                blackFishGFX.localEulerAngles = Vector3.Lerp(new Vector3(0, 0, -25), new Vector3(0, 0, 0), elapsedTime / 0.5f);
+                blackFishGFX.localPosition = Vector3.Lerp(new Vector3(1, 0, 0), new Vector3(0, 0, 0), elapsedTime / 2f);
+
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            idleRotateSpeed = originalRotateSpeed;
         }
     }
 
