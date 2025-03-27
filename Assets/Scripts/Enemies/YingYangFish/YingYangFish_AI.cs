@@ -27,28 +27,21 @@ public class YingYangFish_AI : IEnemyController
     [HideInInspector] public Animator blackAnim;
     [HideInInspector] public Animator whiteAnim;
 
-    [FoldoutGroup("Debug", nameof(black_idling), nameof(white_idling),
-        nameof(black_sprint_startPoint), nameof(white_sprint_startPoint), nameof(white_distanceToCenter),
+    [FoldoutGroup("Debug", nameof(black_idling), nameof(white_idling), nameof(white_distanceToCenter),
         nameof(black_distanceToCenter))]
     public Void void3;
 
     [SerializeField, HideInInspector] public bool black_idling = true;
     [SerializeField, HideInInspector] public bool white_idling = true;
-    [SerializeField, HideInInspector] public bool black_sprint_startPoint = false;
-    [SerializeField, HideInInspector] public bool white_sprint_startPoint = false;
-    [SerializeField, HideInInspector] public bool black_sprint_back = false;
-    [SerializeField, HideInInspector] public bool white_sprint_back = false;
     [SerializeField, HideInInspector] public float white_distanceToCenter = 0f;
     [SerializeField, HideInInspector] public float black_distanceToCenter = 0f;
     public bool isCloseSwimming;
 
     public bool actions = true;
-    [ShowField(nameof(actions)), ButtonField("CloseSwim", "CloseSwim"), SerializeField] private Void void6;
-    [ShowField(nameof(actions)), ButtonField("FarSwim", "FarSwim"), SerializeField] private Void void7;
     [ShowField(nameof(actions)), ButtonField("WaterSpear", "WaterSpear"), SerializeField] private Void void1;
     [ShowField(nameof(actions)), ButtonField("Swing", "Swing"), SerializeField] private Void void8;
-    [SerializeField, ShowField(nameof(actions))] public IEnemyAction waterSpear;
-    [SerializeField, ShowField(nameof(actions))] public IEnemyAction swing;
+    [SerializeField, ShowField(nameof(actions))] public YYF_WaterSpear waterSpear;
+    [SerializeField, ShowField(nameof(actions))] public YYF_Swing swing;
 
     // Update is called once per frame
 
@@ -65,100 +58,90 @@ public class YingYangFish_AI : IEnemyController
     {
         white_distanceToCenter = Vector2.Distance(whiteFish.position, center.position);
         black_distanceToCenter = Vector2.Distance(blackFish.position, center.position);
-
         float tempRotateSpeed = (minMaxDistanceTocenter.y / white_distanceToCenter) * idleRotateSpeed;
         if (tempRotateSpeed >= idleRotateSpeed * 2) { tempRotateSpeed = idleRotateSpeed * 2; }
-        if (black_sprint_startPoint)
-        {
-            blackAnim.SetFloat("swim_speed", sprintRotateSpeed / idleRotateSpeed);
-            blackFish.RotateAround(transform.position, Dir, sprintRotateSpeed * Time.deltaTime);
-            if (blackFish.eulerAngles.z <= 5 || blackFish.eulerAngles.z >= 355)// reached start point
-            {
-                black_sprint_startPoint = false;
-                nextAction.Act();
-            }
-        }
-        else if (black_sprint_back)
-        {
-            blackAnim.SetFloat("swim_speed", sprintRotateSpeed / idleRotateSpeed);
-            blackFish.RotateAround(transform.position, Dir, sprintRotateSpeed * Time.deltaTime);
-            float angle = Vector2.Angle(blackFish.right, whiteFish.right);
-            if (angle <= 180 && angle >= 175)// reached start point
-            {
-                black_sprint_back = false;
-                black_idling = true;
-            }
-        }
-        else if (black_idling) { blackFish.RotateAround(transform.position, Dir, tempRotateSpeed * Time.deltaTime); blackAnim.SetFloat("swim_speed", 1f); }
 
-        if (white_sprint_startPoint)
-        {
-            whiteFish.RotateAround(transform.position, Dir, sprintRotateSpeed * Time.deltaTime);
-            whiteAnim.SetFloat("swim_speed", sprintRotateSpeed / idleRotateSpeed);
-            if (whiteFish.eulerAngles.z <= 5 || whiteFish.eulerAngles.z >= 355)// reached start point
-            {
-                white_sprint_startPoint = false;
-                nextAction.Act();
-            }
-        }
-        else if (white_sprint_back)
-        {
-            whiteFish.RotateAround(transform.position, Dir, sprintRotateSpeed * Time.deltaTime);
-            whiteAnim.SetFloat("swim_speed", sprintRotateSpeed / idleRotateSpeed);
-            float angle = Vector2.Angle(blackFish.right, whiteFish.right);
-            if (angle <= 180 && angle >= 175)// reached start point
-            {
-                white_sprint_back = false;
-                white_idling = true;
-            }
-        }
-        else if (white_idling) { whiteFish.RotateAround(transform.position, Dir, tempRotateSpeed * Time.deltaTime); whiteAnim.SetFloat("swim_speed", 1f); }
-    }
+        if (black_idling) { blackFish.RotateAround(transform.position, Dir, tempRotateSpeed * Time.deltaTime); blackAnim.SetFloat("swim_speed", 1f); }
+        if (white_idling) { whiteFish.RotateAround(transform.position, Dir, tempRotateSpeed * Time.deltaTime); whiteAnim.SetFloat("swim_speed", 1f); }
 
-    public Quaternion CalculateWantedRotation(Vector3 _targetPos)
-    {
-        float angle = Mathf.Atan2(_targetPos.y - transform.position.y, _targetPos.x - transform.position.x) * Mathf.Rad2Deg;
-        Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
-        return targetRotation;
+        if (!isActing && actionList.Count > 0)
+        {
+            isActing = true;
+            StartCoroutine(Act());
+        }
     }
 
     public void WaterSpear()
     {
-        nextAction = waterSpear;
-        Transform closerFish = CheckCloserFish();
-        if (closerFish == blackFish)
-        {
-            black_idling = false;
-            black_sprint_startPoint = true;
-        }
-        else
-        {
-            white_idling = false;
-            white_sprint_startPoint = true;
-        }
+        InsertAction(waterSpear);
     }
 
     public void Swing()
     {
-        nextAction = swing;
-        if (!isCloseSwimming)
+        InsertAction(swing);
+    }
+
+    /// <summary>
+    /// designated fish runs faster to get to start point(top) for next action
+    /// </summary>
+    /// <param name="isBlack"></param>
+    public IEnumerator SprintStartPoint(bool isBlack)
+    {
+        if (isBlack)
         {
-            CloseSwim();
+            black_idling = false;
+            blackAnim.SetFloat("swim_speed", sprintRotateSpeed / idleRotateSpeed);
+            while (blackFish.eulerAngles.z > 5 && blackFish.eulerAngles.z < 355)
+            {
+                blackFish.RotateAround(transform.position, Dir, sprintRotateSpeed * Time.deltaTime);
+                yield return null;
+            }
         }
         else
         {
-            swing.Act();
+            white_idling = false;
+            whiteAnim.SetFloat("swim_speed", sprintRotateSpeed / idleRotateSpeed);
+            while (whiteFish.eulerAngles.z > 5 && whiteFish.eulerAngles.z < 355)// reached start point
+            {
+                whiteFish.RotateAround(transform.position, Dir, sprintRotateSpeed * Time.deltaTime);
+                yield return null;
+            }
         }
+
+        yield return null;
     }
 
-    public void CloseSwim()
+    /// <summary>
+    /// designated fish runs faster to get back to equal position
+    /// </summary>
+    /// <param name="isBlack"></param>
+    public IEnumerator SprintBackEqual(bool isBlack)
     {
-        StartCoroutine(IECloseSwim(true));
-    }
-
-    public void FarSwim()
-    {
-        StartCoroutine(IECloseSwim(false));
+        if (isBlack)
+        {
+            black_idling = false;
+            blackAnim.SetFloat("swim_speed", sprintRotateSpeed / idleRotateSpeed);
+            float angle = Vector2.Angle(blackFish.right, whiteFish.right);
+            while (angle > 180 || angle < 175)// reached start point
+            {
+                angle = Vector2.Angle(blackFish.right, whiteFish.right);
+                blackFish.RotateAround(transform.position, Dir, sprintRotateSpeed * Time.deltaTime);
+                yield return null;
+            }
+            black_idling = true;
+        }
+        else
+        {
+            white_idling = false;
+            whiteAnim.SetFloat("swim_speed", sprintRotateSpeed / idleRotateSpeed);
+            float angle = Vector2.Angle(blackFish.right, whiteFish.right);
+            while (angle > 180 || angle < 175)// reached start point
+            {
+                angle = Vector2.Angle(blackFish.right, whiteFish.right);
+                whiteFish.RotateAround(transform.position, Dir, sprintRotateSpeed * Time.deltaTime);
+            }
+            yield return null;
+        }
     }
 
     public IEnumerator IECloseSwim(bool close)
@@ -180,7 +163,6 @@ public class YingYangFish_AI : IEnemyController
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
-            nextAction.Act();
         }
         else
         {
@@ -277,5 +259,12 @@ public class YingYangFish_AI : IEnemyController
         }//death
 
         return 0;
+    }
+
+    public Quaternion CalculateWantedRotation(Vector3 _targetPos)
+    {
+        float angle = Mathf.Atan2(_targetPos.y - transform.position.y, _targetPos.x - transform.position.x) * Mathf.Rad2Deg;
+        Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        return targetRotation;
     }
 }

@@ -1564,10 +1564,6 @@ MonoBehaviour:
   whiteAnim: {fileID: 0}
   black_idling: 1
   white_idling: 1
-  black_sprint_startPoint: 0
-  white_sprint_startPoint: 0
-  black_sprint_back: 0
-  white_sprint_back: 0
   white_distanceToCenter: 0
   black_distanceToCenter: 0
   isCloseSwimming: 0
@@ -1749,6 +1745,13 @@ MonoBehaviour:
   action_time: 1
   isThisActing: 0
   swingEffect: {fileID: 1179238636}
+  swingAttack:
+    damage: 2
+    stun: 0.5
+    freezeTime: 0.5
+    rumble: {x: 0.5006739, y: 0.90134776}
+    rumbleDuration: 0.3
+    repel: 15
 --- !u!1001 &970573551
 PrefabInstance:
   m_ObjectHideFlags: 0

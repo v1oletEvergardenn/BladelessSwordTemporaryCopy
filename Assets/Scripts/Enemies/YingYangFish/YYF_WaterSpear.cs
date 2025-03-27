@@ -32,9 +32,13 @@ public class YYF_WaterSpear : IEnemyAction
 
     public override IEnumerator Act_coroutine()
     {
+        Transform closerFish = bossAI.CheckCloserFish();
+        if (closerFish == bossAI.blackFish) { bossAI.black_idling = false; }
+        else { bossAI.white_idling = false; }
+
+        yield return StartCoroutine(bossAI.SprintStartPoint(!bossAI.black_idling));
         bool isWhiteActing = false;
         shooted = false;
-
         int i = UnityEngine.Random.Range(0, 2);
         bool second = false;
         if (i == 0) { second = true; }
@@ -77,11 +81,12 @@ public class YYF_WaterSpear : IEnemyAction
         //launch waterspear
 
         yield return new WaitForSeconds(0.5f);
-        if (isWhiteActing) { bossAI.white_sprint_back = true; }
-        else { bossAI.black_sprint_back = true; }
         spear = null;
         secondSpear = null;
-        bossAI.nextAction = null;
+        yield return StartCoroutine(bossAI.SprintBackEqual(!bossAI.black_idling));
+        if (isWhiteActing) { bossAI.white_idling = true; }
+        else { bossAI.black_idling = true; }
+        bossAI.EndAction();
         yield return null;
     }
 

@@ -44,3 +44,24 @@ public abstract class IEnemyAction : MonoBehaviour
         yield return null;
     }
 }
+
+[System.Serializable]
+public struct MeleeAttack
+{
+    public int damage;
+    public float stun;
+    public float freezeTime;
+    [SerializeField, MinMaxSlider(0, 3f)] public Vector2 rumble;
+    public float rumbleDuration;
+    public float repel;
+
+    public MeleeAttack(int damage, float stun, float freezeTime, Vector2 rumble, float rumbleDuration, float repel)
+    {
+        this.damage = damage;
+        this.stun = stun;
+        this.freezeTime = freezeTime;
+        this.rumble = rumble;
+        this.rumbleDuration = rumbleDuration;
+        this.repel = repel;
+    }
+}

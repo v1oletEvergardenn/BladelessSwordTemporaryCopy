@@ -38,7 +38,10 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public LayerMask m_WhatIsGround;
     [HideInInspector] public Collider2D col;
 
-    [FoldoutGroup("basic logic", nameof(IN_COMBAT), nameof(canFlip), nameof(isFacingRight), nameof(AIActivate), nameof(inAct), nameof(speed), nameof(distanceThresholdForRangeAttack), nameof(nextAction))] public Void logicvoid;
+    [FoldoutGroup("basic logic", nameof(IN_COMBAT), nameof(canFlip), nameof(isFacingRight), nameof(AIActivate),
+        nameof(inAct), nameof(speed), nameof(distanceThresholdForRangeAttack), nameof(nextAction))]
+    public Void logicvoid;
+
     [SerializeField, HideInInspector] public bool IN_COMBAT = false;
     [SerializeField, HideInInspector] public bool canFlip = true;
     [SerializeField, HideInInspector] public bool isFacingRight;
@@ -50,6 +53,8 @@ public abstract class IEnemyController : IDamagable
     [HideInInspector] public Vector2 m_Velocity = Vector2.zero;
     [HideInInspector] public float distanceToPlayer;
     [SerializeField, HideInInspector] public IEnemyAction nextAction;
+    public List<IEnemyAction> actionList = new List<IEnemyAction> { };
+    [HideInInspector] public bool isActing = false;
 
     [Space(10)] public GameObject GFX;
     [Space(10)] public Void spacevoid1;
@@ -72,7 +77,33 @@ public abstract class IEnemyController : IDamagable
     }
 
     public virtual void NextAction(IEnemyAction previousAciton)
-    { }
+    {
+    }
+
+    public virtual void EndAction()
+    {
+        actionList.RemoveAt(0);
+    }
+
+    public virtual void InsertAction(IEnemyAction action, int index = 1)
+    {
+        if (actionList.Count == 0) { actionList.Add(action); }
+        else
+        {
+            actionList.Insert(index, action);
+        }
+    }
+
+    public virtual IEnumerator Act()
+    {
+        while (actionList.Count > 0)
+        {
+            IEnemyAction action = actionList[0];
+            yield return StartCoroutine(action.Act_coroutine());
+        }
+        isActing = false;
+        yield return null;
+    }
 
     public virtual void OutLine_Activate(int i)
     {
