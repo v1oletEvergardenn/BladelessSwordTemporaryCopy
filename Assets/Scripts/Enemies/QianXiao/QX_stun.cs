@@ -44,7 +44,7 @@ public class QX_stun : IEnemyAction
         yield return new WaitForSeconds(S1_anim_getUp_time + 0.5f);//end
         bossAI.canFlip = true;
         bossAI.isStunning = false;
-        bossAI.NextAction(this);
+        bossAI.NextAction();
         yield return null;
     }
 
@@ -58,7 +58,7 @@ public class QX_stun : IEnemyAction
         bossAI.canFlip = true;
         bossAI.SetFlyEngine(true);
         bossAI.isStunning = false;
-        bossAI.NextAction(this);
+        bossAI.NextAction();
         yield return null;
     }
 }

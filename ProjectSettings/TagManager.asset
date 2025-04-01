@@ -28,9 +28,9 @@ TagManager:
   - nonCollisionWithPlayer
   - Wall
   - Map
-  - 
-  - 
-  - 
+  - Reflections
+  - WaterPostProcessing
+  - Obstructors
   - 
   - 
   - 
@@ -50,6 +50,9 @@ TagManager:
   - name: Ground
     uniqueID: 2356912631
     locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
   - name: after_player
     uniqueID: 2326428117
     locked: 0
@@ -62,12 +65,15 @@ TagManager:
   - name: UI
     uniqueID: 2586878703
     locked: 0
-  - name: Default
-    uniqueID: 0
-    locked: 0
   - name: CameraSortingLayer
     uniqueID: 1178146749
     locked: 0
   - name: 1
     uniqueID: 4103203301
+    locked: 0
+  - name: water
+    uniqueID: 1329860743
+    locked: 0
+  - name: before_water
+    uniqueID: 253207009
     locked: 0

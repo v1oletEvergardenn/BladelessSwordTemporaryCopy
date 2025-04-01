@@ -78,7 +78,7 @@ public class WaterBossAI : IEnemyController
                 canMove = false;
                 target = GameManager.instance.Player.transform;
                 inAct = false;
-                NextAction(idle);
+                NextAction();
             }
         }
         else if (to_player < 6f)
@@ -166,16 +166,17 @@ public class WaterBossAI : IEnemyController
         transform.Rotate(new Vector3(0, 1, 0), 180);
     }
 
-    public override void NextAction(IEnemyAction previousAciton)
+    public override IEnemyAction NextAction()
     {
-        if (inAct) { return; }
+        IEnemyAction previousAciton = null;
+        if (inAct) { return null; }
         inAct = true;
         if (nextAction != null)
         {
             nextAction.Act();
             nextAction = null;
 
-            return;
+            return null;
         }
         if (distanceToPlayer <= distanceThresholdForRangeAttack)//melee attack
         {
@@ -187,6 +188,7 @@ public class WaterBossAI : IEnemyController
                 if (b) { melee_attack_short.Act(); }
                 else { melee_attack_long.Act(); }
             }
+            return null;
         }
         else//range attack
         {
@@ -200,6 +202,7 @@ public class WaterBossAI : IEnemyController
                 else if (i == 1) { range_attack_long.Act(); }
                 else { melee_attack_long.Act(); }
             }
+            return null;
         }
     }
 

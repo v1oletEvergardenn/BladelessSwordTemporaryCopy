@@ -27,7 +27,7 @@ public class WB_range_attack_short : IEnemyAction
                 acting_this = false;
                 bossAI.inAct = false;
                 bossAI.nextAction = bossAI.melee_attack_short;
-                bossAI.NextAction(this);
+                bossAI.NextAction();
             }
         }
     }
@@ -53,7 +53,7 @@ public class WB_range_attack_short : IEnemyAction
         if (bossAI.inAct)
         {
             bossAI.inAct = false;
-            bossAI.NextAction(this);
+            bossAI.NextAction();
         }
         yield return null;
     }

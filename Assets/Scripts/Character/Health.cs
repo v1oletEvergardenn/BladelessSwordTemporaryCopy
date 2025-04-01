@@ -163,12 +163,19 @@ public class Health : IDamagable
         return Damage(damageAmount, null, 0f);
     }
 
-    public int DamageFromMeleeAttack(bool facingRight, int damageAmount, float t = 0f)
+    public int DamageFromMeleeAttack(Transform attackPos, int damageAmount, float t = 0f)
     {
         if (this.transform.gameObject.layer == 14) { return 4; }
-        if (controller.m_FacingRight != facingRight)
+        if ((attackPos.position.x < transform.position.x && !controller.m_FacingRight)
+            || (attackPos.position.x > transform.position.x && controller.m_FacingRight))
         {
-            if (playerAttack.isDefending) { return 1; }
+            if (playerAttack.isDefending)
+            {
+                int i = Random.Range(1, 3);
+                SoundManager.PlaySound("defend_block" + i);
+                anim.Play("defend_hit");
+                return 1;
+            }
             if (playerAttack.isAttacking) { playerAttack.CounterMeleeAttack(); return 2; }
         }
         DamageDirectlyWithStun(damageAmount, t);

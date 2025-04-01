@@ -1,6 +1,7 @@
 using EditorAttributes;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.U2D;
@@ -39,7 +40,7 @@ public abstract class IEnemyController : IDamagable
     [HideInInspector] public Collider2D col;
 
     [FoldoutGroup("basic logic", nameof(IN_COMBAT), nameof(canFlip), nameof(isFacingRight), nameof(AIActivate),
-        nameof(inAct), nameof(speed), nameof(distanceThresholdForRangeAttack), nameof(nextAction))]
+        nameof(inAct), nameof(speed), nameof(distanceThresholdForRangeAttack), nameof(leftBoundary), nameof(rightBoundary))]
     public Void logicvoid;
 
     [SerializeField, HideInInspector] public bool IN_COMBAT = false;
@@ -48,12 +49,15 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public bool AIActivate = true;
     [SerializeField, HideInInspector] public bool inAct = false;
     [SerializeField, HideInInspector] public float speed = 20f;
+    [SerializeField, HideInInspector] public Transform leftBoundary;
+    [SerializeField, HideInInspector] public Transform rightBoundary;
     [SerializeField, HideInInspector] public float distanceThresholdForRangeAttack = 20f;
     [HideInInspector] public bool canMove = false;
     [HideInInspector] public Vector2 m_Velocity = Vector2.zero;
     [HideInInspector] public float distanceToPlayer;
     [SerializeField, HideInInspector] public IEnemyAction nextAction;
-    public List<IEnemyAction> actionList = new List<IEnemyAction> { };
+    [HideInInspector] public IEnemyAction initialAction;
+    public List<IEnemyAction> actionList = new List<IEnemyAction>();
     [HideInInspector] public bool isActing = false;
 
     [Space(10)] public GameObject GFX;
@@ -76,13 +80,18 @@ public abstract class IEnemyController : IDamagable
         outline_flash_anim_curve = GameManager.instance.outline_flash_anim_curve;
     }
 
-    public virtual void NextAction(IEnemyAction previousAciton)
+    public virtual IEnemyAction NextAction()
     {
+        if (actionList.Count < 2) { return null; }
+        return actionList[1];
     }
 
     public virtual void EndAction()
     {
-        actionList.RemoveAt(0);
+        if (actionList.Count > 0)
+        {
+            actionList.RemoveAt(0);
+        }
     }
 
     public virtual void InsertAction(IEnemyAction action, int index = 1)
@@ -100,6 +109,7 @@ public abstract class IEnemyController : IDamagable
         {
             IEnemyAction action = actionList[0];
             yield return StartCoroutine(action.Act_coroutine());
+            yield return null;
         }
         isActing = false;
         yield return null;
@@ -137,5 +147,33 @@ public abstract class IEnemyController : IDamagable
         {
             isGrounded = true;
         }
+    }
+
+    public bool Possibility(float i)
+    {
+        float chance = UnityEngine.Random.Range(0, 100);
+        if (chance <= i) { return true; }
+        else { return false; }
+    }
+
+    public virtual Transform GetCloseBoundary()
+    {
+        float mid = (leftBoundary.position.x + rightBoundary.position.x) / 2;
+        if (transform.position.x < mid) { return leftBoundary; }
+        else { return rightBoundary; }
+    }
+
+    public virtual Transform GetFarBoundary()
+    {
+        float mid = (leftBoundary.position.x + rightBoundary.position.x) / 2;
+        if (transform.position.x < mid) { return rightBoundary; }
+        else { return leftBoundary; }
+    }
+
+    public virtual Transform GetBoundaryFarOfPlayer()
+    {
+        float mid = (leftBoundary.position.x + rightBoundary.position.x) / 2;
+        if (player.position.x < mid) { return rightBoundary; }
+        else { return leftBoundary; }
     }
 }

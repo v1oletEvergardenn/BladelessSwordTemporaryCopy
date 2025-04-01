@@ -42,7 +42,7 @@ public class WB_melee_attack_short : IEnemyAction
         if (bossAI.inAct)
         {
             bossAI.inAct = false;
-            bossAI.NextAction(this);
+            bossAI.NextAction();
         }
         yield return null;
     }
@@ -62,7 +62,7 @@ public class WB_melee_attack_short : IEnemyAction
 
     public void Hit()
     {
-        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(bossAI.isFacingRight, damageAmount, stunDuration);
+        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(transform, damageAmount, stunDuration);
 
         if (dealtDamage == 2)//counter attack
         {

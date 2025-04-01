@@ -111,12 +111,12 @@ public class QX_add_land_attack : IEnemyAction
             bossAI.inAct = false;
             if (actionSender != null)
             {
-                bossAI.NextAction(actionSender);
+                bossAI.NextAction();
                 actionSender = null;
             }
             else
             {
-                bossAI.NextAction(this);
+                bossAI.NextAction();
             }
         }
     }
@@ -128,12 +128,12 @@ public class QX_add_land_attack : IEnemyAction
             bossAI.inAct = false;
             if (actionSender != null)
             {
-                bossAI.NextAction(actionSender);
+                bossAI.NextAction();
                 actionSender = null;
             }
             else
             {
-                bossAI.NextAction(this);
+                bossAI.NextAction();
             }
             yield return null;
         }
@@ -175,12 +175,12 @@ public class QX_add_land_attack : IEnemyAction
             bossAI.inAct = false;
             if (actionSender != null)
             {
-                bossAI.NextAction(actionSender);
+                bossAI.NextAction();
                 actionSender = null;
             }
             else
             {
-                bossAI.NextAction(this);
+                bossAI.NextAction();
             }
         }
     }
@@ -200,7 +200,7 @@ public class QX_add_land_attack : IEnemyAction
 
     public void DamageSlash()
     {
-        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(bossAI.isFacingRight, slash_Damage, slash_stunDuration);
+        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(transform, slash_Damage, slash_stunDuration);
 
         if (dealtDamage == 2)//counter attack
         {

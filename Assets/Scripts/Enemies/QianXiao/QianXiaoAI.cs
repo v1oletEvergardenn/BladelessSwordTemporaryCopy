@@ -92,56 +92,58 @@ public class QianXiaoAI : IEnemyController
         }
     }
 
-    public override void NextAction(IEnemyAction previousAciton = null)
+    public override IEnemyAction NextAction()
     {
-        if (DEAD) return;
+        IEnemyAction previousAciton = null;
+
+        if (DEAD) return null;
         inAct = true;
         canFlip = true;
         canMove = false;
-        if (nextAction != null) { nextAction.Act(); nextAction = null; return; }
+        if (nextAction != null) { nextAction.Act(); nextAction = null; return null; }
         if (previousAciton == slash)
         {
-            if (distanceToPlayer <= slashRange) { jump_attack.Act(); return; }
-            else { energy_swords.Act(); return; }
+            if (distanceToPlayer <= slashRange) { jump_attack.Act(); return null; }
+            else { energy_swords.Act(); return null; }
         }
         else if (previousAciton == jump_attack)
         {
-            if (playerEnergy.currentEnergy <= 6) { summon_projectile.Act(); return; }
+            if (playerEnergy.currentEnergy <= 6) { summon_projectile.Act(); return null; }
             else
             {
                 bool i = RandomIn_One_Hunderd(70);
-                if (i) { energy_swords.Act(); return; }
-                else { slash.Act(); return; }
+                if (i) { energy_swords.Act(); return null; }
+                else { slash.Act(); return null; }
             }
         }
         else if (previousAciton == energy_swords)
         {
-            if (playerEnergy.currentEnergy <= 6) { summon_projectile.Act(); return; }
+            if (playerEnergy.currentEnergy <= 6) { summon_projectile.Act(); return null; }
             else
             {
                 bool i = RandomIn_One_Hunderd(50);
-                if (i) { slash.Act(); return; }
-                else { throw_sword.Act(); return; }
+                if (i) { slash.Act(); return null; }
+                else { throw_sword.Act(); return null; }
             }
         }
         else if (previousAciton == summon_projectile)
         {
-            if (distanceToPlayer <= slashRange) { slash.Act(); return; }
-            else { energy_swords.Act(); return; }
+            if (distanceToPlayer <= slashRange) { slash.Act(); return null; }
+            else { energy_swords.Act(); return null; }
         }
         else if (previousAciton == throw_sword)
         {
-            if (distanceToPlayer <= slashRange) { slash.Act(); return; }
-            else { summon_projectile.Act(); return; }
+            if (distanceToPlayer <= slashRange) { slash.Act(); return null; }
+            else { summon_projectile.Act(); return null; }
         }
         else
         {
-            if (distanceToPlayer <= slashRange) { slash.Act(); return; }
+            if (distanceToPlayer <= slashRange) { slash.Act(); return null; }
             else
             {
                 bool i = RandomIn_One_Hunderd(70);
-                if (i) { energy_swords.Act(); return; }
-                else { throw_sword.Act(); return; }
+                if (i) { energy_swords.Act(); return null; }
+                else { throw_sword.Act(); return null; }
             }
         }
         //next action

@@ -86,7 +86,7 @@ public class QX_slash : IEnemyAction
         if (bossAI.inAct)
         {
             bossAI.inAct = false;
-            bossAI.NextAction(this);
+            bossAI.NextAction();
         }
         yield return null;
     }
@@ -100,14 +100,14 @@ public class QX_slash : IEnemyAction
         if (bossAI.inAct)
         {
             bossAI.inAct = false;
-            bossAI.NextAction(this);
+            bossAI.NextAction();
         }
         yield return null;
     }
 
     public void Damage()
     {
-        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(bossAI.isFacingRight, damage, stunDuration);
+        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(transform, damage, stunDuration);
 
         if (dealtDamage == 2)//counter attack
         {

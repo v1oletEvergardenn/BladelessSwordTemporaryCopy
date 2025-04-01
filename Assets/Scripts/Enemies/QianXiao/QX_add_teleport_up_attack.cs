@@ -37,12 +37,12 @@ public class QX_add_teleport_up_attack : IEnemyAction
         bossAI.inAct = false;
         if (actionSender != null)
         {
-            bossAI.NextAction(actionSender);
+            bossAI.NextAction();
             actionSender = null;
         }
         else
         {
-            bossAI.NextAction(this);
+            bossAI.NextAction();
         }
     }
 

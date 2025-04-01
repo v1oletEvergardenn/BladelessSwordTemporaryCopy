@@ -63,13 +63,15 @@ public abstract class IProjectile : MonoBehaviour
     /// <param name="_followTarget"> bool to set if keep follow target</param>
     /// <param name="_target"> give target of projectile, to set rotation or follow</param>
     /// <<param name="_isHostileToPlayer"> default: true</param>
-    public virtual void SetUp(Vector3 dir, GameObject _owner, float additionSpeed = 0f, bool _followTarget = false, IDamagable _target = null, bool _isHostileToPlayer = true, int _damage = 0, float _speed = -1)
+    public virtual void SetUp(Vector3 dir, GameObject _owner, float additionSpeed = 0f, bool _followTarget = false, IDamagable _target = null, bool _isHostileToPlayer = true, int _damage = 0, float _speed = -1, float gravityScale = 0)
     {
         ResetAttributes();
         owner = _owner;
         followTarget = _followTarget;
         target = _target;
         isHostileToPlayer = _isHostileToPlayer;
+        rb = GetComponent<Rigidbody2D>();
+        rb.gravityScale = gravityScale;
         if (_damage != 0)
         {
             damage = _damage;
@@ -80,6 +82,7 @@ public abstract class IProjectile : MonoBehaviour
         speed = originalSpeed + additionSpeed;
         isPerfect = false;
         lifeTimer = 0f;
+        rb.velocity = transform.right * speed / 10;
     }
 
     public virtual void PerfectCounterAttack()
@@ -108,6 +111,14 @@ public abstract class IProjectile : MonoBehaviour
         isHostileToPlayer = true;
     }
 
+    public virtual void FixedUpdate()
+    {
+        if (rb.gravityScale != 0)
+        {
+            transform.right = rb.velocity;
+        }//rotate the projectile direction following gravity
+    }
+
     public virtual void Update()
     {
         if (collided) { return; }
@@ -123,7 +134,6 @@ public abstract class IProjectile : MonoBehaviour
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, CalculateWantedRotation(target.GetHitPos()), rotationSpeed * Time.deltaTime);
             }//follow target
         }
-        rb.velocity = transform.right * speed / 10;
     }
 
     public virtual void OnTriggerEnter2D(Collider2D collision)
@@ -131,6 +141,7 @@ public abstract class IProjectile : MonoBehaviour
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
         if (target != null && collision.gameObject != owner && !collided)
         {
+            if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
             if (collision.gameObject == gameManager.Player && collision.gameObject.layer == 14) { return; }
             vfx.SpawnHitEffect(false, GetPivot());
             target.Damage(damage, transform, stunDuration);

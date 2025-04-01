@@ -48,7 +48,7 @@ public class QX_summon_projectiles : IEnemyAction
         if (bossAI.inAct)
         {
             bossAI.inAct = false;
-            bossAI.NextAction(this);
+            bossAI.NextAction();
         }
         yield return null;
     }

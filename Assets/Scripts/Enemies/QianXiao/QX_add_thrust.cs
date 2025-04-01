@@ -47,19 +47,19 @@ public class QX_add_thrust : IEnemyAction
         bossAI.inAct = false;
         if (actionSender != null)
         {
-            bossAI.NextAction(actionSender);
+            bossAI.NextAction();
             actionSender = null;
         }
         else
         {
-            bossAI.NextAction(this);
+            bossAI.NextAction();
         }
         yield return null;
     }
 
     public void hit()
     {
-        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(bossAI.isFacingRight, damageAmount, stunDuration);
+        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(transform, damageAmount, stunDuration);
 
         if (dealtDamage == 2)//counter attack
         {

@@ -23,6 +23,7 @@ public class GeneralProjectile : IProjectile
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
         if (target != null && collision.gameObject != owner && !collided)
         {
+            if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
             if (collision.gameObject == gameManager.Player)
             {
                 if (collision.gameObject.layer == 14) { return; }
@@ -36,16 +37,18 @@ public class GeneralProjectile : IProjectile
             vfx.SpawnEffectWithEnum(hitEffect, transform.position, isRed);
             //shakeManager.CameraShake(gameManager.impulseSource, cameraShakeForce.y);
             rb.velocity = Vector3.zero;
+            rb.gravityScale = 0;
             speed = 0f;
             collided = true;
             target.Damage(damage, transform, stunDuration);
             Invoke("Die", death_delay_time_after_hit);
         }
-        else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0)
+        else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)
         {
             anim.Play(anim_after_hit);
             vfx.SpawnEffectWithEnum(hitEffect, transform.position, isRed);
             rb.velocity = Vector3.zero;
+            rb.gravityScale = 0;
             speed = 0f;
             collided = true;
             Invoke("Die", death_delay_time_after_hit);

@@ -78,14 +78,14 @@ public class WB_melee_attack_long : IEnemyAction
         if (bossAI.inAct)
         {
             bossAI.inAct = false;
-            bossAI.NextAction(this);
+            bossAI.NextAction();
         }
         yield return null;
     }
 
     public void Hit()
     {
-        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(bossAI.isFacingRight, damageAmount, stunDuration);
+        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(transform, damageAmount, stunDuration);
 
         if (dealtDamage == 2)//counter attack
         {

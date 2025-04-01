@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using EditorAttributes;
+using System;
 
 public abstract class IEnemyAction : MonoBehaviour
 {
@@ -15,6 +16,10 @@ public abstract class IEnemyAction : MonoBehaviour
     public float action_time = 1f;
     public bool isThisActing = false;
 
+    [HideInInspector] public PlayerAttack playerAttack;
+    [HideInInspector] public Energy playerEnergy;
+    [HideInInspector] public CharacterController2D playerController;
+
     public virtual void Start()
     {
         playerIDamagable = Health.instance;
@@ -25,6 +30,10 @@ public abstract class IEnemyAction : MonoBehaviour
         anim = controller.anim;
         sprite = controller.sprite;
         pooler = ObjectPooler.instance;
+
+        playerAttack = PlayerAttack.instance;
+        playerEnergy = Energy.instance;
+        playerController = CharacterController2D.instance;
     }
 
     public virtual void Act()
@@ -43,6 +52,57 @@ public abstract class IEnemyAction : MonoBehaviour
     {
         yield return null;
     }
+
+    public virtual IEnumerator ApplyAttackInCircle(float duration, float range, Transform attackPos, MeleeAttack melee)
+    {
+        bool hitAlready = false;
+        float elapsedTime = 0f;
+        while (!hitAlready && elapsedTime <= duration)
+        {
+            float d = Vector3.Distance(playerIDamagable.GetHitPos(), attackPos.position);
+            if (d <= range) { Hit(melee, attackPos); hitAlready = true; }
+            elapsedTime += Time.deltaTime;
+        }
+        yield return null;
+    }
+
+    public virtual void Hit(MeleeAttack melee, Transform attackPos)
+    {
+        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
+        Vector3 direction = new Vector3((playerIDamagable.GetHitPos() - attackPos.position).x, 0, 0).normalized;
+
+        if (dealtDamage == 2)//counter attack
+        {
+            //counter attack effect
+            vfx.SpawnHitEffect(true, playerIDamagable.hitEffectPosition.position);
+            playerIDamagable.Repel(melee.repel, direction);
+            vfx.CameraShake(melee.cameraShake);
+            vfx.RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
+            vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
+        }
+        else if (dealtDamage == 1)//defend
+        {
+            vfx.SpawnHitEffect(true, playerIDamagable.GetHitPos());
+            playerIDamagable.Repel(melee.repel, direction);
+            vfx.CameraShake(melee.cameraShake);
+            vfx.RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
+            vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
+        }
+        else if (dealtDamage == 0)//dealtDamage
+        {
+            vfx.SpawnHitEffect(true, playerIDamagable.GetHitPos());
+            playerIDamagable.Repel(melee.repel * 2, direction);
+            vfx.RumblePulse(melee.rumble.x, melee.rumble.y, melee.rumbleDuration);
+            vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
+        }
+    }
+
+    public bool Possibility(float i)
+    {
+        float chance = UnityEngine.Random.Range(0, 100);
+        if (chance <= i) { return true; }
+        else { return false; }
+    }
 }
 
 [System.Serializable]
@@ -51,11 +111,12 @@ public struct MeleeAttack
     public int damage;
     public float stun;
     public float freezeTime;
+    public float repel;
     [SerializeField, MinMaxSlider(0, 3f)] public Vector2 rumble;
     public float rumbleDuration;
-    public float repel;
+    public float cameraShake;
 
-    public MeleeAttack(int damage, float stun, float freezeTime, Vector2 rumble, float rumbleDuration, float repel)
+    public MeleeAttack(int damage, float stun, float freezeTime, Vector2 rumble, float rumbleDuration, float repel, float cameraShake)
     {
         this.damage = damage;
         this.stun = stun;
@@ -63,5 +124,6 @@ public struct MeleeAttack
         this.rumble = rumble;
         this.rumbleDuration = rumbleDuration;
         this.repel = repel;
+        this.cameraShake = cameraShake;
     }
 }

@@ -66,7 +66,7 @@ public class QX_jump_attack : IEnemyAction
         if (bossAI.inAct)
         {
             bossAI.inAct = false;
-            bossAI.NextAction(this);
+            bossAI.NextAction();
         }
     }
 

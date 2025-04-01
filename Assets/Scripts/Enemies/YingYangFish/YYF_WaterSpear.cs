@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class YYF_WaterSpear : IEnemyAction
@@ -32,20 +33,25 @@ public class YYF_WaterSpear : IEnemyAction
 
     public override IEnumerator Act_coroutine()
     {
-        Transform closerFish = bossAI.CheckCloserFish();
-        if (closerFish == bossAI.blackFish) { bossAI.black_idling = false; }
-        else { bossAI.white_idling = false; }
-
-        yield return StartCoroutine(bossAI.SprintStartPoint(!bossAI.black_idling));
-        bool isWhiteActing = false;
+        yield return StartCoroutine(bossAI.SprintStartPoint());
         shooted = false;
-        int i = UnityEngine.Random.Range(0, 2);
+
+        int possiblity = 5;
+
+        if (bossAI.initialAction == bossAI.waterSpear)
+        {
+            if (playerEnergy.currentEnergy <= 5)
+            {
+                possiblity += 2;
+            }
+        }
+
+        int i = UnityEngine.Random.Range(0, 10);
         bool second = false;
-        if (i == 0) { second = true; }
+        if (i < possiblity) { second = true; }
 
         if (!bossAI.white_idling)
         {
-            isWhiteActing = true;
             bossAI.whiteAnim.Play("spear_pre");
             bossAI.whiteAnim.SetBool("secondSpear", second);
             spear = pooler.SpawnFromPool("water_Spear", waterSpearPos_white.position).GetComponent<Spear>();
@@ -83,9 +89,31 @@ public class YYF_WaterSpear : IEnemyAction
         yield return new WaitForSeconds(0.5f);
         spear = null;
         secondSpear = null;
-        yield return StartCoroutine(bossAI.SprintBackEqual(!bossAI.black_idling));
-        if (isWhiteActing) { bossAI.white_idling = true; }
-        else { bossAI.black_idling = true; }
+
+        if (bossAI.initialAction == bossAI.waterSpear)
+        {
+            if (bossAI.distanceToPlayer <= bossAI.swing.swingRange + 1)
+            {
+                yield return StartCoroutine(bossAI.SprintBackEqual());
+                bossAI.InsertAction(bossAI.swing);
+            }
+            else if (Possibility(60))
+            {
+                //moving
+                bossAI.InsertAction(bossAI.swing);
+                bossAI.InsertAction(bossAI.dive);
+            }
+        }
+        else
+        {
+            if (bossAI.actionList.Count < 2 || (bossAI.actionList[1] != this && bossAI.actionList[1] != bossAI.splash))
+            {
+                yield return StartCoroutine(bossAI.SprintBackEqual());
+            }
+            bossAI.white_idling = true;
+            bossAI.black_idling = true;
+        }
+
         bossAI.EndAction();
         yield return null;
     }

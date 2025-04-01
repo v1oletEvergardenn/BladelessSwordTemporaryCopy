@@ -2,16 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using EditorAttributes;
+using Unity.VisualScripting;
 
 public class YingYangFish_AI : IEnemyController
 {
     [FoldoutGroup("Attributes", nameof(center), nameof(blackFish), nameof(blackFishGFX),
         nameof(whiteFish), nameof(whiteFishGFX),
         nameof(idleRotateSpeed), nameof(sprintRotateSpeed), nameof(Dir),
-        nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter))
+        nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter), nameof(waterLevel))
         ]
     public Void void2;
 
+    [SerializeField, HideInInspector] public Transform YingYangFish;
     [SerializeField, HideInInspector] public Transform center;
     [SerializeField, HideInInspector] public Transform blackFish;
     [SerializeField, HideInInspector] public Transform whiteFish;
@@ -22,26 +24,33 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector] public Vector3 Dir;
     [SerializeField, HideInInspector] public float swimToCenterSpeed = 2f;
     [SerializeField, HideInInspector, MinMaxSlider(1f, 3f)] public Vector2 minMaxDistanceTocenter;
+    [SerializeField, HideInInspector] public Transform waterLevel;
     [HideInInspector] public SpriteRenderer blackSprite;
     [HideInInspector] public SpriteRenderer whiteSprite;
     [HideInInspector] public Animator blackAnim;
     [HideInInspector] public Animator whiteAnim;
 
     [FoldoutGroup("Debug", nameof(black_idling), nameof(white_idling), nameof(white_distanceToCenter),
-        nameof(black_distanceToCenter))]
+        nameof(black_distanceToCenter), nameof(movingTarget))]
     public Void void3;
 
     [SerializeField, HideInInspector] public bool black_idling = true;
     [SerializeField, HideInInspector] public bool white_idling = true;
     [SerializeField, HideInInspector] public float white_distanceToCenter = 0f;
     [SerializeField, HideInInspector] public float black_distanceToCenter = 0f;
+    [SerializeField, HideInInspector] public Transform movingTarget;
     public bool isCloseSwimming;
 
     public bool actions = true;
+    [ShowField(nameof(actions)), ButtonField("StartAction", "StartAction"), SerializeField] private Void void11;
     [ShowField(nameof(actions)), ButtonField("WaterSpear", "WaterSpear"), SerializeField] private Void void1;
     [ShowField(nameof(actions)), ButtonField("Swing", "Swing"), SerializeField] private Void void8;
+    [ShowField(nameof(actions)), ButtonField("Splash", "Splash"), SerializeField] private Void void9;
+    [ShowField(nameof(actions)), ButtonField("Dive", "Dive"), SerializeField] private Void void10;
     [SerializeField, ShowField(nameof(actions))] public YYF_WaterSpear waterSpear;
     [SerializeField, ShowField(nameof(actions))] public YYF_Swing swing;
+    [SerializeField, ShowField(nameof(actions))] public YYF_splash splash;
+    [SerializeField, ShowField(nameof(actions))] public YYF_Dive dive;
 
     // Update is called once per frame
 
@@ -52,10 +61,12 @@ public class YingYangFish_AI : IEnemyController
         whiteSprite = whiteFish.GetComponent<SpriteRenderer>();
         blackAnim = blackFishGFX.GetComponent<Animator>();
         whiteAnim = whiteFishGFX.GetComponent<Animator>();
+        movingTarget = player;
     }
 
     private void Update()
     {
+        distanceToPlayer = Mathf.Abs(transform.position.x - player.position.x);
         white_distanceToCenter = Vector2.Distance(whiteFish.position, center.position);
         black_distanceToCenter = Vector2.Distance(blackFish.position, center.position);
         float tempRotateSpeed = (minMaxDistanceTocenter.y / white_distanceToCenter) * idleRotateSpeed;
@@ -81,13 +92,70 @@ public class YingYangFish_AI : IEnemyController
         InsertAction(swing);
     }
 
+    public void Splash()
+    {
+        InsertAction(splash);
+    }
+
+    public void Dive()
+    {
+        InsertAction(dive);
+    }
+
+    public void StartAction()
+    {
+        List<IEnemyAction> possibleActions = new List<IEnemyAction>();
+        if (playerEnergy.currentEnergy <= 5)
+        {
+            possibleActions.Add(waterSpear);
+        }
+        if (Mathf.Abs(player.position.x - transform.position.x) >= swing.swingRange + 1)
+        {
+            float i = Random.Range(0, 10);
+            if (i < 3) { possibleActions.Add(waterSpear); }
+            else if (i < 6) { possibleActions.Add(splash); }
+            else if (i < 10) { possibleActions.Add(dive); }//moving
+        }
+        else
+        {
+            possibleActions.Add(swing);
+        }
+
+        if (!playerController.isGrounded)
+        {
+            possibleActions.Add(splash);
+        }
+
+        int index = Random.Range(0, possibleActions.Count);
+        initialAction = possibleActions[index];
+
+        actionList.Add(initialAction);
+        if (initialAction == dive)
+        {
+            if ((float)playerEnergy.currentEnergy / (float)playerEnergy.maxEnergy <= 0.6f || playerAttack.currentHS_point < 2)
+            {
+                InsertAction(swing);
+            }
+            else
+            {
+                movingTarget = GetBoundaryFarOfPlayer();
+                if (Possibility(50)) { InsertAction(waterSpear); }
+                else { InsertAction(splash); InsertAction(waterSpear); }
+            }
+        }
+    }
+
     /// <summary>
     /// designated fish runs faster to get to start point(top) for next action
     /// </summary>
     /// <param name="isBlack"></param>
-    public IEnumerator SprintStartPoint(bool isBlack)
+    public IEnumerator SprintStartPoint()
     {
-        if (isBlack)
+        black_idling = true;
+        white_idling = true;
+        Transform closerFish = CheckCloserFish();
+
+        if (closerFish == blackFish)
         {
             black_idling = false;
             blackAnim.SetFloat("swim_speed", sprintRotateSpeed / idleRotateSpeed);
@@ -115,9 +183,13 @@ public class YingYangFish_AI : IEnemyController
     /// designated fish runs faster to get back to equal position
     /// </summary>
     /// <param name="isBlack"></param>
-    public IEnumerator SprintBackEqual(bool isBlack)
+    public IEnumerator SprintBackEqual()
     {
-        if (isBlack)
+        black_idling = true;
+        white_idling = true;
+        float closerFish = Vector2.SignedAngle(blackFish.right, whiteFish.right);
+
+        if (closerFish > 0 && closerFish <= 180)
         {
             black_idling = false;
             blackAnim.SetFloat("swim_speed", sprintRotateSpeed / idleRotateSpeed);
@@ -139,13 +211,18 @@ public class YingYangFish_AI : IEnemyController
             {
                 angle = Vector2.Angle(blackFish.right, whiteFish.right);
                 whiteFish.RotateAround(transform.position, Dir, sprintRotateSpeed * Time.deltaTime);
+                yield return null;
             }
-            yield return null;
+            white_idling = true;
         }
     }
 
+    private bool isIEcloseSwimming;
+
     public IEnumerator IECloseSwim(bool close)
     {
+        if (isIEcloseSwimming) { yield return null; }
+        isIEcloseSwimming = true;
         if (close)
         {
             float elapsedTime = 0f;
@@ -188,6 +265,7 @@ public class YingYangFish_AI : IEnemyController
             }
             idleRotateSpeed = originalRotateSpeed;
         }
+        isIEcloseSwimming = false;
     }
 
     /// <summary>
@@ -196,22 +274,8 @@ public class YingYangFish_AI : IEnemyController
     /// <returns>the one closer to the start point </returns>
     public Transform CheckCloserFish()
     {
-        Transform temp = null;
-
-        //if one of them is busy, return another one
-        if (black_idling != white_idling)
-        {
-            if (black_idling == false) { return whiteFish; }
-            else if (white_idling == false) { return blackFish; }
-        }
-        else// check position.x
-        {
-            if (black_idling == false) { return null; }
-            else if (blackFish.position.x < whiteFish.position.x) { return blackFish; }
-            else { return whiteFish; }
-        }
-
-        return temp;
+        if (blackFish.eulerAngles.z < whiteFish.eulerAngles.z) { return blackFish; }
+        else { return whiteFish; }
     }
 
     public override int Damage(int damageAmount, Transform sender, float stunDuration = 0)

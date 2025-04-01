@@ -46,12 +46,12 @@ public class QX_add_repel : IEnemyAction
         yield return new WaitForSeconds(0.2f);
         if (actionSender != null)
         {
-            bossAI.NextAction(actionSender);
+            bossAI.NextAction();
             actionSender = null;
         }
         else
         {
-            bossAI.NextAction(this);
+            bossAI.NextAction();
         }
 
         yield return null;
@@ -70,12 +70,12 @@ public class QX_add_repel : IEnemyAction
         yield return new WaitForSeconds(0.2f);
         if (actionSender != null)
         {
-            bossAI.NextAction(actionSender);
+            bossAI.NextAction();
             actionSender = null;
         }
         else
         {
-            bossAI.NextAction(this);
+            bossAI.NextAction();
         }
 
         yield return null;
@@ -86,7 +86,7 @@ public class QX_add_repel : IEnemyAction
         float d = Vector3.Distance(playerIDamagable.GetHitPos(), repelPosition.position);
         if (d <= repelRange)
         {
-            int dealtDamage = playerIDamagable.DamageFromMeleeAttack(bossAI.isFacingRight, damageAmount, stunDuration);
+            int dealtDamage = playerIDamagable.DamageFromMeleeAttack(transform, damageAmount, stunDuration);
 
             if (dealtDamage == 2)//counter attack
             {

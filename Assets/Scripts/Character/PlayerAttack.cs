@@ -154,6 +154,10 @@ public class PlayerAttack : MonoBehaviour
         {
             CheckCounterAttack();
         }
+        else
+        {
+            isAttacking = false;
+        }
     }
 
     #region Attack
@@ -168,7 +172,6 @@ public class PlayerAttack : MonoBehaviour
             isInAttackAnim = false;
             isInCombat = true;
             isAttacking = true;
-
             attackTimer = 0f;
             attackAnimTimer = 0f;
             counterAttackCheckTimer = 0f;
@@ -177,7 +180,6 @@ public class PlayerAttack : MonoBehaviour
                 if (!energy.AttackConsume()) { return; }
             }
             isHSattack = false;
-            RetreiveBoomerang();
 
             attackIndex++;
             if (attackIndex > 2) { attackIndex = 1; }
@@ -287,7 +289,6 @@ public class PlayerAttack : MonoBehaviour
         isAttacking = false;
         canDefend = true;
         attackTimer = 3f;
-        print("here");
     }
 
     public void EndAttack()

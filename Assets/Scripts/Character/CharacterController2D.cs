@@ -452,10 +452,7 @@ public class CharacterController2D : MonoBehaviour
     {
         if (!canFlip) { return; }
         if (playerAttack.isInAttackAnim) { return; }
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_back"))
-        {
-            return;
-        }
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_back")) { return; }
         //flip player
         m_FacingRight = !m_FacingRight;
         transform.Rotate(new Vector3(0, 1, 0), 180);
