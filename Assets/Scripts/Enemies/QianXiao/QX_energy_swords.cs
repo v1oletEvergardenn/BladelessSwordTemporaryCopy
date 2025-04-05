@@ -27,11 +27,11 @@ public class QX_energy_swords : IEnemyAction
         pooler = ObjectPooler.instance;
     }
 
-    public override void Act()
-    {
-        if (!bossAI.isStage2) { StartCoroutine(S1_Act()); }
-        else { StartCoroutine(S2_Act()); }
-    }
+    //public override void Act()
+    //{
+    //    if (!bossAI.isStage2) { StartCoroutine(S1_Act()); }
+    //    else { StartCoroutine(S2_Act()); }
+    //}
 
     public override void CancelAct()
     {
@@ -43,25 +43,25 @@ public class QX_energy_swords : IEnemyAction
         projs.Clear();
     }
 
-    public IEnumerator S1_Act()
-    {
-        anim.Play("S1_energy_swords");
-        StartCoroutine(shootSword_White(shoot_pos1.position));
-        yield return new WaitForSeconds(0.5f);
-        StartCoroutine(shootSword_White(shoot_pos2.position));
-        yield return new WaitForSeconds(0.25f);
-        StartCoroutine(shootSword_White(shoot_pos3.position));
-        yield return new WaitForSeconds(0.5f);
-        StartCoroutine(shootSword_Red(shoot_pos4.position));
-        yield return new WaitForSeconds(action_time);
-        anim.Play("S1_Idle");
-        if (bossAI.inAct)
-        {
-            bossAI.inAct = false;
-            bossAI.NextAction();
-        }
-        yield return null;
-    }
+    //public IEnumerator S1_Act()
+    //{
+    //    anim.Play("S1_energy_swords");
+    //    StartCoroutine(shootSword_White(shoot_pos1.position));
+    //    yield return new WaitForSeconds(0.5f);
+    //    StartCoroutine(shootSword_White(shoot_pos2.position));
+    //    yield return new WaitForSeconds(0.25f);
+    //    StartCoroutine(shootSword_White(shoot_pos3.position));
+    //    yield return new WaitForSeconds(0.5f);
+    //    StartCoroutine(shootSword_Red(shoot_pos4.position));
+    //    yield return new WaitForSeconds(action_time);
+    //    anim.Play("S1_Idle");
+    //    if (bossAI.inAct)
+    //    {
+    //        bossAI.inAct = false;
+    //        bossAI.NextAction();
+    //    }
+    //    yield return null;
+    //}
 
     public IEnumerator S2_Act()
     {
@@ -79,9 +79,7 @@ public class QX_energy_swords : IEnemyAction
         StartCoroutine(shootSword_Red(shoot_pos1.position));
         yield return new WaitForSeconds(0.25f);
         StartCoroutine(shootSword_Red(shoot_pos4.position));
-        yield return new WaitForSeconds(action_time);
         anim.Play("S2_Idle");
-        isThisActing = false;
         bossAI.CancelAllActions();
         bossAI.add_land_attack.Act();
         bossAI.add_land_attack.GetComponent<QX_add_land_attack>().actionSender = this;

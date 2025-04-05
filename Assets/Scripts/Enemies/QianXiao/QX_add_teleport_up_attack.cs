@@ -21,30 +21,30 @@ public class QX_add_teleport_up_attack : IEnemyAction
         StartCoroutine(Act_coroutine());
     }
 
-    public override IEnumerator Act_coroutine()
-    {
-        isThisActing = true;
-        bossAI.canFlip = false;
-        if (bossAI.isStage2) { anim.Play("S2_add_teleport_attack"); }
-        else { anim.Play("S1_add_teleport_attack"); }
-        yield return new WaitForSeconds(0.25f);
-        transform.position = new Vector3(playerIDamagable.GetHitPos().x + 0.1f, bossAI.leftCorner.position.y);
-        yield return new WaitForSeconds(0.5f);
-        vfx.SpawnEffectWithEnum(Hit_Effect.slash, transform.position + new Vector3(0, 0.5f, 0f));
-        yield return new WaitForSeconds(action_time);
-        isThisActing = false;
-        bossAI.canFlip = true;
-        bossAI.inAct = false;
-        if (actionSender != null)
-        {
-            bossAI.NextAction();
-            actionSender = null;
-        }
-        else
-        {
-            bossAI.NextAction();
-        }
-    }
+    //public override IEnumerator Act_coroutine()
+    //{
+    //    isThisActing = true;
+    //    bossAI.canFlip = false;
+    //    if (bossAI.isStage2) { anim.Play("S2_add_teleport_attack"); }
+    //    else { anim.Play("S1_add_teleport_attack"); }
+    //    yield return new WaitForSeconds(0.25f);
+    //    transform.position = new Vector3(playerIDamagable.GetHitPos().x + 0.1f, bossAI.leftCorner.position.y);
+    //    yield return new WaitForSeconds(0.5f);
+    //    vfx.SpawnEffectWithEnum(Hit_Effect.slash, transform.position + new Vector3(0, 0.5f, 0f));
+    //    yield return new WaitForSeconds(action_time);
+    //    isThisActing = false;
+    //    bossAI.canFlip = true;
+    //    bossAI.inAct = false;
+    //    if (actionSender != null)
+    //    {
+    //        bossAI.NextAction();
+    //        actionSender = null;
+    //    }
+    //    else
+    //    {
+    //        bossAI.NextAction();
+    //    }
+    //}
 
     public void ShootBullet()
     {

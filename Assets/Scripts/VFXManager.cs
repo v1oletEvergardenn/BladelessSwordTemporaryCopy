@@ -30,16 +30,31 @@ public class VFXManager : MonoBehaviour
         objectPooler = ObjectPooler.instance;
     }
 
-    public void RumblePulse(float lowFrequency, float hightFrequency, float duration)
+    public void RumblePulse(float lowFrequency, float highFrequency, float duration)
     {
         gamePad = Gamepad.current;
         if (gamePad != null)
         {
             //start rumble
-            gamePad.SetMotorSpeeds(lowFrequency, hightFrequency);
+            gamePad.SetMotorSpeeds(lowFrequency, highFrequency);
             //stop rumble
             StartCoroutine(StopRumble(duration, gamePad));
         }
+    }
+
+    public void Rumble(float lowFrequency, float highFrequency)
+    {
+        gamePad = Gamepad.current;
+        if (gamePad != null)
+        {
+            //start rumble
+            gamePad.SetMotorSpeeds(lowFrequency, highFrequency);
+        }
+    }
+
+    public void StopRumble()
+    {
+        Gamepad.current.SetMotorSpeeds(0, 0);
     }
 
     private IEnumerator StopRumble(float duration, Gamepad pad)

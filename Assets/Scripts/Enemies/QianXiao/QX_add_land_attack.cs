@@ -15,13 +15,15 @@ public class QX_add_land_attack : IEnemyAction
     public IEnemyAction actionSender;
     public float rotationSpeed = 100f;
     public float dashingSpeed = 30f;
-    private bool dashing;
-    private QX_AnimTrigger animTrigger;
-    private Vector3 desiredRotation;
-    private bool isGrounded = false;
-    private bool groundChecked = false;
-    private Vector3 dashingDir;
+
+    //private bool dashing;
+    //private QX_AnimTrigger animTrigger;
+    //private Vector3 desiredRotation;
+    //private bool isGrounded = false;
+    //private bool groundChecked = false;
+    //private Vector3 dashingDir;
     public Transform slashEffectPos;
+
     public float attackDetectRange = 20f;
     public int slash_Damage = 10;
     public int land_Damage = 4;
@@ -44,63 +46,63 @@ public class QX_add_land_attack : IEnemyAction
     {
         base.Start();
         bossAI = GetComponent<QianXiaoAI>();
-        animTrigger = bossAI.GFX.GetComponent<QX_AnimTrigger>();
+        //animTrigger = bossAI.GFX.GetComponent<QX_AnimTrigger>();
     }
 
-    public void Update()
-    {
-        if (isThisActing && bossAI.isStage2)
-        {
-            if (dashing)
-            {
-                transform.position += dashingDir * dashingSpeed * Time.deltaTime;
-                float d = Vector3.Distance(playerIDamagable.GetHitPos(), transform.position);
-                if (d <= attackDetectRange)
-                {
-                    anim.Play("dash_attack_attack");
-                }
-                Vector3 v = bossAI.GFX.transform.localPosition;
-                if (v.y < 0)
-                {
-                    bossAI.GFX.transform.localPosition += new Vector3(0, 8f * Time.deltaTime, 0);
-                }
-                else
-                {
-                    bossAI.GFX.transform.localPosition = new Vector3(0, 0, 0);
-                }
-            }
-            if (isGrounded && !groundChecked)
-            {
-                anim.Play("dash_attack_land");
-                animTrigger.Outline_MeleeActivate(0);
-                //anim.Play("S2_land_on_ground");
-                groundChecked = true;
-                dashing = false;
-                bossAI.rb.gravityScale = 60f;
-                transform.rotation = Quaternion.identity;
-                if (bossAI.GFX.transform.localScale.x == -1)
-                {
-                    bossAI.GFX.transform.localScale = new Vector3(1, 1, 1);
-                    bossAI.isFacingRight = !bossAI.isFacingRight;
-                }
+    //public void Update()
+    //{
+    //    if (isThisActing && bossAI.isStage2)
+    //    {
+    //        if (dashing)
+    //        {
+    //            transform.position += dashingDir * dashingSpeed * Time.deltaTime;
+    //            float d = Vector3.Distance(playerIDamagable.GetHitPos(), transform.position);
+    //            if (d <= attackDetectRange)
+    //            {
+    //                anim.Play("dash_attack_attack");
+    //            }
+    //            Vector3 v = bossAI.GFX.transform.localPosition;
+    //            if (v.y < 0)
+    //            {
+    //                bossAI.GFX.transform.localPosition += new Vector3(0, 8f * Time.deltaTime, 0);
+    //            }
+    //            else
+    //            {
+    //                bossAI.GFX.transform.localPosition = new Vector3(0, 0, 0);
+    //            }
+    //        }
+    //        if (isGrounded && !groundChecked)
+    //        {
+    //            anim.Play("dash_attack_land");
+    //            animTrigger.Outline_MeleeActivate(0);
+    //            //anim.Play("S2_land_on_ground");
+    //            groundChecked = true;
+    //            dashing = false;
+    //            bossAI.rb.gravityScale = 60f;
+    //            transform.rotation = Quaternion.identity;
+    //            if (bossAI.GFX.transform.localScale.x == -1)
+    //            {
+    //                bossAI.GFX.transform.localScale = new Vector3(1, 1, 1);
+    //                bossAI.isFacingRight = !bossAI.isFacingRight;
+    //            }
 
-                bossAI.canFlip = true;
-                //land attack
-            }
-        }
-    }
+    //            bossAI.canFlip = true;
+    //            //land attack
+    //        }
+    //    }
+    //}
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.layer == 7)
-        {
-            isGrounded = true;
-        }
-        if (collision.gameObject.layer == 18)
-        {
-            dashing = false;
-            isGrounded = true;
-        }
+        //if (collision.gameObject.layer == 7)
+        //{
+        //    isGrounded = true;
+        //}
+        //if (collision.gameObject.layer == 18)
+        //{
+        //    dashing = false;
+        //    isGrounded = true;
+        //}
     }
 
     public override void Act()
@@ -121,69 +123,69 @@ public class QX_add_land_attack : IEnemyAction
         }
     }
 
-    public override IEnumerator Act_coroutine()
-    {
-        if (bossAI.isGrounded)
-        {
-            bossAI.inAct = false;
-            if (actionSender != null)
-            {
-                bossAI.NextAction();
-                actionSender = null;
-            }
-            else
-            {
-                bossAI.NextAction();
-            }
-            yield return null;
-        }
-        else
-        {
-            isThisActing = true;
-            //turning to player
-            groundChecked = false;
-            isGrounded = false;
-            anim.Play("dash_attack_prepare");
-            animTrigger.Outline_MeleeActivate(1);
-            yield return new WaitForSeconds(2f);
-            vfx.SpawnSlashEffect(transform.position);
-            animTrigger.Outline_Flash();
-            yield return new WaitForSeconds(0.3f);
-            bossAI.canFlip = false;
-            Vector3 dir = player.transform.position - transform.position;
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90;
-            Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
-            if (angle >= -180f)
-            {
-                bossAI.GFX.transform.localScale = new Vector3(1, 1, 1);
-                bossAI.isFacingRight = true;
-            }
-            else
-            {
-                bossAI.GFX.transform.localScale = new Vector3(-1, 1, 1);
-                bossAI.isFacingRight = false;
-            }
+    //public override IEnumerator Act_coroutine()
+    //{
+    //    if (bossAI.isGrounded)
+    //    {
+    //        bossAI.inAct = false;
+    //        if (actionSender != null)
+    //        {
+    //            bossAI.NextAction();
+    //            actionSender = null;
+    //        }
+    //        else
+    //        {
+    //            bossAI.NextAction();
+    //        }
+    //        yield return null;
+    //    }
+    //    else
+    //    {
+    //        isThisActing = true;
+    //        //turning to player
+    //        groundChecked = false;
+    //        isGrounded = false;
+    //        anim.Play("dash_attack_prepare");
+    //        animTrigger.Outline_MeleeActivate(1);
+    //        yield return new WaitForSeconds(2f);
+    //        vfx.SpawnSlashEffect(transform.position);
+    //        animTrigger.Outline_Flash();
+    //        yield return new WaitForSeconds(0.3f);
+    //        bossAI.canFlip = false;
+    //        Vector3 dir = player.transform.position - transform.position;
+    //        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90;
+    //        Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
+    //        if (angle >= -180f)
+    //        {
+    //            bossAI.GFX.transform.localScale = new Vector3(1, 1, 1);
+    //            bossAI.isFacingRight = true;
+    //        }
+    //        else
+    //        {
+    //            bossAI.GFX.transform.localScale = new Vector3(-1, 1, 1);
+    //            bossAI.isFacingRight = false;
+    //        }
 
-            transform.rotation = q;
-            vfx.SpawnDashEffect(transform.position, transform.rotation);
-            anim.Play("dash_attack_dashing");
-            dashing = true;
-            dashingDir = (player.transform.position - transform.position).normalized;
-            yield return new WaitForSeconds(action_time);
-            isThisActing = false;
-            bossAI.SetFlyEngine(true);
-            bossAI.inAct = false;
-            if (actionSender != null)
-            {
-                bossAI.NextAction();
-                actionSender = null;
-            }
-            else
-            {
-                bossAI.NextAction();
-            }
-        }
-    }
+    //        transform.rotation = q;
+    //        vfx.SpawnDashEffect(transform.position, transform.rotation);
+    //        anim.Play("dash_attack_dashing");
+    //        dashing = true;
+    //        dashingDir = (player.transform.position - transform.position).normalized;
+    //        yield return new WaitForSeconds(action_time);
+    //        isThisActing = false;
+    //        bossAI.SetFlyEngine(true);
+    //        bossAI.inAct = false;
+    //        if (actionSender != null)
+    //        {
+    //            bossAI.NextAction();
+    //            actionSender = null;
+    //        }
+    //        else
+    //        {
+    //            bossAI.NextAction();
+    //        }
+    //    }
+    //}
 
     public Quaternion CalculateWantedRotation(Vector3 _targetPos)
     {

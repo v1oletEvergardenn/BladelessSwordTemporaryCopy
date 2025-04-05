@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using EditorAttributes;
 using Unity.VisualScripting;
+using JetBrains.Annotations;
 
 public class YingYangFish_AI : IEnemyController
 {
+    #region ATTRIBUTES
+
     [FoldoutGroup("Attributes", nameof(center), nameof(blackFish), nameof(blackFishGFX),
         nameof(whiteFish), nameof(whiteFishGFX),
         nameof(idleRotateSpeed), nameof(sprintRotateSpeed), nameof(Dir),
-        nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter), nameof(waterLevel))
+        nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter), nameof(waterLevel),
+        nameof(EventInteract))
         ]
     public Void void2;
 
@@ -25,13 +29,19 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector] public float swimToCenterSpeed = 2f;
     [SerializeField, HideInInspector, MinMaxSlider(1f, 3f)] public Vector2 minMaxDistanceTocenter;
     [SerializeField, HideInInspector] public Transform waterLevel;
+    [SerializeField, HideInInspector] public GameObject EventInteract;
+
     [HideInInspector] public SpriteRenderer blackSprite;
     [HideInInspector] public SpriteRenderer whiteSprite;
     [HideInInspector] public Animator blackAnim;
     [HideInInspector] public Animator whiteAnim;
 
+    #endregion ATTRIBUTES
+
+    #region DEBUG
+
     [FoldoutGroup("Debug", nameof(black_idling), nameof(white_idling), nameof(white_distanceToCenter),
-        nameof(black_distanceToCenter), nameof(movingTarget))]
+        nameof(black_distanceToCenter), nameof(movingTarget), nameof(isCloseSwimming), nameof(secondPhase))]
     public Void void3;
 
     [SerializeField, HideInInspector] public bool black_idling = true;
@@ -39,18 +49,26 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector] public float white_distanceToCenter = 0f;
     [SerializeField, HideInInspector] public float black_distanceToCenter = 0f;
     [SerializeField, HideInInspector] public Transform movingTarget;
-    public bool isCloseSwimming;
+    [SerializeField, HideInInspector] public bool isCloseSwimming;
+    [SerializeField, HideInInspector] public bool secondPhase;
 
-    public bool actions = true;
-    [ShowField(nameof(actions)), ButtonField("StartAction", "StartAction"), SerializeField] private Void void11;
-    [ShowField(nameof(actions)), ButtonField("WaterSpear", "WaterSpear"), SerializeField] private Void void1;
-    [ShowField(nameof(actions)), ButtonField("Swing", "Swing"), SerializeField] private Void void8;
-    [ShowField(nameof(actions)), ButtonField("Splash", "Splash"), SerializeField] private Void void9;
-    [ShowField(nameof(actions)), ButtonField("Dive", "Dive"), SerializeField] private Void void10;
-    [SerializeField, ShowField(nameof(actions))] public YYF_WaterSpear waterSpear;
-    [SerializeField, ShowField(nameof(actions))] public YYF_Swing swing;
-    [SerializeField, ShowField(nameof(actions))] public YYF_splash splash;
-    [SerializeField, ShowField(nameof(actions))] public YYF_Dive dive;
+    #endregion DEBUG
+
+    #region ACTIONS
+
+    public bool Actions;
+
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("StartAction", "StartAction")] public Transform void11;
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("WaterSpear", "WaterSpear")] public Void void1;
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("Swing", "Swing")] public Void void8;
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash", "Splash")] public Void void9;
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("Dive", "Dive")] public Void void10;
+    [ShowField(nameof(Actions))][SerializeField] public YYF_WaterSpear waterSpear;
+    [ShowField(nameof(Actions))][SerializeField] public YYF_Swing swing;
+    [ShowField(nameof(Actions))][SerializeField] public YYF_splash splash;
+    [ShowField(nameof(Actions))][SerializeField] public YYF_Dive dive;
+
+    #endregion ACTIONS
 
     // Update is called once per frame
 
@@ -62,6 +80,8 @@ public class YingYangFish_AI : IEnemyController
         blackAnim = blackFishGFX.GetComponent<Animator>();
         whiteAnim = whiteFishGFX.GetComponent<Animator>();
         movingTarget = player;
+        EventInteract.SetActive(true);
+        HealthUI.SetActive(false);
     }
 
     private void Update()
@@ -102,8 +122,33 @@ public class YingYangFish_AI : IEnemyController
         InsertAction(dive);
     }
 
-    public void StartAction()
+    public IEnumerator Pre_SecondPhase()
     {
+        if (!secondPhase)
+        {
+            actionList.Clear();
+            CancelAllAction();
+            co_IEcloseSwim = StartCoroutine(IECloseSwim(true));
+            yield return StartCoroutine(ChangeYPos(false));
+            idleRotateSpeed /= 3;
+            secondPhase = true;
+            EventInteract.SetActive(true);
+        }
+    }
+
+    public override IEnumerator IE_Activate()
+    {
+        IN_COMBAT = true;
+        //play start animation
+        yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
+        HealthUI.SetActive(true);
+        StartAction();
+        //start action loops
+    }
+
+    public override void StartAction()
+    {
+        if (secondPhase) { return; }
         List<IEnemyAction> possibleActions = new List<IEnemyAction>();
         if (playerEnergy.currentEnergy <= 5)
         {
@@ -145,6 +190,8 @@ public class YingYangFish_AI : IEnemyController
         }
     }
 
+    [HideInInspector] public Coroutine co_sprintStartPoint;
+
     /// <summary>
     /// designated fish runs faster to get to start point(top) for next action
     /// </summary>
@@ -178,6 +225,8 @@ public class YingYangFish_AI : IEnemyController
 
         yield return null;
     }
+
+    [HideInInspector] public Coroutine co_sprintBackEqual;
 
     /// <summary>
     /// designated fish runs faster to get back to equal position
@@ -218,6 +267,7 @@ public class YingYangFish_AI : IEnemyController
     }
 
     private bool isIEcloseSwimming;
+    [HideInInspector] public Coroutine co_IEcloseSwim;
 
     public IEnumerator IECloseSwim(bool close)
     {
@@ -288,15 +338,17 @@ public class YingYangFish_AI : IEnemyController
 
         if (currentHealth <= 0)
         {
-            Invoke("Death", 3f);
-            DEAD = true;
-            rb.velocity = Vector3.zero;
-            rb.gravityScale = 0f;
-            rb.isKinematic = true;
-            GetComponent<BoxCollider2D>().enabled = false;
-            HealthUI.SetActive(false);
-            gameObject.layer = 0;
-            anim.Play("death");
+            //Invoke("Death", 3f);
+            //DEAD = true;
+            //rb.velocity = Vector3.zero;
+            //rb.gravityScale = 0f;
+            //rb.isKinematic = true;
+            //GetComponent<BoxCollider2D>().enabled = false;
+            //HealthUI.SetActive(false);
+            //gameObject.layer = 0;
+            //anim.Play("death");
+
+            StartCoroutine(Pre_SecondPhase());
         }//death
 
         return 0;
@@ -311,15 +363,16 @@ public class YingYangFish_AI : IEnemyController
 
         if (currentHealth <= 0)
         {
-            Invoke("Death", 3f);
-            DEAD = true;
-            rb.velocity = Vector3.zero;
-            rb.gravityScale = 0f;
-            rb.isKinematic = true;
-            GetComponent<BoxCollider2D>().enabled = false;
-            HealthUI.SetActive(false);
-            gameObject.layer = 0;
-            anim.Play("death");
+            //Invoke("Death", 3f);
+            //DEAD = true;
+            //rb.velocity = Vector3.zero;
+            //rb.gravityScale = 0f;
+            //rb.isKinematic = true;
+            //GetComponent<BoxCollider2D>().enabled = false;
+            //HealthUI.SetActive(false);
+            //gameObject.layer = 0;
+            //anim.Play("death");
+            StartCoroutine(Pre_SecondPhase());
         }//death
 
         return 0;
@@ -330,5 +383,46 @@ public class YingYangFish_AI : IEnemyController
         float angle = Mathf.Atan2(_targetPos.y - transform.position.y, _targetPos.x - transform.position.x) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
         return targetRotation;
+    }
+
+    public void CancelAllAction()
+    {
+        waterSpear.CancelAct();
+        swing.CancelAct();
+        splash.CancelAct();
+        StopCoroutine(co_sprintStartPoint);
+        StopCoroutine(co_IEcloseSwim);
+        isIEcloseSwimming = false;
+    }
+
+    public void Interact()
+    {
+        //play start animation
+        //start fight
+        if (!secondPhase)
+        {
+            StartCoroutine(IE_Activate());
+            EventInteract.SetActive(false);
+        }
+        else
+        {
+            //start second phase
+            EventInteract.SetActive(false);
+            idleRotateSpeed *= 3;
+            co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
+            StartCoroutine(ChangeYPos(true));
+        }
+    }
+
+    public IEnumerator ChangeYPos(bool up)
+    {
+        if (up)
+        {
+            while (transform.position.y < waterLevel.position.y + 4.5) { transform.position += new Vector3(0, 1, 0) * Time.deltaTime * 3; yield return null; }
+        }
+        else
+        {
+            while (transform.position.y > waterLevel.position.y + 2) { transform.position -= new Vector3(0, 1, 0) * Time.deltaTime * 3; yield return null; }
+        }
     }
 }

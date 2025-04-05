@@ -63,7 +63,6 @@ public class WB_melee_attack_long : IEnemyAction
 
     public override IEnumerator Act_coroutine()
     {
-        isThisActing = true;
         startedIEAttack = true;
         anim.Play("melee_long_attack");
         yield return new WaitForSeconds(time_after_reach_min_distance);
@@ -74,7 +73,6 @@ public class WB_melee_attack_long : IEnemyAction
         startedAct = false;
         yield return new WaitForSeconds(2f - time_after_reach_min_distance);
         bossAI.canFlip = true;
-        isThisActing = false;
         if (bossAI.inAct)
         {
             bossAI.inAct = false;

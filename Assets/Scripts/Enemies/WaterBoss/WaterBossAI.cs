@@ -51,16 +51,18 @@ public class WaterBossAI : IEnemyController
         distanceToPlayer = Vector3.Distance(transform.position, GameManager.instance.Player.transform.position);
         if (target != null) targetPos = target.position;
         CheckCornerStuck();
-        if (cornerTimer >= maxCornerTime) { nextAction = unstuckCorner; }
-        if (IN_COMBAT)
-        {
-            if (canFlip)
+        if (cornerTimer >= maxCornerTime)
+        { //nextAction = unstuckCorner; }
+            if (IN_COMBAT)
             {
-                if (targetPos.x >= this.transform.position.x && !isFacingRight) { Flip(); }//face right
-                else if (targetPos.x < this.transform.position.x && isFacingRight) { Flip(); } //face left
-            }
+                if (canFlip)
+                {
+                    if (targetPos.x >= this.transform.position.x && !isFacingRight) { Flip(); }//face right
+                    else if (targetPos.x < this.transform.position.x && isFacingRight) { Flip(); } //face left
+                }
 
-            Move();
+                Move();
+            }
         }
     }
 
@@ -105,18 +107,18 @@ public class WaterBossAI : IEnemyController
             targetVelocity = new Vector2(speed, rb.velocity.y) * transform.right;
         }
         anim.SetBool("isMoving", canMove);
-        rb.velocity = Vector2.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, 0.1f);
+        //rb.velocity = Vector2.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, 0.1f);
     }
 
     public void SetCombat(bool isCombat)
     {
-        if (DEAD) { return; }
-        HealthUI.SetActive(isCombat);
-        if (!IN_COMBAT && AIActivate)
-        {
-            idle.Act();
-        }
-        IN_COMBAT = isCombat;
+        //if (DEAD) { return; }
+        //HealthUI.SetActive(isCombat);
+        //if (!IN_COMBAT && AIActivate)
+        //{
+        //    idle.Act();
+        //}
+        //IN_COMBAT = isCombat;
     }
 
     public void Stun(int stunAmount)
@@ -125,7 +127,7 @@ public class WaterBossAI : IEnemyController
         if (currentStun >= maxStun)
         {
             currentStun = 0;
-            CancelAllActions();
+            //CancelAllActions();
             inAct = true;
             stun.Act();
         }
@@ -148,7 +150,7 @@ public class WaterBossAI : IEnemyController
             GetComponent<BoxCollider2D>().enabled = false;
             HealthUI.SetActive(false);
             gameObject.layer = 0;
-            CancelAllActions();
+            //CancelAllActions();
 
             anim.Play("death");
         }
@@ -166,83 +168,83 @@ public class WaterBossAI : IEnemyController
         transform.Rotate(new Vector3(0, 1, 0), 180);
     }
 
-    public override IEnemyAction NextAction()
-    {
-        IEnemyAction previousAciton = null;
-        if (inAct) { return null; }
-        inAct = true;
-        if (nextAction != null)
-        {
-            nextAction.Act();
-            nextAction = null;
+    //public override IEnemyAction NextAction()
+    //{
+    //    IEnemyAction previousAciton = null;
+    //    if (inAct) { return null; }
+    //    inAct = true;
+    //    if (nextAction != null)
+    //    {
+    //        nextAction.Act();
+    //        nextAction = null;
 
-            return null;
-        }
-        if (distanceToPlayer <= distanceThresholdForRangeAttack)//melee attack
-        {
-            if (previousAciton == melee_attack_long) { melee_attack_short.Act(); }
-            else if (previousAciton == melee_attack_short) { melee_attack_long.Act(); }
-            else
-            {
-                bool b = RandomIn_One_Hunderd(70);
-                if (b) { melee_attack_short.Act(); }
-                else { melee_attack_long.Act(); }
-            }
-            return null;
-        }
-        else//range attack
-        {
-            bool b = RandomIn_One_Hunderd(50);
-            if (previousAciton == range_attack_long) { if (b) { range_attack_short.Act(); } else { melee_attack_long.Act(); } }
-            else if (previousAciton == range_attack_short) { if (b) { range_attack_long.Act(); } else { melee_attack_long.Act(); } }
-            else
-            {
-                int i = Random.Range(0, 3);
-                if (i == 0) { range_attack_short.Act(); }
-                else if (i == 1) { range_attack_long.Act(); }
-                else { melee_attack_long.Act(); }
-            }
-            return null;
-        }
-    }
+    //        return null;
+    //    }
+    //    //if (distanceToPlayer <= distanceThresholdForRangeAttack)//melee attack
+    //    //{
+    //    //    if (previousAciton == melee_attack_long) { melee_attack_short.Act(); }
+    //    //    else if (previousAciton == melee_attack_short) { melee_attack_long.Act(); }
+    //    //    else
+    //    //    {
+    //    //        bool b = RandomIn_One_Hunderd(70);
+    //    //        if (b) { melee_attack_short.Act(); }
+    //    //        else { melee_attack_long.Act(); }
+    //    //    }
+    //    //    return null;
+    //    //}
+    //    else//range attack
+    //    {
+    //        bool b = RandomIn_One_Hunderd(50);
+    //        if (previousAciton == range_attack_long) { if (b) { range_attack_short.Act(); } else { melee_attack_long.Act(); } }
+    //        else if (previousAciton == range_attack_short) { if (b) { range_attack_long.Act(); } else { melee_attack_long.Act(); } }
+    //        else
+    //        {
+    //            int i = Random.Range(0, 3);
+    //            if (i == 0) { range_attack_short.Act(); }
+    //            else if (i == 1) { range_attack_long.Act(); }
+    //            else { melee_attack_long.Act(); }
+    //        }
+    //        return null;
+    //    }
+    //}
 
-    public void CancelAllActions()
-    {
-        inAct = false;
-        canFlip = true;
-        sprite.material.SetFloat("_OutLine", 0);
-        range_attack_long.CancelAct();
-        range_attack_short.CancelAct();
-        melee_attack_long.CancelAct();
-        melee_attack_short.CancelAct();
-        idle.CancelAct();
-        stun.CancelAct();
-        sprite.material.SetFloat("_OutLine", 0);
-    }
+    //public void CancelAllActions()
+    //{
+    //    inAct = false;
+    //    canFlip = true;
+    //    sprite.material.SetFloat("_OutLine", 0);
+    //    range_attack_long.CancelAct();
+    //    range_attack_short.CancelAct();
+    //    melee_attack_long.CancelAct();
+    //    melee_attack_short.CancelAct();
+    //    idle.CancelAct();
+    //    stun.CancelAct();
+    //    sprite.material.SetFloat("_OutLine", 0);
+    //}
 
-    public bool RandomIn_One_Hunderd(int probablity)
-    {
-        int i = Random.Range(0, 101);
-        return i <= probablity;
-    }
+    //public bool RandomIn_One_Hunderd(int probablity)
+    //{
+    //    int i = Random.Range(0, 101);
+    //    return i <= probablity;
+    //}
 
-    public void test_range_attack_long()
-    {
-        nextAction = range_attack_long;
-    }
+    //public void test_range_attack_long()
+    //{
+    //    nextAction = range_attack_long;
+    //}
 
-    public void test_range_attack_short()
-    {
-        nextAction = range_attack_short;
-    }
+    //public void test_range_attack_short()
+    //{
+    //    nextAction = range_attack_short;
+    //}
 
-    public void test_melee_attack_long()
-    {
-        nextAction = melee_attack_long;
-    }
+    //public void test_melee_attack_long()
+    //{
+    //    nextAction = melee_attack_long;
+    //}
 
-    public void test_melee_attack_short()
-    {
-        nextAction = melee_attack_short;
-    }
+    //public void test_melee_attack_short()
+    //{
+    //    nextAction = melee_attack_short;
+    //}
 }

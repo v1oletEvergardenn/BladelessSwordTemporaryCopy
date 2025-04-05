@@ -65,7 +65,8 @@ public class YYF_Dive : IEnemyAction
             if (transform.position.y > bossAI.waterLevel.position.y - 1)
             {
                 swimEffect.GetComponent<Animator>().Play("end");
-                if (!isSwimming && (bossAI.actionList.Count <= 1 || bossAI.actionList[1] != bossAI.swing)) { isSwimming = true; StartCoroutine(bossAI.IECloseSwim(false)); }
+                if (!isSwimming && (bossAI.actionList.Count <= 1 || bossAI.actionList[1] != bossAI.swing))
+                { isSwimming = true; bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false)); }
             }
             if (ToLeft)
             {
@@ -79,6 +80,7 @@ public class YYF_Dive : IEnemyAction
         }
         swimEffect.SetActive(false);
         bossAI.movingTarget = bossAI.player;
+        bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();
         yield return null;
     }

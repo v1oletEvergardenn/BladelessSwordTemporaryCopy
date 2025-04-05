@@ -111,10 +111,19 @@ public class InputPlayer : MonoBehaviour
             }//dialog
             if (currentEventObject != null)
             {
-                currentEventObject.InteractEvent();
+                currentEventObject.Interact(true);
                 return;
             }//eventObject
-        }//trigger event or dialog
+        }
+
+        if (control.EventKey.WasReleasedThisFrame())
+        {
+            if (currentEventObject != null)
+            {
+                currentEventObject.Interact(false);
+                return;
+            }//eventObject
+        }
 
         if (health.isDead) { return; }
 
@@ -284,6 +293,7 @@ public class InputPlayer : MonoBehaviour
         if (collision.gameObject.layer == 15)//event objects
         {
             currentEventObject.ShowInteractSign(false);
+            currentEventObject.EndInteraction();
             currentEventObject = null;
         }
     }

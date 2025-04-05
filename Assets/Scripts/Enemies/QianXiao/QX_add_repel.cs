@@ -24,62 +24,62 @@ public class QX_add_repel : IEnemyAction
         bossAI = GetComponent<QianXiaoAI>();
     }
 
-    public override void Act()
-    {
-        bossAI.canFlip = false;
-        isThisActing = true;
-        if (!bossAI.isStage2) { StartCoroutine(S1_Act()); }
-        else { StartCoroutine(S2_Act()); }
-    }
+    //public override void Act()
+    //{
+    //    bossAI.canFlip = false;
+    //    isThisActing = true;
+    //    if (!bossAI.isStage2) { StartCoroutine(S1_Act()); }
+    //    else { StartCoroutine(S2_Act()); }
+    //}
 
-    public IEnumerator S1_Act()
-    {
-        anim.Play("S1_add_repel");
-        yield return new WaitForSeconds(0.35f);
-        hit();
+    //public IEnumerator S1_Act()
+    //{
+    //    anim.Play("S1_add_repel");
+    //    yield return new WaitForSeconds(0.35f);
+    //    hit();
 
-        yield return new WaitForSeconds(action_time);
-        bossAI.canFlip = true;
-        isThisActing = false;
-        bossAI.targetPos = bossAI.nullTargetPos;
-        bossAI.inAct = false;
-        yield return new WaitForSeconds(0.2f);
-        if (actionSender != null)
-        {
-            bossAI.NextAction();
-            actionSender = null;
-        }
-        else
-        {
-            bossAI.NextAction();
-        }
+    //    yield return new WaitForSeconds(action_time);
+    //    bossAI.canFlip = true;
+    //    isThisActing = false;
+    //    bossAI.targetPos = bossAI.nullTargetPos;
+    //    bossAI.inAct = false;
+    //    yield return new WaitForSeconds(0.2f);
+    //    if (actionSender != null)
+    //    {
+    //        bossAI.NextAction();
+    //        actionSender = null;
+    //    }
+    //    else
+    //    {
+    //        bossAI.NextAction();
+    //    }
 
-        yield return null;
-    }
+    //    yield return null;
+    //}
 
-    public IEnumerator S2_Act()
-    {
-        anim.Play("S2_add_repel");
-        yield return new WaitForSeconds(0.35f);
-        hit();
-        yield return new WaitForSeconds(action_time);
-        bossAI.canFlip = true;
-        bossAI.targetPos = bossAI.nullTargetPos;
-        isThisActing = false;
-        bossAI.inAct = false;
-        yield return new WaitForSeconds(0.2f);
-        if (actionSender != null)
-        {
-            bossAI.NextAction();
-            actionSender = null;
-        }
-        else
-        {
-            bossAI.NextAction();
-        }
+    //public IEnumerator S2_Act()
+    //{
+    //    anim.Play("S2_add_repel");
+    //    yield return new WaitForSeconds(0.35f);
+    //    hit();
+    //    yield return new WaitForSeconds(action_time);
+    //    bossAI.canFlip = true;
+    //    bossAI.targetPos = bossAI.nullTargetPos;
+    //    isThisActing = false;
+    //    bossAI.inAct = false;
+    //    yield return new WaitForSeconds(0.2f);
+    //    if (actionSender != null)
+    //    {
+    //        bossAI.NextAction();
+    //        actionSender = null;
+    //    }
+    //    else
+    //    {
+    //        bossAI.NextAction();
+    //    }
 
-        yield return null;
-    }
+    //    yield return null;
+    //}
 
     public void hit()
     {

@@ -21,14 +21,14 @@ public class WB_range_attack_short : IEnemyAction
     {
         if (acting_this)
         {
-            if (bossAI.distanceToPlayer <= bossAI.distanceThresholdForRangeAttack)
-            {
-                CancelAct();
-                acting_this = false;
-                bossAI.inAct = false;
-                bossAI.nextAction = bossAI.melee_attack_short;
-                bossAI.NextAction();
-            }
+            //if (bossAI.distanceToPlayer <= bossAI.distanceThresholdForRangeAttack)
+            //{
+            //    CancelAct();
+            //    acting_this = false;
+            //    bossAI.inAct = false;
+            //    bossAI.nextAction = bossAI.melee_attack_short;
+            //    bossAI.NextAction();
+            //}
         }
     }
 

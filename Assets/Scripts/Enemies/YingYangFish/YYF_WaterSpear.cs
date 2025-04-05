@@ -17,6 +17,7 @@ public class YYF_WaterSpear : IEnemyAction
     private Spear spear;
     private Spear secondSpear;
     private bool shooted = false;
+    private bool secondShooted = false;
 
     public override void Start()
     {
@@ -27,14 +28,15 @@ public class YYF_WaterSpear : IEnemyAction
     public override void CancelAct()
     {
         base.CancelAct();
-        if (!shooted && spear != null) { Destroy(spear); }
-        if (!shooted && secondSpear != null) { Destroy(secondSpear); }
+        if (!shooted && spear != null) { spear.SetFalseActive(); }
+        if (!secondShooted && secondSpear != null) { secondSpear.SetFalseActive(); }
     }
 
     public override IEnumerator Act_coroutine()
     {
-        yield return StartCoroutine(bossAI.SprintStartPoint());
+        yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.SprintStartPoint());
         shooted = false;
+        secondShooted = false;
 
         int possiblity = 5;
 
@@ -69,6 +71,7 @@ public class YYF_WaterSpear : IEnemyAction
         yield return new WaitForSeconds(1.8f);
         if (second)
         {
+            bossAI.AddActionBreak(actionBreakAmount);
             if (!bossAI.white_idling) { secondSpear = pooler.SpawnFromPool("water_Spear", waterSpearPos_white.position).GetComponent<Spear>(); }
             else { secondSpear = pooler.SpawnFromPool("water_Spear", waterSpearPos_black.position).GetComponent<Spear>(); }
 
@@ -78,11 +81,13 @@ public class YYF_WaterSpear : IEnemyAction
         yield return new WaitForSeconds(0.8f);
 
         ShootSpear(spear);
+        shooted = true;
 
         if (second)
         {
             yield return new WaitForSeconds(1.3f);
             ShootSpear(secondSpear);
+            secondShooted = true;
         }
         //launch waterspear
 
@@ -94,7 +99,7 @@ public class YYF_WaterSpear : IEnemyAction
         {
             if (bossAI.distanceToPlayer <= bossAI.swing.swingRange + 1)
             {
-                yield return StartCoroutine(bossAI.SprintBackEqual());
+                yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
                 bossAI.InsertAction(bossAI.swing);
             }
             else if (Possibility(60))
@@ -108,12 +113,12 @@ public class YYF_WaterSpear : IEnemyAction
         {
             if (bossAI.actionList.Count < 2 || (bossAI.actionList[1] != this && bossAI.actionList[1] != bossAI.splash))
             {
-                yield return StartCoroutine(bossAI.SprintBackEqual());
+                yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
             }
             bossAI.white_idling = true;
             bossAI.black_idling = true;
         }
-
+        bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();
         yield return null;
     }

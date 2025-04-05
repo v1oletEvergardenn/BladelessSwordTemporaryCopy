@@ -21,7 +21,7 @@ public class YYF_Swing : IEnemyAction
 
     public override IEnumerator Act_coroutine()
     {
-        yield return StartCoroutine(bossAI.IECloseSwim(true));
+        yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
 
         bossAI.whiteAnim.Play("swing");
         bossAI.blackAnim.Play("swing");
@@ -39,8 +39,10 @@ public class YYF_Swing : IEnemyAction
         bossAI.black_idling = true;
         bossAI.white_idling = true;
 
-        if (bossAI.NextAction() != bossAI.dive) { yield return StartCoroutine(bossAI.IECloseSwim(false)); }
+        if (bossAI.NextAction() != bossAI.dive)
+        { yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false)); }
 
+        bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();
     }
 
@@ -67,7 +69,7 @@ public class YYF_Swing : IEnemyAction
                 }
                 else { combo = Possibility(100); }
 
-                if (combo)
+                if (combo && !bossAI.secondPhase)
                 {
                     bossAI.movingTarget = bossAI.GetBoundaryFarOfPlayer();
                     bossAI.InsertAction(bossAI.splash);

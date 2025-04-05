@@ -10,18 +10,67 @@ using UnityEngine.UI;
 [RequireComponent(typeof(DamageFlash), typeof(Rigidbody2D), typeof(IEnemyActionIdle))]
 public abstract class IEnemyController : IDamagable
 {
+    #region HEALTH
+
     [FoldoutGroup("Health", nameof(maxHealth), nameof(HealthUI), nameof(healthBar))] public Void healthVoid;
     [SerializeField, HideInInspector] public int maxHealth;
     [SerializeField, HideInInspector] public GameObject HealthUI;
     [SerializeField, HideInInspector] public Image healthBar;
-    public UnityEvent Die;
+
+    #endregion HEALTH
+
+    #region STUN
+
+    [FoldoutGroup("stunning", nameof(maxStun), nameof(stunBar), nameof(currentStun))] public Void stunVoid1;
+    [SerializeField, HideInInspector] public int maxStun = 10;
+    [SerializeField, HideInInspector] public Image stunBar;
+    [SerializeField, HideInInspector] public int currentStun;
+
+    #endregion STUN
+
+    #region GROUNDCHECK
+
+    [FoldoutGroup("GroundCheck", nameof(isGrounded), nameof(m_WhatIsGround), nameof(col))] public Void groundvoid;
+    [SerializeField, HideInInspector] public bool isGrounded = true;
+    [SerializeField, HideInInspector] public LayerMask m_WhatIsGround;
+    [SerializeField, HideInInspector] public Collider2D col;
+
+    #endregion GROUNDCHECK
+
+    #region BASIC_LOGIC
+
+    [FoldoutGroup("basic_logic", nameof(IN_COMBAT), nameof(canFlip), nameof(isFacingRight),
+        nameof(inAct), nameof(speed), nameof(leftBoundary), nameof(rightBoundary), nameof(GFX),
+        nameof(maxActionBreakCapacity), nameof(currentActionBreakAmount), nameof(breakDuration))]
+    public Void logicvoid;
+
+    [SerializeField, HideInInspector] public bool IN_COMBAT = false;
+    [SerializeField, HideInInspector] public bool canFlip = true;
+    [SerializeField, HideInInspector] public bool isFacingRight;
+    [SerializeField, HideInInspector] public bool inAct = false;
+    [SerializeField, HideInInspector] public float speed = 20f;
+    [SerializeField, HideInInspector] public Transform leftBoundary;
+    [SerializeField, HideInInspector] public Transform rightBoundary;
+    [SerializeField, HideInInspector] public GameObject GFX;
+    [SerializeField, HideInInspector] public int maxActionBreakCapacity = 10;
+    [SerializeField, HideInInspector] public int currentActionBreakAmount = 0;
+    [SerializeField, HideInInspector] public float breakDuration = 3f;
+
+    public List<IEnemyAction> actionList = new List<IEnemyAction>();
+
+    #endregion BASIC_LOGIC
+
+    #region PRIVATE VARIABLES
+
+    [HideInInspector] public bool isActing = false;
+    [HideInInspector] public IEnemyAction initialAction;
+    [HideInInspector] public bool canMove = false;
+    [HideInInspector] public float distanceToPlayer;
     [HideInInspector] public int currentHealth;
     [HideInInspector] public bool DEAD = false;
     [HideInInspector] public DamageFlash flash;
     [HideInInspector] public Rigidbody2D rb;
-
     [HideInInspector] public AnimationCurve outline_flash_anim_curve;
-
     [HideInInspector] public SpriteRenderer sprite;
     [HideInInspector] public Animator anim;
     [HideInInspector] public Transform player;
@@ -29,39 +78,7 @@ public abstract class IEnemyController : IDamagable
     [HideInInspector] public Energy playerEnergy;
     [HideInInspector] public CharacterController2D playerController;
 
-    [FoldoutGroup("stunning", nameof(maxStun), nameof(stunBar), nameof(currentStun))] public Void stunVoid1;
-    [SerializeField, HideInInspector] public int maxStun = 10;
-    [SerializeField, HideInInspector] public Image stunBar;
-    [SerializeField, HideInInspector] public int currentStun;
-
-    [FoldoutGroup("GroundCheck", nameof(isGrounded), nameof(m_WhatIsGround))] public Void groundvoid;
-    [SerializeField, HideInInspector] public bool isGrounded = true;
-    [SerializeField, HideInInspector] public LayerMask m_WhatIsGround;
-    [HideInInspector] public Collider2D col;
-
-    [FoldoutGroup("basic logic", nameof(IN_COMBAT), nameof(canFlip), nameof(isFacingRight), nameof(AIActivate),
-        nameof(inAct), nameof(speed), nameof(distanceThresholdForRangeAttack), nameof(leftBoundary), nameof(rightBoundary))]
-    public Void logicvoid;
-
-    [SerializeField, HideInInspector] public bool IN_COMBAT = false;
-    [SerializeField, HideInInspector] public bool canFlip = true;
-    [SerializeField, HideInInspector] public bool isFacingRight;
-    [SerializeField, HideInInspector] public bool AIActivate = true;
-    [SerializeField, HideInInspector] public bool inAct = false;
-    [SerializeField, HideInInspector] public float speed = 20f;
-    [SerializeField, HideInInspector] public Transform leftBoundary;
-    [SerializeField, HideInInspector] public Transform rightBoundary;
-    [SerializeField, HideInInspector] public float distanceThresholdForRangeAttack = 20f;
-    [HideInInspector] public bool canMove = false;
-    [HideInInspector] public Vector2 m_Velocity = Vector2.zero;
-    [HideInInspector] public float distanceToPlayer;
-    [SerializeField, HideInInspector] public IEnemyAction nextAction;
-    [HideInInspector] public IEnemyAction initialAction;
-    public List<IEnemyAction> actionList = new List<IEnemyAction>();
-    [HideInInspector] public bool isActing = false;
-
-    [Space(10)] public GameObject GFX;
-    [Space(10)] public Void spacevoid1;
+    #endregion PRIVATE VARIABLES
 
     public virtual void Start()
     {
@@ -73,10 +90,9 @@ public abstract class IEnemyController : IDamagable
         anim = GFX.GetComponent<Animator>();
         currentHealth = maxHealth;
         healthBar.fillAmount = currentHealth / maxHealth;
-
+        stunBar.fillAmount = currentStun / maxStun;
         flash = GetComponent<DamageFlash>();
         rb = GetComponent<Rigidbody2D>();
-        col = GetComponent<Collider2D>();
         outline_flash_anim_curve = GameManager.instance.outline_flash_anim_curve;
     }
 
@@ -112,7 +128,22 @@ public abstract class IEnemyController : IDamagable
             yield return null;
         }
         isActing = false;
+        if (currentActionBreakAmount >= maxActionBreakCapacity) { yield return StartCoroutine(Break()); }//break
+        else { StartAction(); }//startover
         yield return null;
+    }
+
+    public virtual IEnumerator Break()
+    {
+        yield return new WaitForSeconds(breakDuration);
+        currentActionBreakAmount = 0;
+        StartAction();
+        yield return null;
+    }
+
+    public virtual void AddActionBreak(int amount)
+    {
+        currentActionBreakAmount += amount;
     }
 
     public virtual void OutLine_Activate(int i)
@@ -136,6 +167,21 @@ public abstract class IEnemyController : IDamagable
             sprite.material.SetFloat("_OutLineThickness", currentFlashAmount);
             yield return null;
         }
+    }
+
+    public virtual void ActivateCombat()
+    {
+        StartCoroutine(IE_Activate());
+    }
+
+    public virtual IEnumerator IE_Activate()
+    {
+        IN_COMBAT = true;
+        yield return null;
+    }
+
+    public virtual void StartAction()
+    {
     }
 
     public virtual void GroundCheck()

@@ -33,12 +33,10 @@ public class WB_melee_attack_short : IEnemyAction
 
     public override IEnumerator Act_coroutine()
     {
-        isThisActing = true;
         yield return new WaitForSeconds(0.3f);
         bossAI.canFlip = false;
         yield return new WaitForSeconds(1.7f);
         bossAI.canFlip = true;
-        isThisActing = false;
         if (bossAI.inAct)
         {
             bossAI.inAct = false;

@@ -21,7 +21,7 @@ public class YYF_splash : IEnemyAction
 
     public override IEnumerator Act_coroutine()
     {
-        yield return StartCoroutine(bossAI.SprintStartPoint());
+        yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.SprintStartPoint());
 
         if (!bossAI.black_idling)
         {
@@ -70,10 +70,12 @@ public class YYF_splash : IEnemyAction
 
         if (bossAI.actionList.Count < 2 || (bossAI.actionList[1] != this && bossAI.actionList[1] != bossAI.waterSpear))
         {
-            yield return StartCoroutine(bossAI.SprintBackEqual());
+            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
         }
         bossAI.white_idling = true;
         bossAI.black_idling = true;
+
+        bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();
 
         yield return null;

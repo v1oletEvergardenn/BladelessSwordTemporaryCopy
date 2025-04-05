@@ -13,12 +13,10 @@ public abstract class IEnemyAction : MonoBehaviour
     [HideInInspector] public ObjectPooler pooler;
     [HideInInspector] public VFXManager vfx;
     [HideInInspector] public Rigidbody2D rb;
-    public float action_time = 1f;
-    public bool isThisActing = false;
-
     [HideInInspector] public PlayerAttack playerAttack;
     [HideInInspector] public Energy playerEnergy;
     [HideInInspector] public CharacterController2D playerController;
+    public int actionBreakAmount = 1;
 
     public virtual void Start()
     {
@@ -43,8 +41,7 @@ public abstract class IEnemyAction : MonoBehaviour
 
     public virtual void CancelAct()
     {
-        StopAllCoroutines();
-        isThisActing = false;
+        StopCoroutine("Act_coroutine");
         //OutLine_Activate(0);
     }
 

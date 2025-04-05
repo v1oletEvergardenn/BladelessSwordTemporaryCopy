@@ -100,7 +100,7 @@ public class QianXiaoAI : IEnemyController
         inAct = true;
         canFlip = true;
         canMove = false;
-        if (nextAction != null) { nextAction.Act(); nextAction = null; return null; }
+        //if (nextAction != null) { nextAction.Act(); nextAction = null; return null; }
         if (previousAciton == slash)
         {
             if (distanceToPlayer <= slashRange) { jump_attack.Act(); return null; }
@@ -160,7 +160,7 @@ public class QianXiaoAI : IEnemyController
         {
             if (currentHealth <= 0)
             {
-                nextAction = stageTransfer;
+                //nextAction = stageTransfer;
             }
         }
         else
@@ -220,21 +220,17 @@ public class QianXiaoAI : IEnemyController
             }
         }
         anim.SetBool("moving", canMove);
-        rb.velocity = Vector2.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, 0.1f);
+        //rb.velocity = Vector2.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, 0.1f);
     }
 
     public void SetCombat(bool isCombat)
     {
         if (DEAD) { return; }
         HealthUI.SetActive(isCombat);
-        if (!IN_COMBAT && AIActivate)
-        {
-            idle.Act();
-        }
 
         if (!isCombat)
         {
-            nextAction = null;
+            //nextAction = null;
             CancelAllActions();
         }
         IN_COMBAT = isCombat;
@@ -303,59 +299,59 @@ public class QianXiaoAI : IEnemyController
 
     #region ABILITIES TEST
 
-    public void test_slash()
-    {
-        print("test_slash");
-        if (slash != null) { nextAction = slash; }
-    }
+    //public void test_slash()
+    //{
+    //    print("test_slash");
+    //    if (slash != null) { nextAction = slash; }
+    //}
 
-    public void test_energy_swords()
-    {
-        print("test_energy_swords");
-        if (energy_swords != null) { nextAction = nextAction = energy_swords; }
-    }
+    //public void test_energy_swords()
+    //{
+    //    print("test_energy_swords");
+    //    if (energy_swords != null) { nextAction = nextAction = energy_swords; }
+    //}
 
-    public void test_summon_projectile()
-    {
-        print("test_summon_projectile");
-        if (summon_projectile != null) { nextAction = nextAction = summon_projectile; }
-    }
+    //public void test_summon_projectile()
+    //{
+    //    print("test_summon_projectile");
+    //    if (summon_projectile != null) { nextAction = nextAction = summon_projectile; }
+    //}
 
-    public void test_jump_attack()
-    {
-        print("test_jump_attack");
-        if (jump_attack != null) { nextAction = nextAction = jump_attack; }
-    }
+    //public void test_jump_attack()
+    //{
+    //    print("test_jump_attack");
+    //    if (jump_attack != null) { nextAction = nextAction = jump_attack; }
+    //}
 
-    public void test_throw_sword()
-    {
-        print("test_throw_sword");
-        if (throw_sword != null) { nextAction = nextAction = throw_sword; }
-    }
+    //public void test_throw_sword()
+    //{
+    //    print("test_throw_sword");
+    //    if (throw_sword != null) { nextAction = nextAction = throw_sword; }
+    //}
 
-    public void test_add_repel()
-    {
-        print("test_add_repel");
-        if (add_repel != null) { nextAction = nextAction = add_repel; }
-    }
+    //public void test_add_repel()
+    //{
+    //    print("test_add_repel");
+    //    if (add_repel != null) { nextAction = nextAction = add_repel; }
+    //}
 
-    public void test_add_teleport_up_attack()
-    {
-        print("test_add_teleport_up_attack");
-        if (add_teleport_up_attack != null) { nextAction = nextAction = add_teleport_up_attack; }
-    }
+    //public void test_add_teleport_up_attack()
+    //{
+    //    print("test_add_teleport_up_attack");
+    //    if (add_teleport_up_attack != null) { nextAction = nextAction = add_teleport_up_attack; }
+    //}
 
-    public void test_add_land_attack()
-    {
-        print("test_add_land_attack");
-        if (add_land_attack != null) { nextAction = nextAction = add_land_attack; }
-    }
+    //public void test_add_land_attack()
+    //{
+    //    print("test_add_land_attack");
+    //    if (add_land_attack != null) { nextAction = nextAction = add_land_attack; }
+    //}
 
-    public void test_S1_to_S2()
-    {
-        print("test_S1_to_S2");
-        if (stageTransfer != null) { nextAction = nextAction = stageTransfer; }
-    }
+    //public void test_S1_to_S2()
+    //{
+    //    print("test_S1_to_S2");
+    //    if (stageTransfer != null) { nextAction = nextAction = stageTransfer; }
+    //}
 
     public void test_stun()
     {
@@ -372,7 +368,7 @@ public class QianXiaoAI : IEnemyController
     public void test_add_thrust()
     {
         print("test_add_thrust");
-        nextAction = add_thrust;
+        //nextAction = add_thrust;
     }
 
     #endregion ABILITIES TEST

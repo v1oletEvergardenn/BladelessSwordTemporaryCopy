@@ -25,45 +25,45 @@ public class QX_StageTransfer : IEnemyAction
     {
     }
 
-    public override IEnumerator Act_coroutine()
-    {
-        isThisActing = true;
-        anim.Play("S1_teleport");
-        bossAI.isStage2 = true;
-        bossAI.Stage2HealthChange();
-        bossAI.currentStun = 0;
-        bossAI.Stun(0);
-        yield return new WaitForSeconds(0.2f);
-        rb.gravityScale = 0f;
-        bossAI.Teleport(teleportPos.position);
-        yield return new WaitForSeconds(2f);
-        wings.SetActive(false);
-        bossAI.OutLine_Activate(1);
-        stageTransferCol.SetActive(true);
-        anim.Play("StageTransferPreparing");
+    //public override IEnumerator Act_coroutine()
+    //{
+    //    isThisActing = true;
+    //    anim.Play("S1_teleport");
+    //    bossAI.isStage2 = true;
+    //    bossAI.Stage2HealthChange();
+    //    bossAI.currentStun = 0;
+    //    bossAI.Stun(0);
+    //    yield return new WaitForSeconds(0.2f);
+    //    rb.gravityScale = 0f;
+    //    bossAI.Teleport(teleportPos.position);
+    //    yield return new WaitForSeconds(2f);
+    //    wings.SetActive(false);
+    //    bossAI.OutLine_Activate(1);
+    //    stageTransferCol.SetActive(true);
+    //    anim.Play("StageTransferPreparing");
 
-        //generate energies
-        GenerateEnergyBubbles();
-        yield return new WaitForSeconds(preparingTime);
-        stageTransferCol.SetActive(false);
-        anim.Play("S1_to_S2");
-        bossAI.SetFlyEngine(true);
-        bossAI.OutLine_Activate(0);
-        foreach (EnergyBubble b in bubbles)
-        {
-            b.End();
-        }
-        yield return new WaitForSeconds(2f);
-        beam.SetActive(true);
-        yield return new WaitForSeconds(5f);
-        beam.SetActive(false);
-        yield return new WaitForSeconds(action_time);
-        isThisActing = false;
-        bossAI.CancelAllActions();
-        bossAI.add_land_attack.Act();
-        bossAI.add_land_attack.GetComponent<QX_add_land_attack>().actionSender = this;
-        yield return null;
-    }
+    //    //generate energies
+    //    GenerateEnergyBubbles();
+    //    yield return new WaitForSeconds(preparingTime);
+    //    stageTransferCol.SetActive(false);
+    //    anim.Play("S1_to_S2");
+    //    bossAI.SetFlyEngine(true);
+    //    bossAI.OutLine_Activate(0);
+    //    foreach (EnergyBubble b in bubbles)
+    //    {
+    //        b.End();
+    //    }
+    //    yield return new WaitForSeconds(2f);
+    //    beam.SetActive(true);
+    //    yield return new WaitForSeconds(5f);
+    //    beam.SetActive(false);
+    //    yield return new WaitForSeconds(action_time);
+    //    isThisActing = false;
+    //    bossAI.CancelAllActions();
+    //    bossAI.add_land_attack.Act();
+    //    bossAI.add_land_attack.GetComponent<QX_add_land_attack>().actionSender = this;
+    //    yield return null;
+    //}
 
     public void GenerateEnergyBubbles()
     {
@@ -88,8 +88,6 @@ public class QX_StageTransfer : IEnemyAction
         anim.Play("S1_to_S2");
         bossAI.SetFlyEngine(true);
         bossAI.OutLine_Activate(0);
-        yield return new WaitForSeconds(action_time);
-        isThisActing = false;
         bossAI.CancelAllActions();
         bossAI.add_land_attack.Act();
         bossAI.add_land_attack.GetComponent<QX_add_land_attack>().actionSender = this;

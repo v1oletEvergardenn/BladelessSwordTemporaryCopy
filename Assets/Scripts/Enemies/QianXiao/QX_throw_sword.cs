@@ -42,7 +42,6 @@ public class QX_throw_sword : IEnemyAction
     {
         teleportAirCounterTime = 0;
         counterAttackTime = 0;
-        isThisActing = true;
         anim.Play("S1_throw_sword 1");
         yield return new WaitForSeconds(2.2f);
         StartCoroutine(S1Shoot());
@@ -53,7 +52,6 @@ public class QX_throw_sword : IEnemyAction
     {
         teleportAirCounterTime = 0;
         counterAttackTime = 0;
-        isThisActing = true;
         bossAI.targetPos = transform.position + new Vector3(0, 5, 0);
         yield return new WaitForSeconds(0.4f);
         anim.Play("S2_throw_sword 1");
@@ -99,7 +97,6 @@ public class QX_throw_sword : IEnemyAction
 
     public void TeleportThrust()
     {
-        isThisActing = false;
         bossAI.CancelAllActions();
         bossAI.add_thrust.Act();
         bossAI.add_thrust.GetComponent<QX_add_thrust>().actionSender = this;
@@ -107,7 +104,6 @@ public class QX_throw_sword : IEnemyAction
 
     public void TeleportAttack()
     {
-        isThisActing = false;
         bossAI.CancelAllActions();
         bossAI.add_teleport_up_attack.Act();
         bossAI.add_teleport_up_attack.GetComponent<QX_add_teleport_up_attack>().actionSender = this;
@@ -137,7 +133,6 @@ public class QX_throw_sword : IEnemyAction
         {
             proj.Die();
             bossAI.Teleport(vector3);
-            isThisActing = false;
             bossAI.CancelAllActions();
             bossAI.add_land_attack.Act();
             bossAI.add_land_attack.GetComponent<QX_add_land_attack>().actionSender = this;
@@ -153,48 +148,48 @@ public class QX_throw_sword : IEnemyAction
     public void CheckCounterAttack()
     {
         bool result = false;
-        if (isThisActing)
-        {
-            if (bossAI.isStage2)
-            {
-                if (counterAttackTime == 0)
-                {
-                    result = true;
-                }
-                else if (counterAttackTime == 1)
-                {
-                    int i = Random.Range(0, 11);
-                    if (i <= 7)
-                    {
-                        result = true;
-                    }
-                }
-                else if (counterAttackTime == 2)
-                {
-                    int i = Random.Range(0, 2);
-                    if (i == 0) { result = true; }
-                }
-            }
-            else
-            {
-                if (counterAttackTime == 0)
-                {
-                    int i = Random.Range(0, 11);
-                    if (i <= 5)
-                    {
-                        result = true;
-                    }
-                }
-                else if (counterAttackTime == 1)
-                {
-                    int i = Random.Range(0, 11);
-                    if (i <= 3)
-                    {
-                        result = true;
-                    }
-                }
-            }
-        }
+        //if (isThisActing)
+        //{
+        //    if (bossAI.isStage2)
+        //    {
+        //        if (counterAttackTime == 0)
+        //        {
+        //            result = true;
+        //        }
+        //        else if (counterAttackTime == 1)
+        //        {
+        //            int i = Random.Range(0, 11);
+        //            if (i <= 7)
+        //            {
+        //                result = true;
+        //            }
+        //        }
+        //        else if (counterAttackTime == 2)
+        //        {
+        //            int i = Random.Range(0, 2);
+        //            if (i == 0) { result = true; }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (counterAttackTime == 0)
+        //        {
+        //            int i = Random.Range(0, 11);
+        //            if (i <= 5)
+        //            {
+        //                result = true;
+        //            }
+        //        }
+        //        else if (counterAttackTime == 1)
+        //        {
+        //            int i = Random.Range(0, 11);
+        //            if (i <= 3)
+        //            {
+        //                result = true;
+        //            }
+        //        }
+        //    }
+        //}
 
         if (result)
         {
@@ -211,7 +206,6 @@ public class QX_throw_sword : IEnemyAction
 
     public void EndAction()
     {
-        isThisActing = false;
         bossAI.CancelAllActions();
         bossAI.add_land_attack.GetComponent<QX_add_land_attack>().actionSender = this;
         bossAI.add_land_attack.Act();

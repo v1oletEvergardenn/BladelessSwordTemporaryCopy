@@ -22,40 +22,40 @@ public class QX_add_thrust : IEnemyAction
         bossAI = GetComponent<QianXiaoAI>();
     }
 
-    public override void Act()
-    {
-        isThisActing = true;
-        StartCoroutine(Act_coroutine());
-    }
+    //public override void Act()
+    //{
+    //    isThisActing = true;
+    //    StartCoroutine(Act_coroutine());
+    //}
 
-    public override IEnumerator Act_coroutine()
-    {
-        if (bossAI.isStage2) { anim.Play("S2_thrust"); }
-        else { anim.Play("S1_thrust"); }
-        yield return new WaitForSeconds(0.5f);
-        //teleport
-        bossAI.Teleport(player.transform.position - player.transform.right * 5);
-        yield return new WaitForSeconds(0.2f);
-        bossAI.canFlip = false;
-        yield return new WaitForSeconds(0.7f);
-        hitBox.gameObject.SetActive(true);
-        yield return new WaitForSeconds(0.1f);
-        hitBox.gameObject.SetActive(false);
-        yield return new WaitForSeconds(action_time);
-        bossAI.canFlip = true;
-        isThisActing = false;
-        bossAI.inAct = false;
-        if (actionSender != null)
-        {
-            bossAI.NextAction();
-            actionSender = null;
-        }
-        else
-        {
-            bossAI.NextAction();
-        }
-        yield return null;
-    }
+    //public override IEnumerator Act_coroutine()
+    //{
+    //    if (bossAI.isStage2) { anim.Play("S2_thrust"); }
+    //    else { anim.Play("S1_thrust"); }
+    //    yield return new WaitForSeconds(0.5f);
+    //    //teleport
+    //    bossAI.Teleport(player.transform.position - player.transform.right * 5);
+    //    yield return new WaitForSeconds(0.2f);
+    //    bossAI.canFlip = false;
+    //    yield return new WaitForSeconds(0.7f);
+    //    hitBox.gameObject.SetActive(true);
+    //    yield return new WaitForSeconds(0.1f);
+    //    hitBox.gameObject.SetActive(false);
+    //    yield return new WaitForSeconds(action_time);
+    //    bossAI.canFlip = true;
+    //    isThisActing = false;
+    //    bossAI.inAct = false;
+    //    if (actionSender != null)
+    //    {
+    //        bossAI.NextAction();
+    //        actionSender = null;
+    //    }
+    //    else
+    //    {
+    //        bossAI.NextAction();
+    //    }
+    //    yield return null;
+    //}
 
     public void hit()
     {
