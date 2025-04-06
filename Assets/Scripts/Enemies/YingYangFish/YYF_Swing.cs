@@ -40,7 +40,9 @@ public class YYF_Swing : IEnemyAction
         bossAI.white_idling = true;
 
         if (bossAI.NextAction() != bossAI.dive)
-        { yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false)); }
+        {
+            yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
+        }
 
         bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();

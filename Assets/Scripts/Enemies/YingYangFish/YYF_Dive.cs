@@ -66,7 +66,10 @@ public class YYF_Dive : IEnemyAction
             {
                 swimEffect.GetComponent<Animator>().Play("end");
                 if (!isSwimming && (bossAI.actionList.Count <= 1 || bossAI.actionList[1] != bossAI.swing))
-                { isSwimming = true; bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false)); }
+                {
+                    isSwimming = true;
+                    bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
+                }
             }
             if (ToLeft)
             {

@@ -57,7 +57,7 @@ public class YingYangFish_AI : IEnemyController
     #region ACTIONS
 
     public bool Actions;
-
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("ForceDie", "ForceDie")] public Transform void112;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("StartAction", "StartAction")] public Transform void11;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("WaterSpear", "WaterSpear")] public Void void1;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Swing", "Swing")] public Void void8;
@@ -69,6 +69,10 @@ public class YingYangFish_AI : IEnemyController
     [ShowField(nameof(Actions))][SerializeField] public YYF_Dive dive;
 
     #endregion ACTIONS
+
+    [HideInInspector] public Coroutine co_sprintStartPoint;
+    [HideInInspector] public Coroutine co_IEcloseSwim;
+    [HideInInspector] public Coroutine co_sprintBackEqual;
 
     // Update is called once per frame
 
@@ -98,13 +102,18 @@ public class YingYangFish_AI : IEnemyController
         if (!isActing && actionList.Count > 0)
         {
             isActing = true;
-            StartCoroutine(Act());
+            co_act = StartCoroutine(Act());
         }
     }
 
     public void WaterSpear()
     {
         InsertAction(waterSpear);
+    }
+
+    public override void ForceDie()
+    {
+        base.ForceDie();
     }
 
     public void Swing()
@@ -128,7 +137,9 @@ public class YingYangFish_AI : IEnemyController
         {
             actionList.Clear();
             CancelAllAction();
+
             co_IEcloseSwim = StartCoroutine(IECloseSwim(true));
+            CharacterUIManager.ShowBlackEdge(true);
             yield return StartCoroutine(ChangeYPos(false));
             idleRotateSpeed /= 3;
             secondPhase = true;
@@ -190,8 +201,6 @@ public class YingYangFish_AI : IEnemyController
         }
     }
 
-    [HideInInspector] public Coroutine co_sprintStartPoint;
-
     /// <summary>
     /// designated fish runs faster to get to start point(top) for next action
     /// </summary>
@@ -225,8 +234,6 @@ public class YingYangFish_AI : IEnemyController
 
         yield return null;
     }
-
-    [HideInInspector] public Coroutine co_sprintBackEqual;
 
     /// <summary>
     /// designated fish runs faster to get back to equal position
@@ -266,13 +273,8 @@ public class YingYangFish_AI : IEnemyController
         }
     }
 
-    private bool isIEcloseSwimming;
-    [HideInInspector] public Coroutine co_IEcloseSwim;
-
     public IEnumerator IECloseSwim(bool close)
     {
-        if (isIEcloseSwimming) { yield return null; }
-        isIEcloseSwimming = true;
         if (close)
         {
             float elapsedTime = 0f;
@@ -315,7 +317,6 @@ public class YingYangFish_AI : IEnemyController
             }
             idleRotateSpeed = originalRotateSpeed;
         }
-        isIEcloseSwimming = false;
     }
 
     /// <summary>
@@ -387,12 +388,20 @@ public class YingYangFish_AI : IEnemyController
 
     public void CancelAllAction()
     {
+        if (co_IEcloseSwim != null) StopCoroutine(co_IEcloseSwim);
+        if (co_sprintBackEqual != null) StopCoroutine(co_sprintBackEqual);
+        if (co_sprintStartPoint != null) StopCoroutine(co_sprintStartPoint);
+
+        StopCoroutine(co_act);
         waterSpear.CancelAct();
         swing.CancelAct();
         splash.CancelAct();
-        StopCoroutine(co_sprintStartPoint);
-        StopCoroutine(co_IEcloseSwim);
-        isIEcloseSwimming = false;
+        dive.CancelAct();
+
+        print("cancel all actions");
+
+        white_idling = true;
+        black_idling = true;
     }
 
     public void Interact()
@@ -407,6 +416,7 @@ public class YingYangFish_AI : IEnemyController
         else
         {
             //start second phase
+
             EventInteract.SetActive(false);
             idleRotateSpeed *= 3;
             co_IEcloseSwim = StartCoroutine(IECloseSwim(false));

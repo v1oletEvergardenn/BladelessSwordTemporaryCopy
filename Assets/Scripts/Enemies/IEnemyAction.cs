@@ -3,6 +3,7 @@ using UnityEngine;
 using EditorAttributes;
 using System;
 
+[Serializable]
 public abstract class IEnemyAction : MonoBehaviour
 {
     [HideInInspector] public Animator anim;
@@ -17,6 +18,7 @@ public abstract class IEnemyAction : MonoBehaviour
     [HideInInspector] public Energy playerEnergy;
     [HideInInspector] public CharacterController2D playerController;
     public int actionBreakAmount = 1;
+    public Coroutine act_routine;
 
     public virtual void Start()
     {
@@ -28,7 +30,6 @@ public abstract class IEnemyAction : MonoBehaviour
         anim = controller.anim;
         sprite = controller.sprite;
         pooler = ObjectPooler.instance;
-
         playerAttack = PlayerAttack.instance;
         playerEnergy = Energy.instance;
         playerController = CharacterController2D.instance;
@@ -36,12 +37,16 @@ public abstract class IEnemyAction : MonoBehaviour
 
     public virtual void Act()
     {
-        StartCoroutine(Act_coroutine());
+        act_routine = StartCoroutine(Act_coroutine());
     }
 
     public virtual void CancelAct()
     {
-        StopCoroutine("Act_coroutine");
+        if (act_routine != null)
+        {
+            StopCoroutine(act_routine);
+        }
+
         //OutLine_Activate(0);
     }
 

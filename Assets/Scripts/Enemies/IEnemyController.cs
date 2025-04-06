@@ -56,7 +56,7 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public int currentActionBreakAmount = 0;
     [SerializeField, HideInInspector] public float breakDuration = 3f;
 
-    public List<IEnemyAction> actionList = new List<IEnemyAction>();
+    [HideInInspector] public List<IEnemyAction> actionList = new List<IEnemyAction>();
 
     #endregion BASIC_LOGIC
 
@@ -94,6 +94,7 @@ public abstract class IEnemyController : IDamagable
         flash = GetComponent<DamageFlash>();
         rb = GetComponent<Rigidbody2D>();
         outline_flash_anim_curve = GameManager.instance.outline_flash_anim_curve;
+        actionList.Clear();
     }
 
     public virtual IEnemyAction NextAction()
@@ -119,12 +120,15 @@ public abstract class IEnemyController : IDamagable
         }
     }
 
+    public Coroutine co_act;
+
     public virtual IEnumerator Act()
     {
-        while (actionList.Count > 0)
+        while (actionList.Count > 0 && actionList[0] != null)
         {
+            print("here");
             IEnemyAction action = actionList[0];
-            yield return StartCoroutine(action.Act_coroutine());
+            yield return action.act_routine = StartCoroutine(action.Act_coroutine());
             yield return null;
         }
         isActing = false;
@@ -221,5 +225,10 @@ public abstract class IEnemyController : IDamagable
         float mid = (leftBoundary.position.x + rightBoundary.position.x) / 2;
         if (player.position.x < mid) { return rightBoundary; }
         else { return leftBoundary; }
+    }
+
+    public virtual void ForceDie()
+    {
+        Damage(maxHealth);
     }
 }

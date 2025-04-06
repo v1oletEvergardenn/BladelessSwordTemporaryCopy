@@ -18,6 +18,7 @@ public class YYF_WaterSpear : IEnemyAction
     private Spear secondSpear;
     private bool shooted = false;
     private bool secondShooted = false;
+    private bool second;
 
     public override void Start()
     {
@@ -27,13 +28,16 @@ public class YYF_WaterSpear : IEnemyAction
 
     public override void CancelAct()
     {
-        base.CancelAct();
+        if (act_routine != null) { StopCoroutine(act_routine); }
+
+        second = false;
         if (!shooted && spear != null) { spear.SetFalseActive(); }
         if (!secondShooted && secondSpear != null) { secondSpear.SetFalseActive(); }
     }
 
     public override IEnumerator Act_coroutine()
     {
+        print("action started");
         yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.SprintStartPoint());
         shooted = false;
         secondShooted = false;
@@ -49,7 +53,7 @@ public class YYF_WaterSpear : IEnemyAction
         }
 
         int i = UnityEngine.Random.Range(0, 10);
-        bool second = false;
+        second = false;
         if (i < possiblity) { second = true; }
 
         if (!bossAI.white_idling)
@@ -82,6 +86,7 @@ public class YYF_WaterSpear : IEnemyAction
 
         ShootSpear(spear);
         shooted = true;
+        print(1);
 
         if (second)
         {
