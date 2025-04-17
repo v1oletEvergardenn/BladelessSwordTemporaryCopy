@@ -21,7 +21,8 @@ public class YYF_Swing : IEnemyAction
 
     public override IEnumerator Act_coroutine()
     {
-        yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
+        bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
+        yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
 
         bossAI.whiteAnim.Play("swing");
         bossAI.blackAnim.Play("swing");

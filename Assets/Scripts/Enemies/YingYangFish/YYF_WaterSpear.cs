@@ -37,7 +37,6 @@ public class YYF_WaterSpear : IEnemyAction
 
     public override IEnumerator Act_coroutine()
     {
-        print("action started");
         yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.SprintStartPoint());
         shooted = false;
         secondShooted = false;
@@ -86,7 +85,6 @@ public class YYF_WaterSpear : IEnemyAction
 
         ShootSpear(spear);
         shooted = true;
-        print(1);
 
         if (second)
         {

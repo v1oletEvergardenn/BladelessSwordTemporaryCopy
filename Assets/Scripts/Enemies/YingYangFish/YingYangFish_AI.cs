@@ -151,10 +151,25 @@ public class YingYangFish_AI : IEnemyController
     {
         IN_COMBAT = true;
         //play start animation
+        co_sprintBackEqual = StartCoroutine(SprintBackEqual());
         yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
         HealthUI.SetActive(true);
         StartAction();
         //start action loops
+    }
+
+    public override IEnumerator Act()
+    {
+        while (actionList.Count > 0 && actionList[0] != null)
+        {
+            IEnemyAction action = actionList[0];
+            yield return action.act_routine = StartCoroutine(action.Act_coroutine());
+            yield return null;
+        }
+        isActing = false;
+        if (!secondPhase && currentActionBreakAmount >= maxActionBreakCapacity) { yield return StartCoroutine(Break()); }//break
+        else { StartAction(); }//startover
+        yield return null;
     }
 
     public override void StartAction()
@@ -278,8 +293,8 @@ public class YingYangFish_AI : IEnemyController
         if (close)
         {
             float elapsedTime = 0f;
-            whiteAnim.Play("close_swim_pre");
-            blackAnim.Play("close_swim_pre");
+            //whiteAnim.Play("close_swim_pre");
+            //blackAnim.Play("close_swim_pre");
             while (white_distanceToCenter > minMaxDistanceTocenter.x)
             {
                 whiteFish.position -= whiteFish.up * swimToCenterSpeed * Time.deltaTime;
@@ -421,18 +436,32 @@ public class YingYangFish_AI : IEnemyController
             idleRotateSpeed *= 3;
             co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
             StartCoroutine(ChangeYPos(true));
+            StartCoroutine(Ultimate());
         }
+    }
+
+    public IEnumerator Ultimate()
+    {
+        //shaking and rotating
+        //normal rotating
+        // dive and QTE
+        // up on right
+        // splash four times
+        yield return true;
     }
 
     public IEnumerator ChangeYPos(bool up)
     {
-        if (up)
+        float y_value = waterLevel.position.y + 4.5f;
+        if (!up) { y_value = waterLevel.position.y + 2f; }
+
+        if (transform.position.y < y_value)
         {
-            while (transform.position.y < waterLevel.position.y + 4.5) { transform.position += new Vector3(0, 1, 0) * Time.deltaTime * 3; yield return null; }
+            while (transform.position.y < y_value) { transform.position += new Vector3(0, 1, 0) * Time.deltaTime * 3; yield return null; }
         }
         else
         {
-            while (transform.position.y > waterLevel.position.y + 2) { transform.position -= new Vector3(0, 1, 0) * Time.deltaTime * 3; yield return null; }
+            while (transform.position.y > y_value) { transform.position -= new Vector3(0, 1, 0) * Time.deltaTime * 3; yield return null; }
         }
     }
 }

@@ -56,7 +56,7 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public int currentActionBreakAmount = 0;
     [SerializeField, HideInInspector] public float breakDuration = 3f;
 
-    [HideInInspector] public List<IEnemyAction> actionList = new List<IEnemyAction>();
+    public List<IEnemyAction> actionList = new List<IEnemyAction>();
 
     #endregion BASIC_LOGIC
 
@@ -126,7 +126,6 @@ public abstract class IEnemyController : IDamagable
     {
         while (actionList.Count > 0 && actionList[0] != null)
         {
-            print("here");
             IEnemyAction action = actionList[0];
             yield return action.act_routine = StartCoroutine(action.Act_coroutine());
             yield return null;

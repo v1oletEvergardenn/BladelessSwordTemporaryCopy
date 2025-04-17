@@ -105,6 +105,11 @@ public abstract class IEnemyAction : MonoBehaviour
         if (chance <= i) { return true; }
         else { return false; }
     }
+
+    public void TryStopCoroutine(Coroutine i)
+    {
+        if (i != null) { StopCoroutine(i); }
+    }
 }
 
 [System.Serializable]
