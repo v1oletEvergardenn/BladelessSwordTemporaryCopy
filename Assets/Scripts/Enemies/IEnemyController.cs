@@ -56,7 +56,7 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public int currentActionBreakAmount = 0;
     [SerializeField, HideInInspector] public float breakDuration = 3f;
 
-    public List<IEnemyAction> actionList = new List<IEnemyAction>();
+    [HideInInspector] public List<IEnemyAction> actionList = new List<IEnemyAction>();
 
     #endregion BASIC_LOGIC
 

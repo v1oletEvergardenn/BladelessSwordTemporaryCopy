@@ -21,13 +21,12 @@ public class YYF_Swing : IEnemyAction
 
     public override IEnumerator Act_coroutine()
     {
-        bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
-        yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+        bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+        yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
 
+        bossAI.StopRotate();
         bossAI.whiteAnim.Play("swing");
         bossAI.blackAnim.Play("swing");
-        bossAI.black_idling = false;
-        bossAI.white_idling = false;
 
         yield return new WaitForSeconds(1f);
 
@@ -37,8 +36,7 @@ public class YYF_Swing : IEnemyAction
         yield return new WaitForSeconds(.7f);
 
         swingEffect.SetActive(false);
-        bossAI.black_idling = true;
-        bossAI.white_idling = true;
+        bossAI.SetNormalRotateSpeed();
 
         if (bossAI.NextAction() != bossAI.dive)
         {

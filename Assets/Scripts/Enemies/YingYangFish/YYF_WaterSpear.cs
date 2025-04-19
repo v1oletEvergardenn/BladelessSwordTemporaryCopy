@@ -50,12 +50,11 @@ public class YYF_WaterSpear : IEnemyAction
                 possiblity += 2;
             }
         }
-
         int i = UnityEngine.Random.Range(0, 10);
         second = false;
         if (i < possiblity) { second = true; }
 
-        if (!bossAI.white_idling)
+        if (!bossAI.closerFish_Black)
         {
             bossAI.whiteAnim.Play("spear_pre");
             bossAI.whiteAnim.SetBool("secondSpear", second);
@@ -75,7 +74,7 @@ public class YYF_WaterSpear : IEnemyAction
         if (second)
         {
             bossAI.AddActionBreak(actionBreakAmount);
-            if (!bossAI.white_idling) { secondSpear = pooler.SpawnFromPool("water_Spear", waterSpearPos_white.position).GetComponent<Spear>(); }
+            if (!bossAI.closerFish_Black) { secondSpear = pooler.SpawnFromPool("water_Spear", waterSpearPos_white.position).GetComponent<Spear>(); }
             else { secondSpear = pooler.SpawnFromPool("water_Spear", waterSpearPos_black.position).GetComponent<Spear>(); }
 
             secondSpear.SetUp(transform.right, this.gameObject, 0, _followTarget: true, _target: playerIDamagable, false, spearDamage, 0);
@@ -92,7 +91,6 @@ public class YYF_WaterSpear : IEnemyAction
             ShootSpear(secondSpear);
             secondShooted = true;
         }
-        //launch waterspear
 
         yield return new WaitForSeconds(0.5f);
         spear = null;
@@ -116,11 +114,12 @@ public class YYF_WaterSpear : IEnemyAction
         {
             if (bossAI.actionList.Count < 2 || (bossAI.actionList[1] != this && bossAI.actionList[1] != bossAI.splash))
             {
+                bossAI.SetNormalRotateSpeed();
                 yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
             }
-            bossAI.white_idling = true;
-            bossAI.black_idling = true;
         }
+
+        bossAI.SetNormalRotateSpeed();
         bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();
         yield return null;
