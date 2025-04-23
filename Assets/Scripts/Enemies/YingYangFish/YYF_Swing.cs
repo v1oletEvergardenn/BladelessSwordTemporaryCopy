@@ -21,8 +21,15 @@ public class YYF_Swing : IEnemyAction
 
     public override IEnumerator Act_coroutine()
     {
-        bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
-        yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
+        if (bossAI.white_distanceToCenter > bossAI.minMaxDistanceTocenter.x)
+        {
+            bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+            yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
+        }
+        else
+        {
+            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+        }
 
         bossAI.StopRotate();
         bossAI.whiteAnim.Play("swing");
@@ -38,10 +45,7 @@ public class YYF_Swing : IEnemyAction
         swingEffect.SetActive(false);
         bossAI.SetNormalRotateSpeed();
 
-        if (bossAI.NextAction() != bossAI.dive)
-        {
-            yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
-        }
+        yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
 
         bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();
@@ -73,7 +77,7 @@ public class YYF_Swing : IEnemyAction
                 if (combo && !bossAI.secondPhase)
                 {
                     bossAI.movingTarget = bossAI.GetBoundaryFarOfPlayer();
-                    bossAI.InsertAction(bossAI.splash);
+                    bossAI.InsertAction(bossAI.splash_white);
                     bossAI.InsertAction(bossAI.waterSpear);
                     bossAI.InsertAction(bossAI.dive);
                 }

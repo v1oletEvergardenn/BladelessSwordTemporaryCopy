@@ -42,6 +42,7 @@ public class YingYangFish_AI : IEnemyController
     [HideInInspector] public SpriteRenderer whiteSprite;
     [HideInInspector] public Animator blackAnim;
     [HideInInspector] public Animator whiteAnim;
+    [HideInInspector] public Animator centerAnim;
     [HideInInspector] public bool closerFish_Black;
 
     #endregion ATTRIBUTES
@@ -70,11 +71,13 @@ public class YingYangFish_AI : IEnemyController
     [ShowField(nameof(Actions))][SerializeField, ButtonField("StartAction", "StartAction")] public Transform void11;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("WaterSpear", "WaterSpear")] public Void void1;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Swing", "Swing")] public Void void8;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash", "Splash")] public Void void9;
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash_white", "Splash_white")] public Void void9;
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash_black", "Splash_black")] public Void void13;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Dive", "Dive")] public Void void10;
     [ShowField(nameof(Actions))][SerializeField] public YYF_WaterSpear waterSpear;
     [ShowField(nameof(Actions))][SerializeField] public YYF_Swing swing;
-    [ShowField(nameof(Actions))][SerializeField] public YYF_splash splash;
+    [ShowField(nameof(Actions))][SerializeField] public YYF_splash_white splash_white;
+    [ShowField(nameof(Actions))][SerializeField] public YYF_splash_black splash_black;
     [ShowField(nameof(Actions))][SerializeField] public YYF_Dive dive;
 
     #endregion ACTIONS
@@ -92,6 +95,7 @@ public class YingYangFish_AI : IEnemyController
         whiteSprite = whiteFish.GetComponent<SpriteRenderer>();
         blackAnim = blackFishGFX.GetComponent<Animator>();
         whiteAnim = whiteFishGFX.GetComponent<Animator>();
+        centerAnim = center.GetComponent<Animator>();
         movingTarget = player;
         EventInteract.SetActive(true);
         HealthUI.SetActive(false);
@@ -124,47 +128,6 @@ public class YingYangFish_AI : IEnemyController
         {
             isActing = true;
             co_act = StartCoroutine(Act());
-        }
-    }
-
-    public void WaterSpear()
-    {
-        InsertAction(waterSpear);
-    }
-
-    public override void ForceDie()
-    {
-        base.ForceDie();
-    }
-
-    public void Swing()
-    {
-        InsertAction(swing);
-    }
-
-    public void Splash()
-    {
-        InsertAction(splash);
-    }
-
-    public void Dive()
-    {
-        InsertAction(dive);
-    }
-
-    public IEnumerator Pre_SecondPhase()
-    {
-        if (!secondPhase)
-        {
-            actionList.Clear();
-            CancelAllAction();
-            co_sprintBackEqual = StartCoroutine(SprintBackEqual());
-            co_IEcloseSwim = StartCoroutine(IECloseSwim(true));
-            CharacterUIManager.ShowBlackEdge(true);
-            yield return StartCoroutine(ChangeYPos(false));
-            idleRotateSpeed /= 3;
-            secondPhase = true;
-            EventInteract.SetActive(true);
         }
     }
 
@@ -201,11 +164,11 @@ public class YingYangFish_AI : IEnemyController
         {
             possibleActions.Add(waterSpear);
         }
-        if (Mathf.Abs(player.position.x - transform.position.x) >= swing.swingRange + 1)
+        if (Mathf.Abs(player.position.x - transform.position.x) >= swing.swingRange - 1)
         {
             float i = Random.Range(0, 10);
             if (i < 3) { possibleActions.Add(waterSpear); }
-            else if (i < 6) { possibleActions.Add(splash); }
+            else if (i < 6) { possibleActions.Add(splash_white); }
             else if (i < 10) { possibleActions.Add(dive); }//moving
         }
         else
@@ -215,7 +178,7 @@ public class YingYangFish_AI : IEnemyController
 
         if (!playerController.isGrounded)
         {
-            possibleActions.Add(splash);
+            possibleActions.Add(splash_black);
         }
 
         int index = Random.Range(0, possibleActions.Count);
@@ -224,15 +187,17 @@ public class YingYangFish_AI : IEnemyController
         actionList.Add(initialAction);
         if (initialAction == dive)
         {
-            if ((float)playerEnergy.currentEnergy / (float)playerEnergy.maxEnergy <= 0.6f || playerAttack.currentHS_point < 2)
+            if ((float)playerEnergy.currentEnergy / (float)playerEnergy.maxEnergy <= 0.7f || playerAttack.currentHS_point < 2)
             {
                 InsertAction(swing);
+                movingTarget = player;
+                print("here");
             }
             else
             {
                 movingTarget = GetBoundaryFarOfPlayer();
                 if (Possibility(50)) { InsertAction(waterSpear); }
-                else { InsertAction(splash); InsertAction(waterSpear); }
+                else { InsertAction(splash_white); InsertAction(waterSpear); }
             }
         }
     }
@@ -249,21 +214,15 @@ public class YingYangFish_AI : IEnemyController
         {
             closerFish_Black = true;
             black_targetRotateSpeed = 0;
+            blackAnim.Play("sprint");
             blackOrigin.DORotate(Vector3.zero, sprintRotateSpeed, RotateMode.FastBeyond360).SetSpeedBased(true).OnComplete(() => { finished = true; });
-            //while (blackFish.eulerAngles.z > 0 && blackFish.eulerAngles.z < 340)
-            //{
-            //    print(blackFish.eulerAngles);
-            //    yield return null;
-            //}
-            //black_targetRotateSpeed = 0;
         }
         else
         {
             closerFish_Black = false;
             white_targetRotateSpeed = 0;
+            whiteAnim.Play("sprint");
             whiteOrigin.DORotate(Vector3.zero, sprintRotateSpeed, RotateMode.FastBeyond360).SetSpeedBased(true).OnComplete(() => { finished = true; });
-            //while (whiteFish.eulerAngles.z > 0 && whiteFish.eulerAngles.z < 340) { print(whiteFish.eulerAngles); yield return null; }
-            //white_targetRotateSpeed = 0;
         }
         while (!finished) { yield return null; }
         yield return null;
@@ -280,6 +239,9 @@ public class YingYangFish_AI : IEnemyController
         if (closerFish > 0 && closerFish <= 180)
         {
             black_targetRotateSpeed = sprintRotateSpeed;
+            if (white_targetRotateSpeed == sprintRotateSpeed) { black_targetRotateSpeed = white_targetRotateSpeed * 2; }
+
+            blackAnim.Play("sprint");
             float angle = Vector2.Angle(blackFish.right, whiteFish.right);
             while (angle > 180 || angle < 165)// reached start point
             {
@@ -290,6 +252,8 @@ public class YingYangFish_AI : IEnemyController
         else
         {
             white_targetRotateSpeed = sprintRotateSpeed;
+            if (black_targetRotateSpeed == sprintRotateSpeed) { white_targetRotateSpeed = black_targetRotateSpeed * 2; }
+            whiteAnim.Play("sprint");
             float angle = Vector2.Angle(blackFish.right, whiteFish.right);
             while (angle > 180 || angle < 165)// reached start point
             {
@@ -302,8 +266,8 @@ public class YingYangFish_AI : IEnemyController
 
     public IEnumerator IECloseSwim(bool close, bool playAnim = true)
     {
-        white_targetRotateSpeed = idleRotateSpeed * 2.5f;
-        black_targetRotateSpeed = idleRotateSpeed * 2.5f;
+        white_targetRotateSpeed = sprintRotateSpeed;
+        black_targetRotateSpeed = sprintRotateSpeed;
 
         if (close)
         {
@@ -312,11 +276,6 @@ public class YingYangFish_AI : IEnemyController
                 whiteAnim.Play("close_swim_pre");
                 blackAnim.Play("close_swim_pre");
             }
-
-            //whiteFishGFX.DOLocalRotate(new Vector3(0, 0, -25), 0.5f);
-            //whiteFishGFX.DOLocalMove(new Vector3(1, 0, 0), 0.5f);
-            //blackFishGFX.DOLocalRotate(new Vector3(0, 0, -25), 0.5f);
-            //blackFishGFX.DOLocalMove(new Vector3(1, 0, 0), 0.5f);
 
             while (white_distanceToCenter > minMaxDistanceTocenter.x)
             {
@@ -327,13 +286,7 @@ public class YingYangFish_AI : IEnemyController
         }
         else
         {
-            whiteAnim.Play("white_idle");
-            blackAnim.Play("black_idle");
-
-            //whiteFishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.5f).SetEase(Ease.InCubic);
-            //whiteFishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.5f).SetEase(Ease.InCubic);
-            //blackFishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.5f).SetEase(Ease.InCubic);
-            //blackFishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.5f).SetEase(Ease.InCubic);
+            blackAnim.Play("sprint"); whiteAnim.Play("sprint");
 
             while (white_distanceToCenter < minMaxDistanceTocenter.y)
             {
@@ -342,8 +295,6 @@ public class YingYangFish_AI : IEnemyController
                 yield return null;
             }
         }
-        white_targetRotateSpeed = idleRotateSpeed;
-        black_targetRotateSpeed = idleRotateSpeed;
     }
 
     /// <summary>
@@ -412,7 +363,8 @@ public class YingYangFish_AI : IEnemyController
         StopCoroutine(co_act);
         waterSpear.CancelAct();
         swing.CancelAct();
-        splash.CancelAct();
+        splash_white.CancelAct();
+        splash_black.CancelAct();
         dive.CancelAct();
         SetNormalRotateSpeed();
     }
@@ -429,12 +381,41 @@ public class YingYangFish_AI : IEnemyController
         else
         {
             //start second phase
-
-            EventInteract.SetActive(false);
-            co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
-            StartCoroutine(ChangeYPos(true));
-            StartCoroutine(Ultimate());
+            StartCoroutine(secondPhaseAnim());
         }
+    }
+
+    public IEnumerator Pre_SecondPhase()
+    {
+        if (!secondPhase)
+        {
+            actionList.Clear();
+            CancelAllAction();
+            co_IEcloseSwim = StartCoroutine(IECloseSwim(true));
+
+            CharacterUIManager.ShowBlackEdge(true);
+            yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
+            white_targetRotateSpeed = idleRotateSpeed / 3;
+            black_targetRotateSpeed = idleRotateSpeed / 3;
+            yield return StartCoroutine(ChangeYPos(false));
+
+            yield return new WaitForSeconds(1.5f);
+            centerAnim.Play("center_break");
+            SoundManager.PlaySound("glass_break");
+            secondPhase = true;
+            EventInteract.SetActive(true);
+        }
+    }
+
+    public IEnumerator secondPhaseAnim()
+    {
+        EventInteract.SetActive(false);
+        centerAnim.Play("center_fade");
+        yield return new WaitForSeconds(1.6f);
+        co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
+        StartCoroutine(ChangeYPos(true));
+        StartCoroutine(Ultimate());
+        yield return null;
     }
 
     public IEnumerator Ultimate()
@@ -460,6 +441,36 @@ public class YingYangFish_AI : IEnemyController
         {
             while (transform.position.y > y_value) { transform.position -= new Vector3(0, 1, 0) * Time.deltaTime * 3; yield return null; }
         }
+    }
+
+    public void WaterSpear()
+    {
+        InsertAction(waterSpear);
+    }
+
+    public override void ForceDie()
+    {
+        base.ForceDie();
+    }
+
+    public void Swing()
+    {
+        InsertAction(swing);
+    }
+
+    public void Splash_black()
+    {
+        InsertAction(splash_black);
+    }
+
+    public void Splash_white()
+    {
+        InsertAction(splash_white);
+    }
+
+    public void Dive()
+    {
+        InsertAction(dive);
     }
 
     public void SetNormalRotateSpeed()

@@ -37,7 +37,9 @@ public class YYF_WaterSpear : IEnemyAction
 
     public override IEnumerator Act_coroutine()
     {
+        yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
         yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.SprintStartPoint());
+
         shooted = false;
         secondShooted = false;
 
@@ -108,14 +110,6 @@ public class YYF_WaterSpear : IEnemyAction
                 //moving
                 bossAI.InsertAction(bossAI.swing);
                 bossAI.InsertAction(bossAI.dive);
-            }
-        }
-        else
-        {
-            if (bossAI.actionList.Count < 2 || (bossAI.actionList[1] != this && bossAI.actionList[1] != bossAI.splash))
-            {
-                bossAI.SetNormalRotateSpeed();
-                yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
             }
         }
 

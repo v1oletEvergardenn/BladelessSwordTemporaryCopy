@@ -10,10 +10,21 @@ public class YYF_Dive : IEnemyAction
     public GameObject swimEffect;
     public Transform dive_end_pos;
 
+    public Coroutine co_closeswim;
+
     public override void Start()
     {
         base.Start();
         bossAI = GetComponent<YingYangFish_AI>();
+    }
+
+    public override void CancelAct()
+    {
+        if (act_routine != null)
+        {
+            StopCoroutine(act_routine);
+        }
+        if (co_closeswim != null) { StopCoroutine(co_closeswim); }
     }
 
     public override IEnumerator Act_coroutine()
@@ -22,28 +33,21 @@ public class YYF_Dive : IEnemyAction
         bool next1 = false;
         bool ToLeft = true;
 
-        swimEffect.transform.localScale = Vector3.one;
+        bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
+        bossAI.white_targetRotateSpeed = bossAI.sprintRotateSpeed;
+        bossAI.black_targetRotateSpeed = bossAI.sprintRotateSpeed;
 
-        bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true, false));
-        bossAI.StopRotate();
-        bossAI.black_rotateSpeed = 0;
-        bossAI.white_rotateSpeed = 0;
-
-        bossAI.whiteOrigin.DORotate(new Vector3(0, 0, -90), 1.05f, RotateMode.FastBeyond360).SetEase(Ease.InOutSine);
-        bossAI.blackOrigin.DORotate(new Vector3(0, 0, -90), 1f, RotateMode.FastBeyond360).SetEase(Ease.InOutSine);
-        bossAI.whiteOrigin.DOMoveY(bossAI.waterLevel.position.y - 5, 1.05f).SetDelay(0.9f).SetEase(Ease.Linear).OnStart(() => { bossAI.whiteAnim.Play("white_dive_2"); });
-        bossAI.blackOrigin.DOMoveY(bossAI.waterLevel.position.y - 5, 1f).SetDelay(0.8f).SetEase(Ease.Linear).OnStart(() => { bossAI.blackAnim.Play("black_dive_2"); });
-
-        bossAI.center.DOMoveY(bossAI.waterLevel.position.y - 5, 2f).SetEase(Ease.InOutBack).OnComplete(() =>
+        transform.DOMoveY(bossAI.waterLevel.position.y - 5, 2f).SetEase(Ease.InOutBack).OnComplete(() =>
         {
             if (bossAI.movingTarget.position.x > transform.position.x) { ToLeft = false; swimEffect.transform.localScale = new Vector3(-1, 1, 1); }
+            else { swimEffect.transform.localScale = new Vector3(1, 1, 1); }
             if (ToLeft) { swimEffect.transform.position = new Vector3(bossAI.movingTarget.position.x + 15, bossAI.waterLevel.position.y, 0); }
             else { swimEffect.transform.position = new Vector3(bossAI.movingTarget.position.x - 15, bossAI.waterLevel.position.y, 0); }
             transform.DOMove(new Vector3(swimEffect.transform.position.x, bossAI.waterLevel.position.y - 6, 0), 1f).OnComplete(() =>
             {
                 bossAI.whiteOrigin.localPosition = Vector3.zero;
                 bossAI.blackOrigin.localPosition = Vector3.zero;
-                bossAI.center.localPosition = Vector3.zero; next1 = true;
+                next1 = true;
             });
         });
 
@@ -149,6 +153,16 @@ public class YYF_Dive : IEnemyAction
         else
         {
             bossAI.white_targetRotateSpeed = bossAI.idleRotateSpeed;
+        }
+    }
+
+    public IEnumerator CloseSwim()
+    {
+        while (bossAI.white_distanceToCenter > bossAI.minMaxDistanceTocenter.x)
+        {
+            bossAI.whiteFish.position -= bossAI.whiteFish.up * bossAI.swimToCenterSpeed * Time.deltaTime;
+            bossAI.blackFish.position -= bossAI.blackFish.up * bossAI.swimToCenterSpeed * Time.deltaTime;
+            yield return null;
         }
     }
 
