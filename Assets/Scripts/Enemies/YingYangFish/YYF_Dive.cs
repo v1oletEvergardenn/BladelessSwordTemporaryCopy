@@ -27,7 +27,7 @@ public class YYF_Dive : IEnemyAction
         if (co_closeswim != null) { StopCoroutine(co_closeswim); }
     }
 
-    public override IEnumerator Act_coroutine()
+    public override IEnumerator Act_coroutine(float factor = 0)
     {
         //dive
         bool next1 = false;

@@ -61,7 +61,7 @@ public class WB_melee_attack_long : IEnemyAction
         startedIEAttack = false;
     }
 
-    public override IEnumerator Act_coroutine()
+    public override IEnumerator Act_coroutine(float factor = 0)
     {
         startedIEAttack = true;
         anim.Play("melee_long_attack");

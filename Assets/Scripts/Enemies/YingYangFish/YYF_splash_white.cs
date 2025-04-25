@@ -20,7 +20,7 @@ public class YYF_splash_white : IEnemyAction
     }
 
     //low and far
-    public override IEnumerator Act_coroutine()
+    public override IEnumerator Act_coroutine(float factor = 0)
     {
         yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
 

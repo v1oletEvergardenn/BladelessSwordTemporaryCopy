@@ -35,7 +35,7 @@ public class YYF_WaterSpear : IEnemyAction
         if (!secondShooted && secondSpear != null) { secondSpear.SetFalseActive(); }
     }
 
-    public override IEnumerator Act_coroutine()
+    public override IEnumerator Act_coroutine(float factor = 0)
     {
         yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
         yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.SprintStartPoint());

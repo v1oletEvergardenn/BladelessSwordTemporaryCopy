@@ -31,7 +31,7 @@ public class WB_melee_attack_short : IEnemyAction
         StartCoroutine(Act_coroutine());
     }
 
-    public override IEnumerator Act_coroutine()
+    public override IEnumerator Act_coroutine(float factor = 0)
     {
         yield return new WaitForSeconds(0.3f);
         bossAI.canFlip = false;

@@ -44,7 +44,7 @@ public class WB_range_attack_short : IEnemyAction
         waterball.SetUp(transform.right, this.gameObject, 0, false, playerIDamagable, true, damage, speed);
     }
 
-    public override IEnumerator Act_coroutine()
+    public override IEnumerator Act_coroutine(float factor = 0)
     {
         acting_this = true;
         anim.Play("short_range_attack");

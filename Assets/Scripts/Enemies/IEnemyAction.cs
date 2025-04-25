@@ -50,7 +50,7 @@ public abstract class IEnemyAction : MonoBehaviour
         //OutLine_Activate(0);
     }
 
-    public virtual IEnumerator Act_coroutine()
+    public virtual IEnumerator Act_coroutine(float factor = 0)
     {
         yield return null;
     }

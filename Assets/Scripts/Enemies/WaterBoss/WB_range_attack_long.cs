@@ -27,7 +27,7 @@ public class WB_range_attack_long : IEnemyAction
         if (!shooted && spear != null) { Destroy(spear); }
     }
 
-    public override IEnumerator Act_coroutine()
+    public override IEnumerator Act_coroutine(float factor = 0)
     {
         //start
         anim.Play("range_attack_long_start");

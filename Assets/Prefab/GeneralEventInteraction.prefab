@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 412339991694245833}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2941398327632710514}
   - {fileID: 5189651978983824906}
@@ -172,7 +172,7 @@ MonoBehaviour:
   holdingTimer: 0
   isHolding: 0
   HoldRumble: 1
-  rumbleFrequency: {x: 0.30487806, y: 0.5772358}
+  rumbleFrequency: {x: 0.15853658, y: 0.30894315}
 --- !u!61 &7943025373174708543
 BoxCollider2D:
   m_ObjectHideFlags: 0

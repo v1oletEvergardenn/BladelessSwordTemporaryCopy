@@ -230,4 +230,18 @@ public abstract class IEnemyController : IDamagable
     {
         Damage(maxHealth);
     }
+
+    public virtual Transform GetCloserTargetOutOfTwo(Transform a, Transform b)
+    {
+        float dist_a = Mathf.Abs(transform.position.y - a.position.y);
+        float dist_b = Mathf.Abs(transform.position.y - b.position.y);
+        if (dist_a < dist_b) { return a; } else { return b; }
+    }
+
+    public virtual Transform GetFarTargetOutOfTwo(Transform a, Transform b)
+    {
+        float dist_a = Mathf.Abs(transform.position.y - a.position.y);
+        float dist_b = Mathf.Abs(transform.position.y - b.position.y);
+        if (dist_a < dist_b) { return b; } else { return a; }
+    }
 }

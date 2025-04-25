@@ -19,22 +19,20 @@ public class YYF_Swing : IEnemyAction
         bossAI = GetComponent<YingYangFish_AI>();
     }
 
-    public override IEnumerator Act_coroutine()
+    public override IEnumerator Act_coroutine(float factor = 0)
     {
+        yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+
         if (bossAI.white_distanceToCenter > bossAI.minMaxDistanceTocenter.x)
         {
-            bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
-        }
-        else
-        {
-            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
         }
 
         bossAI.StopRotate();
         bossAI.whiteAnim.Play("swing");
         bossAI.blackAnim.Play("swing");
 
+        if (factor == 1) { }//qte
         yield return new WaitForSeconds(1f);
 
         swingEffect.transform.eulerAngles = bossAI.whiteFish.eulerAngles;

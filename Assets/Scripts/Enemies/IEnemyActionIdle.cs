@@ -6,7 +6,7 @@ public class IEnemyActionIdle : IEnemyAction
 {
     public float idleTime = 2f;
 
-    public override IEnumerator Act_coroutine()
+    public override IEnumerator Act_coroutine(float factor = 0)
     {
         yield return new WaitForSeconds(idleTime);
         controller.NextAction();
