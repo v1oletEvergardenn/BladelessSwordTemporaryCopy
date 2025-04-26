@@ -20,13 +20,13 @@ public enum PlayerState
 
 public class InputPlayer : MonoBehaviour
 {
-    [HideInInspector] public ControllerInput INPUTcontrol;
-    [HideInInspector] public ControllerInput.GameplayActions control;
+    //[HideInInspector] public ControllerInput.GameplayActions control;
     [HideInInspector] public CharacterController2D controller;
+
     private PlayerAttack playerAttack;
     [HideInInspector] public Animator anim;
     private GameManager gameManager;
-    private InputMaster inputManager;
+    private InputMaster inputMaster;
     private Health health;
     public static InputPlayer instance;
 
@@ -64,6 +64,7 @@ public class InputPlayer : MonoBehaviour
     public bool learnedBarrier = false;
     public bool learnedDefend = false;
     public bool learnedHeartSword = false;
+
     // Start is called before the first frame update
 
     private void Awake()
@@ -76,7 +77,7 @@ public class InputPlayer : MonoBehaviour
         pointerSpriteRenderer = pointer.GetComponent<SpriteRenderer>();
         controller = GetComponent<CharacterController2D>();
         playerAttack = GetComponent<PlayerAttack>();
-        inputManager = InputMaster.instance;
+        inputMaster = InputMaster.instance;
         health = GetComponent<Health>();
         gameManager = GameManager.instance;
         gameManager.playerInput = this;
@@ -87,22 +88,23 @@ public class InputPlayer : MonoBehaviour
 
         anim = controller.anim;
 
-        INPUTcontrol = inputManager.input;
-        control = inputManager.gameplayActions;
-        control.Jump.canceled += ctx => OnEndJump();
-        control.Move.performed += ctx => moveDir = ctx.ReadValue<Vector2>();
-        control.Move.performed += ctx => leftAttackDir = ctx.ReadValue<Vector2>();
-        control.Move.canceled += ctx => leftAttackDir = Vector2.zero;
-        control.AttackDirection.performed += ctx => rightAttackDir = ctx.ReadValue<Vector2>();
-        control.AttackDirection.canceled += ctx => rightAttackDir = Vector2.zero;
-        control.Defend.canceled += ctx => playerAttack.EndDefend();
+        //INPUTcontrol = inputManager.input;
+        //control = inputManager.gameplayActions;
+
+        inputMaster._jumpAction.canceled += ctx => OnEndJump();
+        inputMaster._moveAction.performed += ctx => moveDir = ctx.ReadValue<Vector2>();
+        inputMaster._moveAction.performed += ctx => leftAttackDir = ctx.ReadValue<Vector2>();
+        inputMaster._moveAction.canceled += ctx => leftAttackDir = Vector2.zero;
+        inputMaster._attackDirectionAction.performed += ctx => rightAttackDir = ctx.ReadValue<Vector2>();
+        inputMaster._attackDirectionAction.canceled += ctx => rightAttackDir = Vector2.zero;
+        inputMaster._defendAction.canceled += ctx => playerAttack.EndDefend();
     }
 
     // Update is called once per frame
     private void Update()
     {
         pointer.transform.position = transform.position + new Vector3(0, pointerOffset, 0);
-        if (control.EventKey.WasPressedThisFrame())
+        if (inputMaster._EventKeyAction.WasPressedThisFrame())
         {
             if (DialogManager.instance != null && DialogManager.instance.Printer.activeInHierarchy)
             {
@@ -116,7 +118,7 @@ public class InputPlayer : MonoBehaviour
             }//eventObject
         }
 
-        if (control.EventKey.WasReleasedThisFrame())
+        if (inputMaster._EventKeyAction.WasReleasedThisFrame())
         {
             if (currentEventObject != null)
             {
@@ -139,16 +141,16 @@ public class InputPlayer : MonoBehaviour
         horizontalMove = x;
         if (moveDir.x == 0) { horizontalMove = 0; }
         if (learnedMovement) { controller.Move(horizontalMove * Time.fixedDeltaTime); }// horizontal movement
-        if (learnedJump && control.Jump.WasPressedThisFrame()) { OnJump(); }//jump
+        if (learnedJump && inputMaster._jumpAction.WasPressedThisFrame()) { OnJump(); }//jump
         if (learnedAttack)
         {
-            if (!control.AttackLeft.IsPressed() && control.AttackRight.WasPressedThisFrame())
+            if (!inputMaster._attackLeftAction.IsPressed() && inputMaster._attackRightAction.WasPressedThisFrame())
             {
                 playerAttack.Attack(false);
                 if (learnedBarrier)
                 { anim.SetBool("storm", true); playerAttack.isPreparingStorm = true; playerAttack.prepareStormTimer = 0f; }
             }
-            else if (!control.AttackRight.IsPressed() && control.AttackLeft.WasPressedThisFrame())
+            else if (!inputMaster._attackRightAction.IsPressed() && inputMaster._attackLeftAction.WasPressedThisFrame())
             {
                 playerAttack.Attack(true);
                 if (learnedBarrier)
@@ -157,21 +159,13 @@ public class InputPlayer : MonoBehaviour
         }
         if (learnedBarrier)
         {
-            if ((!control.AttackLeft.IsPressed() && control.AttackRight.WasReleasedThisFrame()) || (!control.AttackRight.IsPressed() && control.AttackLeft.WasReleasedThisFrame()))
+            if ((!inputMaster._attackLeftAction.IsPressed() && inputMaster._attackRightAction.WasReleasedThisFrame()) || (!inputMaster._attackRightAction.IsPressed() && inputMaster._attackLeftAction.WasReleasedThisFrame()))
             {
                 anim.SetBool("storm", false); playerAttack.OnStorm(); playerAttack.isPreparingStorm = false;
             }
         }
-        if (learnedDefend && control.Defend.WasPressedThisFrame() &&
-            !playerAttack.isPreparingStorm) { playerAttack.OnDefend(); }//defend
-        if (learnedTeleport && control.Teleport.WasPressedThisFrame()) { controller.SwordTeleport(); }
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            WaveController wave = ObjectPooler.instance.SpawnFromPool("wave", transform.position).GetComponent<WaveController>();
-            print(wave);
-            wave.CallWave();
-        }
+        if (learnedDefend && inputMaster._defendAction.WasPressedThisFrame() && !playerAttack.isPreparingStorm) { playerAttack.OnDefend(); }//defend
+        if (learnedTeleport && inputMaster._teleportAction.WasPressedThisFrame()) { controller.SwordTeleport(); }
     }
 
     private void FixedUpdate()

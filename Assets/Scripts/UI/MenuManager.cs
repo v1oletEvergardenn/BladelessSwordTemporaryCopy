@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using static ControllerInput;
-
+using UnityEngine.InputSystem;
 
 public enum TutType
 {
@@ -26,22 +26,20 @@ public enum TutType
 
 public class MenuManager : MonoBehaviour
 {
-
-     public static MenuManager instance;
+    public static MenuManager instance;
     [Header("Pause InGame Canvas")] public GameObject PauseGameCanvas;
     public List<GameObject> Tabs;
     private int currentIndexTab = 0;
 
     [Header("End Canvas")] public GameObject EndGameCanvas;
-
     [Header("TutJumpOut")] public GameObject TutJumpOutCanvas;
     public GameObject tutJumpOutCTX;
     public List<Tutorial> jump_tuts = new List<Tutorial>();
+
     private void Awake()
     {
         if (instance == null) { instance = this; }
     }
-
 
     private void Start()
     {
@@ -50,10 +48,9 @@ public class MenuManager : MonoBehaviour
         InputMaster.instance.uiActions.FlipPage_LB.performed += ctx => PreviousTab();
         InputMaster.instance.uiActions.FlipPage_RB.performed += ctx => NextTab();
 
-        InputMaster.instance.gameplayActions.MenuOpen.performed += ctx => OpenPauseGameCanvas();
+        InputMaster.instance._MenuOpenAction.performed += ctx => OpenPauseGameCanvas();
         InputMaster.instance.uiActions.MenuClose.performed += ctx => ClosePauseGameCanvas();
         InputMaster.instance.uiActions.MenuClose.performed += ctx => CloseTutJumpOut();
-
         jump_tuts = tutJumpOutCTX.GetComponentsInChildren<Tutorial>().ToList();
     }
 

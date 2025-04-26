@@ -64,24 +64,6 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Boomerang"",
-                    ""type"": ""Button"",
-                    ""id"": ""377dba3a-aa37-4b4a-9560-dbefd4de40eb"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Barrier"",
-                    ""type"": ""Button"",
-                    ""id"": ""dec8884f-1f94-4038-9c20-33e907389dc1"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""AttackLeft"",
                     ""type"": ""Button"",
                     ""id"": ""57e08d68-fa52-4443-b395-2778f0e973da"",
@@ -103,24 +85,6 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""name"": ""Defend"",
                     ""type"": ""Button"",
                     ""id"": ""0d7aedf2-0095-4dba-9874-059ba123193f"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""HeartSword_increase"",
-                    ""type"": ""Button"",
-                    ""id"": ""ab60c654-bdea-4ec0-9b39-8a3004cf344e"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""HeartSword_decrease"",
-                    ""type"": ""Button"",
-                    ""id"": ""1d812b4d-f04c-427a-aef6-26bf8bba9b2b"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -212,39 +176,6 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""705a4f39-e67a-4866-9be4-6674111b2186"",
-                    ""path"": ""<Gamepad>/rightShoulder"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""HeartSword_increase"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""ad3e8a90-1882-4768-aec6-0696a903c2b2"",
-                    ""path"": ""<Gamepad>/buttonNorth"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Boomerang"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""16384869-fa30-416a-89c8-d71ac1fbf367"",
-                    ""path"": ""<Gamepad>/buttonEast"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Barrier"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""bffc239d-477c-4e0d-81c2-fc752a14fe0a"",
                     ""path"": ""<Gamepad>/rightStick"",
                     ""interactions"": """",
@@ -273,17 +204,6 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Event_flip_page"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""2e1a4352-297d-420f-879c-97be50e6be96"",
-                    ""path"": ""<Gamepad>/leftShoulder"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""HeartSword_decrease"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -469,7 +389,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/leftStick/up"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Gamepad"",
+                    ""groups"": """",
                     ""action"": ""Navigate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -480,7 +400,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/rightStick/up"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Gamepad"",
+                    ""groups"": """",
                     ""action"": ""Navigate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -491,7 +411,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/leftStick/down"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Gamepad"",
+                    ""groups"": """",
                     ""action"": ""Navigate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -502,7 +422,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/rightStick/down"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Gamepad"",
+                    ""groups"": """",
                     ""action"": ""Navigate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -513,7 +433,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/leftStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Gamepad"",
+                    ""groups"": """",
                     ""action"": ""Navigate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -524,7 +444,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/rightStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Gamepad"",
+                    ""groups"": """",
                     ""action"": ""Navigate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -535,7 +455,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/leftStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Gamepad"",
+                    ""groups"": """",
                     ""action"": ""Navigate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -546,7 +466,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/rightStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Gamepad"",
+                    ""groups"": """",
                     ""action"": ""Navigate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -557,7 +477,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/dpad"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Gamepad"",
+                    ""groups"": """",
                     ""action"": ""Navigate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -722,7 +642,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""path"": ""*/{Submit}"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse;Gamepad;Touch;Joystick;XR"",
+                    ""groups"": ""Keyboard&Mouse;Touch;Joystick;XR"",
                     ""action"": ""Submit"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -733,7 +653,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""path"": ""*/{Cancel}"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse;Gamepad;Touch;Joystick;XR"",
+                    ""groups"": ""Keyboard&Mouse;Touch;Joystick;XR"",
                     ""action"": ""Cancel"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -958,13 +878,9 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         m_Gameplay_AttackDirection = m_Gameplay.FindAction("AttackDirection", throwIfNotFound: true);
         m_Gameplay_Jump = m_Gameplay.FindAction("Jump", throwIfNotFound: true);
         m_Gameplay_Teleport = m_Gameplay.FindAction("Teleport", throwIfNotFound: true);
-        m_Gameplay_Boomerang = m_Gameplay.FindAction("Boomerang", throwIfNotFound: true);
-        m_Gameplay_Barrier = m_Gameplay.FindAction("Barrier", throwIfNotFound: true);
         m_Gameplay_AttackLeft = m_Gameplay.FindAction("AttackLeft", throwIfNotFound: true);
         m_Gameplay_AttackRight = m_Gameplay.FindAction("AttackRight", throwIfNotFound: true);
         m_Gameplay_Defend = m_Gameplay.FindAction("Defend", throwIfNotFound: true);
-        m_Gameplay_HeartSword_increase = m_Gameplay.FindAction("HeartSword_increase", throwIfNotFound: true);
-        m_Gameplay_HeartSword_decrease = m_Gameplay.FindAction("HeartSword_decrease", throwIfNotFound: true);
         m_Gameplay_EventKey = m_Gameplay.FindAction("EventKey", throwIfNotFound: true);
         m_Gameplay_Event_flip_page = m_Gameplay.FindAction("Event_flip_page", throwIfNotFound: true);
         m_Gameplay_MenuOpen = m_Gameplay.FindAction("MenuOpen", throwIfNotFound: true);
@@ -1050,13 +966,9 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_AttackDirection;
     private readonly InputAction m_Gameplay_Jump;
     private readonly InputAction m_Gameplay_Teleport;
-    private readonly InputAction m_Gameplay_Boomerang;
-    private readonly InputAction m_Gameplay_Barrier;
     private readonly InputAction m_Gameplay_AttackLeft;
     private readonly InputAction m_Gameplay_AttackRight;
     private readonly InputAction m_Gameplay_Defend;
-    private readonly InputAction m_Gameplay_HeartSword_increase;
-    private readonly InputAction m_Gameplay_HeartSword_decrease;
     private readonly InputAction m_Gameplay_EventKey;
     private readonly InputAction m_Gameplay_Event_flip_page;
     private readonly InputAction m_Gameplay_MenuOpen;
@@ -1068,13 +980,9 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         public InputAction @AttackDirection => m_Wrapper.m_Gameplay_AttackDirection;
         public InputAction @Jump => m_Wrapper.m_Gameplay_Jump;
         public InputAction @Teleport => m_Wrapper.m_Gameplay_Teleport;
-        public InputAction @Boomerang => m_Wrapper.m_Gameplay_Boomerang;
-        public InputAction @Barrier => m_Wrapper.m_Gameplay_Barrier;
         public InputAction @AttackLeft => m_Wrapper.m_Gameplay_AttackLeft;
         public InputAction @AttackRight => m_Wrapper.m_Gameplay_AttackRight;
         public InputAction @Defend => m_Wrapper.m_Gameplay_Defend;
-        public InputAction @HeartSword_increase => m_Wrapper.m_Gameplay_HeartSword_increase;
-        public InputAction @HeartSword_decrease => m_Wrapper.m_Gameplay_HeartSword_decrease;
         public InputAction @EventKey => m_Wrapper.m_Gameplay_EventKey;
         public InputAction @Event_flip_page => m_Wrapper.m_Gameplay_Event_flip_page;
         public InputAction @MenuOpen => m_Wrapper.m_Gameplay_MenuOpen;
@@ -1099,12 +1007,6 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @Teleport.started += instance.OnTeleport;
             @Teleport.performed += instance.OnTeleport;
             @Teleport.canceled += instance.OnTeleport;
-            @Boomerang.started += instance.OnBoomerang;
-            @Boomerang.performed += instance.OnBoomerang;
-            @Boomerang.canceled += instance.OnBoomerang;
-            @Barrier.started += instance.OnBarrier;
-            @Barrier.performed += instance.OnBarrier;
-            @Barrier.canceled += instance.OnBarrier;
             @AttackLeft.started += instance.OnAttackLeft;
             @AttackLeft.performed += instance.OnAttackLeft;
             @AttackLeft.canceled += instance.OnAttackLeft;
@@ -1114,12 +1016,6 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @Defend.started += instance.OnDefend;
             @Defend.performed += instance.OnDefend;
             @Defend.canceled += instance.OnDefend;
-            @HeartSword_increase.started += instance.OnHeartSword_increase;
-            @HeartSword_increase.performed += instance.OnHeartSword_increase;
-            @HeartSword_increase.canceled += instance.OnHeartSword_increase;
-            @HeartSword_decrease.started += instance.OnHeartSword_decrease;
-            @HeartSword_decrease.performed += instance.OnHeartSword_decrease;
-            @HeartSword_decrease.canceled += instance.OnHeartSword_decrease;
             @EventKey.started += instance.OnEventKey;
             @EventKey.performed += instance.OnEventKey;
             @EventKey.canceled += instance.OnEventKey;
@@ -1145,12 +1041,6 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @Teleport.started -= instance.OnTeleport;
             @Teleport.performed -= instance.OnTeleport;
             @Teleport.canceled -= instance.OnTeleport;
-            @Boomerang.started -= instance.OnBoomerang;
-            @Boomerang.performed -= instance.OnBoomerang;
-            @Boomerang.canceled -= instance.OnBoomerang;
-            @Barrier.started -= instance.OnBarrier;
-            @Barrier.performed -= instance.OnBarrier;
-            @Barrier.canceled -= instance.OnBarrier;
             @AttackLeft.started -= instance.OnAttackLeft;
             @AttackLeft.performed -= instance.OnAttackLeft;
             @AttackLeft.canceled -= instance.OnAttackLeft;
@@ -1160,12 +1050,6 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @Defend.started -= instance.OnDefend;
             @Defend.performed -= instance.OnDefend;
             @Defend.canceled -= instance.OnDefend;
-            @HeartSword_increase.started -= instance.OnHeartSword_increase;
-            @HeartSword_increase.performed -= instance.OnHeartSword_increase;
-            @HeartSword_increase.canceled -= instance.OnHeartSword_increase;
-            @HeartSword_decrease.started -= instance.OnHeartSword_decrease;
-            @HeartSword_decrease.performed -= instance.OnHeartSword_decrease;
-            @HeartSword_decrease.canceled -= instance.OnHeartSword_decrease;
             @EventKey.started -= instance.OnEventKey;
             @EventKey.performed -= instance.OnEventKey;
             @EventKey.canceled -= instance.OnEventKey;
@@ -1356,13 +1240,9 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         void OnAttackDirection(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnTeleport(InputAction.CallbackContext context);
-        void OnBoomerang(InputAction.CallbackContext context);
-        void OnBarrier(InputAction.CallbackContext context);
         void OnAttackLeft(InputAction.CallbackContext context);
         void OnAttackRight(InputAction.CallbackContext context);
         void OnDefend(InputAction.CallbackContext context);
-        void OnHeartSword_increase(InputAction.CallbackContext context);
-        void OnHeartSword_decrease(InputAction.CallbackContext context);
         void OnEventKey(InputAction.CallbackContext context);
         void OnEvent_flip_page(InputAction.CallbackContext context);
         void OnMenuOpen(InputAction.CallbackContext context);

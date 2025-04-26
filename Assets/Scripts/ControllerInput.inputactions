@@ -42,24 +42,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Boomerang",
-                    "type": "Button",
-                    "id": "377dba3a-aa37-4b4a-9560-dbefd4de40eb",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Barrier",
-                    "type": "Button",
-                    "id": "dec8884f-1f94-4038-9c20-33e907389dc1",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "AttackLeft",
                     "type": "Button",
                     "id": "57e08d68-fa52-4443-b395-2778f0e973da",
@@ -81,24 +63,6 @@
                     "name": "Defend",
                     "type": "Button",
                     "id": "0d7aedf2-0095-4dba-9874-059ba123193f",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "HeartSword_increase",
-                    "type": "Button",
-                    "id": "ab60c654-bdea-4ec0-9b39-8a3004cf344e",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "HeartSword_decrease",
-                    "type": "Button",
-                    "id": "1d812b4d-f04c-427a-aef6-26bf8bba9b2b",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -190,39 +154,6 @@
                 },
                 {
                     "name": "",
-                    "id": "705a4f39-e67a-4866-9be4-6674111b2186",
-                    "path": "<Gamepad>/rightShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "HeartSword_increase",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "ad3e8a90-1882-4768-aec6-0696a903c2b2",
-                    "path": "<Gamepad>/buttonNorth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Boomerang",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "16384869-fa30-416a-89c8-d71ac1fbf367",
-                    "path": "<Gamepad>/buttonEast",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Barrier",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "bffc239d-477c-4e0d-81c2-fc752a14fe0a",
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
@@ -251,17 +182,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Event_flip_page",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "2e1a4352-297d-420f-879c-97be50e6be96",
-                    "path": "<Gamepad>/leftShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "HeartSword_decrease",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -447,7 +367,7 @@
                     "path": "<Gamepad>/leftStick/up",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Gamepad",
+                    "groups": "",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -458,7 +378,7 @@
                     "path": "<Gamepad>/rightStick/up",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Gamepad",
+                    "groups": "",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -469,7 +389,7 @@
                     "path": "<Gamepad>/leftStick/down",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Gamepad",
+                    "groups": "",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -480,7 +400,7 @@
                     "path": "<Gamepad>/rightStick/down",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Gamepad",
+                    "groups": "",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -491,7 +411,7 @@
                     "path": "<Gamepad>/leftStick/left",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Gamepad",
+                    "groups": "",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -502,7 +422,7 @@
                     "path": "<Gamepad>/rightStick/left",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Gamepad",
+                    "groups": "",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -513,7 +433,7 @@
                     "path": "<Gamepad>/leftStick/right",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Gamepad",
+                    "groups": "",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -524,7 +444,7 @@
                     "path": "<Gamepad>/rightStick/right",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Gamepad",
+                    "groups": "",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -535,7 +455,7 @@
                     "path": "<Gamepad>/dpad",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Gamepad",
+                    "groups": "",
                     "action": "Navigate",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -700,7 +620,7 @@
                     "path": "*/{Submit}",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse;Gamepad;Touch;Joystick;XR",
+                    "groups": "Keyboard&Mouse;Touch;Joystick;XR",
                     "action": "Submit",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -711,7 +631,7 @@
                     "path": "*/{Cancel}",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse;Gamepad;Touch;Joystick;XR",
+                    "groups": "Keyboard&Mouse;Touch;Joystick;XR",
                     "action": "Cancel",
                     "isComposite": false,
                     "isPartOfComposite": false

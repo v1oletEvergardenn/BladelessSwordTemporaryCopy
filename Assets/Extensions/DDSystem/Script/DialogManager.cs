@@ -358,7 +358,7 @@ namespace Doublsb.Dialog
 
         private IEnumerator _waitInput()
         {
-            while (!GameManager.instance.playerInput.control.EventKey.WasPressedThisFrame()) yield return null;
+            while (!InputMaster.instance._EventKeyAction.WasPressedThisFrame()) yield return null;
             _currentDelay = _lastDelay;
         }
 
