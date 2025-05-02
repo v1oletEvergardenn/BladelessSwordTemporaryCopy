@@ -18,7 +18,7 @@ public class InputMaster : MonoBehaviour
 
     public GamepadIcons gamePadicons;
 
-    [Header("Input")] private PlayerInput _playerInput;
+    [Header("Input")] public PlayerInput _playerInput;
     [HideInInspector] public InputAction _moveAction;
     [HideInInspector] public InputAction _attackDirectionAction;
     [HideInInspector] public InputAction _jumpAction;
@@ -33,7 +33,13 @@ public class InputMaster : MonoBehaviour
     [Header("QTE")]
     public GameObject qteKey;
 
+    [HideInInspector] public InputAction inputActionKey;
+    [HideInInspector] public bool inputWasEnabled = false;
+    [HideInInspector] public Coroutine co_QTE;
+    [HideInInspector] public bool isQTE = false;
     public Image qteKey_image;
+    public Image qteInteractedKey_image;
+    [HideInInspector] public System.Action<bool> callBack;
 
     private void Awake()
     {
@@ -53,6 +59,9 @@ public class InputMaster : MonoBehaviour
         _EventKeyAction = _playerInput.actions["EventKey"];
         _EventFlipPageAction = _playerInput.actions["Event_flip_page"];
         _MenuOpenAction = _playerInput.actions["MenuOpen"];
+
+        qteInteractedKey_image.fillAmount = 0;
+        qteKey.SetActive(false);
     }
 
     public void NewInput()
@@ -72,56 +81,133 @@ public class InputMaster : MonoBehaviour
     private void Start()
     {
         gameManager = GameManager.instance;
-
-        StartCoroutine(QTE(InputKeyType.left_attack_key, PlayerAttack.instance.transform.position + new Vector3(0, 3, 0), 2f));
     }
 
-    public IEnumerator QTE(InputKeyType key, Vector3 pos, float duration)
+    public IEnumerator QTE(InputKeyType key, Vector3 pos, float duration, System.Action<bool> _callBack)
     {
         string deviceLayoutName;
         string controlPath;
         string InputPath;
+        callBack = _callBack;
+        isQTE = true;
+        qteInteractedKey_image.fillAmount = 0;
+        Time.timeScale = 0.1f;
+
+        #region input key determine
+
         switch (key)
         {
             case InputKeyType.right_attack_key:
                 InputPath = _attackRightAction.bindings[0].effectivePath;
+                inputActionKey = _attackRightAction;
                 break;
 
             case InputKeyType.left_attack_key:
                 InputPath = _attackLeftAction.bindings[0].effectivePath;
+                inputActionKey = _attackLeftAction;
                 break;
 
             case InputKeyType.defend_key:
                 InputPath = _defendAction.bindings[0].effectivePath;
+                inputActionKey = _defendAction;
                 break;
 
             case InputKeyType.swordTeleport_key:
                 InputPath = _teleportAction.bindings[0].effectivePath;
+                inputActionKey = _teleportAction;
                 break;
 
             case InputKeyType.jump_key:
                 InputPath = _jumpAction.bindings[0].effectivePath;
+                inputActionKey = _jumpAction;
                 break;
 
             case InputKeyType.move_key:
                 InputPath = _moveAction.bindings[0].effectivePath;
+                inputActionKey = _moveAction;
                 break;
 
             case InputKeyType.aim_key:
                 InputPath = _attackDirectionAction.bindings[0].effectivePath;
+                inputActionKey = _attackDirectionAction;
                 break;
 
             default: InputPath = _EventKeyAction.bindings[0].effectivePath; break;
         }
+        inputWasEnabled = inputActionKey.enabled;
+        inputActionKey.Enable();
         InputControlPath.ToHumanReadableString(InputPath, out deviceLayoutName, out controlPath);
         qteKey_image.sprite = gamePadicons.GetSprite(controlPath);
         qteKey_image.SetNativeSize();
         qteKey.transform.position = pos;
         qteKey.SetActive(true);
-        yield return new WaitForSecondsRealtime(duration);
-        qteKey.SetActive(false);
 
-        yield return null;
+        #endregion input key determine
+
+        float elapsedTime = 0f;
+
+        while (elapsedTime <= duration)
+        {
+            elapsedTime += Time.deltaTime;
+            qteInteractedKey_image.fillAmount = 1 - (elapsedTime / duration);
+            yield return null;
+        }
+
+        EndQTE(false);
+        yield return false;
+    }
+
+    public void EndQTE(bool successful)
+    {
+        if (isQTE)
+        {
+            Time.timeScale = 1f;
+            StopCoroutine(co_QTE);
+            isQTE = false;
+            qteKey.SetActive(false);
+            callBack?.Invoke(successful);
+            callBack = null;
+            if (!inputWasEnabled) { inputActionKey.Disable(); }
+            else { inputActionKey.Enable(); }
+            inputActionKey = null;
+        }
+        else
+        {
+            Debug.Log("unsuceessful, not in QTE");
+        }
+    }
+
+    public void StartQTE(InputKeyType key, Vector3 pos, float duration, System.Action<bool> callBack)
+    {
+        co_QTE = StartCoroutine(QTE(key, pos, duration, callBack));
+    }
+
+    public void StartQTE(InputKeyType key, Vector3 pos, float duration)
+    {
+        co_QTE = StartCoroutine(QTE(key, pos, duration, null));
+    }
+
+    public void DisableAllActions()
+    {
+        _moveAction.Disable();
+        _attackDirectionAction.Disable();
+        _jumpAction.Disable();
+        _teleportAction.Disable();
+        _attackLeftAction.Disable();
+        _attackRightAction.Disable();
+        _defendAction.Disable();
+        InputPlayer.instance.DisableAllActions();
+    }
+
+    public void EnableAllActions()
+    {
+        _moveAction.Enable();
+        _attackDirectionAction.Enable();
+        _jumpAction.Enable();
+        _teleportAction.Enable();
+        _attackLeftAction.Enable();
+        _attackRightAction.Enable();
+        _defendAction.Enable();
     }
 }
 

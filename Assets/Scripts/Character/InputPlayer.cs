@@ -8,6 +8,7 @@ using Unity.VisualScripting;
 using System.Data;
 using Doublsb.Dialog;
 using UnityEngine.SceneManagement;
+using System;
 
 public enum PlayerState
 {
@@ -103,6 +104,7 @@ public class InputPlayer : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        if (gameManager.GamePaused) { return; }
         pointer.transform.position = transform.position + new Vector3(0, pointerOffset, 0);
         if (inputMaster._EventKeyAction.WasPressedThisFrame())
         {
@@ -125,6 +127,26 @@ public class InputPlayer : MonoBehaviour
                 currentEventObject.Interact(false);
                 return;
             }//eventObject
+        }
+
+        if (learnedBarrier)
+        {
+            if ((!inputMaster._attackLeftAction.IsPressed() && !inputMaster._attackRightAction.IsPressed()) && playerAttack.isPreparingStorm)
+            {
+                anim.SetBool("storm", false); playerAttack.OnStorm(); playerAttack.isPreparingStorm = false;
+            }
+        }
+
+        if (inputMaster.isQTE)
+        {
+            if (inputMaster.inputActionKey.WasPressedThisFrame())
+            {
+                inputMaster.EndQTE(true);
+            }
+            else
+            {
+                return;
+            }
         }
 
         if (health.isDead) { return; }
@@ -157,13 +179,7 @@ public class InputPlayer : MonoBehaviour
                 { anim.SetBool("storm", true); playerAttack.isPreparingStorm = true; playerAttack.prepareStormTimer = 0f; }
             }
         }
-        if (learnedBarrier)
-        {
-            if ((!inputMaster._attackLeftAction.IsPressed() && inputMaster._attackRightAction.WasReleasedThisFrame()) || (!inputMaster._attackRightAction.IsPressed() && inputMaster._attackLeftAction.WasReleasedThisFrame()))
-            {
-                anim.SetBool("storm", false); playerAttack.OnStorm(); playerAttack.isPreparingStorm = false;
-            }
-        }
+
         if (learnedDefend && inputMaster._defendAction.WasPressedThisFrame() && !playerAttack.isPreparingStorm) { playerAttack.OnDefend(); }//defend
         if (learnedTeleport && inputMaster._teleportAction.WasPressedThisFrame()) { controller.SwordTeleport(); }
     }
@@ -290,5 +306,15 @@ public class InputPlayer : MonoBehaviour
             currentEventObject.EndInteraction();
             currentEventObject = null;
         }
+    }
+
+    public void DisableAllActions()
+    {
+        moveDir = Vector2.zero;
+        leftAttackDir = Vector2.zero;
+        rightAttackDir = Vector2.zero;
+        DisableFloat();
+        anim.SetBool("storm", false);
+        playerAttack.isPreparingStorm = false;
     }
 }

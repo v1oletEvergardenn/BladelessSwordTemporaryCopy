@@ -28,12 +28,27 @@ public class YYF_Swing : IEnemyAction
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
         }
 
-        bossAI.StopRotate();
+        bossAI.black_targetRotateSpeed = bossAI.idleRotateSpeed / 4;
+        bossAI.white_targetRotateSpeed = bossAI.idleRotateSpeed / 4;
+
         bossAI.whiteAnim.Play("swing");
         bossAI.blackAnim.Play("swing");
 
-        if (factor == 1) { }//qte
-        yield return new WaitForSeconds(1f);
+        if (factor == 1)
+        {
+            yield return new WaitForSeconds(0.6f);
+            InputKeyType inputKey = InputKeyType.left_attack_key;
+            if (bossAI.IsPlayerLeft()) { inputKey = InputKeyType.right_attack_key; }
+            InputMaster.instance.StartQTE(inputKey, player.transform.position + new Vector3(0, 4, 0), 0.4f);
+            while (InputMaster.instance.isQTE) { yield return null; }
+        }//qte
+        else
+        {
+            yield return new WaitForSeconds(1f);
+        }
+
+        bossAI.whiteAnim.Play("swing_attack");
+        bossAI.blackAnim.Play("swing_attack");
 
         swingEffect.transform.eulerAngles = bossAI.whiteFish.eulerAngles;
         swingEffect.SetActive(true);
@@ -63,7 +78,7 @@ public class YYF_Swing : IEnemyAction
             vfx.RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
             vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
 
-            if (bossAI.actionList[0] == this)
+            if (bossAI.actionList.Count != 0 && bossAI.actionList[0] == this)
             {
                 bool combo = false;
                 if (((float)bossAI.currentHealth / (float)bossAI.maxHealth) <= 0.5)

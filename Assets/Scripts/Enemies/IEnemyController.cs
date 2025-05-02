@@ -244,4 +244,16 @@ public abstract class IEnemyController : IDamagable
         float dist_b = Mathf.Abs(transform.position.y - b.position.y);
         if (dist_a < dist_b) { return b; } else { return a; }
     }
+
+    public virtual bool IsPlayerLeft()
+    {
+        if (player.position.x <= transform.position.x)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

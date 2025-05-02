@@ -423,10 +423,12 @@ public class YingYangFish_AI : IEnemyController
     public IEnumerator secondPhaseAnim()
     {
         EventInteract.SetActive(false);
+        InputMaster.instance.DisableAllActions();
+
         StartCoroutine(ChangeYPos(true));
         centerAnim.Play("center_fade");
         yield return StartCoroutine(Circling(3.5f));
-        co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
+        yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
 
         StartCoroutine(Ultimate());
         yield return null;
@@ -434,6 +436,7 @@ public class YingYangFish_AI : IEnemyController
 
     public IEnumerator Ultimate()
     {
+        print("start ultimate");
         yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(1));
         // dive and QTE
         // up on right

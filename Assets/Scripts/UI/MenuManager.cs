@@ -60,12 +60,14 @@ public class MenuManager : MonoBehaviour
         currentIndexTab = -1;
         NextTab();
         PauseGameCanvas.SetActive(true);
+        InputMaster.instance._playerInput.SwitchCurrentActionMap("UI");
     }
 
     public void ClosePauseGameCanvas()
     {
         GameManager.instance.UnpauseGame();
         PauseGameCanvas.SetActive(false);
+        InputMaster.instance._playerInput.SwitchCurrentActionMap("Gameplay");
     }
 
     public void NextTab()
