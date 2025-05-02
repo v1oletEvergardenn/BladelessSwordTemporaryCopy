@@ -22,14 +22,26 @@ public class YYF_splash_black : IEnemyAction
     //high and near
     public override IEnumerator Act_coroutine(float factor = 0)
     {
-        yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
+        if (factor == 0)
+        {
+            yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
 
-        bool finished = false;
-        bossAI.black_targetRotateSpeed = 0;
-        bossAI.blackAnim.Play("sprint");
-        bossAI.blackOrigin.DORotate(new Vector3(0, 0, -180), bossAI.sprintRotateSpeed, RotateMode.FastBeyond360).SetEase(Ease.OutSine).SetSpeedBased(true).OnComplete(() => { finished = true; });
-        while (!finished) { yield return null; }
-
+            bool finished = false;
+            bossAI.black_targetRotateSpeed = 0;
+            bossAI.blackAnim.Play("sprint");
+            bossAI.blackOrigin.DORotate(new Vector3(0, 0, -180), bossAI.sprintRotateSpeed, RotateMode.FastBeyond360).SetEase(Ease.OutSine).SetSpeedBased(true).OnComplete(() => { finished = true; });
+            while (!finished) { yield return null; }
+        }
+        else if (factor == 1)
+        {
+            bossAI.black_targetRotateSpeed = bossAI.sprintRotateSpeed;
+            bossAI.blackAnim.Play("sprint");
+            while (Mathf.Abs(180 - bossAI.blackFish.eulerAngles.z) >= 10)
+            {
+                yield return null;
+            }
+            bossAI.black_targetRotateSpeed = 0;
+        }
         bossAI.blackAnim.Play("splash");
 
         yield return new WaitForSeconds(1f);
@@ -54,9 +66,16 @@ public class YYF_splash_black : IEnemyAction
             }
         }
 
-        yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+        if (factor == 0)
+        {
+            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+            bossAI.SetNormalRotateSpeed();
+        }
+        else
+        {
+            bossAI.black_targetRotateSpeed = bossAI.sprintRotateSpeed;
+        }
 
-        bossAI.SetNormalRotateSpeed();
         bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();
 

@@ -465,6 +465,15 @@ public class CharacterController2D : MonoBehaviour
         }
     }//flip the character
 
+    public void FaceTarget(Transform target)
+    {
+        if (target.position.x <= transform.position.x && m_FacingRight
+            || target.position.x > transform.position.x && !m_FacingRight)
+        {
+            Flip();
+        }
+    }
+
     public void SwordTeleport()
     {
         if (teleportTimer <= teleportCD) { return; }

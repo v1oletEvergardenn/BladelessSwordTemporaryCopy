@@ -74,6 +74,7 @@ public class YingYangFish_AI : IEnemyController
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash_white", "Splash_white")] public Void void9;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash_black", "Splash_black")] public Void void13;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Dive", "Dive")] public Void void10;
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("SwimAway", "SwimAway")] public Void void21;
     [ShowField(nameof(Actions))][SerializeField] public YYF_WaterSpear waterSpear;
     [ShowField(nameof(Actions))][SerializeField] public YYF_Swing swing;
     [ShowField(nameof(Actions))][SerializeField] public YYF_splash_white splash_white;
@@ -369,11 +370,11 @@ public class YingYangFish_AI : IEnemyController
 
     public void CancelAllAction()
     {
-        if (co_IEcloseSwim != null) StopCoroutine(co_IEcloseSwim);
-        if (co_sprintBackEqual != null) StopCoroutine(co_sprintBackEqual);
-        if (co_sprintStartPoint != null) StopCoroutine(co_sprintStartPoint);
+        if (co_IEcloseSwim != null) TryStopCoroutine(co_IEcloseSwim);
+        if (co_sprintBackEqual != null) TryStopCoroutine(co_sprintBackEqual);
+        if (co_sprintStartPoint != null) TryStopCoroutine(co_sprintStartPoint);
 
-        StopCoroutine(co_act);
+        TryStopCoroutine(co_act);
         waterSpear.CancelAct();
         swing.CancelAct();
         splash_white.CancelAct();
@@ -424,23 +425,37 @@ public class YingYangFish_AI : IEnemyController
     {
         EventInteract.SetActive(false);
         InputMaster.instance.DisableAllActions();
-
+        InputMaster.instance._attackLeftAction.Enable();
+        InputMaster.instance._attackRightAction.Enable();
+        InputMaster.instance._defendAction.Enable();
+        InputMaster.instance._attackDirectionAction.Enable();
+        CharacterController2D.instance.FaceTarget(this.transform);
         StartCoroutine(ChangeYPos(true));
         centerAnim.Play("center_fade");
+
+        StartCoroutine(EmojiDuringCircling());
         yield return StartCoroutine(Circling(3.5f));
-        yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
 
         StartCoroutine(Ultimate());
+
         yield return null;
     }
 
     public IEnumerator Ultimate()
     {
-        print("start ultimate");
         yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(1));
-        // dive and QTE
-        // up on right
+        yield return dive.act_routine = StartCoroutine(dive.Act_coroutine(1));
+        yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
+        //SetNormalRotateSpeed();
+
         // splash four times
+        yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
+        yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
+        yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
+        yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
+
+        yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
+
         yield return true;
     }
 
@@ -464,6 +479,15 @@ public class YingYangFish_AI : IEnemyController
         while (whiteAnim.GetCurrentAnimatorStateInfo(0).IsName("white_circling_down_end") ||
             blackAnim.GetCurrentAnimatorStateInfo(0).IsName("black_circling_down_end"))
         { yield return null; }
+        yield return null;
+    }
+
+    private IEnumerator EmojiDuringCircling()
+    {
+        yield return new WaitForSeconds(0.2f);
+        Emoji.instance.PlayEmotion(EmotionType.Sigh);
+        yield return new WaitForSeconds(0.5f);
+        playerAttack.anim.Play("defend");
         yield return null;
     }
 
@@ -517,5 +541,25 @@ public class YingYangFish_AI : IEnemyController
     {
         black_targetRotateSpeed = 0;
         white_targetRotateSpeed = 0;
+    }
+
+    public void SwimAway()
+    {
+        StartCoroutine(IE_SwimAway());
+    }
+
+    public IEnumerator IE_SwimAway()
+    {
+        float elapsedTime = 0;
+        Vector3 pos = blackFish.transform.position;
+        black_targetRotateSpeed = 0;
+        while (elapsedTime <= 2f)
+        {
+            blackFish.transform.position = Vector3.Slerp(pos, player.position, elapsedTime / 2);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        yield return null;
     }
 }

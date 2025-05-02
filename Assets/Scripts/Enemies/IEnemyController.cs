@@ -256,4 +256,9 @@ public abstract class IEnemyController : IDamagable
             return false;
         }
     }
+
+    public void TryStopCoroutine(Coroutine i)
+    {
+        if (i != null) { StopCoroutine(i); }
+    }
 }
