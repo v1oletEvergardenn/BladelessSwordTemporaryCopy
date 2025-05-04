@@ -9,17 +9,13 @@ public class CameraLimit : MonoBehaviour
 {
     [SerializeField] private List<Transform> targets;
     [SerializeField] private CinemachineVirtualCamera cam;
-    [SerializeField] private Transform camPos;
     private Vector3 center = Vector3.zero;
     public float minZoom = 2.5f;
-    public float maxZoom = 14f;
-    public float zoomLimiter_x = 30f;
-    public float zoomLimiter_y = 30f;
-    public Vector2 minLimit = new Vector2(1, 1);
-    public Vector2 maxLimit = new Vector2(10, 10);
-
+    public BoxCollider2D col;
     public bool CancelOffset = false;
     public bool includePlayer = false;
+    public float y_limit_low;
+    public bool DEBUG = false;
 
     /// <summary>
     /// once touched the collision, update the camera zoom on Player, change the limit variable to this.
@@ -31,14 +27,10 @@ public class CameraLimit : MonoBehaviour
         camZoom.limitCam = cam;
         camZoom.activate = true;
         camZoom.minZoom = minZoom;
-        camZoom.maxZoom = maxZoom;
         camZoom.targets = new List<Transform>(targets);
-        camZoom.limitCamFollow = camPos;
+        camZoom.limitCamFollow = cam.transform;
+        camZoom.y_limit_low = y_limit_low + transform.position.y;
         if (includePlayer) { camZoom.targets.Add(camZoom._player); }
-        camZoom.zoomLimiter_x = zoomLimiter_x;
-        camZoom.zoomLimiter_y = zoomLimiter_y;
-        camZoom.minLimit = minLimit;
-        camZoom.maxLimit = maxLimit;
         camZoom.transform.position = transform.position;
         if (CancelOffset) { camZoom.useOffset = false; }
     }
@@ -51,12 +43,15 @@ public class CameraLimit : MonoBehaviour
         CameraFollow.instance.Deactivate();
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
+        if (!DEBUG) { return; }
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireCube(transform.position, new Vector3(minLimit.x, minLimit.y, 1));
-        Gizmos.DrawWireCube(transform.position, new Vector3(maxLimit.x, maxLimit.y, 1));
+        //Gizmos.DrawWireCube(transform.position, new Vector3(minLimit.x, minLimit.y, 1));
+        //Gizmos.DrawWireCube(transform.position, new Vector3(maxLimit.x, maxLimit.y, 1));
         Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(transform.position + new Vector3(col.offset.x, col.offset.y, 0), new Vector3(col.size.x, col.size.y, 0));
+        Gizmos.DrawLine(transform.position + new Vector3(4, y_limit_low), transform.position + new Vector3(-4, y_limit_low));
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

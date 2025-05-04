@@ -361,9 +361,9 @@ public class YingYangFish_AI : IEnemyController
         return 0;
     }
 
-    public Quaternion CalculateWantedRotation(Vector3 _targetPos)
+    public Quaternion CalculateWantedRotation(Vector3 startPos, Vector3 _targetPos)
     {
-        float angle = Mathf.Atan2(_targetPos.y - transform.position.y, _targetPos.x - transform.position.x) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(_targetPos.y - startPos.y, _targetPos.x - startPos.x) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
         return targetRotation;
     }
@@ -545,21 +545,47 @@ public class YingYangFish_AI : IEnemyController
 
     public void SwimAway()
     {
-        StartCoroutine(IE_SwimAway());
+        StartCoroutine(IE_SwimAway(test.position, offset, true));
     }
 
-    public IEnumerator IE_SwimAway()
+    public Transform test;
+    public float offset = 1;
+
+    public IEnumerator IE_SwimAway(Vector3 end, float centerOffset, bool isBlack)
     {
-        float elapsedTime = 0;
-        Vector3 pos = blackFish.transform.position;
-        black_targetRotateSpeed = 0;
-        while (elapsedTime <= 2f)
+        Transform fish = whiteOrigin;
+        if (isBlack) { fish = blackOrigin; }
+        yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
+        while (Mathf.RoundToInt(fish.eulerAngles.z) - Mathf.RoundToInt(CalculateWantedRotation(fish.position, end).eulerAngles.z) != 40)
         {
-            blackFish.transform.position = Vector3.Slerp(pos, player.position, elapsedTime / 2);
-            elapsedTime += Time.deltaTime;
             yield return null;
         }
+        if (isBlack) { black_targetRotateSpeed = 0; black_rotateSpeed = 0; }
+        else { white_targetRotateSpeed = 0; white_rotateSpeed = 0; }
 
+        float elapsedTime = 0;
+        Vector3 start = fish.position;
+        Vector3 centerPoint = (start + end) * 0.5f;
+        centerPoint -= fish.up * centerOffset;
+        Vector3 startRelCenter = start - centerPoint;
+        Vector3 endRelCenter = end - centerPoint;
+        float duration = Vector3.Distance(fish.position, end) / 7;
+        Vector3 startAngle = fish.eulerAngles;
+        Vector3 endAngle = fish.eulerAngles - new Vector3(0, 0, 100);
+        while (elapsedTime <= duration)
+        {
+            //if (Mathf.Abs(Mathf.RoundToInt(fish.eulerAngles.z) - Mathf.RoundToInt(CalculateWantedRotation(fish.position, end).eulerAngles.z)) > 2)
+            //{
+            //    fish.eulerAngles -= Vector3.forward;
+            //}
+            fish.eulerAngles = Vector3.Lerp(startAngle, endAngle, elapsedTime / duration);
+            fish.transform.position = Vector3.Slerp(startRelCenter, endRelCenter, elapsedTime / duration) + centerPoint;
+            elapsedTime += Time.deltaTime;
+
+            yield return null;
+        }
+        if (isBlack) { black_targetRotateSpeed = idleRotateSpeed; }
+        else { white_targetRotateSpeed = idleRotateSpeed; }
         yield return null;
     }
 }
