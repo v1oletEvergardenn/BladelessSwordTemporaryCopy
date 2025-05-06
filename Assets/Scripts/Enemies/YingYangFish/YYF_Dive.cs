@@ -57,8 +57,8 @@ public class YYF_Dive : IEnemyAction
         else
         {
             bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
-            bossAI.white_targetRotateSpeed = bossAI.sprintRotateSpeed;
-            bossAI.black_targetRotateSpeed = bossAI.sprintRotateSpeed;
+            bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
+            bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);
 
             transform.DOMoveY(pos.y - 5, 2f).SetEase(Ease.InOutBack).OnComplete(() =>
             {
@@ -176,11 +176,11 @@ public class YYF_Dive : IEnemyAction
     {
         if (isBlack)
         {
-            bossAI.black_targetRotateSpeed = bossAI.idleRotateSpeed;
+            bossAI.SetBlackTargetRotateSpeed(bossAI.idleRotateSpeed);
         }
         else
         {
-            bossAI.white_targetRotateSpeed = bossAI.idleRotateSpeed;
+            bossAI.SetWhiteTargetRotateSpeed(bossAI.idleRotateSpeed);
         }
     }
 

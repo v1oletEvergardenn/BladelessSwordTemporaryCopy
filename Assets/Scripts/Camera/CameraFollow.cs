@@ -38,12 +38,12 @@ public class CameraFollow : MonoBehaviour
     {
         if (instance == null) { instance = this; }
         else { Destroy(this.gameObject); }
-        limitCamFollow = camFollow;
     }
 
     // Start is called before the first frame update
     private void Start()
     {
+        limitCamFollow = camFollow;
         normalOrthoSize = cam.m_Lens.OrthographicSize;
         player = CharacterController2D.instance;
         _isFacingRight = player.m_FacingRight;

@@ -23,6 +23,8 @@ public class Spear : IProjectile
             }//follow target
         }
         rb.velocity = transform.right * speed / 10;
+        if (transform.right.x < 0) { facingRight = false; }
+        else { facingRight = true; }
     }
 
     public override void PerfectCounterAttack()

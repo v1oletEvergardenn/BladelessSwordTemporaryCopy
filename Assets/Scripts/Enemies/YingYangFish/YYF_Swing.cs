@@ -27,9 +27,8 @@ public class YYF_Swing : IEnemyAction
         {
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
         }
-
-        bossAI.black_targetRotateSpeed = bossAI.idleRotateSpeed / 4;
-        bossAI.white_targetRotateSpeed = bossAI.idleRotateSpeed / 4;
+        bossAI.SetBlackTargetRotateSpeed(bossAI.idleRotateSpeed / 4);
+        bossAI.SetWhiteTargetRotateSpeed(bossAI.idleRotateSpeed / 4);
 
         bossAI.whiteAnim.Play("swing");
         bossAI.blackAnim.Play("swing");
