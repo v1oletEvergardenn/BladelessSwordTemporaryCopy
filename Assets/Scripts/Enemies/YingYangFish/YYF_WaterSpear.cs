@@ -18,7 +18,6 @@ public class YYF_WaterSpear : IEnemyAction
     private Spear secondSpear;
     private bool shooted = false;
     private bool secondShooted = false;
-    private bool second;
 
     public override void Start()
     {
@@ -30,22 +29,26 @@ public class YYF_WaterSpear : IEnemyAction
     {
         if (act_routine != null) { StopCoroutine(act_routine); }
 
-        second = false;
         if (!shooted && spear != null) { spear.SetFalseActive(); }
         if (!secondShooted && secondSpear != null) { secondSpear.SetFalseActive(); }
     }
 
     public override IEnumerator Act_coroutine(float factor = 0)
     {
+        bool isBlack = false;
         if (factor == 0)
         {
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
             yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.SprintStartPoint());
+            isBlack = bossAI.closerFish_Black;
         }
 
         shooted = false;
         secondShooted = false;
         Spear _spear;
+        Spear _secondSpear = null;
+
+        bool second = false;
         int possiblity = 5;
 
         if (factor == 0)
@@ -61,21 +64,27 @@ public class YYF_WaterSpear : IEnemyAction
             second = false;
             if (i < possiblity) { second = true; }
         }
+        else if (factor != 5 && factor != 6)
+        {
+            second = true;
+        }
 
         if (factor == 1 || factor == 3 || factor == 5)
         {
             while (!bossAI.blackPositioned) { yield return null; }
             yield return StartCoroutine(bossAI.SprintStartPoint("black"));
-            bossAI.closerFish_Black = true;
+            if (factor == 1 || factor == 3) { yield return new WaitForSeconds(0.6f); }
+
+            isBlack = true;
         }//black fish
         else if (factor == 2 || factor == 4 || factor == 6)
         {
             while (!bossAI.whitePositioned) { yield return null; }
             yield return StartCoroutine(bossAI.SprintStartPoint("white"));
-            bossAI.closerFish_Black = false;
+            isBlack = false;
         }//white fish
 
-        if (!bossAI.closerFish_Black)
+        if (!isBlack)
         {
             bossAI.whiteAnim.Play("spear_pre");
             bossAI.whiteAnim.SetBool("secondSpear", second);
@@ -95,11 +104,12 @@ public class YYF_WaterSpear : IEnemyAction
         if (second)
         {
             bossAI.AddActionBreak(actionBreakAmount);
-            if (!bossAI.closerFish_Black) { secondSpear = pooler.SpawnFromPool("water_Spear", waterSpearPos_white.position).GetComponent<Spear>(); }
-            else { secondSpear = pooler.SpawnFromPool("water_Spear", waterSpearPos_black.position).GetComponent<Spear>(); }
+            if (!isBlack) { _secondSpear = pooler.SpawnFromPool("water_Spear", waterSpearPos_white.position).GetComponent<Spear>(); }
+            else { _secondSpear = pooler.SpawnFromPool("water_Spear", waterSpearPos_black.position).GetComponent<Spear>(); }
 
-            secondSpear.SetUp(transform.right, this.gameObject, 0, _followTarget: true, _target: playerIDamagable, false, spearDamage, 0);
-            secondSpear.collisionActive = false;
+            _secondSpear.SetUp(transform.right, this.gameObject, 0, _followTarget: true, _target: playerIDamagable, false, spearDamage, 0);
+            _secondSpear.collisionActive = false;
+            secondSpear = _secondSpear;
         }
         yield return new WaitForSeconds(0.8f);
 
@@ -109,12 +119,12 @@ public class YYF_WaterSpear : IEnemyAction
         if (second)
         {
             yield return new WaitForSeconds(1.3f);
-            ShootSpear(secondSpear);
+            ShootSpear(_secondSpear);
             secondShooted = true;
         }
 
         yield return new WaitForSeconds(0.5f);
-        _spear = null;
+        spear = null;
         secondSpear = null;
 
         if (factor == 0)
@@ -141,25 +151,30 @@ public class YYF_WaterSpear : IEnemyAction
         else if (factor == 1)
         {
             bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
-            StartCoroutine(bossAI.IE_SwimAway(bossAI.waterSpearPos_black2.position, 10, true));
-            StartCoroutine(Act_coroutine(3));
+            //StartCoroutine(bossAI.IE_SwimAway(bossAI.waterSpearPos_black2.position, 10, true));
+            //StartCoroutine(Act_coroutine(3));
+            StartCoroutine(bossAI.IE_SwimAway(player.transform.position + new Vector3(-15, 1), 10, true));
         }
         else if (factor == 2)
         {
             bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);
-            StartCoroutine(bossAI.IE_SwimAway(bossAI.waterSpearPos_white2.position, 10, false));
-            StartCoroutine(Act_coroutine(4));
-        }
-        else if (factor == 3) { StartCoroutine(bossAI.IE_SwimAway(player.transform.position + new Vector3(-8, 3), 10, true)); }
-        else if (factor == 4)
-        {
-            StartCoroutine(bossAI.IE_SwimAway(player.transform.position + new Vector3(8, 3), 10, false));
+            //StartCoroutine(bossAI.IE_SwimAway(bossAI.waterSpearPos_white2.position, 10, false));
+            //StartCoroutine(Act_coroutine(4));
+
+            StartCoroutine(bossAI.IE_SwimAway(player.transform.position + new Vector3(15, 1), 10, false));
 
             while (!bossAI.blackPositioned || !bossAI.whitePositioned) { yield return null; }
             yield return StartCoroutine(bossAI.SprintSamePos());
+            StartCoroutine(Act_coroutine(3));
+            yield return StartCoroutine(Act_coroutine(4));
+        }
+        else if (factor == 4)
+        {
             StartCoroutine(Act_coroutine(5));
-            yield return StartCoroutine(Act_coroutine(6));
-
+            StartCoroutine(Act_coroutine(6));
+        }
+        else if (factor == 6)
+        {
             bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);
             bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
             StartCoroutine(bossAI.IE_SwimAway(bossAI.center.position, 10, false));
@@ -168,6 +183,7 @@ public class YYF_WaterSpear : IEnemyAction
             yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
             bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);
             bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
+            bossAI.finishedWaterSpearUltimate = true;
         }
         yield return null;
     }

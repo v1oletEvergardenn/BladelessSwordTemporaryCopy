@@ -34,9 +34,14 @@ public class YYF_Dive : IEnemyAction
         bool next1 = false;
         bool ToLeft = true;
 
-        Vector3 pos = Vector3.zero;
+        Vector3 pos = bossAI.movingTarget.transform.position;
 
-        if (factor == 0) { pos = bossAI.movingTarget.transform.position; }
+        if (factor == 0 && (Mathf.Abs(pos.x - transform.position.x) <= 2))
+        {
+            pos = bossAI.movingTarget.transform.position;
+            Debug.Log("too close, cancel action");
+            yield return null;
+        }
         else if (factor == 1)
         {
             if (bossAI.GetCloseBoundary() == bossAI.leftBoundary)
@@ -47,12 +52,6 @@ public class YYF_Dive : IEnemyAction
             {
                 pos = player.transform.position + new Vector3(-9, 0, 0);
             }
-        }
-
-        if (Mathf.Abs(pos.x - transform.position.x) <= 2)
-        {
-            Debug.Log("too close, cancel action");
-            yield return null;
         }
         else
         {
@@ -163,6 +162,7 @@ public class YYF_Dive : IEnemyAction
                 yield return null;
             }
         }
+
         swimEffect.SetActive(false);
         bossAI.movingTarget = bossAI.player;
         bossAI.AddActionBreak(actionBreakAmount);

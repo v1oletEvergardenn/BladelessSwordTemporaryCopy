@@ -450,8 +450,12 @@ public class YingYangFish_AI : IEnemyController
             SetBlackTargetRotateSpeed(idleRotateSpeed / 3);
             whiteAnim.Play("close_swim");
             blackAnim.Play("close_swim");
-            StartCoroutine(ChangeYPos(false));
-            yield return new WaitForSeconds(1.5f);
+
+            yield return StartCoroutine(ChangeYPos(-6));
+            transform.DOMove(new Vector3(GetCenterXOfMap(), waterLevel.position.y - 6, 0), 1.8f);
+            yield return new WaitForSeconds(1.8f);
+            yield return StartCoroutine(ChangeYPos(2));
+
             centerAnim.Play("center_break");
             SoundManager.PlaySound("glass_break");
             secondPhase = true;
@@ -470,11 +474,11 @@ public class YingYangFish_AI : IEnemyController
         InputMaster.instance._defendAction.Enable();
         InputMaster.instance._attackDirectionAction.Enable();
         CharacterController2D.instance.FaceTarget(this.transform);
-        StartCoroutine(ChangeYPos(true));
+        StartCoroutine(ChangeYPos(4.5f));
         centerAnim.Play("center_fade");
 
         StartCoroutine(EmojiDuringCircling());
-        //yield return StartCoroutine(Circling(3.5f));
+        yield return StartCoroutine(Circling(3.5f));
 
         StartCoroutine(Ultimate());
 
@@ -483,27 +487,41 @@ public class YingYangFish_AI : IEnemyController
 
     [HideInInspector] public bool blackPositioned = false;
     [HideInInspector] public bool whitePositioned = false;
+    [HideInInspector] public bool finishedWaterSpearUltimate = false;
 
     public IEnumerator Ultimate()
     {
-        //yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(1));
-        //yield return dive.act_routine = StartCoroutine(dive.Act_coroutine(1));
+        //swing qte
+        yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(1));
+        yield return dive.act_routine = StartCoroutine(dive.Act_coroutine(1));
         yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
         SetNormalRotateSpeed();
 
         // splash four times
-        //yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
-        //yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
-        //yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
-        //yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
+        yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
+        yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
+        yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
+        yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
 
+        //water spear ultimate
         yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
         StartCoroutine(IE_SwimAway(waterSpearPos_black1.position, 10, true));
         StartCoroutine(IE_SwimAway(waterSpearPos_white1.position, 10, false));
-
         while (!blackPositioned || !whitePositioned) { yield return null; }
+        yield return StartCoroutine(SprintSamePos());
         StartCoroutine(waterSpear.Act_coroutine(1));
         StartCoroutine(waterSpear.Act_coroutine(2));
+        while (!finishedWaterSpearUltimate) { yield return null; }
+
+        //swing ultimate
+        movingTarget = player;
+        yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
+        yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(2));
+        movingTarget = GetBoundaryFarOfPlayer();
+        yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
+        yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
+        yield return StartCoroutine(Circling(3.5f));
+        //water ball ultimate
 
         yield return true;
     }
@@ -540,12 +558,11 @@ public class YingYangFish_AI : IEnemyController
         yield return null;
     }
 
-    public IEnumerator ChangeYPos(bool up)
+    public IEnumerator ChangeYPos(float offset)
     {
-        float y_value = waterLevel.position.y + 4.5f;
-        if (!up) { y_value = waterLevel.position.y + 2f; }
+        float y_value = waterLevel.position.y + offset;
         bool finished = false;
-        transform.DOMoveY(y_value, 5f).SetEase(Ease.InOutSine).OnComplete(() => { finished = true; });
+        transform.DOMoveY(y_value, 4f).SetEase(Ease.InOutSine).OnComplete(() => { finished = true; });
         while (!finished) { yield return null; }
         yield return null;
     }

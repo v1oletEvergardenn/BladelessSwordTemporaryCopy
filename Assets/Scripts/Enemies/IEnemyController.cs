@@ -245,6 +245,11 @@ public abstract class IEnemyController : IDamagable
         if (dist_a < dist_b) { return b; } else { return a; }
     }
 
+    public virtual float GetCenterXOfMap()
+    {
+        return (leftBoundary.position.x + rightBoundary.position.x) * 0.5f;
+    }
+
     public virtual bool IsPlayerLeft()
     {
         if (player.position.x <= transform.position.x)

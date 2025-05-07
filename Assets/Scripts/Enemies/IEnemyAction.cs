@@ -64,6 +64,7 @@ public abstract class IEnemyAction : MonoBehaviour
             float d = Vector3.Distance(playerIDamagable.GetHitPos(), attackPos.position);
             if (d <= range) { Hit(melee, attackPos); hitAlready = true; }
             elapsedTime += Time.deltaTime;
+            yield return null;
         }
         yield return null;
     }

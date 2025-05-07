@@ -1,3 +1,4 @@
+using DG.Tweening;
 using EditorAttributes;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,12 +22,16 @@ public class YYF_Swing : IEnemyAction
 
     public override IEnumerator Act_coroutine(float factor = 0)
     {
-        yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
-
-        if (bossAI.white_distanceToCenter > bossAI.minMaxDistanceTocenter.x)
+        if (factor != 3)
         {
-            yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
+            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+
+            if (bossAI.white_distanceToCenter > bossAI.minMaxDistanceTocenter.x)
+            {
+                yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
+            }
         }
+
         bossAI.SetBlackTargetRotateSpeed(bossAI.idleRotateSpeed / 4);
         bossAI.SetWhiteTargetRotateSpeed(bossAI.idleRotateSpeed / 4);
 
@@ -35,32 +40,59 @@ public class YYF_Swing : IEnemyAction
 
         if (factor == 1)
         {
-            yield return new WaitForSeconds(0.6f);
+            yield return new WaitForSeconds(0.4f);
             InputKeyType inputKey = InputKeyType.left_attack_key;
             if (bossAI.IsPlayerLeft()) { inputKey = InputKeyType.right_attack_key; }
             InputMaster.instance.StartQTE(inputKey, player.transform.position + new Vector3(0, 4, 0), 0.4f);
             while (InputMaster.instance.isQTE) { yield return null; }
         }//qte
+        else if (factor == 2)
+        {
+            yield return new WaitForSeconds(0.4f);
+            InputKeyType inputKey = InputKeyType.swordTeleport_key;
+            Vector3 pos = new Vector3(12, 5, 0);
+            if (bossAI.IsPlayerLeft()) { pos = new Vector3(-12, 5, 0); }
+            InputMaster.instance.StartQTE(inputKey, player.transform.position + new Vector3(0, 4, 0),
+                0.4f, () => { playerController.DesignatedPositionTeleport(player.transform.position + pos); }, null);
+            while (InputMaster.instance.isQTE) { yield return null; }
+        }
         else
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.8f);
         }
+
+        float x = transform.position.x + 5;
+        if (bossAI.IsPlayerLeft()) { x = transform.position.x - 5; }
+        transform.DOMoveX(x, 0.3f).SetEase(Ease.InQuint);
+        yield return new WaitForSeconds(0.2f);
 
         bossAI.whiteAnim.Play("swing_attack");
         bossAI.blackAnim.Play("swing_attack");
 
         swingEffect.transform.eulerAngles = bossAI.whiteFish.eulerAngles;
         swingEffect.SetActive(true);
+
         StartCoroutine(ApplyAttackInCircle(swingAttackDuration, swingRange, transform, swingAttack));
+
         yield return new WaitForSeconds(.7f);
 
         swingEffect.SetActive(false);
-        bossAI.SetNormalRotateSpeed();
 
-        yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
+        if (factor == 0 || factor == 1 || factor == 3)
+        {
+            bossAI.SetNormalRotateSpeed();
 
-        bossAI.AddActionBreak(actionBreakAmount);
-        bossAI.EndAction();
+            yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
+
+            bossAI.AddActionBreak(actionBreakAmount);
+            bossAI.EndAction();
+        }
+        else if (factor == 2)
+        {
+            CharacterController2D.instance.FaceTarget(this.transform);
+            yield return StartCoroutine(Act_coroutine(3));
+            yield return null;
+        }
     }
 
     public override void Hit(MeleeAttack melee, Transform attackPos)

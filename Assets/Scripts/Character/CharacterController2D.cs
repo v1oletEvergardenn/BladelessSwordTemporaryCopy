@@ -7,6 +7,7 @@ using EditorAttributes;
 using UnityEngine.InputSystem;
 using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.InputSystem.XR;
+using DG.Tweening;
 
 [SelectionBase]
 public class CharacterController2D : MonoBehaviour
@@ -482,6 +483,39 @@ public class CharacterController2D : MonoBehaviour
         StartCoroutine(TeleportCoroutine(m_FacingRight));
     }
 
+    public void DesignatedPositionTeleport(Vector3 pos)
+    {
+        teleported = false;
+        StartCoroutine(DesignatedTeleport(pos));
+    }
+
+    public IEnumerator DesignatedTeleport(Vector3 pos)
+    {
+        Vector3 dir = pos - transform.position + new Vector3(0f, 1.2f, 0f);
+
+        if (dir.x <= 0 && m_FacingRight) { Flip(); }
+        else if (dir.x >= 0 && !m_FacingRight) { Flip(); }
+        gameObject.layer = 14; //player_dash
+        AnimSetBool.instance.Anim_Teleport(0);
+        if (isFalling) { anim.Play("tele_pre_fall"); }
+        else if (isJumping) { anim.Play("tele_pre_jump"); }
+        else { anim.Play("tele_pre_idle"); }
+        TeleportSword.transform.position = transform.position + new Vector3(0f, 1.2f, 0f);
+        TeleportSword.transform.eulerAngles = CalculateWantedRotation(pos).eulerAngles;
+        TeleportSword.SetActive(true);
+
+        bool finished = false;
+        TeleportSword.transform.DOMove(pos, TeleportDuration).SetEase(Ease.Linear).OnComplete(() => { finished = true; });
+
+        while (!finished)
+        {
+            yield return null;
+        }
+        TeleportToSword();
+        gameObject.layer = 6; //player_dash
+        yield return null;
+    }
+
     public IEnumerator TeleportCoroutine(bool right)
     {
         if (playerAttack.isAimingRightStick)
@@ -558,5 +592,12 @@ public class CharacterController2D : MonoBehaviour
     {
         if (playerAttack.isInCombat) { anim.Play(combatClip); }
         else { anim.Play(normalClip); }
+    }
+
+    public Quaternion CalculateWantedRotation(Vector3 _targetPos)
+    {
+        float angle = Mathf.Atan2(_targetPos.y - transform.position.y, _targetPos.x - transform.position.x) * Mathf.Rad2Deg;
+        Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        return targetRotation;
     }
 }

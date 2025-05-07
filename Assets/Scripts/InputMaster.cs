@@ -39,7 +39,8 @@ public class InputMaster : MonoBehaviour
     [HideInInspector] public bool isQTE = false;
     public Image qteKey_image;
     public Image qteInteractedKey_image;
-    [HideInInspector] public System.Action<bool> callBack;
+    [HideInInspector] public System.Action callBack_success;
+    [HideInInspector] public System.Action callBack_fail;
 
     private void Awake()
     {
@@ -83,12 +84,13 @@ public class InputMaster : MonoBehaviour
         gameManager = GameManager.instance;
     }
 
-    public IEnumerator QTE(InputKeyType key, Vector3 pos, float duration, System.Action<bool> _callBack)
+    public IEnumerator QTE(InputKeyType key, Vector3 pos, float duration, System.Action _callBack_success, System.Action _callback_fail)
     {
         string deviceLayoutName;
         string controlPath;
         string InputPath;
-        callBack = _callBack;
+        callBack_success = _callBack_success;
+        callBack_fail = _callback_fail;
         isQTE = true;
         qteInteractedKey_image.fillAmount = 0;
         Time.timeScale = 0.1f;
@@ -165,8 +167,8 @@ public class InputMaster : MonoBehaviour
             StopCoroutine(co_QTE);
             isQTE = false;
             qteKey.SetActive(false);
-            callBack?.Invoke(successful);
-            callBack = null;
+            if (successful) { callBack_success?.Invoke(); }
+            else { callBack_fail.Invoke(); }
             if (!inputWasEnabled) { inputActionKey.Disable(); }
             else { inputActionKey.Enable(); }
             inputActionKey = null;
@@ -177,14 +179,14 @@ public class InputMaster : MonoBehaviour
         }
     }
 
-    public void StartQTE(InputKeyType key, Vector3 pos, float duration, System.Action<bool> callBack)
+    public void StartQTE(InputKeyType key, Vector3 pos, float duration, System.Action callBack_success, System.Action callback_fail)
     {
-        co_QTE = StartCoroutine(QTE(key, pos, duration, callBack));
+        co_QTE = StartCoroutine(QTE(key, pos, duration, callBack_success, callback_fail));
     }
 
     public void StartQTE(InputKeyType key, Vector3 pos, float duration)
     {
-        co_QTE = StartCoroutine(QTE(key, pos, duration, null));
+        co_QTE = StartCoroutine(QTE(key, pos, duration, null, null));
     }
 
     public void DisableAllActions()
