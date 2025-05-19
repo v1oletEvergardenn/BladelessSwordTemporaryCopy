@@ -14,6 +14,8 @@ public class YYF_Swing : IEnemyAction
     public float swingRange;
     public float swingAttackDuration;
 
+    private float localFactor;
+
     public override void Start()
     {
         base.Start();
@@ -22,6 +24,7 @@ public class YYF_Swing : IEnemyAction
 
     public override IEnumerator Act_coroutine(float factor = 0)
     {
+        localFactor = factor;
         if (factor != 3)
         {
             yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
@@ -44,7 +47,6 @@ public class YYF_Swing : IEnemyAction
             InputKeyType inputKey = InputKeyType.left_attack_key;
             if (bossAI.IsPlayerLeft()) { inputKey = InputKeyType.right_attack_key; }
             InputMaster.instance.StartQTE(inputKey, player.transform.position + new Vector3(0, 4, 0), 0.4f);
-            while (InputMaster.instance.isQTE) { yield return null; }
         }//qte
         else if (factor == 2)
         {
@@ -73,7 +75,6 @@ public class YYF_Swing : IEnemyAction
         swingEffect.SetActive(true);
 
         StartCoroutine(ApplyAttackInCircle(swingAttackDuration, swingRange, transform, swingAttack));
-
         yield return new WaitForSeconds(.7f);
 
         swingEffect.SetActive(false);
@@ -81,7 +82,7 @@ public class YYF_Swing : IEnemyAction
         if (factor == 0 || factor == 1 || factor == 3)
         {
             bossAI.SetNormalRotateSpeed();
-
+            if (factor == 1) { CharacterController2D.instance.FaceTarget(this.transform); }
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
 
             bossAI.AddActionBreak(actionBreakAmount);
@@ -138,7 +139,15 @@ public class YYF_Swing : IEnemyAction
         else if (dealtDamage == 0)//dealtDamage
         {
             vfx.SpawnHitEffect(true, playerIDamagable.GetHitPos());
-            playerIDamagable.Repel(melee.repel * 2, direction);
+            if (localFactor == 2)
+            {
+                playerIDamagable.ForceRepel(melee.repel * 2, direction);
+            }
+            else
+            {
+                playerIDamagable.Repel(melee.repel * 2, direction);
+            }
+
             vfx.RumblePulse(melee.rumble.x, melee.rumble.y, melee.rumbleDuration);
             vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
         }

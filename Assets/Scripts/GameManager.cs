@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     public bool isInDialog;
     public bool GamePaused = false;
 
+    public bool isInPerformingState = false;
+
     public enum PlayerSkillsType
     {
         None,

@@ -162,7 +162,7 @@ public class InputPlayer : MonoBehaviour
         if (Mathf.Abs(moveDir.magnitude) < 0.7f) { x = 0f; }
         horizontalMove = x;
         if (moveDir.x == 0) { horizontalMove = 0; }
-        if (learnedMovement) { controller.Move(horizontalMove * Time.fixedDeltaTime); }// horizontal movement
+        if (learnedMovement) { controller.Move(horizontalMove); }// horizontal movement
         if (learnedJump && inputMaster._jumpAction.WasPressedThisFrame()) { OnJump(); }//jump
         if (learnedAttack)
         {

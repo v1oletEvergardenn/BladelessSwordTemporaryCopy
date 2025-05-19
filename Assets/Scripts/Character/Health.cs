@@ -229,4 +229,15 @@ public class Health : IDamagable
         if (damageFromBehind) { anim.Play("hit_behind"); }
         else { anim.Play("hit"); }
     }
+
+    public override void Repel(float force, Vector3 dir)
+    {
+        if (GameManager.instance.isInPerformingState) { return; }
+        GetComponent<Rigidbody2D>().AddForce(dir * force, ForceMode2D.Impulse);
+    }
+
+    public void ForceRepel(float force, Vector3 dir)
+    {
+        GetComponent<Rigidbody2D>().AddForce(dir * force, ForceMode2D.Impulse);
+    }
 }

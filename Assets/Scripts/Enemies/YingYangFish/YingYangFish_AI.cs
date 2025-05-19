@@ -209,7 +209,6 @@ public class YingYangFish_AI : IEnemyController
             {
                 InsertAction(swing);
                 movingTarget = player;
-                print("here");
             }
             else
             {
@@ -433,6 +432,7 @@ public class YingYangFish_AI : IEnemyController
         else
         {
             //start second phase
+
             StartCoroutine(secondPhaseAnim());
         }
     }
@@ -465,6 +465,10 @@ public class YingYangFish_AI : IEnemyController
 
     public IEnumerator secondPhaseAnim()
     {
+        GameManager.instance.isInPerformingState = true;
+        yield return StartCoroutine(playerController.RunToPosition(transform.position - new Vector3(2, 0, 0)));
+        playerController.FaceTarget(this.transform);
+        yield return new WaitForSeconds(0.5f);
         sprintRotateSpeed *= 1.5f;
         idleRotateSpeed *= 1.5f;
         EventInteract.SetActive(false);
@@ -562,7 +566,7 @@ public class YingYangFish_AI : IEnemyController
     {
         float y_value = waterLevel.position.y + offset;
         bool finished = false;
-        transform.DOMoveY(y_value, 4f).SetEase(Ease.InOutSine).OnComplete(() => { finished = true; });
+        transform.DOMoveY(y_value, 3f).SetEase(Ease.InOutSine).OnComplete(() => { finished = true; });
         while (!finished) { yield return null; }
         yield return null;
     }

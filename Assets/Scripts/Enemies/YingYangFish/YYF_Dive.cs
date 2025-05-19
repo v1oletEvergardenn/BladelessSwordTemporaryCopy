@@ -42,19 +42,13 @@ public class YYF_Dive : IEnemyAction
             Debug.Log("too close, cancel action");
             yield return null;
         }
-        else if (factor == 1)
-        {
-            if (bossAI.GetCloseBoundary() == bossAI.leftBoundary)
-            {
-                pos = player.transform.position + new Vector3(9, 0, 0);
-            }
-            else
-            {
-                pos = player.transform.position + new Vector3(-9, 0, 0);
-            }
-        }
         else
         {
+            if (factor == 1)
+            {
+                pos = player.transform.position + new Vector3(-12, 0, 0);
+            }
+
             bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
             bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
             bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);

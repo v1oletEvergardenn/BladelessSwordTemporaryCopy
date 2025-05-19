@@ -286,7 +286,7 @@ public class CharacterController2D : MonoBehaviour
                     }
                 }
             }
-
+            move *= Time.fixedDeltaTime;
             Vector3 targetVelocity = new Vector2(move * speed * 20f, rb.velocity.y);
             rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
             //flip
@@ -481,6 +481,21 @@ public class CharacterController2D : MonoBehaviour
         teleported = false;
 
         StartCoroutine(TeleportCoroutine(m_FacingRight));
+    }
+
+    public IEnumerator RunToPosition(Vector3 target)
+    {
+        bool isLeft = target.x < transform.position.x;
+        float dir = -1;
+        if (!isLeft) { dir = 1; }
+        while (target.x < transform.position.x == isLeft)
+        {
+            Move(dir);
+            yield return null;
+        }
+
+        Move(0);
+        yield return null;
     }
 
     public void DesignatedPositionTeleport(Vector3 pos)
