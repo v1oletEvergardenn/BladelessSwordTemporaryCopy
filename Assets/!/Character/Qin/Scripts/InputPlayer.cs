@@ -9,6 +9,7 @@ using System.Data;
 using Doublsb.Dialog;
 using UnityEngine.SceneManagement;
 using System;
+using Mobsoft.PixelStyleWaterShader;
 
 public enum PlayerState
 {
@@ -66,8 +67,6 @@ public class InputPlayer : MonoBehaviour
     public bool learnedDefend = false;
     public bool learnedHeartSword = false;
 
-    // Start is called before the first frame update
-
     private void Awake()
     {
         if (instance == null) { instance = this; }
@@ -101,9 +100,13 @@ public class InputPlayer : MonoBehaviour
         inputMaster._defendAction.canceled += ctx => playerAttack.EndDefend();
     }
 
-    // Update is called once per frame
     private void Update()
     {
+        // Use the new input system for space key detection
+        if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            TestEvent();
+        }
         if (gameManager.GamePaused) { return; }
         pointer.transform.position = transform.position + new Vector3(0, pointerOffset, 0);
         if (inputMaster._EventKeyAction.WasPressedThisFrame())
@@ -177,6 +180,14 @@ public class InputPlayer : MonoBehaviour
         if (learnedTeleport && inputMaster._teleportAction.WasPressedThisFrame()) { controller.SwordTeleport(); }
     }
 
+    /// <summary>
+    /// Test function to trigger an event.
+    /// </summary>
+    private void TestEvent()
+    {
+        StartCoroutine(controller.RunToPosition(transform.position + new Vector3(50f, 0, 0)));
+    }
+
     private void FixedUpdate()
     {
         if (gameManager.isInInformationEvent | gameManager.isInDialog | health.isDead) { pointerSpriteRenderer.sprite = null; return; }
@@ -209,71 +220,109 @@ public class InputPlayer : MonoBehaviour
         return rotZ;
     }
 
+    /// <summary>
+    /// Handles the attack direction based on input from the right and left sticks.
+    /// </summary>
     private void OnAttackDirection()
     {
-        if (rightAttackDir.x > 0) { rightPointLeft = false; } else { rightPointLeft = true; }
-        if (leftAttackDir.x > 0) { leftPointLeft = false; } else { leftPointLeft = true; }
+        // Update pointer direction flags based on input
+        rightPointLeft = rightAttackDir.x <= 0;
+        if (!controller.isRunningToTarget) { leftPointLeft = leftAttackDir.x <= 0; }
 
         if (rightAttackDir != Vector2.zero)
         {
+            // Set pointer sprite and aiming state for right stick
             pointerSpriteRenderer.sprite = rightPointer;
             playerAttack.isAimingRightStick = true;
+
+            // Calculate the initial pointer rotation based on right stick input
             float angle = Vector2.SignedAngle(transform.up, rightAttackDir) + 90;
             pointer.rotation = Quaternion.Euler(0, 0, angle);
 
-            //float z = GetRotZFromDirection(rightAttackDir);//get z of rotation
-            //if (!controller.m_FacingRight) { z = GetRotZFromDirection(-rightAttackDir); }//reverse when face left
-            //z = Mathf.Clamp(z, -90, 90);
-            //if (!controller.m_FacingRight) { z += 180; }
-            //pointer.eulerAngles = new Vector3(0, 0, z);//the target rotation
-
+            // Prepare for target snapping
             float tempMinimumAngle = lockOnTargetAngle;
-            float closestTargetZ = Mathf.Infinity;
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(pointer.position, pointerLength, rightPointerLayerMask);
+            float closestTargetZ = float.PositiveInfinity;
+            Vector3 pointerPos = pointer.position;
+            Vector3 pointerRight = pointer.right;
+            float pointerLen = pointerLength;
+
+            // Find all potential targets within pointer range and layer mask
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(pointerPos, pointerLen, rightPointerLayerMask);
             foreach (Collider2D col in colliders)
             {
-                IDamagable damagable;
-                if (col.TryGetComponent<IDamagable>(out damagable))
+                // Only consider objects that implement IDamagable
+                if (!col.TryGetComponent<IDamagable>(out var damagable))
+                    continue;
+
+                // Calculate direction and distance to the target
+                Vector3 targetPos = damagable.GetHitPos();
+                Vector2 toTarget = (targetPos - pointerPos);
+                float distance = toTarget.magnitude;
+                Vector2 direction = toTarget / distance;
+
+                // Check if the target is within the lock-on angle
+                float _tempAngle = Vector3.Angle(pointerRight, direction);
+                if (_tempAngle > tempMinimumAngle)
+                    continue;
+
+                // Raycast to ensure there are no obstacles between pointer and target
+                RaycastHit2D hit = Physics2D.Raycast(pointerPos, direction, distance, rightPointerLayerMask);
+                if (hit.collider != null && hit.collider.gameObject != col.gameObject)
+                    continue;
+
+                // If this target is the closest within angle, remember its rotation
+                float targetZ = GetRotZFromDirection(toTarget);
+                if (_tempAngle < tempMinimumAngle)
                 {
-                    float _tempAngle = Vector3.Angle(pointer.right, (damagable.GetHitPos() - pointer.position).normalized);
-                    float TargetZ = GetRotZFromDirection(damagable.GetHitPos() - pointer.position);
-                    if (_tempAngle <= tempMinimumAngle) { closestTargetZ = TargetZ; tempMinimumAngle = _tempAngle; }
+                    closestTargetZ = targetZ;
+                    tempMinimumAngle = _tempAngle;
                 }
-            }//check angle, if small enough, snap on it.
-            if (closestTargetZ != Mathf.Infinity) { pointer.eulerAngles = new Vector3(0, 0, closestTargetZ); }
+            }
 
-            float dist = pointerLength;
-            RaycastHit2D hit = Physics2D.Raycast(pointer.position, pointer.right, 100f, rightPointerLayerMask);
-            if (hit.collider != null && hit.collider.gameObject != this.gameObject) { dist = hit.distance; }// cut the pointer length based on collision
-            pointer.GetComponent<SpriteRenderer>().size = new Vector2(dist / 2, 0.155f);
+            // If a valid target was found, snap the pointer to it
+            if (!float.IsPositiveInfinity(closestTargetZ))
+                pointer.eulerAngles = new Vector3(0, 0, closestTargetZ);
 
+            // --- Pointer length stops at first collider in pointer's direction ---
+            float visualLength = pointerLen;
+            RaycastHit2D pointerHit = Physics2D.Raycast(pointerPos, pointer.right, pointerLen, rightPointerLayerMask);
+            if (pointerHit.collider != null && pointerHit.collider.gameObject != this.gameObject)
+            {
+                visualLength = pointerHit.distance;
+            }
+            pointerSpriteRenderer.size = new Vector2(visualLength / 2, 0.155f);
+
+            // Update attack direction for use in attack logic
             playerAttack.direction = new Vector3(0, 0, pointer.rotation.eulerAngles.z);
-        }// right stick
+        }
         else if (leftAttackDir != Vector2.zero)
         {
             playerAttack.isAimingRightStick = false;
             pointerSpriteRenderer.sprite = leftPointer;
             float angle = Vector2.SignedAngle(transform.up, leftAttackDir) + 90;
             pointer.rotation = Quaternion.Euler(0, 0, angle);
-            pointer.GetComponent<SpriteRenderer>().size = new Vector2(1.55f, 0.155f);
+
+            // Pointer length stops at first collider in left stick direction
+            float visualLength = 1.55f;
+            RaycastHit2D pointerHit = Physics2D.Raycast(pointer.position, pointer.right, visualLength, rightPointerLayerMask);
+            if (pointerHit.collider != null && pointerHit.collider.gameObject != this.gameObject)
+            {
+                visualLength = pointerHit.distance;
+            }
+            pointerSpriteRenderer.size = new Vector2(visualLength, 0.155f);
+
             playerAttack.direction = new Vector3(0, 0, pointer.rotation.eulerAngles.z);
-        }//left stick
+        }
         else
         {
+            if (!controller.isRunningToTarget) { leftPointLeft = !controller.FacingRight; }
             pointerSpriteRenderer.sprite = leftPointer;
             pointer.rotation = transform.rotation;
-            pointer.GetComponent<SpriteRenderer>().size = new Vector2(1.55f, 0.15f);
-            if (controller.FacingRight)
-            {
-                playerAttack.direction = Vector3.zero;
-            }
-            else
-            {
-                playerAttack.direction = new Vector3(0, 0, -180);
-            }
+            pointerSpriteRenderer.size = new Vector2(1.55f, 0.15f);
+            playerAttack.direction = controller.FacingRight ? Vector3.zero : new Vector3(0, 0, -180);
             playerAttack.isAimingRightStick = false;
-        }// none stick
-    }//change pointer Direction and counter attack direction.
+        }
+    }
 
     public Quaternion CalculateWantedRotation(Vector3 _targetPos, Vector3 fromPos)
     {

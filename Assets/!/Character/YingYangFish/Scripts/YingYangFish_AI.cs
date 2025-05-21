@@ -324,10 +324,6 @@ public class YingYangFish_AI : IEnemyController
         yield return null;
     }
 
-    /// <summary>
-    /// compare black fish and white fish's X position
-    /// </summary>
-    /// <returns>the one closer to the start point </returns>
     public Transform CheckCloserFish()
     {
         if (blackFish.eulerAngles.z < whiteFish.eulerAngles.z) { return blackFish; }

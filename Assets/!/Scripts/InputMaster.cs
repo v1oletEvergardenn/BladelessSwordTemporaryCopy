@@ -84,6 +84,15 @@ public class InputMaster : MonoBehaviour
         gameManager = GameManager.instance;
     }
 
+    /// <summary>
+    /// Starts a QTE (Quick Time Event) with a specified key and duration.
+    /// </summary>
+    /// <param name="key">The input key type the player must press to succeed.</param>
+    /// <param name="pos">The screen position to display the QTE prompt.</param>
+    /// <param name="duration">The duration over which time will slow down (affects timeScale interpolation).</param>
+    /// <param name="_callBack_success">Callback to invoke when the player successfully completes the QTE.</param>
+    /// <param name="_callback_fail">Unused in this method; included for interface consistency.</param>
+    /// <returns>IEnumerator for coroutine execution.</returns>
     public IEnumerator QTE(InputKeyType key, Vector3 pos, float duration, System.Action _callBack_success, System.Action _callback_fail)
     {
         string deviceLayoutName;
@@ -159,6 +168,15 @@ public class InputMaster : MonoBehaviour
         yield return false;
     }
 
+    /// <summary>
+    /// Starts a QTE (Quick Time Event) with no time limit.
+    /// </summary>
+    /// <param name="key">The input key type the player must press to succeed.</param>
+    /// <param name="pos">The screen position to display the QTE prompt.</param>
+    /// <param name="duration">The duration over which time will slow down (affects timeScale interpolation).</param>
+    /// <param name="_callBack_success">Callback to invoke when the player successfully completes the QTE.</param>
+    /// <param name="_callback_fail">Unused in this method; included for interface consistency.</param>
+    /// <returns>IEnumerator for coroutine execution.</returns>
     public IEnumerator EndLessQTE(InputKeyType key, Vector3 pos, float duration, System.Action _callBack_success, System.Action _callback_fail)
     {
         string deviceLayoutName;
@@ -247,6 +265,10 @@ public class InputMaster : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Ends the QTE (Quick Time Event) and invokes the appropriate callback based on success or failure.
+    /// </summary>
+    /// <param name="successful"></param>
     public void EndQTE(bool successful)
     {
         if (isQTE)
@@ -267,11 +289,29 @@ public class InputMaster : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Starts a QTE (Quick Time Event) with a specified key and duration.
+    /// </summary>
+    /// <param name="key">The input key type the player must press to succeed.</param>
+    /// <param name="pos">The screen position to display the QTE prompt.</param>
+    /// <param name="duration">The duration over which time will slow down (affects timeScale interpolation).</param>
+    /// <param name="_callBack_success">Callback to invoke when the player successfully completes the QTE.</param>
+    /// <param name="_callback_fail">Unused in this method; included for interface consistency.</param>
+    /// <returns>IEnumerator for coroutine execution.</returns>
     public void StartQTE(InputKeyType key, Vector3 pos, float duration, System.Action callBack_success, System.Action callback_fail)
     {
         co_QTE = StartCoroutine(QTE(key, pos, duration, callBack_success, callback_fail));
     }
 
+    /// <summary>
+    /// Starts a QTE (Quick Time Event) with no time limit.
+    /// </summary>
+    /// <param name="key">The input key type the player must press to succeed.</param>
+    /// <param name="pos">The screen position to display the QTE prompt.</param>
+    /// <param name="duration">The duration over which time will slow down (affects timeScale interpolation).</param>
+    /// <param name="_callBack_success">Callback to invoke when the player successfully completes the QTE.</param>
+    /// <param name="_callback_fail">Unused in this method; included for interface consistency.</param>
+    /// <returns>IEnumerator for coroutine execution.</returns>
     public void StartMustSuccessQTE(InputKeyType key, Vector3 pos, float duration, System.Action callBack_success)
     {
         co_QTE = StartCoroutine(EndLessQTE(key, pos, duration, callBack_success, null));

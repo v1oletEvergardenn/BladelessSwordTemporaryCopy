@@ -233,7 +233,7 @@ public class CharacterController2D : MonoBehaviour
                 if (isRunning)
                 {
                     if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_run_" + playerAttack.attackIndex)
-                          && playerAttack.isAttackingLeft == FacingRight)
+                          && playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
                     {
                         if (playerAttack.attackIndex == 1)
                         {
@@ -298,8 +298,20 @@ public class CharacterController2D : MonoBehaviour
             Vector3 targetVelocity = new Vector2(move * speed, rb.velocity.y);
             rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
             //flip
-            if (move > 0 && !FacingRight) { Flip(); }
-            else if (move < 0 && FacingRight) { Flip(); }
+            if (isRunningToTarget)
+            {
+                if (playerAttack.isAttacking && playerAttack.isAttackingLeft == FacingRight) { Flip(); }
+                else if (!playerAttack.isAttacking)
+                {
+                    if (move > 0 && !FacingRight) { Flip(); }
+                    else if (move < 0 && FacingRight) { Flip(); }
+                }
+            }
+            else
+            {
+                if (move > 0 && !FacingRight) { Flip(); }
+                else if (move < 0 && FacingRight) { Flip(); }
+            }
         }
     }//movement horizontally
 
@@ -347,7 +359,7 @@ public class CharacterController2D : MonoBehaviour
                     float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
                     if (isRunning)
                     {
-                        if (playerAttack.isAttackingLeft == FacingRight)
+                        if (playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
                         {
                             if (playerAttack.attackIndex == 1)
                             {
@@ -509,6 +521,7 @@ public class CharacterController2D : MonoBehaviour
     public IEnumerator RunToPosition(Vector3 target)
     {
         runToLeft = runToTarget.x < transform.position.x;
+        inputPlayer.leftPointLeft = runToLeft;
         isRunningToTarget = true;
         runToTarget = target;
         yield return new WaitUntil(() => !isRunningToTarget);
@@ -550,7 +563,6 @@ public class CharacterController2D : MonoBehaviour
 
     public IEnumerator TeleportCoroutine(bool right)
     {
-        print(1);
         if (playerAttack.isAimingRightStick)
         {
             if (inputPlayer.rightPointLeft == FacingRight) { Flip(); }
