@@ -19,7 +19,7 @@ public class YingYangFish_AI : IEnemyController
         nameof(idleRotateSpeed), nameof(sprintRotateSpeed), nameof(waterSpearPos_black1),
         nameof(waterSpearPos_black2), nameof(waterSpearPos_white1), nameof(waterSpearPos_white2), nameof(Dir),
         nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter), nameof(waterLevel),
-        nameof(EventInteract), nameof(ultimateWave), nameof(waterDragon))
+        nameof(EventInteract), nameof(ultimateWave), nameof(waterDragon), nameof(slash_effect))
         ]
     public Void void2;
 
@@ -48,6 +48,7 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector] public GameObject EventInteract;
     [SerializeField, HideInInspector] public GameObject ultimateWave;
     [SerializeField, HideInInspector] public GameObject waterDragon;
+    [SerializeField, HideInInspector] public GameObject slash_effect;
     public List<Transform> ultimate_bullets;
 
     [HideInInspector] public SpriteRenderer blackSprite;
@@ -465,17 +466,27 @@ public class YingYangFish_AI : IEnemyController
         yield return new WaitUntil(() => !InputMaster.instance.isQTE);
         playerController.EnableGravity(false);
         playerController.rb.velocity = Vector3.zero;
-        yield return new WaitForSeconds(0.5f);
+
+        yield return new WaitForSeconds(0.4f);
+        playerController.anim.Play("slash_pre");
+        yield return new WaitForSeconds(0.1f);
 
         //slash animation pr
 
         InputMaster.instance.StartMustSuccessQTE(InputKeyType.right_attack_key, player.transform.position + new Vector3(2, 2, 0),
            0.4f, () =>
            {
-               print("Slash");
+               playerController.anim.Play("slash_end");
            });
-
         yield return new WaitUntil(() => !InputMaster.instance.isQTE);
+        yield return new WaitForSeconds(0.2f);
+
+        player.position += new Vector3(12, -7);
+        playerController.EnableGravity(true);
+        slash_effect.transform.position = new Vector3(transform.position.x, waterLevel.position.y, 0f);
+        slash_effect.SetActive(true);
+        yield return new WaitForSeconds(1f);
+        slash_effect.SetActive(false);
     }
 
     private IEnumerator SpawnUltimateBullet(int index, float delay)

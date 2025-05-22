@@ -188,7 +188,11 @@ public class PlayerAttack : MonoBehaviour
 
             bool backAttack = false;
 
-            if (inputPlayer.leftPointLeft != attackLeft) { controller.Flip(true); backAttack = true; }
+            if (InputMaster.instance._moveAction.IsPressed())
+            {
+                if (inputPlayer.leftPointLeft != attackLeft) { controller.Flip(true); backAttack = true; }
+            }
+            else if (controller.FacingRight == attackLeft) { controller.Flip(true); backAttack = true; }
 
             if (controller.isJumping) { anim.Play("attack_jump_" + attackIndex); }
             else if (controller.isFalling) { anim.Play("attack_fall_" + attackIndex); }

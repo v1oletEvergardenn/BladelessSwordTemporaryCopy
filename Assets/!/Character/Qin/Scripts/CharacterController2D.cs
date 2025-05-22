@@ -345,7 +345,11 @@ public class CharacterController2D : MonoBehaviour
             {
                 if (!isJumping && !playerAttack.isDefending)
                 {
-                    PlayAnimClipInCombat("land", "land_combat");
+                    if (!anim.GetCurrentAnimatorStateInfo(0).IsName("slash") && !anim.GetCurrentAnimatorStateInfo(0).IsName("slash_end"))
+                    {
+                        PlayAnimClipInCombat("land", "land_combat");
+                    }
+
                     isFalling = false;
                     isJumping = false;
                 }
@@ -520,11 +524,17 @@ public class CharacterController2D : MonoBehaviour
 
     public IEnumerator RunToPosition(Vector3 target)
     {
+        bool originalEnabled = InputMaster.instance._defendAction.enabled;
+        InputMaster.instance._defendAction.Disable();
         runToLeft = runToTarget.x < transform.position.x;
         inputPlayer.leftPointLeft = runToLeft;
         isRunningToTarget = true;
         runToTarget = target;
         yield return new WaitUntil(() => !isRunningToTarget);
+        if (originalEnabled)
+        {
+            InputMaster.instance._defendAction.Enable();
+        }
     }
 
     public void DesignatedPositionTeleport(Vector3 pos)
