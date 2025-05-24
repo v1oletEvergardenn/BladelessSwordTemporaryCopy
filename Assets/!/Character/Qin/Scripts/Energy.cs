@@ -59,14 +59,8 @@ public class Energy : MonoBehaviour
     private void Update()
     {
         restoreTimer += Time.deltaTime;
-        if (playerAttack.isBoomeranging && !playerAttack._boomerang.stickedInToWall) { boomerang_timer += Time.deltaTime; }
         if (controller.isFloating) { floating_timer += Time.deltaTime; }
         if (playerAttack.isDefending) { defend_timer += Time.deltaTime; }
-        if (boomerang_timer >= boomerang_consumption_frequency)
-        {
-            BoomerangConsume();
-            boomerang_timer = 0f;
-        }//boomeranging
         if (floating_timer >= floating_consumption_frequency)
         {
             FloatingConsume();
@@ -164,21 +158,21 @@ public class Energy : MonoBehaviour
         ChangeEnergy(-perfect_attack_energy_restore);
     }
 
-    public bool BoomerangConsume()
-    {
-        if (currentEnergy <= 1)
-        {
-            playerAttack.RetreiveBoomerang();
-            controller.canMove = true;
-            //playerAttack._boomerang.SetBool(true);
-            return false;
-        }
-        restoreTime = restoreCDafterConsume;
-        restoreTimer = 0f;
-        ChangeEnergy(1);
-        boomerang_timer = 0f;
-        return true;
-    }
+    //public bool BoomerangConsume()
+    //{
+    //    if (currentEnergy <= 1)
+    //    {
+    //        playerAttack.RetreiveBoomerang();
+    //        controller.canMove = true;
+    //        //playerAttack._boomerang.SetBool(true);
+    //        return false;
+    //    }
+    //    restoreTime = restoreCDafterConsume;
+    //    restoreTimer = 0f;
+    //    ChangeEnergy(1);
+    //    boomerang_timer = 0f;
+    //    return true;
+    //}
 
     public bool FloatingConsume()
     {

@@ -66,7 +66,6 @@ public class Health : IDamagable
             else
             {
                 stunned = false;
-                playerAttack.EndHanging();
                 anim_bool.Anim_Hit(1);
 
                 if (!isDead) { anim.SetTrigger("stun_after"); }
@@ -208,7 +207,6 @@ public class Health : IDamagable
 
     public void Stun(float duration, Transform sender)
     {
-        playerAttack.EndHanging();
         playerAttack.EndDefend();
 
         stunned = true;

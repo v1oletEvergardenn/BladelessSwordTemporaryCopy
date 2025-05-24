@@ -19,7 +19,7 @@ public class YingYangFish_AI : IEnemyController
         nameof(idleRotateSpeed), nameof(sprintRotateSpeed), nameof(waterSpearPos_black1),
         nameof(waterSpearPos_black2), nameof(waterSpearPos_white1), nameof(waterSpearPos_white2), nameof(Dir),
         nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter), nameof(waterLevel),
-        nameof(EventInteract), nameof(ultimateWave), nameof(waterDragon), nameof(slash_effect))
+        nameof(EventInteract))
         ]
     public Void void2;
 
@@ -46,10 +46,6 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector, MinMaxSlider(1f, 3f)] public Vector2 minMaxDistanceTocenter;
     [SerializeField, HideInInspector] public Transform waterLevel;
     [SerializeField, HideInInspector] public GameObject EventInteract;
-    [SerializeField, HideInInspector] public GameObject ultimateWave;
-    [SerializeField, HideInInspector] public GameObject waterDragon;
-    [SerializeField, HideInInspector] public GameObject slash_effect;
-    public List<Transform> ultimate_bullets;
 
     [HideInInspector] public SpriteRenderer blackSprite;
     [HideInInspector] public SpriteRenderer whiteSprite;
@@ -76,6 +72,24 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector] public bool secondPhase;
 
     #endregion DEBUG
+
+    #region Ultimate
+
+    public List<Transform> ultimate_bullets;
+
+    [FoldoutGroup("Ultimate", nameof(ultimateWave), nameof(slash_effect),
+        nameof(waterDragon1), nameof(waterDragon2),
+        nameof(waterDragon3), nameof(waterDragon4))]
+    public Void voidWaterDragon;
+
+    [SerializeField, HideInInspector] public GameObject ultimateWave;
+    [SerializeField, HideInInspector] public GameObject slash_effect;
+    [SerializeField, HideInInspector] public Transform waterDragon1;
+    [SerializeField, HideInInspector] public Transform waterDragon2;
+    [SerializeField, HideInInspector] public Transform waterDragon3;
+    [SerializeField, HideInInspector] public Transform waterDragon4;
+
+    #endregion Ultimate
 
     #region ACTIONS
 
@@ -452,10 +466,9 @@ public class YingYangFish_AI : IEnemyController
         {
             StartCoroutine(SpawnUltimateBullet(i, bulletDelays[i]));
         }
-        yield return new WaitForSeconds(6f);
-
-        waterDragon.transform.position = new Vector3(transform.position.x, waterLevel.position.y, 0);
-        waterDragon.SetActive(true);
+        yield return new WaitForSeconds(1f);
+        waterDragon1.gameObject.SetActive(true);
+        yield return new WaitForSeconds(5f);
 
         yield return StartCoroutine(playerController.RunToPosition(transform.position - new Vector3(14f, 0, 0)));
 

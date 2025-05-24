@@ -127,18 +127,19 @@ public class CharacterController2D : MonoBehaviour
         isFloating = Float();
 
         teleportTimer += Time.deltaTime;
+
         //falling check
         if (rb.velocity.y < -1 && !isGrounded && !isFalling)
         {
             if (!playerAttack.isDefending)
             {
                 if (
-                anim.GetCurrentAnimatorStateInfo(0).IsName("attack_run_" + playerAttack.attackIndex) ||
-                 anim.GetCurrentAnimatorStateInfo(0).IsName("attack_idle_" + playerAttack.attackIndex) ||
-                 anim.GetCurrentAnimatorStateInfo(0).IsName("attack_jump_" + playerAttack.attackIndex))
+                anim.GetCurrentAnimatorStateInfo(0).IsName((playerAttack.isHS_attack ? "HS_" : "") + "attack_run_" + playerAttack.attackIndex) ||
+                 anim.GetCurrentAnimatorStateInfo(0).IsName((playerAttack.isHS_attack ? "HS_" : "") + "attack_idle_" + playerAttack.attackIndex) ||
+                 anim.GetCurrentAnimatorStateInfo(0).IsName((playerAttack.isHS_attack ? "HS_" : "") + "attack_jump_" + playerAttack.attackIndex))
                 {
                     float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                    anim.Play("attack_fall_" + playerAttack.attackIndex, 0, duration);
+                    anim.Play((playerAttack.isHS_attack ? "HS_" : "") + "attack_fall_" + playerAttack.attackIndex, 0, duration);
                 }//swtich attack animation
                 else if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_jump_after") ||
                     anim.GetCurrentAnimatorStateInfo(0).IsName("attack_idle_after"))
@@ -207,113 +208,133 @@ public class CharacterController2D : MonoBehaviour
         {
             anim.SetBool("isRunning", false);
             isRunning = false;
-
-            Vector3 targetVelocity = new Vector2(0, rb.velocity.y);
-            rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
-
+            rb.velocity = Vector3.SmoothDamp(rb.velocity, (Vector3)new Vector2(0, rb.velocity.y), ref m_Velocity, m_MovementSmoothing);
             return;
         }
-        if (isGrounded || m_AirControl)
-        {
-            float speed = runSpeed;
 
-            anim.SetBool("isRunning", move != 0);
-            isRunning = move != 0;
-            if (!isGrounded && m_AirControl)
+        if (!(isGrounded || m_AirControl))
+            return;
+
+        string hsPrefix = playerAttack.isHS_attack ? "HS_" : "";
+        float speed = runSpeed;
+        bool moving = move != 0;
+        anim.SetBool("isRunning", moving);
+        isRunning = moving;
+
+        // Air control logic
+        if (!isGrounded && m_AirControl)
+        {
+            speed = isFloating ? 0f : airRunSpeed;
+            isRunning = false;
+            anim.SetBool("isRunning", false);
+        }
+
+        // Cache animation state info
+        var state = anim.GetCurrentAnimatorStateInfo(0);
+
+        // Animation transitions when grounded and not jumping
+        if (isGrounded && !isJumping)
+        {
+            float duration = state.normalizedTime;
+
+            if (isRunning)
             {
-                if (isFloating) { speed = 0f; }
-                else { speed = airRunSpeed; }
-                isRunning = false;
-                anim.SetBool("isRunning", false);
-            }//set speed
-             //move horizontally
-            if (isGrounded && !isJumping)
-            {
-                float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                if (isRunning)
+                if (state.IsName(hsPrefix + "attack_run_" + playerAttack.attackIndex)
+                    && playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
                 {
-                    if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_run_" + playerAttack.attackIndex)
-                          && playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
+                    if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
                     {
-                        if (playerAttack.attackIndex == 1)
-                        {
-                            if (duration < (35f / 71f))
-                            {
-                                anim.Play("attack_back", 0, duration * (71f / 35f));
-                            }
-                            else { if (anim.GetBool("storm")) { anim.Play("storm_pre_run"); } else { anim.Play("run_combat"); } }
-                        }
-                        else { anim.Play("attack_back", 0, duration); }
+                        anim.Play(hsPrefix + "attack_back", 0, duration * (71f / 35f));
                     }
-                    else if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_idle_" + playerAttack.attackIndex))
+                    else
                     {
-                        anim.Play("attack_run_" + playerAttack.attackIndex, 0, duration);
-                    }
-                    else if (anim.GetCurrentAnimatorStateInfo(0).IsName("drawback_idle"))
-                    {
-                        anim.Play("drawback_run", 0, duration);
-                    }
-                    else if (anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_idle") ||
-                        anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_jump") ||
-                        anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_fall"))
-                    {
-                        anim.Play("storm_ready_run", 0, duration);
-                    }
-                    else if (anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_idle") ||
-                        anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_jump") ||
-                        anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_fall"))
-                    {
-                        anim.Play("storm_pre_run", 0, duration);
+                        if (anim.GetBool("storm"))
+                            anim.Play("storm_pre_run");
+                        else
+                            anim.Play("run_combat");
                     }
                 }
-                else if (!isRunning)
+                else if (state.IsName(hsPrefix + "attack_idle_" + playerAttack.attackIndex))
                 {
-                    if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_run_" + playerAttack.attackIndex))
-                    {
-                        anim.Play("attack_idle_" + playerAttack.attackIndex, 0, duration);
-                    }
-                    else if (anim.GetCurrentAnimatorStateInfo(0).IsName("drawback_run"))
-                    {
-                        anim.Play("drawback_idle", 0, duration);
-                    }
-                    else if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_jump_after") ||
-                            anim.GetCurrentAnimatorStateInfo(0).IsName("attack_fall_after"))
-                    {
-                        anim.Play("attack_idle_after", 0, duration);
-                    }
-                    else if (anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_run") ||
-                       anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_jump") ||
-                       anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_fall"))
-                    {
-                        anim.Play("storm_ready_idle", 0, duration);
-                    }
-                    else if (anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_run") ||
-                        anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_jump") ||
-                        anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_fall"))
-                    {
-                        anim.Play("storm_pre_idle", 0, duration);
-                    }
+                    anim.Play(hsPrefix + "attack_run_" + playerAttack.attackIndex, 0, duration);
+                }
+                else if (state.IsName("drawback_idle"))
+                {
+                    anim.Play("drawback_run", 0, duration);
+                }
+                else if (IsStormReadyState(state))
+                {
+                    anim.Play("storm_ready_run", 0, duration);
+                }
+                else if (IsStormPreState(state))
+                {
+                    anim.Play("storm_pre_run", 0, duration);
                 }
             }
-            Vector3 targetVelocity = new Vector2(move * speed, rb.velocity.y);
-            rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
-            //flip
-            if (isRunningToTarget)
+            else // Not running
             {
-                if (playerAttack.isAttacking && playerAttack.isAttackingLeft == FacingRight) { Flip(); }
-                else if (!playerAttack.isAttacking)
+                if (state.IsName(hsPrefix + "attack_run_" + playerAttack.attackIndex))
                 {
-                    if (move > 0 && !FacingRight) { Flip(); }
-                    else if (move < 0 && FacingRight) { Flip(); }
+                    anim.Play(hsPrefix + "attack_idle_" + playerAttack.attackIndex, 0, duration);
                 }
-            }
-            else
-            {
-                if (move > 0 && !FacingRight) { Flip(); }
-                else if (move < 0 && FacingRight) { Flip(); }
+                else if (state.IsName("drawback_run"))
+                {
+                    anim.Play("drawback_idle", 0, duration);
+                }
+                else if (state.IsName("attack_jump_after") ||
+                         state.IsName("attack_fall_after"))
+                {
+                    anim.Play("attack_idle_after", 0, duration);
+                }
+                else if (IsStormReadyState(state))
+                {
+                    anim.Play("storm_ready_idle", 0, duration);
+                }
+                else if (IsStormPreState(state))
+                {
+                    anim.Play("storm_pre_idle", 0, duration);
+                }
             }
         }
-    }//movement horizontally
+
+        // Apply horizontal movement
+        Vector3 targetVelocity = new Vector2(move * speed, rb.velocity.y);
+        rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
+
+        // Handle flipping
+        if (isRunningToTarget)
+        {
+            if (playerAttack.isAttacking && playerAttack.isAttackingLeft == FacingRight)
+            {
+                Flip();
+            }
+            else if (!playerAttack.isAttacking)
+            {
+                if (move > 0 && !FacingRight) Flip();
+                else if (move < 0 && FacingRight) Flip();
+            }
+        }
+        else if (playerAttack.isAttacking)
+        {
+            if (playerAttack.isAttackingLeft == FacingRight) { Flip(); }
+        }
+        else
+        {
+            if (move > 0 && !FacingRight) Flip();
+            else if (move < 0 && FacingRight) Flip();
+        }
+
+        // Local helper functions for animation state checks
+        bool IsStormReadyState(AnimatorStateInfo s) =>
+            s.IsName("storm_ready_idle") ||
+            s.IsName("storm_ready_jump") ||
+            s.IsName("storm_ready_fall");
+
+        bool IsStormPreState(AnimatorStateInfo s) =>
+            s.IsName("storm_pre_idle") ||
+            s.IsName("storm_pre_jump") ||
+            s.IsName("storm_pre_fall");
+    }
 
     public void CheckRunToPos()
     {
@@ -332,59 +353,71 @@ public class CharacterController2D : MonoBehaviour
 
     private void GroundCheck()
     {
-        if (!enableGroundCheck) { return; }
-        if (playerAttack.isHanging) { isGrounded = true; return; }
+        if (!enableGroundCheck)
+            return;
+
         bool wasGrounded = isGrounded;
         isGrounded = false;
+
         RaycastHit2D ray = Physics2D.Raycast(transform.position, Vector2.down, 0.1f, m_WhatIsGround);
-        if (ray.collider != null)
+        if (ray.collider == null)
+            return;
+
+        isGrounded = true;
+
+        // Cache animation state info
+        var state = anim.GetCurrentAnimatorStateInfo(0);
+
+        // If just landed (was not grounded last frame)
+        if (!wasGrounded)
         {
-            isGrounded = true;
-            if (!playerAttack.isBoomeranging) { canDoubleJump = true; floatTriggered = false; }
-            if (!wasGrounded)
+            if (!isJumping && !playerAttack.isDefending)
             {
-                if (!isJumping && !playerAttack.isDefending)
+                if (!state.IsName("slash") && !state.IsName("slash_end"))
                 {
-                    if (!anim.GetCurrentAnimatorStateInfo(0).IsName("slash") && !anim.GetCurrentAnimatorStateInfo(0).IsName("slash_end"))
-                    {
-                        PlayAnimClipInCombat("land", "land_combat");
-                    }
-
-                    isFalling = false;
-                    isJumping = false;
+                    PlayAnimClipInCombat("land", "land_combat");
                 }
+                isFalling = false;
+                isJumping = false;
+            }
 
-                CameraFollow.instance.ChangeOffset(CameraFollow.instance.normalOffset);
+            CameraFollow.instance.ChangeOffset(CameraFollow.instance.normalOffset);
 
-                if (!isJumping &&
-                    (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_jump_" + playerAttack.attackIndex) ||
-                    anim.GetCurrentAnimatorStateInfo(0).IsName("attack_fall_" + playerAttack.attackIndex)))
+            string hsPrefix = playerAttack.isHS_attack ? "HS_" : "";
+
+            if (!isJumping &&
+                (state.IsName(hsPrefix + "attack_jump_" + playerAttack.attackIndex) ||
+                 state.IsName(hsPrefix + "attack_fall_" + playerAttack.attackIndex)))
+            {
+                float duration = state.normalizedTime;
+                if (isRunning)
                 {
-                    float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                    if (isRunning)
+                    if (playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
                     {
-                        if (playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
+                        if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
                         {
-                            if (playerAttack.attackIndex == 1)
-                            {
-                                if (duration < (35f / 71f))
-                                {
-                                    anim.Play("attack_back", 0, duration * (71f / 35f));
-                                }
-                                else { if (anim.GetBool("storm")) { anim.Play("storm_pre_run"); } else { anim.Play("run_combat"); } }
-                            }
-                            else { anim.Play("attack_back", 0, duration); }
+                            anim.Play(hsPrefix + "attack_back", 0, duration * (71f / 35f));
                         }
                         else
                         {
-                            anim.Play("attack_run_" + playerAttack.attackIndex, 0, duration);
+                            if (anim.GetBool("storm"))
+                                anim.Play("storm_pre_run");
+                            else
+                                anim.Play("run_combat");
                         }
                     }
-                    else { anim.Play("attack_idle_" + playerAttack.attackIndex, 0, duration); }
+                    else
+                    {
+                        anim.Play(hsPrefix + "attack_run_" + playerAttack.attackIndex, 0, duration);
+                    }
+                }
+                else
+                {
+                    anim.Play(hsPrefix + "attack_idle_" + playerAttack.attackIndex, 0, duration);
                 }
             }
         }
-    }//ground Check
+    }
 
     private bool Float()
     {
@@ -413,54 +446,74 @@ public class CharacterController2D : MonoBehaviour
 
     public void Jump()
     {
-        if (!canJump) { return; }
-        //playerAttack.RetreiveBoomerang();
+        if (!canJump) return;
+
+        // Only allow jump if within coyote time
+        if (coyoteTimer <= 0f) return;
+
+        // Cache HS prefix for animation names
+        string hsPrefix = playerAttack.isHS_attack ? "HS_" : "";
+
+        coyoteTimer = 0f;
+        isGrounded = false;
         float x = rb.velocity.x;
-        if (coyoteTimer > 0f)
+        rb.velocity = new Vector2(x, m_JumpForce);
+        isJumping = true;
+
+        var state = anim.GetCurrentAnimatorStateInfo(0);
+
+        // Attack jump/fall/back transitions
+        if (state.IsName(hsPrefix + "attack_run_" + playerAttack.attackIndex) ||
+            state.IsName(hsPrefix + "attack_idle_" + playerAttack.attackIndex) ||
+            state.IsName(hsPrefix + "attack_back"))
         {
-            coyoteTimer = 0f;
-            playerAttack.EndHanging();
-            isGrounded = false;
-            rb.velocity = new Vector2(x, m_JumpForce);
-            isJumping = true;
-            if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_run_" + playerAttack.attackIndex) || anim.GetCurrentAnimatorStateInfo(0).IsName("attack_idle_" + playerAttack.attackIndex) || anim.GetCurrentAnimatorStateInfo(0).IsName("attack_back"))
-            {
-                float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                if (playerAttack.attackIndex == 1)
-                {
-                    anim.Play("attack_jump_" + playerAttack.attackIndex, 0, duration - (36 / 71));
-                }
-                else
-                {
-                    anim.Play("attack_jump_" + playerAttack.attackIndex, 0, duration);
-                }
-            }
-            else if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_fall_after") ||
-                     anim.GetCurrentAnimatorStateInfo(0).IsName("attack_idle_after"))
-            {
-                float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                anim.Play("attack_jump_after", 0, duration);
-            }
-            else if ((anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_fall") ||
-                   anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_idle") ||
-                   anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_run")))
-            {
-                float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                anim.Play("storm_ready_jump", 0, duration);
-            }
-            else if ((anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_fall") ||
-                   anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_idle") ||
-                   anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_run")))
-            {
-                float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                anim.Play("storm_pre_jump", 0, duration);
-            }
+            float duration = state.normalizedTime;
+            if (playerAttack.attackIndex == 1)
+                anim.Play(hsPrefix + "attack_jump_" + playerAttack.attackIndex, 0, duration - (36f / 71f));
             else
-            {
-                PlayAnimClipInCombat("jump", "jump_combat");
-            }
+                anim.Play(hsPrefix + "attack_jump_" + playerAttack.attackIndex, 0, duration);
+            return;
         }
-    }//first jump
+
+        // Attack after transitions
+        if (state.IsName(hsPrefix + "attack_fall_after") ||
+            state.IsName(hsPrefix + "attack_idle_after"))
+        {
+            float duration = state.normalizedTime;
+            anim.Play(hsPrefix + "attack_jump_after", 0, duration);
+            return;
+        }
+
+        // Storm ready transitions
+        if (IsStormReadyState(state))
+        {
+            float duration = state.normalizedTime;
+            anim.Play("storm_ready_jump", 0, duration);
+            return;
+        }
+
+        // Storm pre transitions
+        if (IsStormPreState(state))
+        {
+            float duration = state.normalizedTime;
+            anim.Play("storm_pre_jump", 0, duration);
+            return;
+        }
+
+        // Default jump
+        PlayAnimClipInCombat("jump", "jump_combat");
+
+        // Local helper functions for animation state checks
+        bool IsStormReadyState(AnimatorStateInfo s) =>
+            s.IsName("storm_ready_fall") ||
+            s.IsName("storm_ready_idle") ||
+            s.IsName("storm_ready_run");
+
+        bool IsStormPreState(AnimatorStateInfo s) =>
+            s.IsName("storm_pre_fall") ||
+            s.IsName("storm_pre_idle") ||
+            s.IsName("storm_pre_run");
+    }
 
     public void DoubleJump(float holdTime)
     {
@@ -492,7 +545,16 @@ public class CharacterController2D : MonoBehaviour
     {
         if (!canFlip) { return; }
         if (playerAttack.isInAttackAnim) { return; }
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_back")) { return; }
+
+        if (playerAttack.isAttacking)
+        {
+            if (playerAttack.isAttackingLeft == FacingRight) { }
+        }
+        else
+        {
+            if (anim.GetCurrentAnimatorStateInfo(0).IsName((playerAttack.isHS_attack ? "HS_" : "") + "attack_back")) { return; }
+        }
+        print("flipped");
         //flip player
         FacingRight = !FacingRight;
         transform.Rotate(new Vector3(0, 1, 0), 180);

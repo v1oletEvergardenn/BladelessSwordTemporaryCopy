@@ -166,13 +166,13 @@ public class InputPlayer : MonoBehaviour
             {
                 playerAttack.Attack(false);
                 if (learnedBarrier)
-                { anim.SetBool("storm", true); playerAttack.isPreparingStorm = true; playerAttack.prepareStormTimer = 0f; }
+                { playerAttack.isPreparingStorm = true; playerAttack.prepareStormTimer = 0f; }
             }
             else if (!inputMaster._attackRightAction.IsPressed() && inputMaster._attackLeftAction.WasPressedThisFrame())
             {
                 playerAttack.Attack(true);
                 if (learnedBarrier)
-                { anim.SetBool("storm", true); playerAttack.isPreparingStorm = true; playerAttack.prepareStormTimer = 0f; }
+                { playerAttack.isPreparingStorm = true; playerAttack.prepareStormTimer = 0f; }
             }
         }
 

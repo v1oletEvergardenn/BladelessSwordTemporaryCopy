@@ -27,7 +27,9 @@ public class PlayerAttack : MonoBehaviour
 
     #region ATTACK VARIABLES
 
-    [FoldoutGroup("Attack Variables", nameof(CounterAttackRadius), nameof(jumpCounterAttackRadius), nameof(jumpAttackPoint), nameof(counterAttackPoint), nameof(counterAttackCheckDuration), nameof(perfectCounterAttackCheckDuration), nameof(attackGap))]
+    [FoldoutGroup("Attack Variables", nameof(CounterAttackRadius), nameof(jumpCounterAttackRadius),
+        nameof(jumpAttackPoint), nameof(counterAttackPoint), nameof(counterAttackCheckDuration),
+        nameof(perfectCounterAttackCheckDuration), nameof(attackGap))]
     [SerializeField] private Void attackGroupHold;
 
     [SerializeField, HideInInspector, Range(0f, 3f)] private float CounterAttackRadius;
@@ -52,12 +54,13 @@ public class PlayerAttack : MonoBehaviour
     private float comboTimer;
     public bool isAttackingLeft = true;
 
-    [FoldoutGroup("Heart Sword Variables", nameof(HS_attack_radius), nameof(HS_attack_damage), nameof(maxHS_point), nameof(currentHS_point), nameof(activatedHS_point), nameof(HS_points))]
+    [FoldoutGroup("Heart Sword Variables", nameof(HS_attack_radius), nameof(HS_attack_damage),
+        nameof(maxHS_point), nameof(currentHS_point), nameof(activatedHS_point), nameof(HS_points))]
     [SerializeField] private Void HSGroupHold;
 
-    [SerializeField, HideInInspector] public int maxHS_point = 3;
-    [SerializeField, HideInInspector] public int currentHS_point = 0;
-    [SerializeField, HideInInspector] public int activatedHS_point = 0;
+    [SerializeField, HideInInspector] public float maxHS_point = 3;
+    [SerializeField, HideInInspector] public float currentHS_point = 0;
+    [SerializeField, HideInInspector] public float activatedHS_point = 0;
     [SerializeField, HideInInspector, Range(0f, 5f)] public float HS_attack_radius = 2.3f;
     [SerializeField, HideInInspector, Range(0f, 10f)] public int HS_attack_damage = 5;
     public List<GameObject> HS_points;
@@ -66,20 +69,12 @@ public class PlayerAttack : MonoBehaviour
 
     #region BOOMERANG VARIABLES
 
-    [FoldoutGroup("Boomerang Variables", nameof(_boomerang), nameof(launchPosition), nameof(boomerange_speed), nameof(boomerange_startDecreaseTime), nameof(boomerange_decreaseSpeed), nameof(teleportCheckLayer), nameof(boomerange_rotationSpeed))]
+    [FoldoutGroup("Boomerang Variables", nameof(launchPosition),
+         nameof(teleportCheckLayer))]
     [SerializeField] private Void boomerangGroupHold;
 
-    [SerializeField, HideInInspector] public Boomerang _boomerang;
     [SerializeField, HideInInspector] private Transform launchPosition;
-    [SerializeField, HideInInspector, Range(0f, 20f)] private float boomerange_speed = 10f;
-    [SerializeField, HideInInspector, Range(0f, 1f)] private float boomerange_startDecreaseTime = 1f;
-    [SerializeField, HideInInspector, Range(0f, 20f)] private float boomerange_decreaseSpeed = 30f;
-    [SerializeField, HideInInspector, Range(0f, 300f)] private float boomerange_rotationSpeed = 100f;
     [SerializeField, HideInInspector] public LayerMask teleportCheckLayer;
-
-    [HideInInspector] public bool canLaunchBoomerang = true;
-    [HideInInspector] public bool isBoomeranging = false;
-    [HideInInspector] public bool isHanging = false;
 
     #endregion BOOMERANG VARIABLES
 
@@ -142,31 +137,33 @@ public class PlayerAttack : MonoBehaviour
         combatTimer -= Time.deltaTime;
         comboTimer += Time.deltaTime;
         attackAnimTimer += Time.deltaTime;
+
         UpdateHS();
-        if (isPreparingStorm) { prepareStormTimer += Time.deltaTime; }
+
+        if (isPreparingStorm)
+        {
+            prepareStormTimer += Time.deltaTime;
+            if (prepareStormTimer >= 0.2f) { anim.SetBool("storm", true); }
+        }
         else { prepareStormTimer = 0f; stormReady = false; }
+
         if (isPreparingStorm && prepareStormTimer >= prepareStormTime && !stormReady) { stormReady = true; SoundManager.PlaySound("defend_block2"); vfx.SpawnSlashEffect(stormEffectPos.position); }
         if (combatTimer <= 0) { anim.SetBool("isCombat", false); isInCombat = false; combatTimer = 0; }
-        if (comboTimer >= 0.9f) { attackIndex = 2; }
+        if (comboTimer >= 0.67f) { attackIndex = 2; }
         if (attackAnimTimer <= attackAnimDuration) { isInAttackAnim = true; }
         else { isInAttackAnim = false; }
-        if (counterAttackCheckTimer <= counterAttackCheckDuration)
-        {
-            CheckCounterAttack();
-        }
-        else
-        {
-            isAttacking = false;
-        }
+
+        if (counterAttackCheckTimer <= counterAttackCheckDuration) { CheckCounterAttack(); }
+        else { isAttacking = false; }
     }
 
     #region Attack
 
-    private bool isHSattack = false;
+    public bool isHS_attack = false;
 
     public void Attack(bool attackLeft)
     {
-        if (canAttack && !controller.isFloating && attackTimer >= attackGap)
+        if (!isAttacking && canAttack && !controller.isFloating && attackTimer >= attackGap)
         {
             isAttackingLeft = attackLeft;
             isInAttackAnim = false;
@@ -175,11 +172,9 @@ public class PlayerAttack : MonoBehaviour
             attackTimer = 0f;
             attackAnimTimer = 0f;
             counterAttackCheckTimer = 0f;
-            if (activatedHS_point > 0)
-            {
-                if (!energy.AttackConsume()) { return; }
-            }
-            isHSattack = false;
+            isHS_attack = true;
+
+            if (activatedHS_point > 0) { if (!energy.AttackConsume()) { return; } }
 
             attackIndex++;
             if (attackIndex > 2) { attackIndex = 1; }
@@ -194,14 +189,20 @@ public class PlayerAttack : MonoBehaviour
             }
             else if (controller.FacingRight == attackLeft) { controller.Flip(true); backAttack = true; }
 
-            if (controller.isJumping) { anim.Play("attack_jump_" + attackIndex); }
-            else if (controller.isFalling) { anim.Play("attack_fall_" + attackIndex); }
-            else if (controller.isRunning) { if (backAttack) { anim.Play("attack_back"); } else { anim.Play("attack_run_" + attackIndex); } }
-            else { anim.Play("attack_idle_" + attackIndex); }
+            if (controller.isJumping) { anim.Play((isHS_attack ? "HS_" : "") + "attack_jump_" + attackIndex); }
+            else if (controller.isFalling) { anim.Play((isHS_attack ? "HS_" : "") + "attack_fall_" + attackIndex); }
+            else if (controller.isRunning)
+            {
+                if (backAttack)
+                {
+                    anim.Play("run_combat");
+                    anim.Play((isHS_attack ? "HS_" : "") + "attack_back");
+                }
+                else { anim.Play((isHS_attack ? "HS_" : "") + "attack_run_" + attackIndex); }
+            }
+            else { anim.Play((isHS_attack ? "HS_" : "") + "attack_idle_" + attackIndex); }
 
             anim.SetBool("isCombat", true);
-
-            EndHanging();
         }
     }
 
@@ -213,11 +214,11 @@ public class PlayerAttack : MonoBehaviour
         float dist2 = Mathf.Infinity;
         IProjectile closeTarget_proj = null;
         IDamagable closeTarget_obj = null;
-        if (activatedHS_point > 0 && !isHSattack)
+        if (activatedHS_point > 0 && !isHS_attack)
         {
             activatedHS_point -= 1;
             currentHS_point -= 1;
-            isHSattack = true;
+            isHS_attack = true;
         }
         foreach (Collider2D collider in colliders)
         {
@@ -228,7 +229,7 @@ public class PlayerAttack : MonoBehaviour
                     float v = Vector3.Distance(i.GetPivot(), health.GetHitPos());
                     if (dist > v) { dist = v; closeTarget_proj = i; }
                 }//close iprojectile
-                if (collider.TryGetComponent<IDamagable>(out IDamagable d) && isHSattack)
+                if (collider.TryGetComponent<IDamagable>(out IDamagable d) && isHS_attack)
                 {
                     float v = Vector3.Distance(d.GetHitPos(), health.GetHitPos());
                     if (dist2 > v) { dist2 = v; closeTarget_obj = d; }
@@ -244,7 +245,7 @@ public class PlayerAttack : MonoBehaviour
             if (controller.FacingRight && closeTarget_proj.GetPivot().x <= transform.position.x) { return; }
             if (!controller.FacingRight && closeTarget_proj.GetPivot().x >= transform.position.x) { return; }
             float distance = Vector2.Distance(closeTarget_proj.GetPivot(), health.GetHitPos());
-            if (isHSattack)
+            if (isHS_attack)
             {
                 if (distance <= HS_attack_radius + counterAttackPoint.localPosition.x) { CounterAttack(closeTarget_proj, true); return; }
             }
@@ -253,7 +254,7 @@ public class PlayerAttack : MonoBehaviour
                 if (counterAttackCheckTimer <= perfectCounterAttackCheckDuration) { CounterAttack(closeTarget_proj, true); return; }
                 if (counterAttackCheckTimer <= counterAttackCheckDuration) { CounterAttack(closeTarget_proj, false); return; }
             }//HS counter attack projectiles all in range
-            if (closeTarget_obj != null && isHSattack)
+            if (closeTarget_obj != null && isHS_attack)
             {
                 if (controller.FacingRight && closeTarget_obj.GetHitPos().x <= transform.position.x) { return; }
                 if (!controller.FacingRight && closeTarget_obj.GetHitPos().x >= transform.position.x) { return; }
@@ -366,7 +367,7 @@ public class PlayerAttack : MonoBehaviour
 
     private IEnumerator IE_activateHS()
     {
-        for (int i = activatedHS_point; i <= currentHS_point; i++)
+        for (float i = activatedHS_point; i <= currentHS_point; i++)
         {
             vfx.SpawnSlashEffect(health.GetHitPos());
             SoundManager.PlaySound("HS_activate");
@@ -407,11 +408,9 @@ public class PlayerAttack : MonoBehaviour
         if (canDefend && !controller.isFloating)
         {
             if (!energy.DefendConsume()) { return; }
-            RetreiveBoomerang();
             isDefending = true;
             animSet.Anim_Defend(0);
             anim.Play("defend");
-            EndHanging();
         }
     }
 
@@ -433,7 +432,6 @@ public class PlayerAttack : MonoBehaviour
 
     public void OnStorm()
     {
-        if (isBoomeranging) { storm.transform.SetParent(_boomerang.transform, false); storm.transform.localPosition = Vector3.zero; }
         if (canStorm && !isOnStorm)
         {
             if (stormReady)
@@ -484,145 +482,6 @@ public class PlayerAttack : MonoBehaviour
 
     #endregion Storm
 
-    #region Boomerang
-
-    public void CheckBoomerang()
-    {
-        if (canLaunchBoomerang && !isAttacking && !isBoomeranging && !controller.isFloating)
-        {
-            if (!energy.BoomerangConsume()) return;
-            LaunchBoomerang();
-            canLaunchBoomerang = false;
-            isBoomeranging = true;
-        }
-        else if (isBoomeranging && !_boomerang.isQTE)
-        {
-            if (_boomerang.stickedInToWall)
-            {
-                //enter hanging
-                isHanging = true;
-                rb.velocity = Vector3.zero;
-                controller.canMove = false;
-                controller.canDoubleJump = true;
-                controller.canJump = true;
-                controller.isGrounded = true;
-                controller.isJumping = false;
-                rb.isKinematic = true;
-                //anim.setBool
-                anim.SetBool("isHanging", true);
-                if (_boomerang.facingRight == controller.FacingRight)
-                {
-                    controller.Flip();
-                }
-            }
-            else
-            {
-                anim.SetTrigger("teleport");
-            }
-            _boomerang._End();
-            EndBoomerang();
-        }
-    }
-
-    public void TeleportToSword()
-    {
-        RaycastHit2D hit = Physics2D.Raycast(_boomerang.transform.position, Vector2.down, 2.2f, teleportCheckLayer);
-        RaycastHit2D hit_horizontal = Physics2D.Raycast(_boomerang.transform.position, _boomerang.transform.right, 0.7f, teleportCheckLayer);
-        float offset_y = 0f;
-        float offset_x = 0f;
-        if (hit.collider != null)
-        {
-            offset_y = 2.2f - hit.distance;
-        }
-        if (hit_horizontal.collider != null)
-        {
-            offset_x = hit_horizontal.distance + 0.1f;
-            if (!controller.FacingRight)
-            {
-                offset_x = -hit_horizontal.distance - 0.1f;
-            }
-        }
-        rb.velocity = Vector3.zero;
-        transform.position = _boomerang.transform.position + new Vector3(offset_x, offset_y - 2.2f, 0);
-    }
-
-    public void EndHanging()
-    {
-        if (isHanging)
-        {
-            anim.SetBool("isHanging", false);
-            rb.isKinematic = false;
-            isHanging = false;
-            rb.isKinematic = false;
-            controller.canMove = true;
-        }
-    }
-
-    public void RetreiveBoomerang()
-    {
-        if (_boomerang.isActiveAndEnabled)
-        {
-            _boomerang.BounceQTEUI.SetActive(false);
-            if (CameraManager.IsActiveCamera(_boomerang.cam))
-            {
-                if (CameraManager.beforeActiveCam == _boomerang.cam | CameraManager.beforeActiveCam == null)
-                {
-                    CameraManager.instance.SwtichToNormalCam();
-                }
-                else
-                {
-                    CameraManager.SwitchBounceQTECamera(CameraManager.beforeActiveCam);
-                }
-            }
-            storm.transform.SetParent(this.transform, false);
-            storm.transform.localPosition = originalStormPos;
-            _boomerang._End();
-            EndBoomerang();
-        }
-    }
-
-    public void LaunchBoomerang()
-    {
-        EndHanging();
-        if (_boomerang.isActiveAndEnabled && _boomerang.stickedInToWall) { RetreiveBoomerang(); }
-        if (isOnStorm)
-        {
-            storm.transform.SetParent(_boomerang.transform, false); storm.transform.localPosition = Vector3.zero;
-        }
-        rb.isKinematic = false;
-        controller.canMove = true;
-        SoundManager.PlaySound("sword_launch");
-        anim.SetBool("isBoomerang", true);
-
-        float offset = 0f;
-        RaycastHit2D hit_horizontal = Physics2D.Raycast(launchPosition.position, transform.right, 1.3f, teleportCheckLayer);
-        if (hit_horizontal.collider != null)
-        {
-            offset = 1.3f - hit_horizontal.distance;
-        }
-        _boomerang.transform.position = launchPosition.position - transform.right * offset;
-        _boomerang.transform.rotation = Quaternion.identity;
-        _boomerang.gameObject.SetActive(true);
-        _boomerang.flyingTimer = 0f;
-        _boomerang.SetUp(boomerange_speed, boomerange_startDecreaseTime, boomerange_decreaseSpeed, boomerange_rotationSpeed);
-        if (!controller.FacingRight)
-        {
-            _boomerang.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
-        }
-        _boomerang.facingRight = controller.FacingRight;
-    }
-
-    public void EndBoomerang()
-    {
-        anim.SetBool("isBoomerang", false);
-        storm.transform.SetParent(this.transform, false);
-        storm.transform.localPosition = originalStormPos;
-        canLaunchBoomerang = true;
-        isBoomeranging = false;
-    }
-
-    #endregion Boomerang
-
     private void OnDrawGizmos()
     {
         if (showCounterAttackRange)
@@ -642,4 +501,143 @@ public class PlayerAttack : MonoBehaviour
             Gizmos.DrawWireSphere(storm.transform.position, storm_radius);
         }
     }
+
+    //#region Boomerang
+
+    //public void CheckBoomerang()
+    //{
+    //    if (canLaunchBoomerang && !isAttacking && !isBoomeranging && !controller.isFloating)
+    //    {
+    //        if (!energy.BoomerangConsume()) return;
+    //        LaunchBoomerang();
+    //        canLaunchBoomerang = false;
+    //        isBoomeranging = true;
+    //    }
+    //    else if (isBoomeranging && !_boomerang.isQTE)
+    //    {
+    //        if (_boomerang.stickedInToWall)
+    //        {
+    //            //enter hanging
+    //            isHanging = true;
+    //            rb.velocity = Vector3.zero;
+    //            controller.canMove = false;
+    //            controller.canDoubleJump = true;
+    //            controller.canJump = true;
+    //            controller.isGrounded = true;
+    //            controller.isJumping = false;
+    //            rb.isKinematic = true;
+    //            //anim.setBool
+    //            anim.SetBool("isHanging", true);
+    //            if (_boomerang.facingRight == controller.FacingRight)
+    //            {
+    //                controller.Flip();
+    //            }
+    //        }
+    //        else
+    //        {
+    //            anim.SetTrigger("teleport");
+    //        }
+    //        _boomerang._End();
+    //        EndBoomerang();
+    //    }
+    //}
+
+    //public void TeleportToSword()
+    //{
+    //    RaycastHit2D hit = Physics2D.Raycast(_boomerang.transform.position, Vector2.down, 2.2f, teleportCheckLayer);
+    //    RaycastHit2D hit_horizontal = Physics2D.Raycast(_boomerang.transform.position, _boomerang.transform.right, 0.7f, teleportCheckLayer);
+    //    float offset_y = 0f;
+    //    float offset_x = 0f;
+    //    if (hit.collider != null)
+    //    {
+    //        offset_y = 2.2f - hit.distance;
+    //    }
+    //    if (hit_horizontal.collider != null)
+    //    {
+    //        offset_x = hit_horizontal.distance + 0.1f;
+    //        if (!controller.FacingRight)
+    //        {
+    //            offset_x = -hit_horizontal.distance - 0.1f;
+    //        }
+    //    }
+    //    rb.velocity = Vector3.zero;
+    //    transform.position = _boomerang.transform.position + new Vector3(offset_x, offset_y - 2.2f, 0);
+    //}
+
+    //public void EndHanging()
+    //{
+    //    if (isHanging)
+    //    {
+    //        anim.SetBool("isHanging", false);
+    //        rb.isKinematic = false;
+    //        isHanging = false;
+    //        rb.isKinematic = false;
+    //        controller.canMove = true;
+    //    }
+    //}
+
+    //public void RetreiveBoomerang()
+    //{
+    //    if (_boomerang.isActiveAndEnabled)
+    //    {
+    //        _boomerang.BounceQTEUI.SetActive(false);
+    //        if (CameraManager.IsActiveCamera(_boomerang.cam))
+    //        {
+    //            if (CameraManager.beforeActiveCam == _boomerang.cam | CameraManager.beforeActiveCam == null)
+    //            {
+    //                CameraManager.instance.SwtichToNormalCam();
+    //            }
+    //            else
+    //            {
+    //                CameraManager.SwitchBounceQTECamera(CameraManager.beforeActiveCam);
+    //            }
+    //        }
+    //        storm.transform.SetParent(this.transform, false);
+    //        storm.transform.localPosition = originalStormPos;
+    //        _boomerang._End();
+    //        EndBoomerang();
+    //    }
+    //}
+
+    //public void LaunchBoomerang()
+    //{
+    //    EndHanging();
+    //    if (_boomerang.isActiveAndEnabled && _boomerang.stickedInToWall) { RetreiveBoomerang(); }
+    //    if (isOnStorm)
+    //    {
+    //        storm.transform.SetParent(_boomerang.transform, false); storm.transform.localPosition = Vector3.zero;
+    //    }
+    //    rb.isKinematic = false;
+    //    controller.canMove = true;
+    //    SoundManager.PlaySound("sword_launch");
+    //    anim.SetBool("isBoomerang", true);
+
+    //    float offset = 0f;
+    //    RaycastHit2D hit_horizontal = Physics2D.Raycast(launchPosition.position, transform.right, 1.3f, teleportCheckLayer);
+    //    if (hit_horizontal.collider != null)
+    //    {
+    //        offset = 1.3f - hit_horizontal.distance;
+    //    }
+    //    _boomerang.transform.position = launchPosition.position - transform.right * offset;
+    //    _boomerang.transform.rotation = Quaternion.identity;
+    //    _boomerang.gameObject.SetActive(true);
+    //    _boomerang.flyingTimer = 0f;
+    //    _boomerang.SetUp(boomerange_speed, boomerange_startDecreaseTime, boomerange_decreaseSpeed, boomerange_rotationSpeed);
+    //    if (!controller.FacingRight)
+    //    {
+    //        _boomerang.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
+    //    }
+    //    _boomerang.facingRight = controller.FacingRight;
+    //}
+
+    //public void EndBoomerang()
+    //{
+    //    anim.SetBool("isBoomerang", false);
+    //    storm.transform.SetParent(this.transform, false);
+    //    storm.transform.localPosition = originalStormPos;
+    //    canLaunchBoomerang = true;
+    //    isBoomeranging = false;
+    //}
+
+    //#endregion Boomerang
 }

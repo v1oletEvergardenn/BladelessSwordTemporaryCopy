@@ -25,7 +25,7 @@ public class AnimSetBool : MonoBehaviour
         controller.canJump = true;
         playerAttack.canAttack = true;
         playerAttack.canAttack = true;
-        playerAttack.canLaunchBoomerang = true;
+        //playerAttack.canLaunchBoomerang = true;
         playerAttack.canStorm = true;
         playerAttack.canDefend = true;
     }
@@ -43,7 +43,7 @@ public class AnimSetBool : MonoBehaviour
         controller.canFlip = b;
         controller.canJump = b;
         playerAttack.canAttack = b;
-        playerAttack.canLaunchBoomerang = b;
+        // playerAttack.canLaunchBoomerang = b;
         playerAttack.canStorm = b;
     }
 
@@ -55,7 +55,7 @@ public class AnimSetBool : MonoBehaviour
         controller.canFlip = b;
         controller.canJump = b;
         playerAttack.canAttack = b;
-        playerAttack.canLaunchBoomerang = b;
+        //playerAttack.canLaunchBoomerang = b;
         playerAttack.canStorm = b;
     }
 
@@ -68,7 +68,7 @@ public class AnimSetBool : MonoBehaviour
         controller.canFlip = b;
         controller.canJump = b;
         playerAttack.canAttack = b;
-        playerAttack.canLaunchBoomerang = b;
+        //playerAttack.canLaunchBoomerang = b;
         playerAttack.canStorm = b;
         playerAttack.canDefend = b;
     }
@@ -86,7 +86,7 @@ public class AnimSetBool : MonoBehaviour
         controller.canFlip = b;
         controller.canJump = b;
         playerAttack.canAttack = b;
-        playerAttack.canLaunchBoomerang = b;
+        // playerAttack.canLaunchBoomerang = b;
         playerAttack.canStorm = b;
         playerAttack.canDefend = b;
         playerAttack.isAttacking = !b;
@@ -102,11 +102,6 @@ public class AnimSetBool : MonoBehaviour
         {
             player.transform.position -= new Vector3(x, 0, 0);
         }
-    }
-
-    public void TeleportToBoomerang()
-    {
-        playerAttack.TeleportToSword();
     }
 
     #endregion COMBAT BOOL SETTINGS
