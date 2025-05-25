@@ -10,22 +10,49 @@ using UnityEngine.Playables;
 
 public class PlayerAttack : MonoBehaviour
 {
-    private CharacterController2D controller;
+    #region Singleton & References
+
     public static PlayerAttack instance;
+    private CharacterController2D controller;
     private VFXManager vfx;
     private GameManager gameManager;
     private Energy energy;
     private Rigidbody2D rb;
     private AnimSetBool animSet;
     private InputPlayer inputPlayer;
-    [SerializeField] public Animator anim;
     private IDamagable health;
+    [SerializeField] public Animator anim;
     [SerializeField] private Transform pointerPos;
+
+    #endregion Singleton & References
+
+    #region State Flags
+
     [HideInInspector] public bool isAimingRightStick;
     [HideInInspector] public bool isInCombat;
-    public GameObject BounceUI;
+    [HideInInspector] public bool isDefending;
+    [HideInInspector] public bool canDefend = true;
+    [HideInInspector] public bool canAttack;
+    [HideInInspector] public bool isAttacking;
+    [HideInInspector] public bool isInAttackAnim = false;
+    [HideInInspector] public bool isAttackingLeft = true;
+    [HideInInspector] public bool isHS_attack = false;
+    [HideInInspector] public bool canStorm = true;
+    [HideInInspector] public bool isOnStorm = false;
+    [HideInInspector] public bool isPreparingStorm = false;
 
-    #region ATTACK VARIABLES
+    #endregion State Flags
+
+    #region Debug/Editor Flags
+
+    public bool showCounterAttackRange;
+    public bool showJumpAttackRange;
+    public bool showHSAttackRange;
+    public bool showBarrierRange;
+
+    #endregion Debug/Editor Flags
+
+    #region Attack Variables
 
     [FoldoutGroup("Attack Variables", nameof(CounterAttackRadius), nameof(jumpCounterAttackRadius),
         nameof(jumpAttackPoint), nameof(counterAttackPoint), nameof(counterAttackCheckDuration),
@@ -44,15 +71,16 @@ public class PlayerAttack : MonoBehaviour
     private float counterAttackCheckTimer = 0f;
 
     [HideInInspector] public Vector3 direction;
-    [HideInInspector] public bool canAttack;
-    [HideInInspector] public bool isAttacking;
-    [HideInInspector] public bool isInAttackAnim = false;
     private float attackAnimTimer = 0f;
     private float attackAnimDuration = 0.36f;//duration of an attack animation
     [HideInInspector] public int attackIndex = 2;
     [HideInInspector] public float combatTimer;
     private float comboTimer;
-    public bool isAttackingLeft = true;
+    private HashSet<IDamagable> hsHitTargets = new HashSet<IDamagable>();
+
+    #endregion Attack Variables
+
+    #region Heart Sword Variables
 
     [FoldoutGroup("Heart Sword Variables", nameof(HS_attack_radius), nameof(HS_attack_damage),
         nameof(maxHS_point), nameof(currentHS_point), nameof(activatedHS_point), nameof(HS_points))]
@@ -65,22 +93,12 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField, HideInInspector, Range(0f, 10f)] public int HS_attack_damage = 5;
     public List<GameObject> HS_points;
 
-    #endregion ATTACK VARIABLES
+    #endregion Heart Sword Variables
 
-    #region BOOMERANG VARIABLES
+    #region Storm Variables
 
-    [FoldoutGroup("Boomerang Variables", nameof(launchPosition),
-         nameof(teleportCheckLayer))]
-    [SerializeField] private Void boomerangGroupHold;
-
-    [SerializeField, HideInInspector] private Transform launchPosition;
-    [SerializeField, HideInInspector] public LayerMask teleportCheckLayer;
-
-    #endregion BOOMERANG VARIABLES
-
-    #region STORM VARIABLES
-
-    [FoldoutGroup("Barrier Variables", nameof(storm), nameof(prepareStormTime), nameof(stormDuration), nameof(storm_radius), nameof(repelLayer), nameof(repelForce), nameof(stormEffectPos))]
+    [FoldoutGroup("Barrier Variables", nameof(storm), nameof(prepareStormTime), nameof(stormDuration),
+        nameof(storm_radius), nameof(repelLayer), nameof(repelForce), nameof(stormEffectPos))]
     [SerializeField] private Void barrierGroupHold;
 
     [SerializeField, HideInInspector] private GameObject storm;
@@ -89,30 +107,20 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField, HideInInspector, Range(0f, 2f)] public float storm_radius = 1.1f;
     [SerializeField, HideInInspector] private LayerMask repelLayer;
     [SerializeField, HideInInspector, Range(0f, 300f)] private float repelForce = 100;
-    [HideInInspector] public bool canStorm = true;
-    [HideInInspector] public bool isOnStorm = false;
-    [HideInInspector] public bool isPreparingStorm = false;
     private bool stormReady = false;
     [HideInInspector] public float prepareStormTimer = 0f;
     private Vector3 originalStormPos;
     public Transform stormEffectPos;
 
-    #endregion STORM VARIABLES
+    #endregion Storm Variables
 
-    [HideInInspector] public bool isDefending;
-    [HideInInspector] public bool canDefend = true;
-
-    public bool showCounterAttackRange;
-    public bool showJumpAttackRange;
-    public bool showHSAttackRange;
-    public bool showBarrierRange;
+    #region Unity Lifecycle
 
     private void Awake()
     {
         if (instance == null) { instance = this; }
     }
 
-    // Start is called before the first frame update
     private void Start()
     {
         controller = GetComponent<CharacterController2D>();
@@ -157,52 +165,79 @@ public class PlayerAttack : MonoBehaviour
         else { isAttacking = false; }
     }
 
-    #region Attack
+    #endregion Unity Lifecycle
 
-    public bool isHS_attack = false;
+    #region Attack Methods
 
     public void Attack(bool attackLeft)
     {
-        if (!isAttacking && canAttack && !controller.isFloating && attackTimer >= attackGap)
+        // Guard clauses for attack eligibility
+        if (isAttacking || !canAttack || controller.isFloating || attackTimer < attackGap)
+            return;
+
+        // Set attack state
+        isAttackingLeft = attackLeft;
+        isInAttackAnim = false;
+        isInCombat = true;
+        isAttacking = true;
+        attackTimer = 0f;
+        attackAnimTimer = 0f;
+        counterAttackCheckTimer = 0f;
+        hsHitTargets.Clear();
+
+        // Heart Sword attack logic
+        isHS_attack = true;
+        if (activatedHS_point > 1)
         {
-            isAttackingLeft = attackLeft;
-            isInAttackAnim = false;
-            isInCombat = true;
-            isAttacking = true;
-            attackTimer = 0f;
-            attackAnimTimer = 0f;
-            counterAttackCheckTimer = 0f;
+            activatedHS_point -= 1;
+            currentHS_point -= 1;
             isHS_attack = true;
+        }
 
-            if (activatedHS_point > 0) { if (!energy.AttackConsume()) { return; } }
+        if (activatedHS_point > 0 && !energy.AttackConsume())
+            return;
 
-            attackIndex++;
-            if (attackIndex > 2) { attackIndex = 1; }
-            combatTimer = 2f;
-            comboTimer = 0f;
+        // Combo logic
+        attackIndex++;
+        if (attackIndex > 2) attackIndex = 1;
+        combatTimer = 2f;
+        comboTimer = 0f;
 
-            bool backAttack = false;
-
-            if (InputMaster.instance._moveAction.IsPressed())
+        // Determine if this is a back attack and handle flipping
+        bool backAttack = false;
+        if (InputMaster.instance._moveAction.IsPressed())
+        {
+            if (inputPlayer.leftPointLeft != attackLeft)
             {
-                if (inputPlayer.leftPointLeft != attackLeft) { controller.Flip(true); backAttack = true; }
+                controller.Flip(true);
+                backAttack = true;
             }
-            else if (controller.FacingRight == attackLeft) { controller.Flip(true); backAttack = true; }
+        }
+        else if (controller.FacingRight == attackLeft)
+        {
+            controller.Flip(true);
+            backAttack = true;
+        }
 
-            if (controller.isJumping) { anim.Play((isHS_attack ? "HS_" : "") + "attack_jump_" + attackIndex); }
-            else if (controller.isFalling) { anim.Play((isHS_attack ? "HS_" : "") + "attack_fall_" + attackIndex); }
-            else if (controller.isRunning)
-            {
-                if (backAttack)
-                {
-                    anim.Play("run_combat");
-                    anim.Play((isHS_attack ? "HS_" : "") + "attack_back");
-                }
-                else { anim.Play((isHS_attack ? "HS_" : "") + "attack_run_" + attackIndex); }
-            }
-            else { anim.Play((isHS_attack ? "HS_" : "") + "attack_idle_" + attackIndex); }
+        // Play the appropriate attack animation
+        anim.Play(GetAttackAnimName(backAttack));
+        anim.SetBool("isCombat", true);
 
-            anim.SetBool("isCombat", true);
+        // Helper method to select the correct animation name
+        string GetAttackAnimName(bool backAttack)
+        {
+            string prefix = isHS_attack ? "HS_" : "";
+            string indexStr = attackIndex.ToString();
+
+            if (controller.isJumping)
+                return $"{prefix}attack_jump_{indexStr}";
+            if (controller.isFalling)
+                return $"{prefix}attack_fall_{indexStr}";
+            if (controller.isRunning)
+                return backAttack
+                    ? $"run_combat;{prefix}attack_back_{indexStr}"
+                    : $"{prefix}attack_run_{indexStr}";
+            return $"{prefix}attack_idle_{indexStr}";
         }
     }
 
@@ -210,57 +245,90 @@ public class PlayerAttack : MonoBehaviour
     {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(counterAttackPoint.position, HS_attack_radius + 5);
 
-        float dist = Mathf.Infinity;
-        float dist2 = Mathf.Infinity;
-        IProjectile closeTarget_proj = null;
-        IDamagable closeTarget_obj = null;
-        if (activatedHS_point > 0 && !isHS_attack)
-        {
-            activatedHS_point -= 1;
-            currentHS_point -= 1;
-            isHS_attack = true;
-        }
+        IProjectile closestProjectile = null;
+        IDamagable closestDamagable = null;
+        float minProjDist = float.PositiveInfinity;
+        float minDmgDist = float.PositiveInfinity;
+
+        var inRangeProjectiles = new List<IProjectile>();
+        var inRangeDamagables = new List<IDamagable>();
+
+        // Gather projectiles and damagables, and find closest of each
         foreach (Collider2D collider in colliders)
         {
-            if (collider.gameObject != this.gameObject)
+            if (collider.gameObject == this.gameObject) continue;
+
+            if (collider.TryGetComponent<IProjectile>(out IProjectile proj))
             {
-                if (collider.TryGetComponent<IProjectile>(out IProjectile i))
+                float dist = Vector3.Distance(proj.GetPivot(), health.GetHitPos());
+                if (dist < minProjDist)
                 {
-                    float v = Vector3.Distance(i.GetPivot(), health.GetHitPos());
-                    if (dist > v) { dist = v; closeTarget_proj = i; }
-                }//close iprojectile
-                if (collider.TryGetComponent<IDamagable>(out IDamagable d) && isHS_attack)
+                    minProjDist = dist;
+                    closestProjectile = proj;
+                }
+                inRangeProjectiles.Add(proj);
+            }
+
+            if (isHS_attack && collider.TryGetComponent<IDamagable>(out IDamagable dmg))
+            {
+                float dist = Vector3.Distance(dmg.GetHitPos(), health.GetHitPos());
+                if (dist < minDmgDist)
                 {
-                    float v = Vector3.Distance(d.GetHitPos(), health.GetHitPos());
-                    if (dist2 > v) { dist2 = v; closeTarget_obj = d; }
-                } // close idamagable
-                if (collider.TryGetComponent<NonHSAttackHitTrigger>(out NonHSAttackHitTrigger n))
+                    minDmgDist = dist;
+                    closestDamagable = dmg;
+                }
+                inRangeDamagables.Add(dmg);
+            }
+        }
+
+        float hsCheckDistance = HS_attack_radius + counterAttackPoint.localPosition.x;
+
+        if (isHS_attack)
+        {
+            // HS counter: damagables
+            foreach (var dmg in inRangeDamagables)
+            {
+                if (!IsInCounterDirection(dmg.GetHitPos())) continue;
+
+                float dist = Vector2.Distance(dmg.GetHitPos(), health.GetHitPos());
+                if (dist <= hsCheckDistance) HSAttack(dmg);
+            }
+
+            // HS counter: projectiles
+            foreach (var proj in inRangeProjectiles)
+            {
+                if (!proj.isHostileToPlayer || proj.collided) continue;
+                if (!IsInCounterDirection(proj.GetPivot())) continue;
+
+                float dist = Vector2.Distance(proj.GetPivot(), health.GetHitPos());
+                if (dist <= hsCheckDistance)
+                    CounterAttack(proj, true);
+            }
+        }
+        else if (closestProjectile != null && closestProjectile.isHostileToPlayer && !closestProjectile.collided)
+        {
+            float dist = Vector2.Distance(closestProjectile.GetPivot(), health.GetHitPos());
+            float counterRadius = CounterAttackRadius + counterAttackPoint.localPosition.x;
+
+            if (dist <= counterRadius)
+            {
+                if (counterAttackCheckTimer <= perfectCounterAttackCheckDuration)
                 {
-                    n.Trigger();
+                    CounterAttack(closestProjectile, true); return;
+                }
+                if (counterAttackCheckTimer <= counterAttackCheckDuration)
+                {
+                    CounterAttack(closestProjectile, false); return;
                 }
             }
-        }//search for close target
-        if (closeTarget_proj != null && closeTarget_proj.isHostileToPlayer && !closeTarget_proj.collided)
+        }
+
+        // Helper: checks if a target is in the correct direction for counter
+        bool IsInCounterDirection(Vector3 targetPos)
         {
-            if (controller.FacingRight && closeTarget_proj.GetPivot().x <= transform.position.x) { return; }
-            if (!controller.FacingRight && closeTarget_proj.GetPivot().x >= transform.position.x) { return; }
-            float distance = Vector2.Distance(closeTarget_proj.GetPivot(), health.GetHitPos());
-            if (isHS_attack)
-            {
-                if (distance <= HS_attack_radius + counterAttackPoint.localPosition.x) { CounterAttack(closeTarget_proj, true); return; }
-            }
-            if (distance <= CounterAttackRadius + counterAttackPoint.localPosition.x)
-            {
-                if (counterAttackCheckTimer <= perfectCounterAttackCheckDuration) { CounterAttack(closeTarget_proj, true); return; }
-                if (counterAttackCheckTimer <= counterAttackCheckDuration) { CounterAttack(closeTarget_proj, false); return; }
-            }//HS counter attack projectiles all in range
-            if (closeTarget_obj != null && isHS_attack)
-            {
-                if (controller.FacingRight && closeTarget_obj.GetHitPos().x <= transform.position.x) { return; }
-                if (!controller.FacingRight && closeTarget_obj.GetHitPos().x >= transform.position.x) { return; }
-                float v = Vector3.Distance(closeTarget_obj.GetHitPos(), health.GetHitPos());
-                if (v <= HS_attack_radius + counterAttackPoint.localPosition.x) { HSAttack(closeTarget_obj); return; }//deal damage to them
-            }//HS counter attack deals damage in range
+            if (controller.FacingRight && targetPos.x <= transform.position.x) return false;
+            if (!controller.FacingRight && targetPos.x >= transform.position.x) return false;
+            return true;
         }
     }
 
@@ -286,6 +354,17 @@ public class PlayerAttack : MonoBehaviour
         }
     }
 
+    public void HSAttack(IDamagable damagable)
+    {
+        if (hsHitTargets.Contains(damagable)) return; // Already hit this target in this attack
+        IDamagable parentDamagble = damagable;
+        if (damagable is SubDamageable sub) { parentDamagble = sub.ParentDamageable; }
+        hsHitTargets.Add(parentDamagble);
+        foreach (IDamagable i in parentDamagble.subDamagables) { hsHitTargets.Add(i); }
+        damagable.Damage(HS_attack_damage, this.transform, 0);
+        canDefend = true;
+    }
+
     public void CounterMeleeAttack()
     {
         currentHS_point = maxHS_point;
@@ -300,13 +379,6 @@ public class PlayerAttack : MonoBehaviour
     public void EndAttack()
     {
         isAttacking = false;
-    }
-
-    public void HSAttack(IDamagable damagable)
-    {
-        damagable.Damage(HS_attack_damage, null, 0);
-        isAttacking = false;
-        canDefend = true;
     }
 
     public bool JumpAttack()
@@ -399,9 +471,9 @@ public class PlayerAttack : MonoBehaviour
         }
     }
 
-    #endregion Attack
+    #endregion Attack Methods
 
-    #region Defend
+    #region Defend Methods
 
     public void OnDefend()
     {
@@ -426,9 +498,9 @@ public class PlayerAttack : MonoBehaviour
         isDefending = false;
     }
 
-    #endregion Defend
+    #endregion Defend Methods
 
-    #region Storm
+    #region Storm Methods
 
     public void OnStorm()
     {
@@ -480,7 +552,9 @@ public class PlayerAttack : MonoBehaviour
         isOnStorm = false;
     }
 
-    #endregion Storm
+    #endregion Storm Methods
+
+    #region Gizmos
 
     private void OnDrawGizmos()
     {
@@ -502,142 +576,5 @@ public class PlayerAttack : MonoBehaviour
         }
     }
 
-    //#region Boomerang
-
-    //public void CheckBoomerang()
-    //{
-    //    if (canLaunchBoomerang && !isAttacking && !isBoomeranging && !controller.isFloating)
-    //    {
-    //        if (!energy.BoomerangConsume()) return;
-    //        LaunchBoomerang();
-    //        canLaunchBoomerang = false;
-    //        isBoomeranging = true;
-    //    }
-    //    else if (isBoomeranging && !_boomerang.isQTE)
-    //    {
-    //        if (_boomerang.stickedInToWall)
-    //        {
-    //            //enter hanging
-    //            isHanging = true;
-    //            rb.velocity = Vector3.zero;
-    //            controller.canMove = false;
-    //            controller.canDoubleJump = true;
-    //            controller.canJump = true;
-    //            controller.isGrounded = true;
-    //            controller.isJumping = false;
-    //            rb.isKinematic = true;
-    //            //anim.setBool
-    //            anim.SetBool("isHanging", true);
-    //            if (_boomerang.facingRight == controller.FacingRight)
-    //            {
-    //                controller.Flip();
-    //            }
-    //        }
-    //        else
-    //        {
-    //            anim.SetTrigger("teleport");
-    //        }
-    //        _boomerang._End();
-    //        EndBoomerang();
-    //    }
-    //}
-
-    //public void TeleportToSword()
-    //{
-    //    RaycastHit2D hit = Physics2D.Raycast(_boomerang.transform.position, Vector2.down, 2.2f, teleportCheckLayer);
-    //    RaycastHit2D hit_horizontal = Physics2D.Raycast(_boomerang.transform.position, _boomerang.transform.right, 0.7f, teleportCheckLayer);
-    //    float offset_y = 0f;
-    //    float offset_x = 0f;
-    //    if (hit.collider != null)
-    //    {
-    //        offset_y = 2.2f - hit.distance;
-    //    }
-    //    if (hit_horizontal.collider != null)
-    //    {
-    //        offset_x = hit_horizontal.distance + 0.1f;
-    //        if (!controller.FacingRight)
-    //        {
-    //            offset_x = -hit_horizontal.distance - 0.1f;
-    //        }
-    //    }
-    //    rb.velocity = Vector3.zero;
-    //    transform.position = _boomerang.transform.position + new Vector3(offset_x, offset_y - 2.2f, 0);
-    //}
-
-    //public void EndHanging()
-    //{
-    //    if (isHanging)
-    //    {
-    //        anim.SetBool("isHanging", false);
-    //        rb.isKinematic = false;
-    //        isHanging = false;
-    //        rb.isKinematic = false;
-    //        controller.canMove = true;
-    //    }
-    //}
-
-    //public void RetreiveBoomerang()
-    //{
-    //    if (_boomerang.isActiveAndEnabled)
-    //    {
-    //        _boomerang.BounceQTEUI.SetActive(false);
-    //        if (CameraManager.IsActiveCamera(_boomerang.cam))
-    //        {
-    //            if (CameraManager.beforeActiveCam == _boomerang.cam | CameraManager.beforeActiveCam == null)
-    //            {
-    //                CameraManager.instance.SwtichToNormalCam();
-    //            }
-    //            else
-    //            {
-    //                CameraManager.SwitchBounceQTECamera(CameraManager.beforeActiveCam);
-    //            }
-    //        }
-    //        storm.transform.SetParent(this.transform, false);
-    //        storm.transform.localPosition = originalStormPos;
-    //        _boomerang._End();
-    //        EndBoomerang();
-    //    }
-    //}
-
-    //public void LaunchBoomerang()
-    //{
-    //    EndHanging();
-    //    if (_boomerang.isActiveAndEnabled && _boomerang.stickedInToWall) { RetreiveBoomerang(); }
-    //    if (isOnStorm)
-    //    {
-    //        storm.transform.SetParent(_boomerang.transform, false); storm.transform.localPosition = Vector3.zero;
-    //    }
-    //    rb.isKinematic = false;
-    //    controller.canMove = true;
-    //    SoundManager.PlaySound("sword_launch");
-    //    anim.SetBool("isBoomerang", true);
-
-    //    float offset = 0f;
-    //    RaycastHit2D hit_horizontal = Physics2D.Raycast(launchPosition.position, transform.right, 1.3f, teleportCheckLayer);
-    //    if (hit_horizontal.collider != null)
-    //    {
-    //        offset = 1.3f - hit_horizontal.distance;
-    //    }
-    //    _boomerang.transform.position = launchPosition.position - transform.right * offset;
-    //    _boomerang.transform.rotation = Quaternion.identity;
-    //    _boomerang.gameObject.SetActive(true);
-    //    _boomerang.flyingTimer = 0f;
-    //    _boomerang.SetUp(boomerange_speed, boomerange_startDecreaseTime, boomerange_decreaseSpeed, boomerange_rotationSpeed);
-    //    if (!controller.FacingRight)
-    //    {
-    //        _boomerang.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
-    //    }
-    //    _boomerang.facingRight = controller.FacingRight;
-    //}
-
-    //public void EndBoomerang()
-    //{
-    //    anim.SetBool("isBoomerang", false);
-    //    storm.transform.SetParent(this.transform, false);
-    //    storm.transform.localPosition = originalStormPos;
-    //    canLaunchBoomerang = true;
-    //    isBoomeranging = false;
-    //}
-
-    //#endregion Boomerang
+    #endregion Gizmos
 }

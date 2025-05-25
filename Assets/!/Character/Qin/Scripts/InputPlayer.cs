@@ -22,6 +22,8 @@ public enum PlayerState
 
 public class InputPlayer : MonoBehaviour
 {
+    #region Singleton & References
+
     //[HideInInspector] public ControllerInput.GameplayActions control;
     [HideInInspector] public CharacterController2D controller;
 
@@ -32,6 +34,10 @@ public class InputPlayer : MonoBehaviour
     private Health health;
     public static InputPlayer instance;
 
+    #endregion Singleton & References
+
+    #region Movement & Input State
+
     private float horizontalMove = 0f;
     [HideInInspector] public bool input_floating = false;
     [HideInInspector] public float input_floating_timer = 0f;
@@ -39,6 +45,10 @@ public class InputPlayer : MonoBehaviour
     [HideInInspector] public float HS_cancel_timer = 0f;
     [HideInInspector] public float HS_hold_timer = 0f;
     private Vector2 moveDir;
+
+    #endregion Movement & Input State
+
+    #region Pointer & Attack Direction
 
     [Title("pointerSetting", 15)] public Transform pointer;
     public float pointerOffset = 1f;
@@ -53,9 +63,16 @@ public class InputPlayer : MonoBehaviour
     public bool rightPointLeft = false;
     public bool leftPointLeft = false;
 
-    [Header("EventTrigger")] private EventObject currentEventObject;
+    #endregion Pointer & Attack Direction
 
+    #region Event & Map Camera
+
+    [Header("EventTrigger")] private EventObject currentEventObject;
     [Header("MapCamera")] public Transform MapCamera;
+
+    #endregion Event & Map Camera
+
+    #region Skills & Progression
 
     [Header("LearnSkills")] public bool learnedMovement = true;
     public bool learnedJump = true;
@@ -66,6 +83,10 @@ public class InputPlayer : MonoBehaviour
     public bool learnedBarrier = false;
     public bool learnedDefend = false;
     public bool learnedHeartSword = false;
+
+    #endregion Skills & Progression
+
+    #region Unity Lifecycle
 
     private void Awake()
     {
@@ -88,9 +109,6 @@ public class InputPlayer : MonoBehaviour
 
         anim = controller.anim;
 
-        //INPUTcontrol = inputManager.input;
-        //control = inputManager.gameplayActions;
-
         inputMaster._jumpAction.canceled += ctx => OnEndJump();
         inputMaster._moveAction.performed += ctx => moveDir = ctx.ReadValue<Vector2>();
         inputMaster._moveAction.performed += ctx => leftAttackDir = ctx.ReadValue<Vector2>();
@@ -102,25 +120,59 @@ public class InputPlayer : MonoBehaviour
 
     private void Update()
     {
-        // Use the new input system for space key detection
+        if (CheckAndHandlePauseOrQTE()) return;
+
+        UpdatePointerPosition();
+
+        if (gameManager.isInInformationEvent | gameManager.isInDialog | health.isDead)
+        { pointerSpriteRenderer.sprite = null; }
+        else { OnAttackDirection(); }
+        if (HandleEventKeyInput()) return;
+        HandleBarrierRelease();
+        if (health.isDead) return;
+        if (HandleDialogOrInfoEvent()) return;
+
+        UpdateFloatingState();
+        UpdateMovementInput();
+        HandleJumpInput();
+        HandleAttackInput();
+        HandleDefendInput();
+        HandleTeleportInput();
+    }
+
+    // --- Helper Methods ---
+
+    private bool CheckAndHandlePauseOrQTE()
+    {
+        // Space key test event
         if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             TestEvent();
         }
-        if (gameManager.GamePaused) { return; }
+        if (gameManager.GamePaused) return true;
+        if (inputMaster.isQTE) return true;
+        return false;
+    }
+
+    private void UpdatePointerPosition()
+    {
         pointer.transform.position = transform.position + new Vector3(0, pointerOffset, 0);
+    }
+
+    private bool HandleEventKeyInput()
+    {
         if (inputMaster._EventKeyAction.WasPressedThisFrame())
         {
             if (DialogManager.instance != null && DialogManager.instance.Printer.activeInHierarchy)
             {
                 DialogManager.instance.Click_Window();
-                return;
-            }//dialog
+                return true;
+            }
             if (currentEventObject != null)
             {
                 currentEventObject.Interact(true);
-                return;
-            }//eventObject
+                return true;
+            }
         }
 
         if (inputMaster._EventKeyAction.WasReleasedThisFrame())
@@ -128,57 +180,128 @@ public class InputPlayer : MonoBehaviour
             if (currentEventObject != null)
             {
                 currentEventObject.Interact(false);
-                return;
-            }//eventObject
+                return true;
+            }
         }
+        return false;
+    }
 
+    private void HandleBarrierRelease()
+    {
         if (learnedBarrier)
         {
-            if ((!inputMaster._attackLeftAction.IsPressed() && !inputMaster._attackRightAction.IsPressed()) && playerAttack.isPreparingStorm)
+            bool noAttackPressed = !inputMaster._attackLeftAction.IsPressed() && !inputMaster._attackRightAction.IsPressed();
+            if (noAttackPressed && playerAttack.isPreparingStorm)
             {
-                anim.SetBool("storm", false); playerAttack.OnStorm(); playerAttack.isPreparingStorm = false;
+                anim.SetBool("storm", false);
+                playerAttack.OnStorm();
+                playerAttack.isPreparingStorm = false;
             }
         }
-
-        if (inputMaster.isQTE)
-        {
-            return;
-        }
-
-        if (health.isDead) { return; }
-
-        if (gameManager.isInInformationEvent | gameManager.isInDialog) { anim.SetBool("isRunning", false); GetComponent<Rigidbody2D>().velocity = new Vector2(0, GetComponent<Rigidbody2D>().velocity.y); return; }
-
-        if (learnedDoubleJump && input_floating) { input_floating_timer += Time.deltaTime; controller.floatingTime = input_floating_timer; }
-        if (learnedDoubleJump && input_floating_timer > 0f) { controller.input_floating = true; } else { controller.input_floating = false; }
-
-        float x = moveDir.x;
-        if (x < 0 && x > -0.4) { x = -0.4f; }
-        if (x > 0 && x < 0.4) { x = 0.4f; }
-        if (Mathf.Abs(moveDir.magnitude) < 0.7f) { x = 0f; }
-        horizontalMove = x;
-        if (moveDir.x == 0) { horizontalMove = 0; }
-        if (learnedMovement && !controller.isRunningToTarget) { controller.Move(horizontalMove); }// horizontal movement
-        if (learnedJump && inputMaster._jumpAction.WasPressedThisFrame()) { OnJump(); }//jump
-        if (learnedAttack)
-        {
-            if (!inputMaster._attackLeftAction.IsPressed() && inputMaster._attackRightAction.WasPressedThisFrame())
-            {
-                playerAttack.Attack(false);
-                if (learnedBarrier)
-                { playerAttack.isPreparingStorm = true; playerAttack.prepareStormTimer = 0f; }
-            }
-            else if (!inputMaster._attackRightAction.IsPressed() && inputMaster._attackLeftAction.WasPressedThisFrame())
-            {
-                playerAttack.Attack(true);
-                if (learnedBarrier)
-                { playerAttack.isPreparingStorm = true; playerAttack.prepareStormTimer = 0f; }
-            }
-        }
-
-        if (learnedDefend && inputMaster._defendAction.WasPressedThisFrame() && !playerAttack.isPreparingStorm) { playerAttack.OnDefend(); }//defend
-        if (learnedTeleport && inputMaster._teleportAction.WasPressedThisFrame()) { controller.SwordTeleport(); }
     }
+
+    private bool HandleDialogOrInfoEvent()
+    {
+        if (gameManager.isInInformationEvent | gameManager.isInDialog)
+        {
+            anim.SetBool("isRunning", false);
+            GetComponent<Rigidbody2D>().velocity = new Vector2(0, GetComponent<Rigidbody2D>().velocity.y);
+            return true;
+        }
+        return false;
+    }
+
+    private void UpdateFloatingState()
+    {
+        if (learnedDoubleJump && input_floating)
+        {
+            input_floating_timer += Time.deltaTime;
+            controller.floatingTime = input_floating_timer;
+        }
+        if (learnedDoubleJump && input_floating_timer > 0f)
+        {
+            controller.input_floating = true;
+        }
+        else
+        {
+            controller.input_floating = false;
+        }
+    }
+
+    private void UpdateMovementInput()
+    {
+        float x = moveDir.x;
+        if (x < 0 && x > -0.4f) x = -0.4f;
+        if (x > 0 && x < 0.4f) x = 0.4f;
+        if (Mathf.Abs(moveDir.magnitude) < 0.7f) x = 0f;
+        horizontalMove = x;
+        if (moveDir.x == 0) horizontalMove = 0;
+        if (learnedMovement && !controller.isRunningToTarget)
+        {
+            controller.Move(horizontalMove);
+        }
+    }
+
+    private void HandleJumpInput()
+    {
+        if (learnedJump && inputMaster._jumpAction.WasPressedThisFrame())
+        {
+            OnJump();
+        }
+    }
+
+    private void HandleAttackInput()
+    {
+        if (!learnedAttack) return;
+
+        bool leftPressed = inputMaster._attackLeftAction.IsPressed();
+        bool rightPressed = inputMaster._attackRightAction.IsPressed();
+        bool rightJustPressed = inputMaster._attackRightAction.WasPressedThisFrame();
+        bool leftJustPressed = inputMaster._attackLeftAction.WasPressedThisFrame();
+
+        if (!leftPressed && rightJustPressed)
+        {
+            playerAttack.Attack(false);
+            if (learnedBarrier)
+            {
+                playerAttack.isPreparingStorm = true;
+                playerAttack.prepareStormTimer = 0f;
+            }
+        }
+        else if (!rightPressed && leftJustPressed)
+        {
+            playerAttack.Attack(true);
+            if (learnedBarrier)
+            {
+                playerAttack.isPreparingStorm = true;
+                playerAttack.prepareStormTimer = 0f;
+            }
+        }
+    }
+
+    private void HandleDefendInput()
+    {
+        if (learnedDefend && inputMaster._defendAction.WasPressedThisFrame() && !playerAttack.isPreparingStorm)
+        {
+            playerAttack.OnDefend();
+        }
+    }
+
+    private void HandleTeleportInput()
+    {
+        if (learnedTeleport && inputMaster._teleportAction.WasPressedThisFrame())
+        {
+            controller.SwordTeleport();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+    }
+
+    #endregion Unity Lifecycle
+
+    #region Input & Action Handlers
 
     /// <summary>
     /// Test function to trigger an event.
@@ -186,12 +309,6 @@ public class InputPlayer : MonoBehaviour
     private void TestEvent()
     {
         StartCoroutine(controller.RunToPosition(transform.position + new Vector3(50f, 0, 0)));
-    }
-
-    private void FixedUpdate()
-    {
-        if (gameManager.isInInformationEvent | gameManager.isInDialog | health.isDead) { pointerSpriteRenderer.sprite = null; return; }
-        OnAttackDirection();// set counter attack direction
     }
 
     private void OnJump()
@@ -213,6 +330,10 @@ public class InputPlayer : MonoBehaviour
         input_floating_timer = 0f;
         //floating
     }//double jump and floating
+
+    #endregion Input & Action Handlers
+
+    #region Pointer & Attack Direction Logic
 
     public float GetRotZFromDirection(Vector3 dir)
     {
@@ -331,6 +452,10 @@ public class InputPlayer : MonoBehaviour
         return targetRotation;
     }
 
+    #endregion Pointer & Attack Direction Logic
+
+    #region Trigger & EventObject Handling
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.layer == 15)//event objects
@@ -350,6 +475,10 @@ public class InputPlayer : MonoBehaviour
         }
     }
 
+    #endregion Trigger & EventObject Handling
+
+    #region Utility
+
     public void DisableAllActions()
     {
         moveDir = Vector2.zero;
@@ -359,4 +488,6 @@ public class InputPlayer : MonoBehaviour
         anim.SetBool("storm", false);
         playerAttack.isPreparingStorm = false;
     }
+
+    #endregion Utility
 }

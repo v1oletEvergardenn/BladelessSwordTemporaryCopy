@@ -1,4 +1,5 @@
 using EditorAttributes;
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class IDamagable : MonoBehaviour
@@ -6,6 +7,8 @@ public abstract class IDamagable : MonoBehaviour
     [FoldoutGroup("HitPos", nameof(getHitPosition), nameof(color))] public Void hitposVoid1;
     [SerializeField, HideInInspector] private Vector3 getHitPosition;
     [SerializeField, HideInInspector] public Color color = Color.red;
+
+    [HideInInspector] public HashSet<SubDamageable> subDamagables = new HashSet<SubDamageable>();
 
     public virtual int Damage(int damageAmount, Transform sender = null, float stunDuration = 0f)
     {

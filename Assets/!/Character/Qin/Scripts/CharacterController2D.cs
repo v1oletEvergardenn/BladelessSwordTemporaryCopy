@@ -13,6 +13,8 @@ using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 [SelectionBase]
 public class CharacterController2D : MonoBehaviour
 {
+    #region Singleton & References
+
     public static CharacterController2D instance;
     [Title("references", 15)][SerializeField] public Animator anim;
     [HideInInspector] public Rigidbody2D rb;
@@ -23,16 +25,21 @@ public class CharacterController2D : MonoBehaviour
     [SerializeField] private Transform pointer;
     [SerializeField] private CameraFollow camFollow;
 
+    #endregion Singleton & References
+
+    #region Ground Check
+
     [Title("GroundCheck", 15)][SerializeField] public LayerMask m_WhatIsGround;
     [SerializeField] private float coyoteTime = 0.2f;
     [HideInInspector] public float coyoteTimer = 0f;
     public bool isGrounded;
     [HideInInspector] public bool enableGroundCheck = true;
 
+    #endregion Ground Check
+
+    #region Movement Variables
+
     [Title("Variables", 15)]
-
-    #region MOVEMENT VARIABLES
-
     [FoldoutGroup("Movement Variables", nameof(FacingRight), nameof(m_AirControl), nameof(m_MovementSmoothing), nameof(runSpeed), nameof(airRunSpeed))]
     [SerializeField] private Void movementGroupHold;
 
@@ -49,9 +56,9 @@ public class CharacterController2D : MonoBehaviour
     [HideInInspector] public float gravity;
     private bool runToLeft = false;
 
-    #endregion MOVEMENT VARIABLES
+    #endregion Movement Variables
 
-    #region JUMP VARIABLES
+    #region Jump & Floating Variables
 
     [FoldoutGroup("Jump&&floating Variables", nameof(m_JumpForce), nameof(DoubleJumpForceMultiplier), nameof(MinDoubleJumpForceMultiplier), nameof(DoubleJumpForceTime), nameof(floatingSpeed), nameof(floatingRumblingSpeed))]
     [SerializeField] private Void JumpGroupHold;
@@ -67,19 +74,14 @@ public class CharacterController2D : MonoBehaviour
     [HideInInspector] public bool resetRumbleJump = false;
     public bool isJumping = false;
     public bool isFloating;
-
     [HideInInspector] public bool floatTriggered = false;
-
-    //new
-
     public bool isFalling = false;
     [HideInInspector] public bool isRunning = false;
-
     private float _fallSpeedYDampingChangeThreshold;
 
-    #endregion JUMP VARIABLES
+    #endregion Jump & Floating Variables
 
-    #region TELEPORT VARIABLES
+    #region Teleport Variables
 
     [FoldoutGroup("Teleport Variables", nameof(teleportCD), nameof(TeleportDistance), nameof(TeleportDuration), nameof(TeleportSword), nameof(teleportCheckLayer))]
     [SerializeField] private Void teleGroupHold;
@@ -92,12 +94,18 @@ public class CharacterController2D : MonoBehaviour
     private float teleportTimer = 0f;
     private bool teleported = false;
 
-    #endregion TELEPORT VARIABLES
+    #endregion Teleport Variables
+
+    #region State Flags
 
     [HideInInspector] public bool canFlip = true;
     [HideInInspector] public bool canMove = true;
     [HideInInspector] public bool canJump = true;
     [HideInInspector] public bool canDoubleJump;
+
+    #endregion State Flags
+
+    #region Unity Lifecycle
 
     private void Awake()
     {
@@ -200,7 +208,9 @@ public class CharacterController2D : MonoBehaviour
         GroundCheck();
     }
 
-    #region BASIC MOVEMENT
+    #endregion Unity Lifecycle
+
+    #region Basic Movement
 
     public void Move(float move)
     {
@@ -244,7 +254,7 @@ public class CharacterController2D : MonoBehaviour
                 {
                     if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
                     {
-                        anim.Play(hsPrefix + "attack_back", 0, duration * (71f / 35f));
+                        anim.Play(hsPrefix + "attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
                     }
                     else
                     {
@@ -396,7 +406,7 @@ public class CharacterController2D : MonoBehaviour
                     {
                         if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
                         {
-                            anim.Play(hsPrefix + "attack_back", 0, duration * (71f / 35f));
+                            anim.Play(hsPrefix + "attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
                         }
                         else
                         {
@@ -418,6 +428,10 @@ public class CharacterController2D : MonoBehaviour
             }
         }
     }
+
+    #endregion Basic Movement
+
+    #region Jump & Floating
 
     private bool Float()
     {
@@ -465,7 +479,7 @@ public class CharacterController2D : MonoBehaviour
         // Attack jump/fall/back transitions
         if (state.IsName(hsPrefix + "attack_run_" + playerAttack.attackIndex) ||
             state.IsName(hsPrefix + "attack_idle_" + playerAttack.attackIndex) ||
-            state.IsName(hsPrefix + "attack_back"))
+            state.IsName(hsPrefix + "attack_back_" + playerAttack.attackIndex))
         {
             float duration = state.normalizedTime;
             if (playerAttack.attackIndex == 1)
@@ -541,6 +555,10 @@ public class CharacterController2D : MonoBehaviour
         }
     }//double jump and jump counter attack
 
+    #endregion Jump & Floating
+
+    #region Flipping & Facing
+
     public void Flip(bool ignoreCamFollowFlip = false)
     {
         if (!canFlip) { return; }
@@ -552,9 +570,8 @@ public class CharacterController2D : MonoBehaviour
         }
         else
         {
-            if (anim.GetCurrentAnimatorStateInfo(0).IsName((playerAttack.isHS_attack ? "HS_" : "") + "attack_back")) { return; }
+            if (anim.GetCurrentAnimatorStateInfo(0).IsName((playerAttack.isHS_attack ? "HS_" : "") + "attack_back_" + playerAttack.attackIndex)) { return; }
         }
-        print("flipped");
         //flip player
         FacingRight = !FacingRight;
         transform.Rotate(new Vector3(0, 1, 0), 180);
@@ -575,6 +592,10 @@ public class CharacterController2D : MonoBehaviour
             Flip();
         }
     }
+
+    #endregion Flipping & Facing
+
+    #region Teleportation
 
     public void SwordTeleport()
     {
@@ -697,7 +718,9 @@ public class CharacterController2D : MonoBehaviour
         transform.position = TeleportSword.transform.position + new Vector3(offset_x, offset_y - 1.2f, 0);
     }
 
-    #endregion BASIC MOVEMENT
+    #endregion Teleportation
+
+    #region Utility
 
     public void EnableGravity(bool enable)
     {
@@ -722,4 +745,6 @@ public class CharacterController2D : MonoBehaviour
         Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
         return targetRotation;
     }
+
+    #endregion Utility
 }

@@ -47,7 +47,7 @@ public class YYF_Swing : IEnemyAction
             yield return new WaitForSeconds(0.4f);
             InputKeyType inputKey = InputKeyType.left_attack_key;
             if (bossAI.IsPlayerLeft()) { inputKey = InputKeyType.right_attack_key; }
-            InputMaster.instance.StartQTE(inputKey, player.transform.position + new Vector3(0, 4, 0), 0.4f, () =>
+            InputMaster.instance.StartQTE(inputKey, player.transform.position + new Vector3(0, 4, 0), 0.2f, () =>
             {
                 playerAttack.Attack(bossAI.IsPlayerLeft() ? false : true);
             }, null);
@@ -59,7 +59,7 @@ public class YYF_Swing : IEnemyAction
             Vector3 pos = new Vector3(12, 5, 0);
             if (bossAI.IsPlayerLeft()) { pos = new Vector3(-12, 5, 0); }
             InputMaster.instance.StartQTE(inputKey, player.transform.position + new Vector3(0, 4, 0),
-                0.4f, () => { playerController.DesignatedPositionTeleport(player.transform.position + pos); }, null);
+                0.3f, () => { playerController.DesignatedPositionTeleport(player.transform.position + pos); }, null);
             yield return new WaitUntil(() => !InputMaster.instance.isQTE);
         }
         else
@@ -70,7 +70,8 @@ public class YYF_Swing : IEnemyAction
         float x = transform.position.x + 5;
         if (bossAI.IsPlayerLeft()) { x = transform.position.x - 5; }
         transform.DOMoveX(x, 0.3f).SetEase(Ease.InQuint);
-        yield return new WaitForSeconds(0.2f);
+        if (factor == 1) { yield return new WaitUntil(() => !InputMaster.instance.isQTE); }
+        else { yield return new WaitForSeconds(0.2f); }
 
         bossAI.whiteAnim.Play("swing_attack");
         bossAI.blackAnim.Play("swing_attack");

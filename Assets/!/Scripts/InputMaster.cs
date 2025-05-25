@@ -161,11 +161,16 @@ public class InputMaster : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             qteInteractedKey_image.fillAmount = 1 - (elapsedTime / duration);
+            if (inputActionKey.triggered)
+            {
+                EndQTE(true);
+                yield break;
+            }
             yield return null;
         }
 
         EndQTE(false);
-        yield return false;
+        yield return null;
     }
 
     /// <summary>
@@ -253,12 +258,7 @@ public class InputMaster : MonoBehaviour
 
             if (inputActionKey.triggered)
             {
-                qteInteractedKey_image.fillAmount = 1;
-                qteKey.SetActive(false);
-                Time.timeScale = 1f;
-                inputActionKey.Disable();
-                isQTE = false;
-                callBack_success?.Invoke();
+                EndQTE(true);
                 yield break;
             }
             yield return null;
@@ -278,7 +278,7 @@ public class InputMaster : MonoBehaviour
             isQTE = false;
             qteKey.SetActive(false);
             if (successful) { callBack_success?.Invoke(); }
-            else { callBack_fail.Invoke(); }
+            else { callBack_fail?.Invoke(); }
             if (!inputWasEnabled) { inputActionKey.Disable(); }
             else { inputActionKey.Enable(); }
             inputActionKey = null;

@@ -12,15 +12,14 @@ using static UnityEditor.PlayerSettings;
 
 public class YingYangFish_AI : IEnemyController
 {
-    #region ATTRIBUTES
+    #region Inspector Fields
 
     [FoldoutGroup("Attributes", nameof(center), nameof(blackFish), nameof(blackFishGFX),
         nameof(whiteFish), nameof(whiteFishGFX), nameof(blackOrigin), nameof(whiteOrigin),
         nameof(idleRotateSpeed), nameof(sprintRotateSpeed), nameof(waterSpearPos_black1),
         nameof(waterSpearPos_black2), nameof(waterSpearPos_white1), nameof(waterSpearPos_white2), nameof(Dir),
         nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter), nameof(waterLevel),
-        nameof(EventInteract))
-        ]
+        nameof(EventInteract))]
     public Void void2;
 
     [SerializeField, HideInInspector] public Transform YingYangFish;
@@ -54,26 +53,15 @@ public class YingYangFish_AI : IEnemyController
     [HideInInspector] public Animator centerAnim;
     [HideInInspector] public bool closerFish_Black;
 
-    #endregion ATTRIBUTES
-
-    #region DEBUG
-
     [FoldoutGroup("Debug", nameof(white_distanceToCenter),
         nameof(black_distanceToCenter), nameof(movingTarget), nameof(isCloseSwimming), nameof(secondPhase))]
     public Void void3;
 
-    //[SerializeField, HideInInspector] public bool black_idling = true;
-    //[SerializeField, HideInInspector] public bool white_idling = true;
     [SerializeField, HideInInspector] public float white_distanceToCenter = 0f;
-
     [SerializeField, HideInInspector] public float black_distanceToCenter = 0f;
     [SerializeField, HideInInspector] public Transform movingTarget;
     [SerializeField, HideInInspector] public bool isCloseSwimming;
     [SerializeField, HideInInspector] public bool secondPhase;
-
-    #endregion DEBUG
-
-    #region Ultimate
 
     public List<Transform> ultimate_bullets;
 
@@ -89,9 +77,9 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector] public Transform waterDragon3;
     [SerializeField, HideInInspector] public Transform waterDragon4;
 
-    #endregion Ultimate
+    #endregion Inspector Fields
 
-    #region ACTIONS
+    #region Action Fields
 
     public bool Actions;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("ForceDie", "ForceDie")] public Transform void112;
@@ -107,17 +95,21 @@ public class YingYangFish_AI : IEnemyController
     [ShowField(nameof(Actions))][SerializeField] public YYF_splash_black splash_black;
     [ShowField(nameof(Actions))][SerializeField] public YYF_Dive dive;
 
-    #endregion ACTIONS
-
-    #region COROUTINES
-
     [HideInInspector] public Coroutine co_sprintStartPoint;
     [HideInInspector] public Coroutine co_IEcloseSwim;
     [HideInInspector] public Coroutine co_sprintBackEqual;
 
-    #endregion COROUTINES
+    #endregion Action Fields
 
-    // Update is called once per frame
+    #region State Fields
+
+    [HideInInspector] public bool blackPositioned = false;
+    [HideInInspector] public bool whitePositioned = false;
+    [HideInInspector] public bool finishedWaterSpearUltimate = false;
+
+    #endregion State Fields
+
+    #region Unity Lifecycle
 
     public override void Start()
     {
@@ -162,7 +154,9 @@ public class YingYangFish_AI : IEnemyController
         }
     }
 
-    #region Main Functions
+    #endregion Unity Lifecycle
+
+    #region Main AI Coroutines
 
     public IEnumerator SprintStartPoint(string fish = "null")
     {
@@ -188,10 +182,6 @@ public class YingYangFish_AI : IEnemyController
         yield return null;
     }
 
-    /// <summary>
-    /// designated fish runs faster to get back to equal position
-    /// </summary>
-    /// <param name="isBlack"></param>
     public IEnumerator SprintBackEqual()
     {
         float closerFish = Vector2.SignedAngle(blackFish.right, whiteFish.right);
@@ -203,7 +193,7 @@ public class YingYangFish_AI : IEnemyController
 
             blackAnim.Play("sprint");
             float angle = Vector2.Angle(blackFish.right, whiteFish.right);
-            while (angle > 180 || angle < 170)// reached start point
+            while (angle > 180 || angle < 170)
             {
                 angle = Vector2.Angle(blackFish.right, whiteFish.right); yield return null;
             }
@@ -216,7 +206,7 @@ public class YingYangFish_AI : IEnemyController
             if (black_targetRotateSpeed == sprintRotateSpeed) { SetWhiteTargetRotateSpeed(black_targetRotateSpeed * 2); }
             whiteAnim.Play("sprint");
             float angle = Vector2.Angle(blackFish.right, whiteFish.right);
-            while (angle > 180 || angle < 170)// reached start point
+            while (angle > 180 || angle < 170)
             {
                 angle = Vector2.Angle(blackFish.right, whiteFish.right); yield return null;
             }
@@ -236,7 +226,7 @@ public class YingYangFish_AI : IEnemyController
             if (black_targetRotateSpeed == sprintRotateSpeed) { SetWhiteTargetRotateSpeed(black_targetRotateSpeed * 2); }
             whiteAnim.Play("sprint");
             float angle = Vector2.Angle(blackFish.right, whiteFish.right);
-            while (angle > 5)// reached start point
+            while (angle > 5)
             {
                 angle = Vector2.Angle(blackFish.right, whiteFish.right); yield return null;
             }
@@ -249,7 +239,7 @@ public class YingYangFish_AI : IEnemyController
 
             blackAnim.Play("sprint");
             float angle = Vector2.Angle(blackFish.right, whiteFish.right);
-            while (angle > 5)// reached start point
+            while (angle > 5)
             {
                 angle = Vector2.Angle(blackFish.right, whiteFish.right); yield return null;
             }
@@ -300,7 +290,7 @@ public class YingYangFish_AI : IEnemyController
         if (isBlack) { origin = blackOrigin; }
 
         float angle = Vector2.Angle(origin.right, (end - origin.position).normalized) + 60;
-        while (58 > angle || angle > 62)// reached start point
+        while (58 > angle || angle > 62)
         {
             angle = Vector2.Angle(origin.right, (end - origin.position).normalized) + 40;
             yield return null;
@@ -339,6 +329,10 @@ public class YingYangFish_AI : IEnemyController
         yield return null;
     }
 
+    #endregion Main AI Coroutines
+
+    #region AI Utility Methods
+
     public Transform CheckCloserFish()
     {
         if (blackFish.eulerAngles.z < whiteFish.eulerAngles.z) { return blackFish; }
@@ -360,14 +354,15 @@ public class YingYangFish_AI : IEnemyController
         SetNormalRotateSpeed();
     }
 
-    [HideInInspector] public bool blackPositioned = false;
-    [HideInInspector] public bool whitePositioned = false;
-    [HideInInspector] public bool finishedWaterSpearUltimate = false;
+    #endregion AI Utility Methods
+
+    #region Phase & Ultimate Coroutines
 
     public IEnumerator Pre_SecondPhase()
     {
         if (!secondPhase)
         {
+            DEAD = true;
             actionList.Clear();
             CancelAllAction();
             CharacterUIManager.ShowBlackEdge(true);
@@ -378,9 +373,9 @@ public class YingYangFish_AI : IEnemyController
             whiteAnim.Play("close_swim");
             blackAnim.Play("close_swim");
 
-            //yield return StartCoroutine(ChangeYPos(-6));
-            //transform.DOMove(new Vector3(GetCenterXOfMap(), waterLevel.position.y - 6, 0), 1.8f);
-            //yield return new WaitForSeconds(1.8f);
+            yield return StartCoroutine(ChangeYPos(-6));
+            transform.DOMove(new Vector3(GetCenterXOfMap(), waterLevel.position.y - 6, 0), 1.8f);
+            yield return new WaitForSeconds(1.8f);
             yield return StartCoroutine(ChangeYPos(2));
 
             centerAnim.Play("center_break");
@@ -406,11 +401,11 @@ public class YingYangFish_AI : IEnemyController
         InputMaster.instance._defendAction.Enable();
         InputMaster.instance._attackDirectionAction.Enable();
         CharacterController2D.instance.FaceTarget(this.transform);
-        //StartCoroutine(ChangeYPos(4.5f));
+        StartCoroutine(ChangeYPos(4.5f));
         centerAnim.Play("center_fade");
 
         StartCoroutine(EmojiDuringCircling());
-        //yield return StartCoroutine(Circling(3.5f));
+        yield return StartCoroutine(Circling(3.5f));
 
         StartCoroutine(Ultimate());
 
@@ -420,32 +415,32 @@ public class YingYangFish_AI : IEnemyController
     public IEnumerator Ultimate()
     {
         //swing qte
-        //yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(1));
-        //yield return dive.act_routine = StartCoroutine(dive.Act_coroutine(1));
+        yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(1));
+        yield return dive.act_routine = StartCoroutine(dive.Act_coroutine(1));
 
         yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
-        //SetNormalRotateSpeed();
+        SetNormalRotateSpeed();
 
-        //// splash four times
-        //yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
-        //yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
-        //yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
-        //yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
+        // splash four times
+        yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
+        yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
+        yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
+        yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
 
-        ////water spear ultimate
-        //yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
-        //StartCoroutine(IE_SwimAway(waterSpearPos_black1.position, 10, true));
-        //StartCoroutine(IE_SwimAway(waterSpearPos_white1.position, 10, false));
-        //while (!blackPositioned || !whitePositioned) { yield return null; }
-        //yield return StartCoroutine(SprintSamePos());
-        //StartCoroutine(waterSpear.Act_coroutine(1));
-        //StartCoroutine(waterSpear.Act_coroutine(2));
-        //while (!finishedWaterSpearUltimate) { yield return null; }
+        //water spear ultimate
+        yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
+        StartCoroutine(IE_SwimAway(waterSpearPos_black1.position, 10, true));
+        StartCoroutine(IE_SwimAway(waterSpearPos_white1.position, 10, false));
+        while (!blackPositioned || !whitePositioned) { yield return null; }
+        yield return StartCoroutine(SprintSamePos());
+        StartCoroutine(waterSpear.Act_coroutine(1));
+        StartCoroutine(waterSpear.Act_coroutine(2));
+        while (!finishedWaterSpearUltimate) { yield return null; }
 
-        ////swing ultimate
-        //movingTarget = player;
-        //yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
-        //yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(2));
+        //swing ultimate
+        movingTarget = player;
+        yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
+        yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(2));
         movingTarget = GetBoundaryFarOfPlayer();
         yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
         yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
@@ -556,9 +551,9 @@ public class YingYangFish_AI : IEnemyController
         yield return null;
     }
 
-    #endregion Main Functions
+    #endregion Phase & Ultimate Coroutines
 
-    #region Overrides
+    #region IEnemyController Overrides
 
     public override IEnumerator Act()
     {
@@ -572,8 +567,8 @@ public class YingYangFish_AI : IEnemyController
                 yield return null;
             }
             isActing = false;
-            if (!secondPhase && currentActionBreakAmount >= maxActionBreakCapacity) { yield return StartCoroutine(Break()); }//break
-            else { StartAction(); }//startover
+            if (!secondPhase && currentActionBreakAmount >= maxActionBreakCapacity) { yield return StartCoroutine(Break()); }
+            else { StartAction(); }
             yield return null;
         }
     }
@@ -593,13 +588,13 @@ public class YingYangFish_AI : IEnemyController
                 float i = Random.Range(0, 10);
                 if (i < 3) { possibleActions.Add(waterSpear); }
                 else if (i < 6) { possibleActions.Add(splash_white); }
-                else if (i < 10) { possibleActions.Add(dive); }//moving
+                else if (i < 10) { possibleActions.Add(dive); }
             }
             else
             {
                 float i = Random.Range(0, 10);
                 if (i < 5) { possibleActions.Add(waterSpear); }
-                else if (i < 10) { possibleActions.Add(dive); }//moving
+                else if (i < 10) { possibleActions.Add(dive); }
             }
         }
         else
@@ -635,16 +630,21 @@ public class YingYangFish_AI : IEnemyController
     public override IEnumerator IE_Activate()
     {
         IN_COMBAT = true;
-        //play start animation
         co_sprintBackEqual = StartCoroutine(SprintBackEqual());
         yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
         HealthUI.SetActive(true);
         StartAction();
-        //start action loops
     }
 
     public override int Damage(int damageAmount, Transform sender, float stunDuration = 0)
     {
+        int attackId = sender != null ? sender.GetInstanceID() : 0;
+        if (lastAttackId == attackId && Time.time - lastAttackTime < attackCooldown)
+            return 0; // Already processed this attack
+
+        lastAttackId = attackId;
+        lastAttackTime = Time.time;
+
         if (DEAD) { return 0; }
 
         flash.OnDamageFlash();
@@ -654,13 +654,20 @@ public class YingYangFish_AI : IEnemyController
         if (currentHealth <= 0)
         {
             StartCoroutine(Pre_SecondPhase());
-        }//death
+        }
 
         return 0;
     }
 
     public override int SubObjectDamage(int damageAmount, Transform sender = null, float stunDuration = 0)
     {
+        int attackId = sender != null ? sender.GetInstanceID() : 0;
+        if (lastAttackId == attackId && Time.time - lastAttackTime < attackCooldown)
+            return 0; // Already processed this attack
+
+        lastAttackId = attackId;
+        lastAttackTime = Time.time;
+
         if (DEAD) { return 0; }
 
         currentHealth -= damageAmount;
@@ -669,14 +676,14 @@ public class YingYangFish_AI : IEnemyController
         if (currentHealth <= 0)
         {
             StartCoroutine(Pre_SecondPhase());
-        }//death
+        }
 
         return 0;
     }
 
-    #endregion Overrides
+    #endregion IEnemyController Overrides
 
-    #region Small Functions
+    #region Utility & Interaction
 
     public Quaternion CalculateWantedRotation(Vector3 startPos, Vector3 _targetPos)
     {
@@ -687,8 +694,6 @@ public class YingYangFish_AI : IEnemyController
 
     public void Interact()
     {
-        //play start animation
-        //start fight
         if (!secondPhase)
         {
             StartCoroutine(IE_Activate());
@@ -696,8 +701,6 @@ public class YingYangFish_AI : IEnemyController
         }
         else
         {
-            //start second phase
-
             StartCoroutine(secondPhaseAnim());
         }
     }
@@ -754,5 +757,5 @@ public class YingYangFish_AI : IEnemyController
         white_targetRotateSpeed = speed;
     }
 
-    #endregion Small Functions
+    #endregion Utility & Interaction
 }

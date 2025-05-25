@@ -7,7 +7,11 @@ public class SubDamageable : IDamagable
     public IDamagable ParentDamageable;
     public DamageFlash flash;
 
-    // Start is called before the first frame update
+    private void Start()
+    {
+        ParentDamageable.subDamagables.Add(this);
+    }
+
     public override int Damage(int damageAmount, Transform sender = null, float stunDuration = 0)
     {
         flash.OnDamageFlash();

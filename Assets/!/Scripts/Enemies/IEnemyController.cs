@@ -16,6 +16,9 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public int maxHealth;
     [SerializeField, HideInInspector] public GameObject HealthUI;
     [SerializeField, HideInInspector] public Image healthBar;
+    [HideInInspector] public int lastAttackId = -1;
+    [HideInInspector] public float lastAttackTime = -1f;
+    [HideInInspector] public const float attackCooldown = 0.05f; // 50ms window to prevent double hit
 
     #endregion HEALTH
 
