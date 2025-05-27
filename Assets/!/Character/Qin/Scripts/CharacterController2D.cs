@@ -8,7 +8,6 @@ using UnityEngine.InputSystem;
 using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.InputSystem.XR;
 using DG.Tweening;
-using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 [SelectionBase]
 public class CharacterController2D : MonoBehaviour
@@ -83,7 +82,8 @@ public class CharacterController2D : MonoBehaviour
 
     #region Teleport Variables
 
-    [FoldoutGroup("Teleport Variables", nameof(teleportCD), nameof(TeleportDistance), nameof(TeleportDuration), nameof(TeleportSword), nameof(teleportCheckLayer))]
+    [FoldoutGroup("Teleport Variables", nameof(teleportCD), nameof(TeleportDistance),
+        nameof(TeleportDuration), nameof(TeleportSword), nameof(teleportCheckLayer))]
     [SerializeField] private Void teleGroupHold;
 
     [SerializeField, HideInInspector, Range(1, 10f)] public float TeleportDistance = 3f;
@@ -101,7 +101,7 @@ public class CharacterController2D : MonoBehaviour
     [HideInInspector] public bool canFlip = true;
     [HideInInspector] public bool canMove = true;
     [HideInInspector] public bool canJump = true;
-    [HideInInspector] public bool canDoubleJump;
+    [HideInInspector] public bool canDoubleJump = true;
 
     #endregion State Flags
 
@@ -126,15 +126,19 @@ public class CharacterController2D : MonoBehaviour
         _fallSpeedYDampingChangeThreshold = CameraManager.instance._fallSpeedYDampingChangeThreshold;
         inputPlayer = InputPlayer.instance;
         gravity = rb.gravityScale;
+        canFlip = true;
+        canMove = true;
+        canJump = true;
+        canDoubleJump = true;
     }
 
     private void Update()
     {
         if (isGrounded && !isJumping) { coyoteTimer = coyoteTime; }
-        else { coyoteTimer -= Time.deltaTime; }
+        else { coyoteTimer -= VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime; }
         isFloating = Float();
 
-        teleportTimer += Time.deltaTime;
+        teleportTimer += VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
 
         //falling check
         if (rb.velocity.y < -1 && !isGrounded && !isFalling)
@@ -205,6 +209,14 @@ public class CharacterController2D : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (VFXManager.isInBulletTime)
+        {
+            // Apply gravity manually
+            rb.velocity += Physics2D.gravity * rb.gravityScale * Time.unscaledDeltaTime;
+            // Move position manually
+            rb.MovePosition(rb.position + rb.velocity * Time.unscaledDeltaTime);
+        }
+
         GroundCheck();
     }
 
@@ -218,7 +230,14 @@ public class CharacterController2D : MonoBehaviour
         {
             anim.SetBool("isRunning", false);
             isRunning = false;
-            rb.velocity = Vector3.SmoothDamp(rb.velocity, (Vector3)new Vector2(0, rb.velocity.y), ref m_Velocity, m_MovementSmoothing);
+            rb.velocity = Vector3.SmoothDamp(
+                  rb.velocity,
+                  new Vector2(0, rb.velocity.y),
+                  ref m_Velocity,
+                  m_MovementSmoothing,
+                  Mathf.Infinity,
+                  VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime
+  );
             return;
         }
 
@@ -274,11 +293,11 @@ public class CharacterController2D : MonoBehaviour
                 }
                 else if (IsStormReadyState(state))
                 {
-                    anim.Play("storm_ready_run", 0, duration);
+                    if (!state.IsName("storm_ready_run")) { anim.Play("storm_ready_run", 0, duration); }
                 }
                 else if (IsStormPreState(state))
                 {
-                    anim.Play("storm_pre_run", 0, duration);
+                    if (!state.IsName("storm_pre_run")) { anim.Play("storm_pre_run", 0, duration); }
                 }
             }
             else // Not running
@@ -298,18 +317,31 @@ public class CharacterController2D : MonoBehaviour
                 }
                 else if (IsStormReadyState(state))
                 {
-                    anim.Play("storm_ready_idle", 0, duration);
+                    if (!state.IsName("storm_ready_idle"))
+                    {
+                        anim.Play("storm_ready_idle", 0, duration);
+                    }
                 }
                 else if (IsStormPreState(state))
                 {
-                    anim.Play("storm_pre_idle", 0, duration);
+                    if (!state.IsName("storm_pre_idle"))
+                    {
+                        anim.Play("storm_pre_idle", 0, duration);
+                    }
                 }
             }
         }
 
         // Apply horizontal movement
         Vector3 targetVelocity = new Vector2(move * speed, rb.velocity.y);
-        rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
+        rb.velocity = Vector3.SmoothDamp(
+            rb.velocity,
+            targetVelocity,
+            ref m_Velocity,
+            m_MovementSmoothing,
+            Mathf.Infinity,
+            VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime
+        );
 
         // Handle flipping
         if (isRunningToTarget)
@@ -338,12 +370,14 @@ public class CharacterController2D : MonoBehaviour
         bool IsStormReadyState(AnimatorStateInfo s) =>
             s.IsName("storm_ready_idle") ||
             s.IsName("storm_ready_jump") ||
-            s.IsName("storm_ready_fall");
+            s.IsName("storm_ready_fall") ||
+            s.IsName("storm_ready_run");
 
         bool IsStormPreState(AnimatorStateInfo s) =>
             s.IsName("storm_pre_idle") ||
             s.IsName("storm_pre_jump") ||
-            s.IsName("storm_pre_fall");
+            s.IsName("storm_pre_fall") ||
+             s.IsName("storm_pre_run");
     }
 
     public void CheckRunToPos()
@@ -374,7 +408,8 @@ public class CharacterController2D : MonoBehaviour
             return;
 
         isGrounded = true;
-
+        canDoubleJump = true;
+        floatTriggered = false;
         // Cache animation state info
         var state = anim.GetCurrentAnimatorStateInfo(0);
 
@@ -441,9 +476,8 @@ public class CharacterController2D : MonoBehaviour
         {
             if (!floatTriggered) { SoundManager.PlaySound("sword_jump_floating"); floatTriggered = true; }
             if (!energy.FloatingConsume()) { return false; }
-
             float x = rb.velocity.x;
-            rb.velocity = new Vector2(x, -floatingSpeed * Time.deltaTime);
+            rb.velocity = new Vector2(x, (VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime) * -floatingSpeed);
             if (!isFloating)
             {
                 PlayAnimClipInCombat("sword_jump_pre", "sword_jump_pre_combat");
@@ -519,22 +553,23 @@ public class CharacterController2D : MonoBehaviour
 
         // Local helper functions for animation state checks
         bool IsStormReadyState(AnimatorStateInfo s) =>
-            s.IsName("storm_ready_fall") ||
             s.IsName("storm_ready_idle") ||
+            s.IsName("storm_ready_jump") ||
+            s.IsName("storm_ready_fall") ||
             s.IsName("storm_ready_run");
 
         bool IsStormPreState(AnimatorStateInfo s) =>
-            s.IsName("storm_pre_fall") ||
             s.IsName("storm_pre_idle") ||
-            s.IsName("storm_pre_run");
+            s.IsName("storm_pre_jump") ||
+            s.IsName("storm_pre_fall") ||
+             s.IsName("storm_pre_run");
     }
 
     public void DoubleJump(float holdTime)
     {
         if (!canDoubleJump) { return; }
         float x = rb.velocity.x;
-        float strength = holdTime / DoubleJumpForceTime;
-        strength = Mathf.Clamp(strength, MinDoubleJumpForceMultiplier, DoubleJumpForceMultiplier);
+        float strength = Mathf.Lerp(MinDoubleJumpForceMultiplier, DoubleJumpForceMultiplier, holdTime / DoubleJumpForceTime);
         if (canDoubleJump && !isGrounded)
         {
             SoundManager.PlaySound("sword_jump");
@@ -597,12 +632,16 @@ public class CharacterController2D : MonoBehaviour
 
     #region Teleportation
 
+    public Coroutine co_teleport;
+
     public void SwordTeleport()
     {
         if (teleportTimer <= teleportCD) { return; }
+        if (!energy.TeleportConsume()) return;
+        teleportTimer = 0f;
         teleported = false;
 
-        StartCoroutine(TeleportCoroutine(FacingRight));
+        co_teleport = StartCoroutine(TeleportCoroutine(FacingRight));
     }
 
     public IEnumerator RunToPosition(Vector3 target)
@@ -669,16 +708,15 @@ public class CharacterController2D : MonoBehaviour
         TeleportSword.transform.position = transform.position + new Vector3(0f, 1.2f, 0f);
         TeleportSword.transform.eulerAngles = inputPlayer.pointer.transform.eulerAngles;
         TeleportSword.SetActive(true);
-        float elapsedTime = 0f;
-        teleportTimer = 0f;
 
-        while (elapsedTime < TeleportDuration)
-        {
-            elapsedTime += Time.deltaTime;
-            Vector3 dist = TeleportSword.transform.right * (TeleportDistance / TeleportDuration);
-            TeleportSword.GetComponent<Rigidbody2D>().velocity = dist;
-            yield return null;
-        }
+        Vector3 targetPos = TeleportSword.transform.position + TeleportSword.transform.right * TeleportDistance;
+        bool finished = false;
+        TeleportSword.transform.DOMove(targetPos, TeleportDuration)
+            .SetEase(Ease.Linear)
+            .SetUpdate(VFXManager.isInBulletTime ? true : false)
+            .OnComplete(() => { finished = true; });
+
+        yield return new WaitUntil(() => finished);
         TeleportToSword();
         gameObject.layer = 6; //player_dash
         yield return null;
@@ -710,12 +748,12 @@ public class CharacterController2D : MonoBehaviour
         teleportTimer = 0f;
         TeleportSword.SetActive(false);
         anim.SetBool("isCombat", true);
-        rb.velocity = new Vector2(rb.velocity.x, -0.1f);
         PlayerAttack.instance.combatTimer = 2f;
         if (isFalling) { anim.Play("tele_fall"); }
         else if (isRunning) { anim.Play("tele_run"); }
         else { anim.Play("tele_idle"); }
         transform.position = TeleportSword.transform.position + new Vector3(offset_x, offset_y - 1.2f, 0);
+        rb.velocity = new Vector2(0, 0f);
     }
 
     #endregion Teleportation

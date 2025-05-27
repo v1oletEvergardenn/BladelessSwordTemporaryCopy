@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.U2D;
+
 using UnityEngine;
 
 public class DamageFlash : MonoBehaviour
@@ -11,6 +11,7 @@ public class DamageFlash : MonoBehaviour
     public SpriteRenderer sprite;
     private Material originalMat;
     public AnimationCurve flashCurve = AnimationCurve.Linear(0f, 1f, 0.2f, 0f);
+    private Coroutine co_damageFlash;
 
     private void Start()
     {
@@ -20,13 +21,14 @@ public class DamageFlash : MonoBehaviour
 
     public void OnDamageFlash(SpriteRenderer spriteInput = null)
     {
+        if (co_damageFlash != null) { StopCoroutine(co_damageFlash); }
         if (spriteInput != null)
         {
-            StartCoroutine(IEDamageFlasher(spriteInput));
+            co_damageFlash = StartCoroutine(IEDamageFlasher(spriteInput));
         }
         else
         {
-            StartCoroutine(IEDamageFlasher(sprite));
+            co_damageFlash = StartCoroutine(IEDamageFlasher(sprite));
         }
     }
 

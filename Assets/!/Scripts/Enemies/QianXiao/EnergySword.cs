@@ -28,7 +28,7 @@ public class EnergySword : IProjectile
                 {
                     if (gameManager.Player.GetComponent<PlayerAttack>().isAttacking && gameManager.Player.GetComponent<CharacterController2D>().FacingRight != facingRight)
                     {
-                        target.Repel(50f, this.transform.right);
+                        target.Repel(50f, this.transform.right.x < 0 ? true : false);
                         gameManager.Player.GetComponent<PlayerAttack>().CounterAttack(this, true);
                     }
                     else
@@ -38,7 +38,7 @@ public class EnergySword : IProjectile
                         vfx.SlowTimeForSeconds(0.1f, 0f);
                         vfx.SpawnSlashEffect(GetPivot(), true);
                         target.Damage(damage, transform, stunDuration);
-                        target.Repel(50f, this.transform.right);
+                        target.Repel(50f, this.transform.right.x < 0 ? true : false);
                         Die();
                     }
                 }

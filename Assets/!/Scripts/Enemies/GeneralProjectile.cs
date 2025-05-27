@@ -24,6 +24,7 @@ public class GeneralProjectile : IProjectile
         if (target != null && collision.gameObject != owner && !collided)
         {
             if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
+
             if (collision.gameObject == gameManager.Player)
             {
                 if (collision.gameObject.layer == 14) { return; }
@@ -31,7 +32,7 @@ public class GeneralProjectile : IProjectile
 
                 vfx.RumblePulse(rumbleFrequncy_normal.x, rumbleFrequncy_normal.y, rumbleDuration_normal);
                 vfx.SlowTimeForSeconds(freezeTimeDuration, slowTimeScale);
-                gameManager.player_Idamagable.Repel(repelForce, transform.right);
+                gameManager.player_Idamagable.Repel(repelForce, transform.right.x < 0 ? true : false);
             }
             anim.Play(anim_after_hit);
             vfx.SpawnEffectWithEnum(hitEffect, transform.position, isRed);
@@ -40,7 +41,7 @@ public class GeneralProjectile : IProjectile
             rb.gravityScale = 0;
             speed = 0f;
             collided = true;
-            target.Damage(damage, transform, stunDuration);
+            target.Damage(damage, transform, stunDuration, stunValue: stunValue);
             Invoke("Die", death_delay_time_after_hit);
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)

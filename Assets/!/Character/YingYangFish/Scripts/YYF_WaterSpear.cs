@@ -14,6 +14,7 @@ public class YYF_WaterSpear : IEnemyAction
     public float spearSpeed = 100f;
     public float spear_stunDuration = 1f;
 
+    public float stunValue = 25f;
     private Spear spear;
     private Spear secondSpear;
     private bool shooted = false;
@@ -191,7 +192,7 @@ public class YYF_WaterSpear : IEnemyAction
     public void ShootSpear(Spear spear)
     {
         spear.collisionActive = true;
-        spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed);
+        spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed, _stunValue: stunValue);
         spear.stunDuration = spear_stunDuration;
         shooted = true;
     }

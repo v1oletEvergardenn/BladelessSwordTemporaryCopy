@@ -14,6 +14,7 @@ public class YYF_Swing : IEnemyAction
     public MeleeAttack swingAttack = new MeleeAttack(2, 0.5f, 0.2f, new Vector2(0.25f, 0.4f), 0.2f, 20f, 0.1f);
     public float swingRange;
     public float swingAttackDuration;
+    public float stunValue = 35f;
 
     private float localFactor;
 
@@ -104,17 +105,18 @@ public class YYF_Swing : IEnemyAction
     public override void Hit(MeleeAttack melee, Transform attackPos)
     {
         int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
-        Vector3 direction = new Vector3((playerIDamagable.GetHitPos() - attackPos.position).x, 0, 0).normalized;
+        bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
 
         if (dealtDamage == 2)//counter attack
         {
             //counter attack effect
             vfx.SpawnHitEffect(true, playerIDamagable.hitEffectPosition.position);
-            playerIDamagable.Repel(melee.repel, direction);
+            playerIDamagable.Repel(melee.repel, left);
             vfx.CameraShake(melee.cameraShake);
             vfx.RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
             vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
 
+            bossAI.DecreaseStun(stunValue);
             if (bossAI.actionList.Count != 0 && bossAI.actionList[0] == this)
             {
                 bool combo = false;
@@ -136,7 +138,7 @@ public class YYF_Swing : IEnemyAction
         else if (dealtDamage == 1)//defend
         {
             vfx.SpawnHitEffect(true, playerIDamagable.GetHitPos());
-            playerIDamagable.Repel(melee.repel, direction);
+            playerIDamagable.Repel(melee.repel, left);
             vfx.CameraShake(melee.cameraShake);
             vfx.RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
             vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
@@ -146,11 +148,11 @@ public class YYF_Swing : IEnemyAction
             vfx.SpawnHitEffect(true, playerIDamagable.GetHitPos());
             if (localFactor == 2)
             {
-                playerIDamagable.ForceRepel(melee.repel * 2, direction);
+                playerIDamagable.ForceRepel(melee.repel * 2, left);
             }
             else
             {
-                playerIDamagable.Repel(melee.repel * 2, direction);
+                playerIDamagable.Repel(melee.repel * 2, left);
             }
 
             vfx.RumblePulse(melee.rumble.x, melee.rumble.y, melee.rumbleDuration);

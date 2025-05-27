@@ -115,7 +115,7 @@ public class QX_slash : IEnemyAction
             //counter attack effect
             vfx.SpawnHitEffect(true, playerIDamagable.hitEffectPosition.position);
 
-            playerIDamagable.Repel(RepelForce, transform.right);
+            playerIDamagable.Repel(RepelForce, transform.right.x < 0 ? true : false);
             vfx.CameraShake(0.2f);
             vfx.RumblePulse(rumbleFrequncy.x * 2, rumbleFrequncy.y * 2, rumbleDuration * 2);
             vfx.SlowTimeForSeconds(freezeTimeDuration, 0f);
@@ -123,7 +123,7 @@ public class QX_slash : IEnemyAction
         else if (dealtDamage == 1)//defended
         {
             vfx.SpawnSlashEffect(playerIDamagable.GetHitPos());
-            playerIDamagable.Repel(RepelForce, transform.right);
+            playerIDamagable.Repel(RepelForce, transform.right.x < 0 ? true : false);
             vfx.CameraShake(0.2f);
             vfx.RumblePulse(rumbleFrequncy.x * 2, rumbleFrequncy.y * 2, rumbleDuration * 2);
             vfx.SlowTimeForSeconds(freezeTimeDuration, 0f);
@@ -132,7 +132,7 @@ public class QX_slash : IEnemyAction
         {
             vfx.SpawnSlashEffect(playerIDamagable.GetHitPos());
             vfx.RumblePulse(rumbleFrequncy.x, rumbleFrequncy.y, rumbleDuration);
-            playerIDamagable.Repel(RepelForce * 2, transform.right);
+            playerIDamagable.Repel(RepelForce * 2, transform.right.x < 0 ? true : false);
             vfx.SlowTimeForSeconds(freezeTimeDuration, 0f);
         }
     }

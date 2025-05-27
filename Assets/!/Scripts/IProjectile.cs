@@ -15,6 +15,7 @@ public abstract class IProjectile : MonoBehaviour
     public float rotationSpeed = 100f;
     public float stunDuration = 0.3f;
     public float lifeTime = 10f;
+    public float stunValue = 1;
     public LayerMask stopLayer = 1 << 7 | 1 << 10 | 1 << 11;
     [HideInInspector] public GameObject owner;
     [HideInInspector] public bool followTarget;
@@ -63,7 +64,10 @@ public abstract class IProjectile : MonoBehaviour
     /// <param name="_followTarget"> bool to set if keep follow target</param>
     /// <param name="_target"> give target of projectile, to set rotation or follow</param>
     /// <<param name="_isHostileToPlayer"> default: true</param>
-    public virtual void SetUp(Vector3 dir, GameObject _owner, float additionSpeed = 0f, bool _followTarget = false, IDamagable _target = null, bool _isHostileToPlayer = true, int _damage = 0, float _speed = -1, float gravityScale = 0)
+    public virtual void SetUp(Vector3 dir, GameObject _owner, float additionSpeed = 0f, bool _followTarget = false,
+        IDamagable _target = null, bool _isHostileToPlayer = true,
+        int _damage = 0, float _speed = -1, float gravityScale = 0,
+        float _stunValue = 0)
     {
         ResetAttributes();
         owner = _owner;
@@ -72,6 +76,8 @@ public abstract class IProjectile : MonoBehaviour
         isHostileToPlayer = _isHostileToPlayer;
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = gravityScale;
+        if (_stunValue != 0) { stunValue = _stunValue; }
+
         if (_damage != 0)
         {
             damage = _damage;
@@ -144,7 +150,7 @@ public abstract class IProjectile : MonoBehaviour
             if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
             if (collision.gameObject == gameManager.Player && collision.gameObject.layer == 14) { return; }
             vfx.SpawnHitEffect(false, GetPivot());
-            target.Damage(damage, transform, stunDuration);
+            target.Damage(damage, transform, stunDuration, stunValue: stunValue);
             this.gameObject.SetActive(false);
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0)

@@ -4,7 +4,9 @@ public class Bullet : IProjectile
 {
     public bool dodged = false;
 
-    public override void SetUp(Vector3 dir, GameObject _owner, float additionSpeed = 0f, bool _followTarget = false, IDamagable _target = null, bool _isHostileToPlayer = true, int _damage = 0, float _speed = -1, float gravityScale = 0)
+    public override void SetUp(Vector3 dir, GameObject _owner, float additionSpeed = 0f, bool _followTarget = false,
+        IDamagable _target = null, bool _isHostileToPlayer = true,
+        int _damage = 0, float _speed = -1, float gravityScale = 0, float _stunValue = 0)
     {
         ResetAttributes();
         owner = _owner;

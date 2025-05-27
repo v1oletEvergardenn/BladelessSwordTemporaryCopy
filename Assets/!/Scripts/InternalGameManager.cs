@@ -52,7 +52,7 @@ public class InternalGameManager : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         VFXManager vfx = VFXManager.instance;
         vfx.SpawnSlashEffect(Health.instance.GetHitPos());
-        Health.instance.Repel(20, transform.right);
+        Health.instance.Repel(20, transform.right.x < 0 ? true : false);
         vfx.CameraShake(0.2f);
         vfx.RumblePulse(0.3f * 2, 0.4f * 2, 0.1f * 2);
         vfx.SlowTimeForSeconds(0.2f, 0f);

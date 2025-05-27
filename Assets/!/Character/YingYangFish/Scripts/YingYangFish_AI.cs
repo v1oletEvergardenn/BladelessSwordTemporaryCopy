@@ -8,7 +8,6 @@ using DG.Tweening;
 using System;
 using Void = EditorAttributes.Void;
 using Random = UnityEngine.Random;
-using static UnityEditor.PlayerSettings;
 
 public class YingYangFish_AI : IEnemyController
 {
@@ -19,7 +18,7 @@ public class YingYangFish_AI : IEnemyController
         nameof(idleRotateSpeed), nameof(sprintRotateSpeed), nameof(waterSpearPos_black1),
         nameof(waterSpearPos_black2), nameof(waterSpearPos_white1), nameof(waterSpearPos_white2), nameof(Dir),
         nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter), nameof(waterLevel),
-        nameof(EventInteract))]
+        nameof(EventInteract), nameof(endCanvas))]
     public Void void2;
 
     [SerializeField, HideInInspector] public Transform YingYangFish;
@@ -36,6 +35,7 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector] public Transform waterSpearPos_black2;
     [SerializeField, HideInInspector] public Transform waterSpearPos_white1;
     [SerializeField, HideInInspector] public Transform waterSpearPos_white2;
+    [SerializeField, HideInInspector] public Transform endCanvas;
     [HideInInspector] public float black_rotateSpeed;
     [HideInInspector] public float white_rotateSpeed;
     private float black_targetRotateSpeed;
@@ -83,6 +83,7 @@ public class YingYangFish_AI : IEnemyController
 
     public bool Actions;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("ForceDie", "ForceDie")] public Transform void112;
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("ForceStun", "ForceStun")] public Transform void114;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("StartAction", "StartAction")] public Transform void11;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("WaterSpear", "WaterSpear")] public Void void1;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Swing", "Swing")] public Void void8;
@@ -339,18 +340,23 @@ public class YingYangFish_AI : IEnemyController
         else { return whiteFish; }
     }
 
-    public void CancelAllAction()
+    public override void CancelAllAction()
     {
         if (co_IEcloseSwim != null) TryStopCoroutine(co_IEcloseSwim);
         if (co_sprintBackEqual != null) TryStopCoroutine(co_sprintBackEqual);
         if (co_sprintStartPoint != null) TryStopCoroutine(co_sprintStartPoint);
 
+        actionList.Clear();
         TryStopCoroutine(co_act);
         waterSpear.CancelAct();
         swing.CancelAct();
         splash_white.CancelAct();
         splash_black.CancelAct();
         dive.CancelAct();
+
+        blackAnim.Play("black_idle");
+        whiteAnim.Play("white_idle");
+
         SetNormalRotateSpeed();
     }
 
@@ -495,6 +501,9 @@ public class YingYangFish_AI : IEnemyController
         slash_effect.SetActive(true);
         yield return new WaitForSeconds(1f);
         slash_effect.SetActive(false);
+
+        yield return new WaitForSeconds(3f);
+        endCanvas.gameObject.SetActive(true);
     }
 
     private IEnumerator SpawnUltimateBullet(int index, float delay)
@@ -636,49 +645,40 @@ public class YingYangFish_AI : IEnemyController
         StartAction();
     }
 
-    public override int Damage(int damageAmount, Transform sender, float stunDuration = 0)
+    public override int Damage(float damageAmount, Transform sender, float stunDuration = 0, bool damageFlash = true, float stunValue = 0)
     {
+        if (DEAD) { return 0; }
+
         int attackId = sender != null ? sender.GetInstanceID() : 0;
-        if (lastAttackId == attackId && Time.time - lastAttackTime < attackCooldown)
-            return 0; // Already processed this attack
+        if (lastAttackId == attackId && Time.time - lastAttackTime < attackCooldown) return 0;
 
         lastAttackId = attackId;
         lastAttackTime = Time.time;
 
-        if (DEAD) { return 0; }
+        if (damageFlash) flash.OnDamageFlash();
 
-        flash.OnDamageFlash();
+        if (!isBossBreaking) { damageAmount *= 0.5f; }
+
         currentHealth -= damageAmount;
         healthBar.fillAmount = (float)currentHealth / (float)maxHealth;
+        DecreaseStun(stunValue);
 
         if (currentHealth <= 0)
         {
             StartCoroutine(Pre_SecondPhase());
+            DEAD = true;
         }
 
         return 0;
     }
 
-    public override int SubObjectDamage(int damageAmount, Transform sender = null, float stunDuration = 0)
+    public override void Repel(float force, bool left)
     {
-        int attackId = sender != null ? sender.GetInstanceID() : 0;
-        if (lastAttackId == attackId && Time.time - lastAttackTime < attackCooldown)
-            return 0; // Already processed this attack
+    }
 
-        lastAttackId = attackId;
-        lastAttackTime = Time.time;
-
-        if (DEAD) { return 0; }
-
-        currentHealth -= damageAmount;
-        healthBar.fillAmount = (float)currentHealth / (float)maxHealth;
-
-        if (currentHealth <= 0)
-        {
-            StartCoroutine(Pre_SecondPhase());
-        }
-
-        return 0;
+    public override int SubObjectDamage(float damageAmount, Transform sender = null, float stunDuration = 0, float stunValue = 0)
+    {
+        return Damage(damageAmount, sender, stunDuration, false, stunValue);
     }
 
     #endregion IEnemyController Overrides
@@ -733,6 +733,39 @@ public class YingYangFish_AI : IEnemyController
     public void Dive()
     {
         InsertAction(dive);
+    }
+
+    public override IEnumerator BossBreak()
+    {
+        isBossBreaking = true;
+        CancelAllAction();
+        VFXManager.instance.BulletTime();
+        float duration = stunDuration;
+        float elapsed = 0f;
+        float startStun = currentStun;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime; // Use unscaled time to be immune to bullet time
+            float t = Mathf.Clamp01(elapsed / duration);
+            currentStun = Mathf.Lerp(startStun, maxStun, t);
+
+            if (stunBar != null && maxStun > 0)
+                stunBar.fillAmount = Mathf.Clamp01(currentStun / maxStun);
+
+            yield return null;
+        }
+
+        currentStun = maxStun;
+        if (stunBar != null && maxStun > 0)
+            stunBar.fillAmount = 1f;
+
+        VFXManager.instance.UnBulletTime();
+        isBossBreaking = false;
+        yield return new WaitForSeconds(1f);
+        yield return StartCoroutine(SprintBackEqual());
+        StartAction();
+        yield return null;
     }
 
     public void SetNormalRotateSpeed()

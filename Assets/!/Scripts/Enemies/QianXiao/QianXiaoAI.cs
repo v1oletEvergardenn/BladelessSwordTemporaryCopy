@@ -149,7 +149,7 @@ public class QianXiaoAI : IEnemyController
         //next action
     }
 
-    public override int Damage(int damageAmount, Transform sender, float stunDuration = 0)
+    public override int Damage(float damageAmount, Transform sender, float stunDuration = 0, bool damageFlash = true, float stunValue = 0)
     {
         if (DEAD) { return 0; }
         Stun(1);

@@ -209,7 +209,7 @@ public class QX_add_land_attack : IEnemyAction
             //counter attack effect
             vfx.SpawnLargeSlashEffect(playerIDamagable.hitEffectPosition.position);
 
-            playerIDamagable.Repel(slash_RepelForce, transform.right);
+            playerIDamagable.Repel(slash_RepelForce, transform.right.x < 0 ? true : false);
             vfx.CameraShake(slash_cameraShakeForce);
             vfx.RumblePulse(slash_rumbleFrequncy.x * 2, slash_rumbleFrequncy.y * 2, slash_rumbleDuration * 2);
             vfx.SlowTimeForSeconds(slash_freezeTimeDuration, 0f);
@@ -217,7 +217,7 @@ public class QX_add_land_attack : IEnemyAction
         else if (dealtDamage == 1)//defended
         {
             vfx.SpawnLargeSlashEffect(playerIDamagable.GetHitPos());
-            playerIDamagable.Repel(slash_RepelForce, transform.right);
+            playerIDamagable.Repel(slash_RepelForce, transform.right.x < 0 ? true : false);
             vfx.CameraShake(slash_cameraShakeForce);
             vfx.RumblePulse(slash_rumbleFrequncy.x * 2, slash_rumbleFrequncy.y * 2, slash_rumbleDuration * 2);
             vfx.SlowTimeForSeconds(slash_freezeTimeDuration, 0f);
@@ -226,7 +226,7 @@ public class QX_add_land_attack : IEnemyAction
         {
             vfx.SpawnLargeSlashEffect(playerIDamagable.GetHitPos());
             vfx.RumblePulse(slash_rumbleFrequncy.x, slash_rumbleFrequncy.y, slash_rumbleDuration);
-            playerIDamagable.Repel(slash_RepelForce * 2, transform.right);
+            playerIDamagable.Repel(slash_RepelForce * 2, transform.right.x < 0 ? true : false);
             vfx.SlowTimeForSeconds(slash_freezeTimeDuration, 0f);
             vfx.CameraShake(slash_cameraShakeForce);
         }
@@ -239,7 +239,7 @@ public class QX_add_land_attack : IEnemyAction
         if (dealtDamage == 1)//defended
         {
             vfx.SpawnSlashEffect(playerIDamagable.GetHitPos());
-            playerIDamagable.Repel(land_RepelForce, transform.right);
+            playerIDamagable.Repel(land_RepelForce, transform.right.x < 0 ? true : false);
             vfx.CameraShake(land_cameraShakeForce);
             vfx.RumblePulse(land_rumbleFrequncy.x * 2, land_rumbleFrequncy.y * 2, land_rumbleDuration * 2);
             vfx.SlowTimeForSeconds(land_freezeTimeDuration, 0f);
@@ -248,7 +248,7 @@ public class QX_add_land_attack : IEnemyAction
         {
             vfx.SpawnSlashEffect(playerIDamagable.GetHitPos());
             vfx.RumblePulse(land_rumbleFrequncy.x, land_rumbleFrequncy.y, land_rumbleDuration);
-            playerIDamagable.Repel(land_RepelForce * 2, transform.right);
+            playerIDamagable.Repel(land_RepelForce * 2, transform.right.x < 0 ? true : false);
             vfx.SlowTimeForSeconds(land_freezeTimeDuration, 0f);
             vfx.CameraShake(land_cameraShakeForce);
         }

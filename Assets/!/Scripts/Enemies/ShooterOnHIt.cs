@@ -8,8 +8,8 @@ public class ShooterOnHIt : IDamagable
 {
     private SpriteRenderer spriteRenderer;
     private DamageFlash flash;
-    public int maxHealth;
-    public int currentHealth;
+    public float maxHealth;
+    public float currentHealth;
     public bool _requirePerfect;
     public bool _requireHeartSwordAttack;
     public UnityEvent Die;
@@ -25,7 +25,7 @@ public class ShooterOnHIt : IDamagable
         flash = GetComponent<DamageFlash>();
     }
 
-    public override int Damage(int damageAmount, Transform sender, float stunDuration = 0)
+    public override int Damage(float damageAmount, Transform sender, float stunDuration = 0, bool damageFlash = true, float stunValue = 0)
     {
         if (_requirePerfect && !sender.GetComponent<IProjectile>().isPerfect) { return 0; }
         if (_requireHeartSwordAttack && sender != null) { return 0; }

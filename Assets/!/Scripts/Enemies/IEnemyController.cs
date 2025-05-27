@@ -24,10 +24,12 @@ public abstract class IEnemyController : IDamagable
 
     #region STUN
 
-    [FoldoutGroup("stunning", nameof(maxStun), nameof(stunBar), nameof(currentStun))] public Void stunVoid1;
-    [SerializeField, HideInInspector] public int maxStun = 10;
+    [FoldoutGroup("stunning", nameof(maxStun), nameof(stunBar), nameof(currentStun), nameof(stunDuration))] public Void stunVoid1;
+    [SerializeField, HideInInspector] public float maxStun = 10;
     [SerializeField, HideInInspector] public Image stunBar;
-    [SerializeField, HideInInspector] public int currentStun;
+    [SerializeField, HideInInspector] public float currentStun;
+    [SerializeField, HideInInspector] public float stunDuration = 5f;
+    [HideInInspector] public bool isBossBreaking = false;
 
     #endregion STUN
 
@@ -70,7 +72,7 @@ public abstract class IEnemyController : IDamagable
     [HideInInspector] public IEnemyAction initialAction;
     [HideInInspector] public bool canMove = false;
     [HideInInspector] public float distanceToPlayer;
-    [HideInInspector] public int currentHealth;
+    [HideInInspector] public float currentHealth;
     [HideInInspector] public bool DEAD = false;
     [HideInInspector] public DamageFlash flash;
     [HideInInspector] public Rigidbody2D rb;
@@ -84,6 +86,11 @@ public abstract class IEnemyController : IDamagable
 
     #endregion PRIVATE VARIABLES
 
+    #region UNITY_LifeCycle
+
+    /// <summary>
+    /// Unity Start method. Initializes references and sets up initial state.
+    /// </summary>
     public virtual void Start()
     {
         sprite = GFX.GetComponent<SpriteRenderer>();
@@ -93,6 +100,7 @@ public abstract class IEnemyController : IDamagable
         player = playerAttack.gameObject.transform;
         anim = GFX.GetComponent<Animator>();
         currentHealth = maxHealth;
+        currentStun = maxStun;
         healthBar.fillAmount = currentHealth / maxHealth;
         stunBar.fillAmount = currentStun / maxStun;
         flash = GetComponent<DamageFlash>();
@@ -101,12 +109,22 @@ public abstract class IEnemyController : IDamagable
         actionList.Clear();
     }
 
+    #endregion UNITY_LifeCycle
+
+    #region ACTION_MANAGEMENT
+
+    /// <summary>
+    /// Returns the next action in the action list, or null if not available.
+    /// </summary>
     public virtual IEnemyAction NextAction()
     {
         if (actionList.Count < 2) { return null; }
         return actionList[1];
     }
 
+    /// <summary>
+    /// Removes the current action from the action list.
+    /// </summary>
     public virtual void EndAction()
     {
         if (actionList.Count > 0)
@@ -115,6 +133,11 @@ public abstract class IEnemyController : IDamagable
         }
     }
 
+    /// <summary>
+    /// Inserts an action into the action list at the specified index.
+    /// </summary>
+    /// <param name="action">The action to insert.</param>
+    /// <param name="index">The index to insert at (default is 1).</param>
     public virtual void InsertAction(IEnemyAction action, int index = 1)
     {
         if (actionList.Count == 0) { actionList.Add(action); }
@@ -126,6 +149,9 @@ public abstract class IEnemyController : IDamagable
 
     public Coroutine co_act;
 
+    /// <summary>
+    /// Coroutine for executing actions in the action list.
+    /// </summary>
     public virtual IEnumerator Act()
     {
         while (actionList.Count > 0 && actionList[0] != null)
@@ -140,6 +166,9 @@ public abstract class IEnemyController : IDamagable
         yield return null;
     }
 
+    /// <summary>
+    /// Coroutine for handling action breaks.
+    /// </summary>
     public virtual IEnumerator Break()
     {
         yield return new WaitForSeconds(breakDuration);
@@ -148,21 +177,39 @@ public abstract class IEnemyController : IDamagable
         yield return null;
     }
 
+    /// <summary>
+    /// Adds to the current action break amount.
+    /// </summary>
+    /// <param name="amount">Amount to add.</param>
     public virtual void AddActionBreak(int amount)
     {
         currentActionBreakAmount += amount;
     }
 
+    #endregion ACTION_MANAGEMENT
+
+    #region VISUALS
+
+    /// <summary>
+    /// Sets the outline effect on the sprite.
+    /// </summary>
+    /// <param name="i">Outline value.</param>
     public virtual void OutLine_Activate(int i)
     {
         sprite.material.SetFloat("_OutLine", i);
     }
 
+    /// <summary>
+    /// Starts the outline flash effect.
+    /// </summary>
     public virtual void OutLineFlash()
     {
         StartCoroutine(IEOutLineFlash());
     }
 
+    /// <summary>
+    /// Coroutine for the outline flash effect.
+    /// </summary>
     public virtual IEnumerator IEOutLineFlash()
     {
         float currentFlashAmount = 0f;
@@ -176,21 +223,41 @@ public abstract class IEnemyController : IDamagable
         }
     }
 
+    #endregion VISUALS
+
+    #region COMBAT
+
+    /// <summary>
+    /// Activates combat mode for the enemy.
+    /// </summary>
     public virtual void ActivateCombat()
     {
         StartCoroutine(IE_Activate());
     }
 
+    /// <summary>
+    /// Coroutine for activating combat mode.
+    /// </summary>
     public virtual IEnumerator IE_Activate()
     {
         IN_COMBAT = true;
         yield return null;
     }
 
+    /// <summary>
+    /// Starts the enemy's action routine. Intended to be overridden.
+    /// </summary>
     public virtual void StartAction()
     {
     }
 
+    #endregion COMBAT
+
+    #region GROUND_CHECK
+
+    /// <summary>
+    /// Checks if the enemy is grounded using a raycast.
+    /// </summary>
     public virtual void GroundCheck()
     {
         bool wasGrounded = isGrounded;
@@ -202,6 +269,14 @@ public abstract class IEnemyController : IDamagable
         }
     }
 
+    #endregion GROUND_CHECK
+
+    #region UTILITY
+
+    /// <summary>
+    /// Returns true with the given probability (0-100).
+    /// </summary>
+    /// <param name="i">Chance percentage.</param>
     public bool Possibility(float i)
     {
         float chance = UnityEngine.Random.Range(0, 100);
@@ -209,6 +284,9 @@ public abstract class IEnemyController : IDamagable
         else { return false; }
     }
 
+    /// <summary>
+    /// Gets the boundary closest to the enemy.
+    /// </summary>
     public virtual Transform GetCloseBoundary()
     {
         float mid = (leftBoundary.position.x + rightBoundary.position.x) / 2;
@@ -216,6 +294,9 @@ public abstract class IEnemyController : IDamagable
         else { return rightBoundary; }
     }
 
+    /// <summary>
+    /// Gets the boundary farthest from the enemy.
+    /// </summary>
     public virtual Transform GetFarBoundary()
     {
         float mid = (leftBoundary.position.x + rightBoundary.position.x) / 2;
@@ -223,6 +304,9 @@ public abstract class IEnemyController : IDamagable
         else { return leftBoundary; }
     }
 
+    /// <summary>
+    /// Gets the boundary farthest from the player.
+    /// </summary>
     public virtual Transform GetBoundaryFarOfPlayer()
     {
         float mid = (leftBoundary.position.x + rightBoundary.position.x) / 2;
@@ -230,11 +314,22 @@ public abstract class IEnemyController : IDamagable
         else { return leftBoundary; }
     }
 
+    /// <summary>
+    /// Instantly kills the enemy.
+    /// </summary>
     public virtual void ForceDie()
     {
         Damage(maxHealth);
     }
 
+    public virtual void ForceStun()
+    {
+        DecreaseStun(maxStun);
+    }
+
+    /// <summary>
+    /// Returns the closer of two targets based on Y distance.
+    /// </summary>
     public virtual Transform GetCloserTargetOutOfTwo(Transform a, Transform b)
     {
         float dist_a = Mathf.Abs(transform.position.y - a.position.y);
@@ -242,6 +337,9 @@ public abstract class IEnemyController : IDamagable
         if (dist_a < dist_b) { return a; } else { return b; }
     }
 
+    /// <summary>
+    /// Returns the farther of two targets based on Y distance.
+    /// </summary>
     public virtual Transform GetFarTargetOutOfTwo(Transform a, Transform b)
     {
         float dist_a = Mathf.Abs(transform.position.y - a.position.y);
@@ -249,11 +347,17 @@ public abstract class IEnemyController : IDamagable
         if (dist_a < dist_b) { return b; } else { return a; }
     }
 
+    /// <summary>
+    /// Gets the center X position of the map.
+    /// </summary>
     public virtual float GetCenterXOfMap()
     {
         return (leftBoundary.position.x + rightBoundary.position.x) * 0.5f;
     }
 
+    /// <summary>
+    /// Checks if the player is to the left of the enemy.
+    /// </summary>
     public virtual bool IsPlayerLeft()
     {
         if (player.position.x <= transform.position.x)
@@ -266,8 +370,73 @@ public abstract class IEnemyController : IDamagable
         }
     }
 
+    /// <summary>
+    /// Attempts to stop a coroutine if it is running.
+    /// </summary>
+    /// <param name="i">Coroutine to stop.</param>
     public void TryStopCoroutine(Coroutine i)
     {
         if (i != null) { StopCoroutine(i); }
     }
+
+    /// <summary>
+    /// Increases the stun value by the given amount. If the stun exceeds maxStun,
+    /// resets stun, cancels all actions, and triggers the boss break effect.
+    /// </summary>
+    /// <param name="amount">Amount to increase stun by.</param>
+    public virtual void DecreaseStun(float amount)
+    {
+        if (isBossBreaking || DEAD) { return; }
+
+        currentStun -= amount;
+        currentStun = Mathf.Clamp(currentStun, 0, maxStun);
+
+        if (stunBar != null && maxStun > 0)
+            stunBar.fillAmount = Mathf.Clamp01((float)currentStun / maxStun);
+
+        if (currentStun <= 0)
+        {
+            isActing = false;
+            // Cancel all actions
+            StartCoroutine(BossBreak());
+        }
+    }
+
+    public virtual IEnumerator BossBreak()
+    {
+        isBossBreaking = true;
+        CancelAllAction();
+        VFXManager.instance.BulletTime();
+        float duration = stunDuration;
+        float elapsed = 0f;
+        float startStun = currentStun;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime; // Use unscaled time to be immune to bullet time
+            float t = Mathf.Clamp01(elapsed / duration);
+            currentStun = Mathf.Lerp(startStun, maxStun, t);
+
+            if (stunBar != null && maxStun > 0)
+                stunBar.fillAmount = Mathf.Clamp01(currentStun / maxStun);
+
+            yield return null;
+        }
+
+        currentStun = maxStun;
+        if (stunBar != null && maxStun > 0)
+            stunBar.fillAmount = 1f;
+
+        VFXManager.instance.UnBulletTime();
+        isBossBreaking = false;
+        yield return new WaitForSeconds(1f);
+        StartAction();
+        yield return null;
+    }
+
+    public virtual void CancelAllAction()
+    {
+    }
+
+    #endregion UTILITY
 }

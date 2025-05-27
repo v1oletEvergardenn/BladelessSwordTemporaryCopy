@@ -16,9 +16,9 @@ public class Health : IDamagable
     private PlayerAttack playerAttack;
     private CharacterController2D controller;
     private InputPlayer inputPlayer;
-    public int maxHealth;
-    private int currentHealth;
-    private DamageFlash damageFlash;
+    public float maxHealth;
+    private float currentHealth;
+    private DamageFlash _damageFlash;
 
     public Image Health_segment;
     public Transform health_parent;
@@ -44,7 +44,7 @@ public class Health : IDamagable
     {
         currentHealth = maxHealth;
         playerAttack = GetComponent<PlayerAttack>();
-        damageFlash = GetComponent<DamageFlash>();
+        _damageFlash = GetComponent<DamageFlash>();
         inputPlayer = GetComponent<InputPlayer>();
         controller = GetComponent<CharacterController2D>();
         originalColor = Health_segment.color;
@@ -99,7 +99,7 @@ public class Health : IDamagable
     /// <returns>-1: target is dead, damage unsuccessfully
     /// 0: damaged successfully
     /// 1: target is defending</returns>
-    public override int Damage(int damageAmount, Transform sender, float stun_duration = 0f)
+    public override int Damage(float damageAmount, Transform sender, float stun_duration = 0f, bool damageFlash = true, float stunValue = 0)
     {
         if (isDead) return -1;
         if (playerAttack.isDefending)
@@ -126,7 +126,7 @@ public class Health : IDamagable
         SoundManager.PlaySound("player_take_damage");
         currentHealth -= damageAmount;
 
-        damageFlash.OnDamageFlash();
+        _damageFlash.OnDamageFlash();
         inputPlayer.DisableFloat();
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         for (int i = 0; i < maxHealth; i++)
@@ -228,14 +228,14 @@ public class Health : IDamagable
         else { anim.Play("hit"); }
     }
 
-    public override void Repel(float force, Vector3 dir)
+    public override void Repel(float force, bool left)
     {
         if (GameManager.instance.isInPerformingState) { return; }
-        GetComponent<Rigidbody2D>().AddForce(dir * force, ForceMode2D.Impulse);
+        GetComponent<Rigidbody2D>().AddForce((left ? Vector3.left : Vector3.right) * force, ForceMode2D.Impulse);
     }
 
-    public void ForceRepel(float force, Vector3 dir)
+    public void ForceRepel(float force, bool left)
     {
-        GetComponent<Rigidbody2D>().AddForce(dir * force, ForceMode2D.Impulse);
+        GetComponent<Rigidbody2D>().AddForce((left ? Vector3.left : Vector3.right) * force, ForceMode2D.Impulse);
     }
 }

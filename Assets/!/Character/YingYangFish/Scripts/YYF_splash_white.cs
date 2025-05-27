@@ -12,6 +12,7 @@ public class YYF_splash_white : IEnemyAction
 
     public int damage = 2;
     public float gravityScale = 5f;
+    public float stunValue = 5f;
 
     public override void Start()
     {
@@ -84,11 +85,21 @@ public class YYF_splash_white : IEnemyAction
         IProjectile bullet = bossAI.selfPooler.SpawnFromPool("water_bullet", shootPos.position).GetComponent<IProjectile>();
         if (player.transform.position.x <= shootPos.position.x)
         {
-            bullet.SetUp(new Vector3(0, 0, 90 + shootDirecitons[index].x), this.gameObject, _damage: damage, _speed: shootDirecitons[index].y, gravityScale: gravityScale);
+            bullet.SetUp(new Vector3(0, 0, 90 + shootDirecitons[index].x),
+                this.gameObject,
+                _damage: damage,
+                _speed: shootDirecitons[index].y,
+                gravityScale: gravityScale,
+                _stunValue: stunValue);
         }
         else
         {
-            bullet.SetUp(new Vector3(0, 0, 90 - shootDirecitons[index].x), this.gameObject, _damage: damage, _speed: shootDirecitons[index].y, gravityScale: gravityScale);
+            bullet.SetUp(new Vector3(0, 0, 90 - shootDirecitons[index].x),
+                this.gameObject,
+                _damage: damage,
+                _speed: shootDirecitons[index].y,
+                gravityScale: gravityScale,
+                _stunValue: stunValue);
         }
     }
 }

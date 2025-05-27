@@ -93,7 +93,7 @@ public class QX_add_repel : IEnemyAction
                 //counter attack effect
                 vfx.SpawnHitEffect(true, playerIDamagable.hitEffectPosition.position);
 
-                playerIDamagable.Repel(repelForce, -transform.right);
+                playerIDamagable.Repel(repelForce, -transform.right.x < 0 ? true : false);
                 vfx.CameraShake(0.1f);
                 vfx.RumblePulse(rumbleFrequncy.x * 2, rumbleFrequncy.y * 2, rumbleDuration * 2);
                 vfx.SlowTimeForSeconds(freezeTimeDuration, 0f);
@@ -101,7 +101,7 @@ public class QX_add_repel : IEnemyAction
             else if (dealtDamage == 1)//defend
             {
                 vfx.SpawnHitEffect(true, playerIDamagable.GetHitPos());
-                playerIDamagable.Repel(repelForce, -transform.right);
+                playerIDamagable.Repel(repelForce, -transform.right.x < 0 ? true : false);
                 vfx.CameraShake(0.1f);
                 vfx.RumblePulse(rumbleFrequncy.x * 2, rumbleFrequncy.y * 2, rumbleDuration * 2);
                 vfx.SlowTimeForSeconds(freezeTimeDuration, 0f);
@@ -110,7 +110,7 @@ public class QX_add_repel : IEnemyAction
             {
                 vfx.SpawnHitEffect(true, playerIDamagable.GetHitPos());
                 vfx.RumblePulse(rumbleFrequncy.x, rumbleFrequncy.y, rumbleDuration);
-                playerIDamagable.Repel(repelForce * 2, -transform.right);
+                playerIDamagable.Repel(repelForce * 2, -transform.right.x < 0 ? true : false);
                 vfx.SlowTimeForSeconds(freezeTimeDuration, 0f);
             }
         }

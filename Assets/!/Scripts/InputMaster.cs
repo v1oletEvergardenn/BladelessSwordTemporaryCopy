@@ -29,6 +29,9 @@ public class InputMaster : MonoBehaviour
     [HideInInspector] public InputAction _EventKeyAction;
     [HideInInspector] public InputAction _EventFlipPageAction;
     [HideInInspector] public InputAction _MenuOpenAction;
+    [HideInInspector] public InputAction _AbilityX;
+    [HideInInspector] public InputAction _AbilityY;
+    [HideInInspector] public InputAction _AbilityB;
 
     [Header("QTE")]
     public GameObject qteKey;
@@ -60,6 +63,9 @@ public class InputMaster : MonoBehaviour
         _EventKeyAction = _playerInput.actions["EventKey"];
         _EventFlipPageAction = _playerInput.actions["Event_flip_page"];
         _MenuOpenAction = _playerInput.actions["MenuOpen"];
+        _AbilityX = _playerInput.actions["AbilityX"];
+        _AbilityB = _playerInput.actions["AbilityB"];
+        _AbilityY = _playerInput.actions["AbilityY"];
 
         qteInteractedKey_image.fillAmount = 0;
         qteKey.SetActive(false);

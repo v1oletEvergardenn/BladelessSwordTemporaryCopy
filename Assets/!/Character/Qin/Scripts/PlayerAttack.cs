@@ -54,11 +54,12 @@ public class PlayerAttack : MonoBehaviour
 
     #region Attack Variables
 
-    [FoldoutGroup("Attack Variables", nameof(CounterAttackRadius), nameof(jumpCounterAttackRadius),
+    [FoldoutGroup("Attack Variables", nameof(basicAttackDamage), nameof(CounterAttackRadius), nameof(jumpCounterAttackRadius),
         nameof(jumpAttackPoint), nameof(counterAttackPoint), nameof(counterAttackCheckDuration),
         nameof(perfectCounterAttackCheckDuration), nameof(attackGap))]
     [SerializeField] private Void attackGroupHold;
 
+    [SerializeField, HideInInspector] private int basicAttackDamage = 1;
     [SerializeField, HideInInspector, Range(0f, 3f)] private float CounterAttackRadius;
     [SerializeField, HideInInspector, Range(0f, 2f)] private float jumpCounterAttackRadius;
     [SerializeField, HideInInspector] public Transform jumpAttackPoint;
@@ -83,15 +84,18 @@ public class PlayerAttack : MonoBehaviour
     #region Heart Sword Variables
 
     [FoldoutGroup("Heart Sword Variables", nameof(HS_attack_radius), nameof(HS_attack_damage),
-        nameof(maxHS_point), nameof(currentHS_point), nameof(activatedHS_point), nameof(HS_points))]
+        nameof(maxHS_point), nameof(currentHS_point), nameof(activatedHS_point))]
     [SerializeField] private Void HSGroupHold;
 
     [SerializeField, HideInInspector] public float maxHS_point = 3;
+
     [SerializeField, HideInInspector] public float currentHS_point = 0;
     [SerializeField, HideInInspector] public float activatedHS_point = 0;
     [SerializeField, HideInInspector, Range(0f, 5f)] public float HS_attack_radius = 2.3f;
     [SerializeField, HideInInspector, Range(0f, 10f)] public int HS_attack_damage = 5;
+    public MeleeAttack HS_attack_effect;
     public List<GameObject> HS_points;
+    private bool hsHitEffectPlayed = false;
 
     #endregion Heart Sword Variables
 
@@ -107,7 +111,7 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField, HideInInspector, Range(0f, 2f)] public float storm_radius = 1.1f;
     [SerializeField, HideInInspector] private LayerMask repelLayer;
     [SerializeField, HideInInspector, Range(0f, 300f)] private float repelForce = 100;
-    private bool stormReady = false;
+    [HideInInspector] public bool stormReady = false;
     [HideInInspector] public float prepareStormTimer = 0f;
     private Vector3 originalStormPos;
     public Transform stormEffectPos;
@@ -140,17 +144,18 @@ public class PlayerAttack : MonoBehaviour
     {
         currentHS_point = Mathf.Clamp(currentHS_point, 0, maxHS_point);
         activatedHS_point = Mathf.Clamp(activatedHS_point, 0, currentHS_point);
-        attackTimer += Time.deltaTime;
-        counterAttackCheckTimer += Time.deltaTime;
-        combatTimer -= Time.deltaTime;
-        comboTimer += Time.deltaTime;
-        attackAnimTimer += Time.deltaTime;
+        bool isInBulletTime = VFXManager.isInBulletTime;
+        attackTimer += isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
+        counterAttackCheckTimer += isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
+        combatTimer -= isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
+        comboTimer += isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
+        attackAnimTimer += isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
 
         UpdateHS();
 
         if (isPreparingStorm)
         {
-            prepareStormTimer += Time.deltaTime;
+            prepareStormTimer += isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
             if (prepareStormTimer >= 0.2f) { anim.SetBool("storm", true); }
         }
         else { prepareStormTimer = 0f; stormReady = false; }
@@ -158,8 +163,10 @@ public class PlayerAttack : MonoBehaviour
         if (isPreparingStorm && prepareStormTimer >= prepareStormTime && !stormReady) { stormReady = true; SoundManager.PlaySound("defend_block2"); vfx.SpawnSlashEffect(stormEffectPos.position); }
         if (combatTimer <= 0) { anim.SetBool("isCombat", false); isInCombat = false; combatTimer = 0; }
         if (comboTimer >= 0.67f) { attackIndex = 2; }
-        if (attackAnimTimer <= attackAnimDuration) { isInAttackAnim = true; }
-        else { isInAttackAnim = false; }
+
+        if (attackAnimTimer <= attackAnimDuration) { isInAttackAnim = true; } else { isInAttackAnim = false; }
+
+        if (attackTimer > attackGap) { isAttacking = false; isHS_attack = false; }
 
         if (counterAttackCheckTimer <= counterAttackCheckDuration) { CheckCounterAttack(); }
         else { isAttacking = false; }
@@ -174,6 +181,7 @@ public class PlayerAttack : MonoBehaviour
         // Guard clauses for attack eligibility
         if (isAttacking || !canAttack || controller.isFloating || attackTimer < attackGap)
             return;
+        if (activatedHS_point < 1 && !energy.AttackConsume()) { return; }
 
         // Set attack state
         isAttackingLeft = attackLeft;
@@ -183,19 +191,17 @@ public class PlayerAttack : MonoBehaviour
         attackTimer = 0f;
         attackAnimTimer = 0f;
         counterAttackCheckTimer = 0f;
+        hsHitEffectPlayed = false;
         hsHitTargets.Clear();
 
         // Heart Sword attack logic
-        isHS_attack = true;
-        if (activatedHS_point > 1)
+        isHS_attack = false;
+        if (activatedHS_point >= 1)
         {
             activatedHS_point -= 1;
             currentHS_point -= 1;
             isHS_attack = true;
         }
-
-        if (activatedHS_point > 0 && !energy.AttackConsume())
-            return;
 
         // Combo logic
         attackIndex++;
@@ -235,7 +241,7 @@ public class PlayerAttack : MonoBehaviour
                 return $"{prefix}attack_fall_{indexStr}";
             if (controller.isRunning)
                 return backAttack
-                    ? $"run_combat;{prefix}attack_back_{indexStr}"
+                    ? $"{prefix}attack_back_{indexStr}"
                     : $"{prefix}attack_run_{indexStr}";
             return $"{prefix}attack_idle_{indexStr}";
         }
@@ -302,7 +308,7 @@ public class PlayerAttack : MonoBehaviour
 
                 float dist = Vector2.Distance(proj.GetPivot(), health.GetHitPos());
                 if (dist <= hsCheckDistance)
-                    CounterAttack(proj, true);
+                    HS_CounterAttack(proj);
             }
         }
         else if (closestProjectile != null && closestProjectile.isHostileToPlayer && !closestProjectile.collided)
@@ -341,17 +347,32 @@ public class PlayerAttack : MonoBehaviour
         counterAttackCheckTimer = counterAttackCheckDuration + 0.5f;
         if (isPerfect)
         {
-            energy.PerfectCounterAttackRestore();
-            projectile.SetUp(direction, this.gameObject, 100, _isHostileToPlayer: false);
+            ModifyHSPoint(1);
+            energy.ChangeEnergy(-energy.attack_energy_consumption);
+            projectile.SetUp(direction, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * basicAttackDamage);
             projectile.PerfectCounterAttack();
             SoundManager.PlaySound("perfect_attack");
         }
         else
         {
-            projectile.SetUp(direction, this.gameObject, 30, _isHostileToPlayer: false);
+            projectile.SetUp(direction, this.gameObject, 30, _isHostileToPlayer: false, _damage: projectile.damage * basicAttackDamage);
             projectile.NormalCounterAttack();
             SoundManager.PlaySound("normal_counter_attack");
         }
+    }
+
+    public void HS_CounterAttack(IProjectile projectile)
+    {
+        if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
+        isAttacking = false;
+        canDefend = true;
+        attackTimer = attackGap;
+        counterAttackCheckTimer = counterAttackCheckDuration + 0.5f;
+
+        energy.ChangeEnergy(-energy.attack_energy_consumption);
+        projectile.SetUp(direction, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * basicAttackDamage);
+        projectile.PerfectCounterAttack();
+        SoundManager.PlaySound("perfect_attack");
     }
 
     public void HSAttack(IDamagable damagable)
@@ -361,13 +382,34 @@ public class PlayerAttack : MonoBehaviour
         if (damagable is SubDamageable sub) { parentDamagble = sub.ParentDamageable; }
         hsHitTargets.Add(parentDamagble);
         foreach (IDamagable i in parentDamagble.subDamagables) { hsHitTargets.Add(i); }
-        damagable.Damage(HS_attack_damage, this.transform, 0);
+
+        if (!hsHitEffectPlayed)
+        {
+            vfx.MeleeAttackEffect(HS_attack_effect,
+            damagable,
+            damagable.GetHitPos().x < health.GetHitPos().x ? true : false);
+            hsHitEffectPlayed = true;
+        }
+        else
+        {
+            vfx.SpawnHitEffect(true, damagable.GetHitPos());
+            damagable.Repel(HS_attack_effect.repel, damagable.GetHitPos().x < health.GetHitPos().x ? true : false);
+        }
+
+        damagable.Damage(HS_attack_damage, this.transform, 0, stunValue: 10);
         canDefend = true;
+    }
+
+    public void ModifyHSPoint(float i)
+    {
+        currentHS_point += i;
+        currentHS_point = Mathf.Clamp(currentHS_point, 0, maxHS_point);
     }
 
     public void CounterMeleeAttack()
     {
-        currentHS_point = maxHS_point;
+        ModifyHSPoint(1);
+        energy.ChangeEnergy(-2);
         int i = Random.Range(1, 3);
         SoundManager.PlaySound("metal_hit" + i);
         energy.PerfectCounterAttackRestore();
@@ -404,6 +446,7 @@ public class PlayerAttack : MonoBehaviour
         Vector3 v = new Vector3(0, 0, -90);
         SoundManager.PlaySound("normal_counter_attack");
         projectile.SetUp(v, this.gameObject, 100, _isHostileToPlayer: false);
+        energy.ChangeEnergy(4);
         projectile.PerfectCounterAttack();
     }
 
@@ -444,7 +487,7 @@ public class PlayerAttack : MonoBehaviour
             vfx.SpawnSlashEffect(health.GetHitPos());
             SoundManager.PlaySound("HS_activate");
             vfx.RumblePulse(0.2f, 0.3f, 0.1f);
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSecondsRealtime(0.1f);
         }
 
         yield return null;

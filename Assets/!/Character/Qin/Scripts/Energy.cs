@@ -18,26 +18,29 @@ public class Energy : MonoBehaviour
     public int currentEnergy;
     public Image energyBar;
 
+    public Transform failedToDoActionSymbol;
+
     [Header("RestoreEnergy")] public float restoreCD;
     public float restoreCDafterConsume;
     private float restoreTimer;
     private float restoreTime;
 
-    [Header("Attack")] public int attack_energy_consumption;
+    public int attack_energy_consumption;
     public int perfect_attack_energy_restore;
 
-    [Header("boomerang")] public float boomerang_consumption_frequency;
+    public int swordTeleport_energy_consumption;
 
-    private float boomerang_timer;
+    public float floating_consumption_frequency;
 
-    [Header("floating")] public float floating_consumption_frequency;
+    public float defend_consumption_frequency;
+
+    public float storm_consumption_frequency;
+
+    public int dash_energy_consumption;
+
     private float floating_timer;
-
-    [Header("defend")] public float defend_consumption_frequency;
     private float defend_timer;
-
-    [Header("barrier")] public int barrier_energy_consumption;
-    [Header("dash")] public int dash_energy_consumption;
+    private float storm_timer;
 
     private void Awake()
     {
@@ -61,18 +64,23 @@ public class Energy : MonoBehaviour
         restoreTimer += Time.deltaTime;
         if (controller.isFloating) { floating_timer += Time.deltaTime; }
         if (playerAttack.isDefending) { defend_timer += Time.deltaTime; }
+        if (!playerAttack.isAttacking && playerAttack.anim.GetBool("storm") && !playerAttack.stormReady) { storm_timer += Time.deltaTime; }
         if (floating_timer >= floating_consumption_frequency)
         {
             FloatingConsume();
-            ChangeEnergy(1);
             floating_timer = 0f;
         }//floating
         if (defend_timer >= defend_consumption_frequency)
         {
             DefendConsume();
-            ChangeEnergy(1);
             defend_timer = 0f;
         }//defending
+
+        if (storm_timer >= storm_consumption_frequency)
+        {
+            StromConsume();
+            storm_timer = 0;
+        }
 
         if (restoreTimer >= restoreTime)
         {
@@ -126,6 +134,20 @@ public class Energy : MonoBehaviour
             ChangeEnergy(attack_energy_consumption);
             return true;
         }
+        VFXManager.instance.FailedToDoAction();
+        return false;
+    }
+
+    public bool TeleportConsume()
+    {
+        if (swordTeleport_energy_consumption <= currentEnergy)
+        {
+            restoreTime = restoreCDafterConsume;
+            restoreTimer = 0f;
+            ChangeEnergy(swordTeleport_energy_consumption);
+            return true;
+        }
+        VFXManager.instance.FailedToDoAction();
         return false;
     }
 
@@ -138,18 +160,7 @@ public class Energy : MonoBehaviour
             ChangeEnergy(dash_energy_consumption);
             return true;
         }
-        return false;
-    }
-
-    public bool BarrierConsume()
-    {
-        if (barrier_energy_consumption <= currentEnergy)
-        {
-            restoreTime = restoreCDafterConsume;
-            restoreTimer = 0f;
-            ChangeEnergy(barrier_energy_consumption);
-            return true;
-        }
+        VFXManager.instance.FailedToDoAction();
         return false;
     }
 
@@ -158,30 +169,33 @@ public class Energy : MonoBehaviour
         ChangeEnergy(-perfect_attack_energy_restore);
     }
 
-    //public bool BoomerangConsume()
-    //{
-    //    if (currentEnergy <= 1)
-    //    {
-    //        playerAttack.RetreiveBoomerang();
-    //        controller.canMove = true;
-    //        //playerAttack._boomerang.SetBool(true);
-    //        return false;
-    //    }
-    //    restoreTime = restoreCDafterConsume;
-    //    restoreTimer = 0f;
-    //    ChangeEnergy(1);
-    //    boomerang_timer = 0f;
-    //    return true;
-    //}
-
     public bool FloatingConsume()
     {
         if (currentEnergy < 1)
         {
             playerInput.input_floating = false;
             playerInput.input_floating_timer = 0f;
+            VFXManager.instance.FailedToDoAction();
             return false;
         }
+        ChangeEnergy(1);
+        restoreTime = restoreCDafterConsume;
+        restoreTimer = 0f;
+        return true;
+    }
+
+    public bool StromConsume()
+    {
+        if (currentEnergy < 1)
+        {
+            playerAttack.anim.SetBool("storm", false);
+            playerAttack.isOnStorm = false;
+            playerAttack.isPreparingStorm = false;
+            playerAttack.prepareStormTimer = 0f;
+            VFXManager.instance.FailedToDoAction();
+            return false;
+        }
+        ChangeEnergy(1);
         restoreTime = restoreCDafterConsume;
         restoreTimer = 0f;
         return true;
@@ -192,8 +206,10 @@ public class Energy : MonoBehaviour
         if (currentEnergy < 1)
         {
             playerAttack.EndDefend();
+            VFXManager.instance.FailedToDoAction();
             return false;
         }
+        ChangeEnergy(1);
         restoreTime = restoreCDafterConsume;
         restoreTimer = 0f;
         return true;

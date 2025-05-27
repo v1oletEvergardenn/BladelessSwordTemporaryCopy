@@ -9,6 +9,7 @@ public class TeleportSword : MonoBehaviour
         if ((CharacterController2D.instance.teleportCheckLayer.value & (1 << collision.gameObject.layer)) > 0)
         {
             CharacterController2D.instance.TeleportToSword();
+            StopCoroutine(CharacterController2D.instance.co_teleport);
         }
     }
 }

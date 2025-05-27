@@ -72,7 +72,7 @@ public abstract class IEnemyAction : MonoBehaviour
     public virtual void Hit(MeleeAttack melee, Transform attackPos)
     {
         int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
-        Vector3 direction = new Vector3((playerIDamagable.GetHitPos() - attackPos.position).x, 0, 0).normalized;
+        bool direction = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
 
         if (dealtDamage == 2)//counter attack
         {

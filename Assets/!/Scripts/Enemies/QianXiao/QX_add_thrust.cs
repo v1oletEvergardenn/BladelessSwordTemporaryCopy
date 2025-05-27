@@ -66,7 +66,7 @@ public class QX_add_thrust : IEnemyAction
             //counter attack effect
             vfx.SpawnLargeSlashEffect(playerIDamagable.GetHitPos(), false);
 
-            playerIDamagable.Repel(repelForce, transform.right);
+            playerIDamagable.Repel(repelForce, transform.right.x < 0 ? true : false);
             vfx.CameraShake(0.1f);
             vfx.RumblePulse(rumbleFrequncy.x * 2, rumbleFrequncy.y * 2, rumbleDuration * 2);
             vfx.SlowTimeForSeconds(freezeTimeDuration, 0f);
@@ -74,7 +74,7 @@ public class QX_add_thrust : IEnemyAction
         else if (dealtDamage == 1)//defend
         {
             vfx.SpawnLargeSlashEffect(playerIDamagable.GetHitPos(), false);
-            playerIDamagable.Repel(repelForce, transform.right);
+            playerIDamagable.Repel(repelForce, transform.right.x < 0 ? true : false);
             vfx.CameraShake(0.1f);
             vfx.RumblePulse(rumbleFrequncy.x * 2, rumbleFrequncy.y * 2, rumbleDuration * 2);
             vfx.SlowTimeForSeconds(freezeTimeDuration, 0f);
@@ -83,7 +83,7 @@ public class QX_add_thrust : IEnemyAction
         {
             vfx.SpawnLargeSlashEffect(playerIDamagable.GetHitPos(), false);
             vfx.RumblePulse(rumbleFrequncy.x, rumbleFrequncy.y, rumbleDuration);
-            playerIDamagable.Repel(repelForce * 2, transform.right);
+            playerIDamagable.Repel(repelForce * 2, transform.right.x < 0 ? true : false);
             vfx.SlowTimeForSeconds(freezeTimeDuration, 0f);
         }
     }

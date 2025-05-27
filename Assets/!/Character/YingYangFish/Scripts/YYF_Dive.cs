@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using DG.Tweening;
-using static UnityEditor.PlayerSettings;
 
 public class YYF_Dive : IEnemyAction
 {

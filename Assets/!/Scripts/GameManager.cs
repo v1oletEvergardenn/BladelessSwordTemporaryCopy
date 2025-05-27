@@ -9,11 +9,11 @@ public class GameManager : MonoBehaviour
     private InputMaster inputManager;
 
     public static GameManager instance;
-    public GameObject Player;
+    [HideInInspector] public GameObject Player;
     public AnimationCurve outline_flash_anim_curve;
-    public Health player_Idamagable;
-    public PlayerAttack playerAttack;
-    public InputPlayer playerInput;
+    [HideInInspector] public Health player_Idamagable;
+    [HideInInspector] public PlayerAttack playerAttack;
+    [HideInInspector] public InputPlayer playerInput;
     public CharacterController2D player_controller;
     public Material FlashEffectMat;
     [HideInInspector] public CinemachineImpulseSource impulseSource;
@@ -90,7 +90,7 @@ public class GameManager : MonoBehaviour
         }
         else if (skill == PlayerSkillsType.Barrier)
         {
-            Player.GetComponent<InputPlayer>().learnedBarrier = true;
+            Player.GetComponent<InputPlayer>().learnedStorm = true;
         }
         else if (skill == PlayerSkillsType.Defend)
         {

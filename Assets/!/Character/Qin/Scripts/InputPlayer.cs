@@ -10,15 +10,7 @@ using Doublsb.Dialog;
 using UnityEngine.SceneManagement;
 using System;
 using Mobsoft.PixelStyleWaterShader;
-
-public enum PlayerState
-{
-    idling,
-    running,
-    jumping,
-    idle_attacking,
-    run_attacking
-}
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class InputPlayer : MonoBehaviour
 {
@@ -32,6 +24,7 @@ public class InputPlayer : MonoBehaviour
     private GameManager gameManager;
     private InputMaster inputMaster;
     private Health health;
+    private Energy energy;
     public static InputPlayer instance;
 
     #endregion Singleton & References
@@ -80,7 +73,7 @@ public class InputPlayer : MonoBehaviour
     public bool learnedDoubleJump = false;
     public bool learnedAttack = false;
     public bool learnedBoomerang = false;
-    public bool learnedBarrier = false;
+    public bool learnedStorm = false;
     public bool learnedDefend = false;
     public bool learnedHeartSword = false;
 
@@ -98,6 +91,7 @@ public class InputPlayer : MonoBehaviour
         pointerSpriteRenderer = pointer.GetComponent<SpriteRenderer>();
         controller = GetComponent<CharacterController2D>();
         playerAttack = GetComponent<PlayerAttack>();
+        energy = GetComponent<Energy>();
         inputMaster = InputMaster.instance;
         health = GetComponent<Health>();
         gameManager = GameManager.instance;
@@ -128,7 +122,7 @@ public class InputPlayer : MonoBehaviour
         { pointerSpriteRenderer.sprite = null; }
         else { OnAttackDirection(); }
         if (HandleEventKeyInput()) return;
-        HandleBarrierRelease();
+        HandleStormRelease();
         if (health.isDead) return;
         if (HandleDialogOrInfoEvent()) return;
 
@@ -136,6 +130,7 @@ public class InputPlayer : MonoBehaviour
         UpdateMovementInput();
         HandleJumpInput();
         HandleAttackInput();
+        HandleAbilityInput();
         HandleDefendInput();
         HandleTeleportInput();
     }
@@ -186,9 +181,9 @@ public class InputPlayer : MonoBehaviour
         return false;
     }
 
-    private void HandleBarrierRelease()
+    private void HandleStormRelease()
     {
-        if (learnedBarrier)
+        if (learnedStorm)
         {
             bool noAttackPressed = !inputMaster._attackLeftAction.IsPressed() && !inputMaster._attackRightAction.IsPressed();
             if (noAttackPressed && playerAttack.isPreparingStorm)
@@ -262,7 +257,8 @@ public class InputPlayer : MonoBehaviour
         if (!leftPressed && rightJustPressed)
         {
             playerAttack.Attack(false);
-            if (learnedBarrier)
+
+            if (learnedStorm)
             {
                 playerAttack.isPreparingStorm = true;
                 playerAttack.prepareStormTimer = 0f;
@@ -271,12 +267,20 @@ public class InputPlayer : MonoBehaviour
         else if (!rightPressed && leftJustPressed)
         {
             playerAttack.Attack(true);
-            if (learnedBarrier)
+
+            if (learnedStorm)
             {
                 playerAttack.isPreparingStorm = true;
                 playerAttack.prepareStormTimer = 0f;
             }
         }
+    }
+
+    private void HandleAbilityInput()
+    {
+        if (inputMaster._AbilityX.WasPressedThisFrame()) { playerAttack.ActivateHS(); }//ability X;
+        if (inputMaster._AbilityY.WasPressedThisFrame()) { }//ability Y;
+        if (inputMaster._AbilityB.WasPressedThisFrame()) { }//ability B;
     }
 
     private void HandleDefendInput()
@@ -295,10 +299,6 @@ public class InputPlayer : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-    }
-
     #endregion Unity Lifecycle
 
     #region Input & Action Handlers
@@ -308,7 +308,7 @@ public class InputPlayer : MonoBehaviour
     /// </summary>
     private void TestEvent()
     {
-        StartCoroutine(controller.RunToPosition(transform.position + new Vector3(50f, 0, 0)));
+        VFXManager.instance.FailedToDoAction();
     }
 
     private void OnJump()

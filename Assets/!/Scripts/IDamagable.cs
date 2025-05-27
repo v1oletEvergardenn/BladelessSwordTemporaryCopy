@@ -10,19 +10,19 @@ public abstract class IDamagable : MonoBehaviour
 
     [HideInInspector] public HashSet<SubDamageable> subDamagables = new HashSet<SubDamageable>();
 
-    public virtual int Damage(int damageAmount, Transform sender = null, float stunDuration = 0f)
+    public virtual int Damage(float damageAmount, Transform sender = null, float stunDuration = 0f, bool damageFlash = true, float stunValue = 0)
     {
         return 0;
     }
 
-    public virtual int SubObjectDamage(int damageAmount, Transform sender = null, float stunDuration = 0f)
+    public virtual int SubObjectDamage(float damageAmount, Transform sender = null, float stunDuration = 0f, float stunValue = 0)
     {
         return 0;
     }
 
-    public virtual void Repel(float force, Vector3 dir)
+    public virtual void Repel(float force, bool left)
     {
-        GetComponent<Rigidbody2D>().AddForce(dir * force, ForceMode2D.Impulse);
+        GetComponent<Rigidbody2D>().AddForce((left ? Vector3.left : Vector3.right) * force, ForceMode2D.Impulse);
     }
 
     private void OnDrawGizmosSelected()
