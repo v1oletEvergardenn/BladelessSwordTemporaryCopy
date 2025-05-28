@@ -25,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6367594606740407753}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6367594606740407758
 MonoBehaviour:
@@ -46,7 +46,57 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _waterSimulationType: 0
+  _wavesSimulation:
+    WaterGO: {fileID: 0}
+    WaterSr: {fileID: 0}
+    collider: {fileID: 0}
+    buoyancy: {fileID: 0}
+    settings:
+      automaticWaves:
+        _value: 1
+      enableBuoyancy:
+        _value: 1
+      enableRigidbodyCollisions:
+        _value: 1
+      wavePoints:
+        _value: 128
+      simulationSteps:
+        _value: 4
+      waveDensity:
+        _value: 1
+      waveDensity2:
+        _value: 1
+      waveHeight:
+        _value: 0.1
+      stringDampening:
+        _value: 0.03
+      stringSpread:
+        _value: 0.006
+      stringStiffness:
+        _value: 0.1
+      edgeColoringSize:
+        _value: 0
+      edgeColor:
+        _value: {r: 1, g: 1, b: 1, a: 1}
+      edgeIgnoreTransparency:
+        _value: 0
+      splashForceMin:
+        _value: 0
+      splashForceMax:
+        _value: 10
+      splashVelMin:
+        _value: 0
+      splashVelMax:
+        _value: 1
+      splashNodesWidthMin:
+        _value: 1
+      splashNodesWidthMax:
+        _value: 6
+    heights: {fileID: 0}
+    nodes: []
+  _surfaceRenderer: {fileID: 0}
   _childPPLayerRenderer:
+    water2D: {fileID: 0}
     layerTexture: {fileID: 0}
     rendererType: 0
     sr: {fileID: 0}
@@ -60,28 +110,12 @@ MonoBehaviour:
     holder: {fileID: 0}
     follow: {fileID: 0}
     res: 1
+    scale: {x: 1, y: 1}
     reflectionLayerIdx: 4
     copyMainBackground: 0
     lastOrtographicSize: 0
+    lastAspectRatio: 0
   _childPP: {fileID: 0}
-  _surfaceRenderer:
-    layerTexture: {fileID: 0}
-    rendererType: 1
-    sr: {fileID: 6367594606740407759}
-    format: 0
-    fliterMode: 0
-    bitDepth: 0
-    layerName: nl
-    layerMask: 2147481775
-    mainCamera: {fileID: 0}
-    CameraRenderingScene: {fileID: 0}
-    holder: {fileID: 0}
-    follow: {fileID: 0}
-    res: 1
-    reflectionLayerIdx: -1
-    copyMainBackground: 0
-    lastOrtographicSize: 0
-  _surfaceRendererObject: {fileID: 0}
   ManagersVisible:
     _value: 1
   enableObstruction:
@@ -90,13 +124,17 @@ MonoBehaviour:
     _value: 1
   enableSimulation:
     _value: 1
+  enableWavesSimulation:
+    _value: 0
   enableBlur:
     _value: 0
+  lightingWhenBlur: 0
   normalsPreview:
     _value: 0
   overrideMainCamera:
     _value: 0
   cameraOverride: {fileID: 0}
+  raymarchUnits: 0
   settings:
     _obstructorSettings:
       mainCamera: {fileID: 0}
@@ -112,6 +150,8 @@ MonoBehaviour:
       enableTopDownReflections:
         _value: 1
       enablePlatformerReflections:
+        _value: 0
+      enableRaymarchedReflections:
         _value: 0
       mainCamera: {fileID: 0}
       textureResolution:
@@ -153,14 +193,28 @@ MonoBehaviour:
         _value: 0
       enableScrolling:
         _value: 0
+      customReflectionStart:
+        _value: 0
       playerPosition: {fileID: 0}
       scrollingStrength:
         _value: 0
       DistortionFPRH:
         _value: 0
+      raymarchlayers: 
+      raymarchSteps:
+        _value: 0
+      type2:
+        _value: 0
+      raymarchFalloffStart:
+        _value: 0
+      raymarchFalloffEnd:
+        _value: 0
     _waterSettings:
       color:
         _value: {r: 0.6273585, g: 0.8338827, b: 1, a: 0}
+      depthColor:
+        _value: {r: 0.64760596, g: 0.8781786, b: 0.9339623, a: 0}
+      coloringType: 1
       tiling:
         _value: {x: 0.3, y: 0.3}
       baseAlpha:
@@ -176,8 +230,6 @@ MonoBehaviour:
         _value: {r: 1, g: 1, b: 1, a: 0}
       obstructionAlpha:
         _value: 1
-      depthColor:
-        _value: {r: 0.64760596, g: 0.8781786, b: 0.9339623, a: 0}
       foamColor:
         _value: {r: 1, g: 1, b: 1, a: 0}
       foamSize:
@@ -224,6 +276,8 @@ MonoBehaviour:
         _value: {x: 0, y: 0}
       _useLighting:
         _value: 0
+      depthFromObstructors:
+        _value: 0
       enableBelowWater:
         _value: 0
       belowWaterUV:
@@ -232,9 +286,42 @@ MonoBehaviour:
         _value: 1
       belowWaterAlpha:
         _value: 0.798
+      colorGradient:
+        _value:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+      depthMlp:
+        _value: 0
     _simulationSettings:
       resolution:
-        _value: {x: 1024, y: 315}
+        _value: {x: 1024, y: 1024}
       waterCmp: {fileID: 7200000, guid: 14821a0cc6771aa45b7163f15854b208, type: 3}
       sr: {fileID: 6367594606740407759}
       obstruction: {fileID: 0}
@@ -269,6 +356,47 @@ MonoBehaviour:
         _value: {r: 1, g: 1, b: 1, a: 1}
       waveColorMinMaxHeight:
         _value: {x: 0, y: 0.12}
+    _wavesSettings:
+      automaticWaves:
+        _value: 1
+      enableBuoyancy:
+        _value: 1
+      enableRigidbodyCollisions:
+        _value: 1
+      wavePoints:
+        _value: 128
+      simulationSteps:
+        _value: 4
+      waveDensity:
+        _value: 1
+      waveDensity2:
+        _value: 1
+      waveHeight:
+        _value: 0.1
+      stringDampening:
+        _value: 0.03
+      stringSpread:
+        _value: 0.006
+      stringStiffness:
+        _value: 0.1
+      edgeColoringSize:
+        _value: 0
+      edgeColor:
+        _value: {r: 1, g: 1, b: 1, a: 1}
+      edgeIgnoreTransparency:
+        _value: 0
+      splashForceMin:
+        _value: 0
+      splashForceMax:
+        _value: 10
+      splashVelMin:
+        _value: 0
+      splashVelMax:
+        _value: 1
+      splashNodesWidthMin:
+        _value: 1
+      splashNodesWidthMax:
+        _value: 6
     _blurSettings:
       blurType: 1
       useBlur:
