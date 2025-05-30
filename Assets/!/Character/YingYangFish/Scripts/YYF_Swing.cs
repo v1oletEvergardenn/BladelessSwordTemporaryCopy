@@ -10,6 +10,7 @@ public class YYF_Swing : IEnemyAction
     private YingYangFish_AI bossAI;
 
     public GameObject swingEffect;
+    public GameObject swing_outline;
 
     public MeleeAttack swingAttack = new MeleeAttack(2, 0.5f, 0.2f, new Vector2(0.25f, 0.4f), 0.2f, 20f, 0.1f);
     public float swingRange;
@@ -22,6 +23,13 @@ public class YYF_Swing : IEnemyAction
     {
         base.Start();
         bossAI = GetComponent<YingYangFish_AI>();
+    }
+
+    public override void CancelAct()
+    {
+        base.CancelAct();
+        swingEffect.SetActive(false);
+        swing_outline.SetActive(false);
     }
 
     public override IEnumerator Act_coroutine(float factor = 0)
@@ -46,9 +54,10 @@ public class YYF_Swing : IEnemyAction
         if (factor == 1)
         {
             yield return new WaitForSeconds(0.4f);
+            swing_outline.SetActive(true);
             InputKeyType inputKey = InputKeyType.left_attack_key;
             if (bossAI.IsPlayerLeft()) { inputKey = InputKeyType.right_attack_key; }
-            InputMaster.instance.StartQTE(inputKey, player.transform.position + new Vector3(0, 4, 0), 0.2f, () =>
+            InputMaster.instance.StartQTE(inputKey, player.transform.position + new Vector3(0, 4, 0), 0.3f, () =>
             {
                 playerAttack.Attack(bossAI.IsPlayerLeft() ? false : true);
             }, null);
@@ -56,6 +65,7 @@ public class YYF_Swing : IEnemyAction
         else if (factor == 2)
         {
             yield return new WaitForSeconds(0.4f);
+            swing_outline.SetActive(true);
             InputKeyType inputKey = InputKeyType.swordTeleport_key;
             Vector3 pos = new Vector3(12, 5, 0);
             if (bossAI.IsPlayerLeft()) { pos = new Vector3(-12, 5, 0); }
@@ -65,7 +75,9 @@ public class YYF_Swing : IEnemyAction
         }
         else
         {
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(0.5f);
+            swing_outline.SetActive(true);
+            yield return new WaitForSeconds(0.3f);
         }
 
         float x = transform.position.x + 5;
@@ -84,6 +96,7 @@ public class YYF_Swing : IEnemyAction
         yield return new WaitForSeconds(.7f);
 
         swingEffect.SetActive(false);
+        swing_outline.SetActive(false);
 
         if (factor == 0 || factor == 1 || factor == 3)
         {

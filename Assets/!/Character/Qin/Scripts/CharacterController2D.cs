@@ -19,6 +19,7 @@ public class CharacterController2D : MonoBehaviour
     [HideInInspector] public Rigidbody2D rb;
     private PlayerAttack playerAttack;
     private Energy energy;
+    private Health health;
     private InputPlayer inputPlayer;
     private CapsuleCollider2D capsuleCollider;
     [SerializeField] private Transform pointer;
@@ -118,6 +119,7 @@ public class CharacterController2D : MonoBehaviour
         playerAttack = GetComponent<PlayerAttack>();
         capsuleCollider = GetComponent<CapsuleCollider2D>();
         energy = GetComponent<Energy>();
+        health = GetComponent<Health>();
         camFollowDirection = FacingRight;
     }
 
@@ -475,7 +477,7 @@ public class CharacterController2D : MonoBehaviour
         if (input_floating && !isGrounded && isFalling && canDoubleJump && !playerAttack.isPreparingStorm && !playerAttack.isDefending)
         {
             if (!floatTriggered) { SoundManager.PlaySound("sword_jump_floating"); floatTriggered = true; }
-            if (!energy.FloatingConsume()) { return false; }
+            //if (!energy.FloatingConsume()) { return false; }
             float x = rb.velocity.x;
             rb.velocity = new Vector2(x, (VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime) * -floatingSpeed);
             if (!isFloating)
@@ -726,6 +728,7 @@ public class CharacterController2D : MonoBehaviour
     {
         if (teleported) { return; }
         teleported = true;
+        gameObject.layer = 6; //player_dash
         RaycastHit2D hit = Physics2D.Raycast(TeleportSword.transform.position, Vector2.down, 1.2f, teleportCheckLayer);
         RaycastHit2D hit_horizontal = Physics2D.Raycast(TeleportSword.transform.position, TeleportSword.transform.right, 0.7f, teleportCheckLayer);
         float offset_y = 0f;

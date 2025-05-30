@@ -143,6 +143,7 @@ public class Health : IDamagable
         {
             anim_bool.Anim_Attack(2);
             isDead = true;
+            controller.isRunningToTarget = false;
             GetComponent<Rigidbody2D>().velocity = Vector2.zero;
             GetComponent<Rigidbody2D>().isKinematic = true;
             anim.SetBool("dead", true);

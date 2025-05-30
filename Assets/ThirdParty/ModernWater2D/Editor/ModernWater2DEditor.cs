@@ -5,16 +5,13 @@ using UnityEngine;
 
 namespace Water2D
 {
-
     [InitializeOnLoad]
     [CustomEditor(typeof(ModernWater2D))]
     public class ModernWater2DEditor : Editor
     {
-
         #region variables
 
-
-        ModernWater2D water;
+        private ModernWater2D water;
 
         private const int space1W = 20;
         private const int space2W = 14;
@@ -29,22 +26,25 @@ namespace Water2D
 
         private static readonly Color sector1 = new Color(0.22f, 0.22f, 0.22f);
         private static readonly Color sector2 = new Color(0.18f, 0.25f, 0.18f);
-        private static readonly Color sector3= new Color(0.18f, 0.25f, 0.25f);
-        private static readonly Color sector4= new Color(0.4f, 0.20f, 0.25f);
+        private static readonly Color sector3 = new Color(0.18f, 0.25f, 0.25f);
+        private static readonly Color sector4 = new Color(0.4f, 0.20f, 0.25f);
 
         private AnimBool[] animBs = new AnimBool[64];
-        public AnimBool GetAnimBs(int idx) { if (animBs[idx] == null) animBs[idx] = new AnimBool(); return animBs[idx]; }
+
+        public AnimBool GetAnimBs(int idx)
+        { if (animBs[idx] == null) animBs[idx] = new AnimBool(); return animBs[idx]; }
+
         [SerializeField] private bool FancyEditor = false;
         [SerializeField] private TextureUtils.ResolutionEnum resEnum;
 
-        #endregion
+        #endregion variables
 
         #region utils
 
+        private Rect rect;
+        private Rect vrect;
 
-        Rect rect;
-        Rect vrect;
-        private void Banner() 
+        private void Banner()
         {
             rect = GUILayoutUtility.GetRect(1, 1);
             vrect = EditorGUILayout.BeginVertical();
@@ -69,18 +69,18 @@ namespace Water2D
             EditorGUI.DrawRect(new Rect(rect.x - 13, rect.y - 1, rect.width + 17, vrect.height + 9), bg);
         }
 
-        private void EndVB() { EditorGUILayout.EndVertical(); }
+        private void EndVB()
+        { EditorGUILayout.EndVertical(); }
 
-        [SerializeField] List<int> layers = new List<int>();
+        [SerializeField] private List<int> layers = new List<int>();
 
-        #endregion
+        #endregion utils
 
         #region OnInspectorGUI
 
         public override void OnInspectorGUI()
         {
             EditorGUI.BeginChangeCheck();
-
 
             base.OnInspectorGUI();
             water = (ModernWater2D)(target);
@@ -95,7 +95,7 @@ namespace Water2D
             //type = Foldout(type, "type", GUIStyleUtils.DropDown(dropDown1W), space1W);
             //if (type) TypeSettings();
 
-            using (new WaterLayoutUtils.FoldoutScope(FancyEditor,GetAnimBs(0), out var shouldDraw, "looks"))
+            using (new WaterLayoutUtils.FoldoutScope(FancyEditor, GetAnimBs(0), out var shouldDraw, "looks"))
             {
                 if (shouldDraw) LooksSettings();
             }
@@ -141,7 +141,7 @@ namespace Water2D
             }
 
             EditorGUILayout.EndVertical();
-           
+
             if (EditorGUI.EndChangeCheck())
             {
                 EditorUtility.SetDirty(water);
@@ -151,18 +151,21 @@ namespace Water2D
         [SerializeField][HideInInspector] private bool singleColor = false;
         [SerializeField][HideInInspector] private bool lightingWhenBlur = false;
 
-        private void LooksSettings() 
+        public void Nothing()
         {
+            lightingWhenBlur = singleColor;
+            singleColor = lightingWhenBlur;
+        }
 
-         
-
-            using (new WaterLayoutUtils.FoldoutScope(FancyEditor,GetAnimBs(6), out var shouldDraw, "alpha and tiling"))
+        private void LooksSettings()
+        {
+            using (new WaterLayoutUtils.FoldoutScope(FancyEditor, GetAnimBs(6), out var shouldDraw, "alpha and tiling"))
             {
                 if (shouldDraw)
                 {
                     StartVB(sector1);
                     water.settings._waterSettings.baseAlpha.value = EditorGUILayout.Slider("base alpha", water.settings._waterSettings.baseAlpha.value, 0f, 1f, GUILayout.ExpandWidth(true));
-                    water.settings._waterSettings.alphaTexture = (Texture2D)EditorGUILayout.ObjectField("alpha texture", water.settings._waterSettings.alphaTexture, typeof(Texture2D), true ,GUILayout.ExpandWidth(true));
+                    water.settings._waterSettings.alphaTexture = (Texture2D)EditorGUILayout.ObjectField("alpha texture", water.settings._waterSettings.alphaTexture, typeof(Texture2D), true, GUILayout.ExpandWidth(true));
 
                     EditorGUILayout.Space(5);
 
@@ -173,7 +176,7 @@ namespace Water2D
                     else
                     {
                         water.settings._waterSettings._useLighting.value = EditorGUILayout.Toggle("recieve URP Lighting", water.settings._waterSettings._useLighting.value, GUILayout.ExpandWidth(true));
-                        water.lightingWhenBlur=water.settings._waterSettings._useLighting.value;
+                        water.lightingWhenBlur = water.settings._waterSettings._useLighting.value;
                     }
 
                     EditorGUILayout.Space(5);
@@ -193,7 +196,6 @@ namespace Water2D
                     EndVB();
                 }
             }
-
 
             using (new WaterLayoutUtils.FoldoutScope(FancyEditor, GetAnimBs(26), out var shouldDraw, "coloring"))
             {
@@ -221,16 +223,14 @@ namespace Water2D
                         water.settings._waterSettings.color.value = EditorGUILayout.ColorField("edges color", water.settings._waterSettings.color.value, GUILayout.ExpandWidth(true));
                         water.settings._waterSettings.depthColor.value = EditorGUILayout.ColorField("depth color", water.settings._waterSettings.depthColor.value, GUILayout.ExpandWidth(true));
                     }
-                        EndVB();
+                    EndVB();
                 }
             }
-
 
             using (new WaterLayoutUtils.FoldoutScope(FancyEditor, GetAnimBs(8), out var shouldDraw, "strips and foam"))
             {
                 if (shouldDraw)
                 {
-          
                     StartVB(sector1);
                     water.settings._waterSettings.foamSpeed.value = EditorGUILayout.Vector2Field("speed", water.settings._waterSettings.foamSpeed.value, GUILayout.ExpandWidth(true));
 
@@ -241,7 +241,7 @@ namespace Water2D
 
                     EditorGUILayout.Space(10);
 
-                    water.settings._waterSettings.sunStripsTexture = (Texture2D)EditorGUILayout.ObjectField("strips texture",water.settings._waterSettings.sunStripsTexture, typeof(Texture2D), true, GUILayout.ExpandWidth(true));
+                    water.settings._waterSettings.sunStripsTexture = (Texture2D)EditorGUILayout.ObjectField("strips texture", water.settings._waterSettings.sunStripsTexture, typeof(Texture2D), true, GUILayout.ExpandWidth(true));
                     EditorGUILayout.Space(5);
                     water.settings._waterSettings.stripsAlpha.value = EditorGUILayout.Slider("strips alpha", water.settings._waterSettings.stripsAlpha.value, 0f, 1f, GUILayout.ExpandWidth(true));
                     water.settings._waterSettings.stripsSize.value = EditorGUILayout.FloatField("strips size", water.settings._waterSettings.stripsSize.value, GUILayout.ExpandWidth(true));
@@ -250,9 +250,6 @@ namespace Water2D
                     EndVB();
                 }
             }
-
-
-            
 
             using (new WaterLayoutUtils.FoldoutScope(FancyEditor, GetAnimBs(9), out var shouldDraw, "distortion"))
             {
@@ -274,32 +271,29 @@ namespace Water2D
                 }
             }
 
-
             using (new WaterLayoutUtils.FoldoutScope(FancyEditor, GetAnimBs(10), out var shouldDraw, "surface texture"))
             {
                 if (shouldDraw)
                 {
                     StartVB(sector1);
                     var c = water.settings._waterSettings.surfaceTexture;
-                    water.settings._waterSettings.surfaceSprite = (SpriteRenderer)EditorGUILayout.ObjectField("surface sprite",water.settings._waterSettings.surfaceSprite, typeof(SpriteRenderer), true, GUILayout.ExpandWidth(true));
-                    water.settings._waterSettings.surfaceTexture = (Texture2D)EditorGUILayout.ObjectField("surface texture",water.settings._waterSettings.surfaceTexture, typeof(Texture2D), true, GUILayout.ExpandWidth(true));
+                    water.settings._waterSettings.surfaceSprite = (SpriteRenderer)EditorGUILayout.ObjectField("surface sprite", water.settings._waterSettings.surfaceSprite, typeof(SpriteRenderer), true, GUILayout.ExpandWidth(true));
+                    water.settings._waterSettings.surfaceTexture = (Texture2D)EditorGUILayout.ObjectField("surface texture", water.settings._waterSettings.surfaceTexture, typeof(Texture2D), true, GUILayout.ExpandWidth(true));
                     if (c != water.settings._waterSettings.surfaceTexture) water.settings._waterSettings.surfaceSpeed.onValueChanged.Invoke();
 
                     EditorGUILayout.Space(5);
                     water.settings._waterSettings.surfaceTiling.value = EditorGUILayout.Vector2Field("tiling", water.settings._waterSettings.surfaceTiling.value, GUILayout.ExpandWidth(true));
                     water.settings._waterSettings.surfaceSpeed.value = EditorGUILayout.Vector2Field("speed", water.settings._waterSettings.surfaceSpeed.value, GUILayout.ExpandWidth(true));
-                    water.settings._waterSettings.surfaceAlpha.value = EditorGUILayout.Slider("alpha", water.settings._waterSettings.surfaceAlpha.value,0f,1f, GUILayout.ExpandWidth(true));
-                    water.settings._waterSettings.useFoamSpeed.value = EditorGUILayout.Toggle("use foam speed as surface speed", water.settings._waterSettings.useFoamSpeed.value , GUILayout.ExpandWidth(true));
+                    water.settings._waterSettings.surfaceAlpha.value = EditorGUILayout.Slider("alpha", water.settings._waterSettings.surfaceAlpha.value, 0f, 1f, GUILayout.ExpandWidth(true));
+                    water.settings._waterSettings.useFoamSpeed.value = EditorGUILayout.Toggle("use foam speed as surface speed", water.settings._waterSettings.useFoamSpeed.value, GUILayout.ExpandWidth(true));
 
                     EndVB();
                 }
             }
-
         }
 
         private void reflectionsSettings()
         {
-
             StartVB(sector1); water.enableReflections.value = GUILayout.Toggle(water.enableReflections.value, "enable"); EndVB();
             StartVB(sector2); water.settings._reflectionsSettings.enableTopDownReflections.value = GUILayout.Toggle(water.settings._reflectionsSettings.enableTopDownReflections.value, "enable top down reflections"); EndVB();
             StartVB(sector3); water.settings._reflectionsSettings.enablePlatformerReflections.value = GUILayout.Toggle(water.settings._reflectionsSettings.enablePlatformerReflections.value, "enable platformer reflections"); EndVB();
@@ -327,13 +321,11 @@ namespace Water2D
                 EndVB();
             }
 
-
             if (water.settings._reflectionsSettings.enablePlatformerReflections.value)
             {
                 StartVB(sector3);
                 water.settings._reflectionsSettings.customReflectionStart.value = EditorGUILayout.Toggle("custom reflections starting point", water.settings._reflectionsSettings.customReflectionStart.value, GUILayout.ExpandWidth(true));
                 if (water.settings._reflectionsSettings.customReflectionStart.value) water.settings._reflectionsSettings.mirrorY.value = EditorGUILayout.Slider("reflections starting point", water.settings._reflectionsSettings.mirrorY.value, 0f, 5f, GUILayout.ExpandWidth(true));
-
 
                 EditorGUILayout.Space(5);
 
@@ -375,20 +367,18 @@ namespace Water2D
                 EndVB();
             }
 
-
-
             if (water.settings._reflectionsSettings.enableRaymarchedReflections.value)
             {
                 StartVB(sector4);
                 water.raymarchUnits = EditorGUILayout.FloatField("raymarch units", water.raymarchUnits);
                 float worldH = Screen.height;
-                float partOfW = (float)(water.raymarchUnits) /(water.cameraOverride ? water.cameraOverride.orthographicSize*2f : Camera.main.orthographicSize*2f );
-                int pixels = (int)Mathf.Min(worldH*partOfW, 256f);
+                float partOfW = (float)(water.raymarchUnits) / (water.cameraOverride ? water.cameraOverride.orthographicSize * 2f : Camera.main.orthographicSize * 2f);
+                int pixels = (int)Mathf.Min(worldH * partOfW, 256f);
 
                 water.settings._reflectionsSettings.raymarchSteps.value = pixels;
                 water.settings._reflectionsSettings.raymarchFalloffStart.value = EditorGUILayout.Slider("falloff start", water.settings._reflectionsSettings.raymarchFalloffStart.value, 0f, 1f);
                 water.settings._reflectionsSettings.raymarchFalloffEnd.value = EditorGUILayout.Slider("falloff end", water.settings._reflectionsSettings.raymarchFalloffEnd.value, water.settings._reflectionsSettings.raymarchFalloffStart.value, 1f);
-              
+
                 var list = water.settings._reflectionsSettings.raymarchlayers;
                 int newCount = Mathf.Max(0, EditorGUILayout.IntField("layers to render size", list.Count));
                 while (newCount < list.Count)
@@ -407,7 +397,7 @@ namespace Water2D
             }
         }
 
-        private void blursSettings() 
+        private void blursSettings()
         {
             StartVB(sector1);
 
@@ -416,34 +406,35 @@ namespace Water2D
             var b1 = water.settings._blurSettings.useBlur.value;
             water.settings._blurSettings.useBlur.value = EditorGUILayout.Toggle("enable", water.settings._blurSettings.useBlur.value);
 
-
             if (b1 != water.settings._blurSettings.useBlur.value) lightingWhenBlur = !water.settings._waterSettings._useLighting.value;
 
-            if (water.settings._blurSettings.useFalloff.value = EditorGUILayout.Toggle("enable falloff",water.settings._blurSettings.useFalloff.value))
+            if (water.settings._blurSettings.useFalloff.value = EditorGUILayout.Toggle("enable falloff", water.settings._blurSettings.useFalloff.value))
             {
                 water.settings._blurSettings.falloffStart.value = EditorGUILayout.Slider("blur falloff start", water.settings._blurSettings.falloffStart.value, 0f, 1f);
                 water.settings._blurSettings.falloffEnd.value = EditorGUILayout.Slider("blur falloff end", water.settings._blurSettings.falloffEnd.value, Mathf.Min(0f, water.settings._blurSettings.falloffStart.value), 1f);
-                water.settings._blurSettings.falloffStrength.value = EditorGUILayout.Slider("blur falloff strength", water.settings._blurSettings.falloffStrength.value, 0f,3f);
+                water.settings._blurSettings.falloffStrength.value = EditorGUILayout.Slider("blur falloff strength", water.settings._blurSettings.falloffStrength.value, 0f, 3f);
             }
 
             BlurSettings.BlurType old = water.settings._blurSettings.blurType;
-            water.settings._blurSettings.blurType = (BlurSettings.BlurType)EditorGUILayout.EnumPopup("type of blur",water.settings._blurSettings.blurType);
+            water.settings._blurSettings.blurType = (BlurSettings.BlurType)EditorGUILayout.EnumPopup("type of blur", water.settings._blurSettings.blurType);
             if (old != water.settings._blurSettings.blurType) water.OnBlurMaterialChanged();
 
             switch (water.settings._blurSettings.blurType)
             {
                 case BlurSettings.BlurType.box:
-                    water.settings._blurSettings.boxSamplingRange.value = EditorGUILayout.IntSlider("sampling area" , water.settings._blurSettings.boxSamplingRange.value, 1, 32);
-                    water.settings._blurSettings.boxStrength.value = EditorGUILayout.Slider("strength", water.settings._blurSettings.boxStrength.value,0f,1f);
+                    water.settings._blurSettings.boxSamplingRange.value = EditorGUILayout.IntSlider("sampling area", water.settings._blurSettings.boxSamplingRange.value, 1, 32);
+                    water.settings._blurSettings.boxStrength.value = EditorGUILayout.Slider("strength", water.settings._blurSettings.boxStrength.value, 0f, 1f);
 
                     break;
+
                 case BlurSettings.BlurType.gaussian:
                     water.settings._blurSettings.gaussianSamplingRange.value = EditorGUILayout.IntSlider("sampling area", water.settings._blurSettings.gaussianSamplingRange.value, 1, 32);
                     water.settings._blurSettings.gaussianStrengthX.value = EditorGUILayout.FloatField("strength", water.settings._blurSettings.gaussianStrengthX.value);
 
                     break;
+
                 case BlurSettings.BlurType.bokeh:
-                    water.settings._blurSettings.bokehArea.value = EditorGUILayout.Slider("sampling area", water.settings._blurSettings.bokehArea.value,0f,0.01f);
+                    water.settings._blurSettings.bokehArea.value = EditorGUILayout.Slider("sampling area", water.settings._blurSettings.bokehArea.value, 0f, 0.01f);
                     water.settings._blurSettings.bokehQuality.value = EditorGUILayout.IntSlider("sampling quality", water.settings._blurSettings.bokehQuality.value, 1, 32);
 
                     water.settings._blurSettings.bokehGamma.value = EditorGUILayout.Slider("gamma", water.settings._blurSettings.bokehGamma.value, 1f, 32f);
@@ -458,7 +449,7 @@ namespace Water2D
         private void obstructionSettings()
         {
             StartVB(sector1);
-            water.enableObstruction.value = GUILayout.Toggle(water.enableObstruction.value,"enable");
+            water.enableObstruction.value = GUILayout.Toggle(water.enableObstruction.value, "enable");
             water.settings._obstructorSettings.textureResolution.value = EditorGUILayout.Slider("resolution", water.settings._obstructorSettings.textureResolution.value, 0f, 1f, GUILayout.ExpandWidth(true));
 
             water.settings._waterSettings.obstructionAlpha.value = EditorGUILayout.Slider("alpha", water.settings._waterSettings.obstructionAlpha.value, 0f, 1f, GUILayout.ExpandWidth(true));
@@ -481,7 +472,6 @@ namespace Water2D
             {
                 WaterSimulationAdvanced wsim = water.waterSimulation as WaterSimulationAdvanced;
             }
-
 
             EditorGUILayout.Space(10);
 
@@ -524,11 +514,11 @@ namespace Water2D
             EditorGUILayout.Space(10);
 
             water.settings._simulationSettings.waveHeight.value = EditorGUILayout.FloatField("wave height", water.settings._simulationSettings.waveHeight.value, GUILayout.ExpandWidth(true));
-            water.settings._simulationSettings.dispersion.value = EditorGUILayout.Slider("water dispersion", water.settings._simulationSettings.dispersion.value,0.75f,1f, GUILayout.ExpandWidth(true));
+            water.settings._simulationSettings.dispersion.value = EditorGUILayout.Slider("water dispersion", water.settings._simulationSettings.dispersion.value, 0.75f, 1f, GUILayout.ExpandWidth(true));
 
             EditorGUILayout.Space(5);
             EditorGUILayout.LabelField("iterations will increase the cost of simulation linearly, 3 recommended");
-            water.settings._simulationSettings.iterations.value = EditorGUILayout.IntSlider("iterations", water.settings._simulationSettings.iterations.value, 1,16, GUILayout.ExpandWidth(true));
+            water.settings._simulationSettings.iterations.value = EditorGUILayout.IntSlider("iterations", water.settings._simulationSettings.iterations.value, 1, 16, GUILayout.ExpandWidth(true));
 
             EditorGUILayout.Space(5);
             water.settings._simulationSettings.enableRain.value = EditorGUILayout.Toggle("enable rain effect", water.settings._simulationSettings.enableRain.value);
@@ -537,15 +527,13 @@ namespace Water2D
                 water.settings._simulationSettings.rainSpeed.value = EditorGUILayout.FloatField("rain speed", water.settings._simulationSettings.rainSpeed.value);
                 water.settings._simulationSettings.rainWaveHeight.value = EditorGUILayout.FloatField("rain strength", water.settings._simulationSettings.rainWaveHeight.value);
 
-                water.settings._simulationSettings.rainSizeX.value = EditorGUILayout.IntSlider("rain size X", water.settings._simulationSettings.rainSizeX.value,1,4);
-                water.settings._simulationSettings.rainSizeY.value = EditorGUILayout.IntSlider("rain size Y", water.settings._simulationSettings.rainSizeY.value,1,4);
-
+                water.settings._simulationSettings.rainSizeX.value = EditorGUILayout.IntSlider("rain size X", water.settings._simulationSettings.rainSizeX.value, 1, 4);
+                water.settings._simulationSettings.rainSizeY.value = EditorGUILayout.IntSlider("rain size Y", water.settings._simulationSettings.rainSizeY.value, 1, 4);
             }
             EndVB();
-
         }
 
-        private void surfaceWavesSettings() 
+        private void surfaceWavesSettings()
         {
             StartVB(sector1);
 
@@ -562,12 +550,12 @@ namespace Water2D
             water.settings._wavesSettings.splashForceMax.value = EditorGUILayout.FloatField("max kinetic force needed to splash", water.settings._wavesSettings.splashForceMax.value);
             water.settings._wavesSettings.splashVelMin.value = EditorGUILayout.FloatField("min velocity of splash waves", water.settings._wavesSettings.splashVelMin.value);
             water.settings._wavesSettings.splashVelMax.value = EditorGUILayout.FloatField("max velocity of splash waves", water.settings._wavesSettings.splashVelMax.value);
-            water.settings._wavesSettings.splashNodesWidthMin.value = EditorGUILayout.IntSlider("min width of created splash", water.settings._wavesSettings.splashNodesWidthMin.value,1, water.settings._wavesSettings.wavePoints.value/4);
-            water.settings._wavesSettings.splashNodesWidthMax.value = EditorGUILayout.IntSlider("max width of created splash", water.settings._wavesSettings.splashNodesWidthMax.value, water.settings._wavesSettings.splashNodesWidthMin.value, water.settings._wavesSettings.wavePoints.value/4);
+            water.settings._wavesSettings.splashNodesWidthMin.value = EditorGUILayout.IntSlider("min width of created splash", water.settings._wavesSettings.splashNodesWidthMin.value, 1, water.settings._wavesSettings.wavePoints.value / 4);
+            water.settings._wavesSettings.splashNodesWidthMax.value = EditorGUILayout.IntSlider("max width of created splash", water.settings._wavesSettings.splashNodesWidthMax.value, water.settings._wavesSettings.splashNodesWidthMin.value, water.settings._wavesSettings.wavePoints.value / 4);
             EditorGUILayout.Space(10);
-            water.settings._wavesSettings.edgeColor.value = EditorGUILayout.ColorField("edge color",water.settings._wavesSettings.edgeColor.value);
-            water.settings._wavesSettings.edgeColoringSize.value = EditorGUILayout.Slider("edge size",water.settings._wavesSettings.edgeColoringSize.value,0f,0.3f);
-            water.settings._wavesSettings.edgeIgnoreTransparency.value = EditorGUILayout.Toggle("edge ignore transparency",water.settings._wavesSettings.edgeIgnoreTransparency.value);
+            water.settings._wavesSettings.edgeColor.value = EditorGUILayout.ColorField("edge color", water.settings._wavesSettings.edgeColor.value);
+            water.settings._wavesSettings.edgeColoringSize.value = EditorGUILayout.Slider("edge size", water.settings._wavesSettings.edgeColoringSize.value, 0f, 0.3f);
+            water.settings._wavesSettings.edgeIgnoreTransparency.value = EditorGUILayout.Toggle("edge ignore transparency", water.settings._wavesSettings.edgeIgnoreTransparency.value);
             EditorGUILayout.Space(10);
             water.settings._wavesSettings.automaticWaves.value = EditorGUILayout.Toggle("auto waves", water.settings._wavesSettings.automaticWaves.value);
             water.settings._wavesSettings.waveDensity.value = EditorGUILayout.FloatField("auto speed", water.settings._wavesSettings.waveDensity.value);
@@ -576,7 +564,6 @@ namespace Water2D
             water.settings._wavesSettings.enableBuoyancy.value = EditorGUILayout.Toggle("enable rigidbody buoyancy", water.settings._wavesSettings.enableBuoyancy.value);
             water.settings._wavesSettings.enableRigidbodyCollisions.value = EditorGUILayout.Toggle("enable rigidbody collisions", water.settings._wavesSettings.enableRigidbodyCollisions.value);
             EditorGUILayout.Space(10);
-
 
             EndVB();
         }
@@ -589,10 +576,9 @@ namespace Water2D
             EditorGUILayout.LabelField("Example is in the: 'wet surface' demo scene");
 
             water.settings._waterSettings.enableBelowWater.value = EditorGUILayout.Toggle("enable", water.settings._waterSettings.enableBelowWater.value);
-            
 
-            water.settings._waterSettings.belowWaterAlpha.value = EditorGUILayout.Slider("alpha (surface below water)", water.settings._waterSettings.belowWaterAlpha.value,0f,1f);
-            water.settings._waterSettings.belowWaterDistortionStrength.value = EditorGUILayout.Slider("simulation/distortion strength", water.settings._waterSettings.belowWaterDistortionStrength.value,0f,1f);
+            water.settings._waterSettings.belowWaterAlpha.value = EditorGUILayout.Slider("alpha (surface below water)", water.settings._waterSettings.belowWaterAlpha.value, 0f, 1f);
+            water.settings._waterSettings.belowWaterDistortionStrength.value = EditorGUILayout.Slider("simulation/distortion strength", water.settings._waterSettings.belowWaterDistortionStrength.value, 0f, 1f);
 
             EndVB();
         }
@@ -600,8 +586,8 @@ namespace Water2D
         private void editorSettings()
         {
             StartVB(sector1);
-            water.ManagersVisible.value = EditorGUILayout.Toggle("Managers Visible" , water.ManagersVisible.value);
-            if (water.ManagersVisible.value) 
+            water.ManagersVisible.value = EditorGUILayout.Toggle("Managers Visible", water.ManagersVisible.value);
+            if (water.ManagersVisible.value)
             {
                 water.settings._reflectionsSettings.cameraVisible.value = EditorGUILayout.Toggle("reflection camera visible", water.settings._reflectionsSettings.cameraVisible.value);
                 water.settings._obstructorSettings.cameraVisible.value = EditorGUILayout.Toggle("obstruction camera visible", water.settings._obstructorSettings.cameraVisible.value);
@@ -612,15 +598,14 @@ namespace Water2D
             EndVB();
         }
 
-        GameObject set;
-
+        private GameObject set;
 
         private void utilsSettings()
         {
             StartVB(sector1);
 
             set = (GameObject)EditorGUILayout.ObjectField(set, typeof(GameObject), true);
-            if(GUILayout.Button("copy settings"))
+            if (GUILayout.Button("copy settings"))
             {
                 if (set.GetComponent<ModernWater2D>() != null)
                 {
@@ -628,12 +613,10 @@ namespace Water2D
                     Debug.Log("water settings copied");
                 }
                 else Debug.LogError("couldn't load settings, " + set.name + "doesn't have ModernWater2D component");
-                
             }
             EndVB();
         }
 
-        #endregion
+        #endregion OnInspectorGUI
     }
-
 }

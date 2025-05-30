@@ -18,7 +18,7 @@ public class YingYangFish_AI : IEnemyController
         nameof(idleRotateSpeed), nameof(sprintRotateSpeed), nameof(waterSpearPos_black1),
         nameof(waterSpearPos_black2), nameof(waterSpearPos_white1), nameof(waterSpearPos_white2), nameof(Dir),
         nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter), nameof(waterLevel),
-        nameof(EventInteract), nameof(endCanvas))]
+        nameof(EventInteract), nameof(endCanvas), nameof(black_particle), nameof(white_particle))]
     public Void void2;
 
     [SerializeField, HideInInspector] public Transform YingYangFish;
@@ -45,6 +45,11 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector, MinMaxSlider(1f, 3f)] public Vector2 minMaxDistanceTocenter;
     [SerializeField, HideInInspector] public Transform waterLevel;
     [SerializeField, HideInInspector] public GameObject EventInteract;
+
+    [SerializeField, HideInInspector] public GameObject black_particle;
+    [SerializeField, HideInInspector] public GameObject white_particle;
+    [SerializeField, HideInInspector] public Sprite black_tex;
+    [SerializeField, HideInInspector] public Sprite white_tex;
 
     [HideInInspector] public SpriteRenderer blackSprite;
     [HideInInspector] public SpriteRenderer whiteSprite;
@@ -115,8 +120,8 @@ public class YingYangFish_AI : IEnemyController
     public override void Start()
     {
         base.Start();
-        blackSprite = blackFish.GetComponent<SpriteRenderer>();
-        whiteSprite = whiteFish.GetComponent<SpriteRenderer>();
+        blackSprite = blackFishGFX.GetComponent<SpriteRenderer>();
+        whiteSprite = whiteFishGFX.GetComponent<SpriteRenderer>();
         blackAnim = blackFishGFX.GetComponent<Animator>();
         whiteAnim = whiteFishGFX.GetComponent<Animator>();
         centerAnim = center.GetComponent<Animator>();
@@ -379,10 +384,10 @@ public class YingYangFish_AI : IEnemyController
             whiteAnim.Play("close_swim");
             blackAnim.Play("close_swim");
 
-            yield return StartCoroutine(ChangeYPos(-6));
-            transform.DOMove(new Vector3(GetCenterXOfMap(), waterLevel.position.y - 6, 0), 1.8f);
-            yield return new WaitForSeconds(1.8f);
-            yield return StartCoroutine(ChangeYPos(2));
+            //yield return StartCoroutine(ChangeYPos(-6));
+            //transform.DOMove(new Vector3(GetCenterXOfMap(), waterLevel.position.y - 6, 0), 1.8f);
+            //yield return new WaitForSeconds(1.8f);
+            //yield return StartCoroutine(ChangeYPos(2));
 
             centerAnim.Play("center_break");
             SoundManager.PlaySound("glass_break");
@@ -411,7 +416,7 @@ public class YingYangFish_AI : IEnemyController
         centerAnim.Play("center_fade");
 
         StartCoroutine(EmojiDuringCircling());
-        yield return StartCoroutine(Circling(3.5f));
+        //yield return StartCoroutine(Circling(3.5f));
 
         StartCoroutine(Ultimate());
 
@@ -421,32 +426,32 @@ public class YingYangFish_AI : IEnemyController
     public IEnumerator Ultimate()
     {
         //swing qte
-        yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(1));
-        yield return dive.act_routine = StartCoroutine(dive.Act_coroutine(1));
+        //yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(1));
+        //yield return dive.act_routine = StartCoroutine(dive.Act_coroutine(1));
 
         yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
         SetNormalRotateSpeed();
 
         // splash four times
-        yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
-        yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
-        yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
-        yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
+        //yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
+        //yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
+        //yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
+        //yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
 
-        //water spear ultimate
-        yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
-        StartCoroutine(IE_SwimAway(waterSpearPos_black1.position, 10, true));
-        StartCoroutine(IE_SwimAway(waterSpearPos_white1.position, 10, false));
-        while (!blackPositioned || !whitePositioned) { yield return null; }
-        yield return StartCoroutine(SprintSamePos());
-        StartCoroutine(waterSpear.Act_coroutine(1));
-        StartCoroutine(waterSpear.Act_coroutine(2));
-        while (!finishedWaterSpearUltimate) { yield return null; }
+        ////water spear ultimate
+        //yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
+        //StartCoroutine(IE_SwimAway(waterSpearPos_black1.position, 10, true));
+        //StartCoroutine(IE_SwimAway(waterSpearPos_white1.position, 10, false));
+        //while (!blackPositioned || !whitePositioned) { yield return null; }
+        //yield return StartCoroutine(SprintSamePos());
+        //StartCoroutine(waterSpear.Act_coroutine(1));
+        //StartCoroutine(waterSpear.Act_coroutine(2));
+        //while (!finishedWaterSpearUltimate) { yield return null; }
 
         //swing ultimate
-        movingTarget = player;
-        yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
-        yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(2));
+        //movingTarget = player;
+        //yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
+        //yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(2));
         movingTarget = GetBoundaryFarOfPlayer();
         yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
         yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
@@ -499,7 +504,24 @@ public class YingYangFish_AI : IEnemyController
         playerController.EnableGravity(true);
         slash_effect.transform.position = new Vector3(transform.position.x, waterLevel.position.y, 0f);
         slash_effect.SetActive(true);
-        yield return new WaitForSeconds(1f);
+        SetWhiteTargetRotateSpeed(0);
+        SetBlackTargetRotateSpeed(0);
+        blackAnim.speed = 0; whiteAnim.speed = 0;
+        blackSprite.sprite = black_tex; whiteSprite.sprite = white_tex;
+        VFXManager.instance.SlowTimeForSeconds(0.5f, 0);
+        yield return new WaitForSeconds(0.1f);
+        CancelAllAction();
+        //whiteAnim.SetTrigger("circling_end"); blackAnim.SetTrigger("circling_end");
+
+        ultimateWave.GetComponent<Animator>().SetTrigger("end");
+
+        blackSprite.enabled = false;
+        whiteSprite.enabled = false;
+
+        black_particle.SetActive(true); white_particle.SetActive(true);
+        yield return new WaitForSeconds(5f);
+        black_particle.SetActive(false); white_particle.SetActive(false);
+
         slash_effect.SetActive(false);
 
         yield return new WaitForSeconds(3f);
@@ -540,6 +562,27 @@ public class YingYangFish_AI : IEnemyController
             blackAnim.GetCurrentAnimatorStateInfo(0).IsName("black_circling_down_end"))
         { yield return null; }
         yield return null;
+    }
+
+    private IEnumerator Dissolve()
+    {
+        float elapsedTime = 0f;
+        float dissolveTime = 1.5f;
+
+        black_particle.SetActive(true);
+        white_particle.SetActive(true);
+        while (elapsedTime < dissolveTime)
+        {
+            elapsedTime += Time.deltaTime;
+            float lerpedDissolve = Mathf.Lerp(0, 1f, (elapsedTime / dissolveTime));
+            blackFishGFX.GetComponent<SpriteRenderer>().material.SetFloat(Shader.PropertyToID("_DissolveAmount"), lerpedDissolve);
+            whiteFishGFX.GetComponent<SpriteRenderer>().material.SetFloat(Shader.PropertyToID("_DissolveAmount"), lerpedDissolve);
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(2f);
+        black_particle.SetActive(false);
+        white_particle.SetActive(false);
     }
 
     private IEnumerator EmojiDuringCircling()
