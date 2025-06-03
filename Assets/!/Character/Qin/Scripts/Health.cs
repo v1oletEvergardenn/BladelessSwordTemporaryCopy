@@ -106,16 +106,16 @@ public class Health : IDamagable
         {
             if (sender != null)
             {
-                float x_sender = sender.transform.position.x;
-                float x_player = transform.position.x;
-
-                //if facing towards the damage source
-                if ((x_sender > x_player && controller.FacingRight) || (x_sender < x_player && !controller.FacingRight))
+                if (sender.TryGetComponent<IProjectile>(out IProjectile proj))
                 {
-                    int i = Random.Range(1, 3);
-                    SoundManager.PlaySound("defend_block" + i);
-                    anim.Play("defend_hit");
-                    return 1;
+                    if ((proj.transform.right.x < 0 && controller.FacingRight) ||
+                        (proj.transform.right.x > 0 && !controller.FacingRight))
+                    {
+                        int i = Random.Range(1, 3);
+                        SoundManager.PlaySound("defend_block" + i);
+                        anim.Play("defend_hit");
+                        return 1;
+                    }
                 }
             }
 

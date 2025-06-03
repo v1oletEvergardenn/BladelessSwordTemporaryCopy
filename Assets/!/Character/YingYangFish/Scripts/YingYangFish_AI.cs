@@ -504,20 +504,23 @@ public class YingYangFish_AI : IEnemyController
         playerController.EnableGravity(true);
         slash_effect.transform.position = new Vector3(transform.position.x, waterLevel.position.y, 0f);
         slash_effect.SetActive(true);
-        SetWhiteTargetRotateSpeed(0);
-        SetBlackTargetRotateSpeed(0);
-        blackAnim.speed = 0; whiteAnim.speed = 0;
+
+        blackAnim.speed = 0;
+        whiteAnim.speed = 0;
         blackSprite.sprite = black_tex; whiteSprite.sprite = white_tex;
         VFXManager.instance.SlowTimeForSeconds(0.5f, 0);
         yield return new WaitForSeconds(0.1f);
         CancelAllAction();
+        SetWhiteTargetRotateSpeed(0); white_rotateSpeed = 0;
+        SetBlackTargetRotateSpeed(0); black_rotateSpeed = 0;
+
         //whiteAnim.SetTrigger("circling_end"); blackAnim.SetTrigger("circling_end");
 
         ultimateWave.GetComponent<Animator>().SetTrigger("end");
 
+        yield return new WaitForSeconds(3f);
         blackSprite.enabled = false;
         whiteSprite.enabled = false;
-
         black_particle.SetActive(true); white_particle.SetActive(true);
         yield return new WaitForSeconds(5f);
         black_particle.SetActive(false); white_particle.SetActive(false);
