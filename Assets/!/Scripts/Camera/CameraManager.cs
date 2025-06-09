@@ -47,6 +47,7 @@ public class CameraManager : MonoBehaviour
     {
         if (mainCam == null) { mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>(); }
         if (mainCam == null) { return; }
+
         if (mainCam.GetComponent<PixelPerfectCamera>().enabled != desiredPixelPerfectCamState)
         {
             if (mainCam.orthographicSize <= desiredOrthographicSizeThreshold.x || mainCam.orthographicSize >= desiredOrthographicSizeThreshold.y)

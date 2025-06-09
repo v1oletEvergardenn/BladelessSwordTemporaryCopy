@@ -7,6 +7,7 @@ namespace Water2D
     public class WaterSimulationAdvanced : WaterSimulation
     {
         private Material _waveShader;
+
         private Material waveShader
         {
             get { if (_waveShader == null) _waveShader = new Material(Shader.Find("Water2D/Simulations/process")); return _waveShader; }
@@ -14,6 +15,7 @@ namespace Water2D
         }
 
         private Material _offsetShader;
+
         private Material offsetShader
         {
             get { if (_offsetShader == null) _offsetShader = new Material(Shader.Find("Water2D/Simulations/offset")); return _offsetShader; }
@@ -40,10 +42,11 @@ namespace Water2D
 
         private Vector2 lastPos = Vector2.zero;
 
-        const float marginMlp = 1.5f; //min 1.0, max 2.0
+        private const float marginMlp = 1.5f; //min 1.0, max 2.0
 
-        [SerializeField][HideInInspector] Camera _mainCam;
-        Camera mainCam
+        [SerializeField][HideInInspector] private Camera _mainCam;
+
+        private Camera mainCam
         {
             set { _mainCam = value; }
             get { if (_mainCam == null) _mainCam = ObstructorManager.instance.cam; return _mainCam; }
@@ -51,7 +54,7 @@ namespace Water2D
 
         public void Setup(Camera mainCam, float simSpeed, Vector2Int resolution, SpriteRenderer sr, RenderTexture obstruction, float rainSpeed = 1, int rainSizeX = 1, int rainSizeY = 1, float rainWaveH = 1, float waveRad = 0.005f, float waveHeight = 1f, float dispersion = 0.98f, int iterations = 3, bool enableRain = false)
         {
-            this.resolution = new Vector2Int( (int)(marginMlp * resolution.x),  (int)(marginMlp * resolution.x * (1f / (sr.bounds.size.x / sr.bounds.size.y))));
+            this.resolution = new Vector2Int((int)(marginMlp * resolution.x), (int)(marginMlp * resolution.x * (1f / (sr.bounds.size.x / sr.bounds.size.y))));
             this.mainCam = mainCam;
             this.sr = sr;
             this.ObstructionTex = obstruction;
@@ -68,39 +71,37 @@ namespace Water2D
             Init();
         }
 
-
-
         public override RenderTexture GetRT()
         {
             return CurrentState;
         }
 
-        void InitTex(out RenderTexture rt)
+        private void InitTex(out RenderTexture rt)
         {
             if (resolution.x == 0 || resolution.y == 0) resolution = new Vector2Int(1024, (int)(1f / (sr.bounds.size.x / sr.bounds.size.y) * 1024f));
-            rt = new RenderTexture( resolution.x,  resolution.y, 1, RenderTextureFormat.RGHalf);
+            rt = new RenderTexture(resolution.x, resolution.y, 1, RenderTextureFormat.RGHalf);
             rt.enableRandomWrite = false;
             rt.depth = 24;
             rt.filterMode = FilterMode.Bilinear;
             rt.Create();
         }
 
-        void Init()
+        private void Init()
         {
             if (CurrentState != null) CurrentState.Release();
             if (CurrentState != null) CurrentState.Release();
 
             InitTex(out CurrentState);
-            InitTex(out Temporary); 
+            InitTex(out Temporary);
         }
 
-        void CreateIfNull()
+        private void CreateIfNull()
         {
             if (CurrentState == null) InitTex(out CurrentState);
             if (Temporary == null) InitTex(out Temporary);
         }
 
-        Vector4 GetObstructionPositions()
+        private Vector4 GetObstructionPositions()
         {
             Camera cam = GetCameraRenderingScreen();
             if (cam != ObstructorManager.instance.cam) cam = ObstructorManager.instance.cam;
@@ -112,15 +113,12 @@ namespace Water2D
             }
             else
             {
-
                 v1 = mainCam.ViewportToWorldPoint(new Vector3(0f, 0f, 0f));
                 v2 = mainCam.ViewportToWorldPoint(new Vector3(1f, 1f, 0f));
-
             }
 
             return new Vector4(v1.x, v1.y, v2.x, v2.y);
         }
-
 
         private Camera GetCameraRenderingScreen()
         {
@@ -128,46 +126,47 @@ namespace Water2D
             return mainCam;
         }
 
-        Vector4 GetSimulatedTexturePositions()
+        private Vector4 GetSimulatedTexturePositions()
         {
-            Vector2 v1 = GetCameraRenderingScreen().ViewportToWorldPoint(new Vector3(- (marginMlp-1f)/2, -(marginMlp - 1f) / 2, -10f));
-            Vector2 v2 = GetCameraRenderingScreen().ViewportToWorldPoint(new Vector3(1f + (marginMlp-1f) / 2, 1f + (marginMlp - 1f) / 2, -10f));
+            Vector2 v1 = GetCameraRenderingScreen().ViewportToWorldPoint(new Vector3(-(marginMlp - 1f) / 2, -(marginMlp - 1f) / 2, -10f));
+            Vector2 v2 = GetCameraRenderingScreen().ViewportToWorldPoint(new Vector3(1f + (marginMlp - 1f) / 2, 1f + (marginMlp - 1f) / 2, -10f));
             return new Vector4(v1.x, v1.y, v2.x, v2.y);
         }
 
-        Vector4 GetCameraPositions()
+        private Vector4 GetCameraPositions()
         {
             Vector2 v1 = GetCameraRenderingScreen().ViewportToWorldPoint(new Vector3(0f, 0f, -10f));
             Vector2 v2 = GetCameraRenderingScreen().ViewportToWorldPoint(new Vector3(1f, 1f, -10f));
             return new Vector4(v1.x, v1.y, v2.x, v2.y);
         }
 
-        Vector4 GetFullTexturePositions()
+        private Vector4 GetFullTexturePositions()
         {
             Vector2 v1 = sr.bounds.min;
             Vector2 v2 = sr.bounds.max;
             return new Vector4(v1.x, v1.y, v2.x, v2.y);
         }
 
-
-        void Render()
+        private void Render()
         {
             //blit here
             RenderUtils.RenderToRT2D(waveShader, Temporary);
             Graphics.CopyTexture(Temporary, CurrentState);
         }
 
-        void RenderOffset() 
+        private void RenderOffset()
         {
             Vector2 d = (Vector2)CalculateDeltaUV();
             offsetShader.SetTexture("_tex", CurrentState);
             offsetShader.SetVector("delta", d);
+
             RenderUtils.RenderToRT2D(offsetShader, Temporary);
+
             Graphics.CopyTexture(Temporary, CurrentState);
         }
 
-        Vector4 TexturePos = Vector4.zero;
-        Vector4 lastTexturePos = Vector4.zero;
+        private Vector4 TexturePos = Vector4.zero;
+        private Vector4 lastTexturePos = Vector4.zero;
 
         public override void UpdLoop()
         {
@@ -209,7 +208,7 @@ namespace Water2D
             waveShader.SetFloat("timeFromStart", Time.timeSinceLevelLoad);
 
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-           
+
             sr.GetPropertyBlock(propBlock);
             var cS = GetSimulatedTexturePositions();
             var cF = GetFullTexturePositions();
@@ -226,7 +225,7 @@ namespace Water2D
             Profiler.EndSample();
         }
 
-        private Vector2 CalculateDeltaUV() 
+        private Vector2 CalculateDeltaUV()
         {
             Vector2 wd = (Vector2)mainCam.transform.position - lastPos;
             Vector4 camPos = GetSimulatedTexturePositions();
@@ -246,6 +245,5 @@ namespace Water2D
         {
             Setup(value);
         }
-
     }
 }
