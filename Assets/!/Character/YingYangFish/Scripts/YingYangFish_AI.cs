@@ -8,49 +8,22 @@ using DG.Tweening;
 using System;
 using Void = EditorAttributes.Void;
 using Random = UnityEngine.Random;
+using static UnityEngine.UI.Image;
+using UnityEngine.UIElements;
 
 public class YingYangFish_AI : IEnemyController
 {
-    #region Inspector Fields
+    #region COROUTINES
 
-    [FoldoutGroup("Attributes", nameof(center), nameof(blackFish), nameof(blackFishGFX),
-        nameof(whiteFish), nameof(whiteFishGFX), nameof(blackOrigin), nameof(whiteOrigin),
-        nameof(idleRotateSpeed), nameof(sprintRotateSpeed), nameof(waterSpearPos_black1),
-        nameof(waterSpearPos_black2), nameof(waterSpearPos_white1), nameof(waterSpearPos_white2), nameof(Dir),
-        nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter), nameof(waterLevel),
-        nameof(EventInteract), nameof(endCanvas), nameof(black_particle), nameof(white_particle))]
-    public Void void2;
+    [HideInInspector] public Coroutine co_sprintStartPoint;
+    [HideInInspector] public Coroutine co_IEcloseSwim;
+    [HideInInspector] public Coroutine co_sprintBackEqual;
+    [HideInInspector] public Coroutine co_sprintToAngle;
+    [HideInInspector] public Coroutine co_singleFishDive;
 
-    [SerializeField, HideInInspector] public Transform YingYangFish;
-    [SerializeField, HideInInspector] public Transform center;
-    [SerializeField, HideInInspector] public Transform blackFish;
-    [SerializeField, HideInInspector] public Transform whiteFish;
-    [SerializeField, HideInInspector] public Transform blackFishGFX;
-    [SerializeField, HideInInspector] public Transform whiteFishGFX;
-    [SerializeField, HideInInspector] public Transform blackOrigin;
-    [SerializeField, HideInInspector] public Transform whiteOrigin;
-    [SerializeField, HideInInspector] public float idleRotateSpeed;
-    [SerializeField, HideInInspector] public float sprintRotateSpeed;
-    [SerializeField, HideInInspector] public Transform waterSpearPos_black1;
-    [SerializeField, HideInInspector] public Transform waterSpearPos_black2;
-    [SerializeField, HideInInspector] public Transform waterSpearPos_white1;
-    [SerializeField, HideInInspector] public Transform waterSpearPos_white2;
-    [SerializeField, HideInInspector] public Transform endCanvas;
-    [HideInInspector] public float black_rotateSpeed;
-    [HideInInspector] public float white_rotateSpeed;
-    private float black_targetRotateSpeed;
-    private float white_targetRotateSpeed;
-    [SerializeField, HideInInspector] public Vector3 Dir;
-    [SerializeField, HideInInspector] public float swimToCenterSpeed = 2f;
-    [SerializeField, HideInInspector, MinMaxSlider(1f, 3f)] public Vector2 minMaxDistanceTocenter;
-    [SerializeField, HideInInspector] public Transform waterLevel;
-    [SerializeField, HideInInspector] public GameObject EventInteract;
+    #endregion COROUTINES
 
-    [SerializeField, HideInInspector] public GameObject black_particle;
-    [SerializeField, HideInInspector] public GameObject white_particle;
-    [SerializeField, HideInInspector] public Sprite black_tex;
-    [SerializeField, HideInInspector] public Sprite white_tex;
-
+    [HideInInspector] public Vector3 Dir;
     [HideInInspector] public SpriteRenderer blackSprite;
     [HideInInspector] public SpriteRenderer whiteSprite;
     [HideInInspector] public Animator blackAnim;
@@ -58,33 +31,104 @@ public class YingYangFish_AI : IEnemyController
     [HideInInspector] public Animator centerAnim;
     [HideInInspector] public bool closerFish_Black;
 
-    [FoldoutGroup("Debug", nameof(white_distanceToCenter),
-        nameof(black_distanceToCenter), nameof(movingTarget), nameof(isCloseSwimming), nameof(secondPhase))]
-    public Void void3;
+    private float white_rotateVelocity;
+    private float black_rotateVelocity;
 
-    [SerializeField, HideInInspector] public float white_distanceToCenter = 0f;
-    [SerializeField, HideInInspector] public float black_distanceToCenter = 0f;
-    [SerializeField, HideInInspector] public Transform movingTarget;
-    [SerializeField, HideInInspector] public bool isCloseSwimming;
-    [SerializeField, HideInInspector] public bool secondPhase;
+    #region FISH REFERENCES
 
-    public List<Transform> ultimate_bullets;
+    [FoldoutGroup("Fish References", nameof(center), nameof(blackFish), nameof(whiteFish),
+        nameof(blackFishGFX), nameof(whiteFishGFX), nameof(blackOrigin), nameof(whiteOrigin))]
+    public Void fishRefsGroup;
+
+    [SerializeField, HideInInspector] public Transform center;
+    [SerializeField, HideInInspector] public Transform blackFish;
+    [SerializeField, HideInInspector] public Transform whiteFish;
+    [SerializeField, HideInInspector] public Transform blackFishGFX;
+    [SerializeField, HideInInspector] public Transform whiteFishGFX;
+    [SerializeField, HideInInspector] public Transform blackOrigin;
+    [SerializeField, HideInInspector] public Transform whiteOrigin;
+
+    #endregion FISH REFERENCES
+
+    #region ROTATION & MOVEMENT
+
+    [FoldoutGroup("Rotation & Movement", nameof(idleRotateSpeed), nameof(sprintRotateSpeed),
+        nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter))]
+    public Void rotationMoveGroup;
+
+    [SerializeField, HideInInspector] public float idleRotateSpeed;
+    [SerializeField, HideInInspector] public float sprintRotateSpeed;
+    [SerializeField, HideInInspector] public float swimToCenterSpeed = 2f;
+    [SerializeField, HideInInspector, MinMaxSlider(1f, 3f)] public Vector2 minMaxDistanceTocenter;
+
+    [HideInInspector] public float white_distanceToCenter = 0f;
+    [HideInInspector] public float black_distanceToCenter = 0f;
+    [HideInInspector] public Transform movingTarget;
+
+    private bool isCloseSwimming;
+    public float black_rotateSpeed;
+    public float white_rotateSpeed;
+    public float black_targetRotateSpeed;
+    public float white_targetRotateSpeed;
+
+    public bool isBlackBusy { get; private set; } = false;
+
+    public bool isWhiteBusy { get; private set; } = false;
+
+    #endregion ROTATION & MOVEMENT
+
+    #region GENERAL REFERENCES
+
+    [FoldoutGroup("General References", nameof(waterLevel), nameof(endCanvas),
+        nameof(EventInteract), nameof(black_particle), nameof(white_particle),
+       nameof(black_tex), nameof(white_tex))]
+    public Void refenereceGroup;
+
+    [SerializeField, HideInInspector] public Transform endCanvas;
+    [SerializeField, HideInInspector] public Transform waterLevel;
+    [SerializeField, HideInInspector] public GameObject EventInteract;
+    [SerializeField, HideInInspector] public GameObject black_particle;
+    [SerializeField, HideInInspector] public GameObject white_particle;
+    [SerializeField, HideInInspector] public Sprite black_tex;
+    [SerializeField, HideInInspector] public Sprite white_tex;
+
+    #endregion GENERAL REFERENCES
+
+    #region ULTIMATE REFERENCES
 
     [FoldoutGroup("Ultimate", nameof(ultimateWave), nameof(slash_effect),
-        nameof(waterDragon1), nameof(waterDragon2),
-        nameof(waterDragon3), nameof(waterDragon4))]
+        nameof(waterDragon1),
+        nameof(waterSpearPos_black1), nameof(waterSpearPos_black2),
+        nameof(waterSpearPos_white1), nameof(waterSpearPos_white2))]
     public Void voidWaterDragon;
 
     [SerializeField, HideInInspector] public GameObject ultimateWave;
     [SerializeField, HideInInspector] public GameObject slash_effect;
     [SerializeField, HideInInspector] public Transform waterDragon1;
-    [SerializeField, HideInInspector] public Transform waterDragon2;
-    [SerializeField, HideInInspector] public Transform waterDragon3;
-    [SerializeField, HideInInspector] public Transform waterDragon4;
+    [SerializeField, HideInInspector] public Transform waterSpearPos_black1;
+    [SerializeField, HideInInspector] public Transform waterSpearPos_black2;
+    [SerializeField, HideInInspector] public Transform waterSpearPos_white1;
+    [SerializeField, HideInInspector] public Transform waterSpearPos_white2;
 
-    #endregion Inspector Fields
+    [HideInInspector] public bool secondPhase;
+    [HideInInspector] public bool blackPositioned = false;
+    [HideInInspector] public bool whitePositioned = false;
+    [HideInInspector] public bool finishedWaterSpearUltimate = false;
+    public List<Transform> ultimate_bullets;
+
+    #endregion ULTIMATE REFERENCES
 
     #region Action Fields
+
+    [FoldoutGroup("Action References", nameof(waterSpear), nameof(swing),
+        nameof(splash_white), nameof(splash_black), nameof(dive))]
+    public Void actionRefsGroup;
+
+    [SerializeField, HideInInspector] public YYF_WaterSpear waterSpear;
+    [SerializeField, HideInInspector] public YYF_Swing swing;
+    [SerializeField, HideInInspector] public YYF_splash_white splash_white;
+    [SerializeField, HideInInspector] public YYF_splash_black splash_black;
+    [SerializeField, HideInInspector] public YYF_Dive dive;
 
     public bool Actions;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("ForceDie", "ForceDie")] public Transform void112;
@@ -95,25 +139,10 @@ public class YingYangFish_AI : IEnemyController
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash_white", "Splash_white")] public Void void9;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash_black", "Splash_black")] public Void void13;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Dive", "Dive")] public Void void10;
-    [ShowField(nameof(Actions))][SerializeField] public YYF_WaterSpear waterSpear;
-    [ShowField(nameof(Actions))][SerializeField] public YYF_Swing swing;
-    [ShowField(nameof(Actions))][SerializeField] public YYF_splash_white splash_white;
-    [ShowField(nameof(Actions))][SerializeField] public YYF_splash_black splash_black;
-    [ShowField(nameof(Actions))][SerializeField] public YYF_Dive dive;
-
-    [HideInInspector] public Coroutine co_sprintStartPoint;
-    [HideInInspector] public Coroutine co_IEcloseSwim;
-    [HideInInspector] public Coroutine co_sprintBackEqual;
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("SingleSwing_white", "SingleSwing_white")] public Void voidSingleswing_b;
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("SingleSwing_black", "SingleSwing_black")] public Void voidSingleswing_w;
 
     #endregion Action Fields
-
-    #region State Fields
-
-    [HideInInspector] public bool blackPositioned = false;
-    [HideInInspector] public bool whitePositioned = false;
-    [HideInInspector] public bool finishedWaterSpearUltimate = false;
-
-    #endregion State Fields
 
     #region Unity Lifecycle
 
@@ -134,9 +163,6 @@ public class YingYangFish_AI : IEnemyController
         black_rotateSpeed = idleRotateSpeed;
         SetBlackTargetRotateSpeed(idleRotateSpeed);
     }
-
-    private float white_rotateVelocity;
-    private float black_rotateVelocity;
 
     private void Update()
     {
@@ -164,31 +190,42 @@ public class YingYangFish_AI : IEnemyController
 
     #region Main AI Coroutines
 
-    public IEnumerator SprintStartPoint(string fish = "null")
+    /// <summary>
+    /// check closest fish and rotate it to the start point.
+    /// </summary>
+    /// <param name="assignedFish"> designate a specific fish to swim to start point</param>
+    /// <returns></returns>
+    public IEnumerator IESprintStartPoint(string assignedFish = "null")
     {
         Transform closerFish = CheckCloserFish();
-        if (fish == "white") { closerFish = whiteFish; }
-        else if (fish == "black") { closerFish = blackFish; }
-        bool finished = false;
-        if (closerFish == blackFish)
-        {
-            closerFish_Black = true;
-            SetBlackTargetRotateSpeed(0);
-            blackAnim.Play("sprint");
-            blackOrigin.DORotate(Vector3.zero, sprintRotateSpeed, RotateMode.FastBeyond360).SetSpeedBased(true).OnComplete(() => { finished = true; });
-        }
-        else
-        {
-            closerFish_Black = false;
-            SetWhiteTargetRotateSpeed(0);
-            whiteAnim.Play("sprint");
-            whiteOrigin.DORotate(Vector3.zero, sprintRotateSpeed, RotateMode.FastBeyond360).SetSpeedBased(true).OnComplete(() => { finished = true; });
-        }
-        while (!finished) { yield return null; }
-        yield return null;
+        if (assignedFish == "white") { closerFish = whiteFish; }
+        else if (assignedFish == "black") { closerFish = blackFish; }
+        closerFish_Black = closerFish == blackFish ? true : false;
+        bool isBlack = closerFish == blackFish ? true : false;
+
+        yield return co_sprintToAngle = StartCoroutine(IESprintToAngle(isBlack, 0));
     }
 
-    public IEnumerator SprintBackEqual()
+    public IEnumerator IESprintToAngle(bool isBlack, float angle)
+    {
+        bool finished = false;
+
+        if (isBlack) { SetBlackTargetRotateSpeed(0); } else { SetWhiteTargetRotateSpeed(0); }
+        if (isBlack) { blackAnim.Play("sprint"); } else { whiteAnim.Play("sprint"); }
+        Transform origin = isBlack ? blackOrigin : whiteOrigin;
+        float currentZ = origin.eulerAngles.z;
+
+        float delta = ((angle - currentZ - 360f) % 360f);
+
+        origin.DORotate(new Vector3(0, 0, delta), sprintRotateSpeed * 2, RotateMode.WorldAxisAdd)
+           .SetSpeedBased(true)
+           .SetEase(Ease.Linear)
+           .OnComplete(() => { finished = true; });
+
+        yield return new WaitUntil(() => finished);
+    }
+
+    public IEnumerator IESprintBackEqual()
     {
         float closerFish = Vector2.SignedAngle(blackFish.right, whiteFish.right);
 
@@ -222,7 +259,7 @@ public class YingYangFish_AI : IEnemyController
         yield return null;
     }
 
-    public IEnumerator SprintSamePos()
+    public IEnumerator IESprintSamePos()
     {
         float closerFish = Vector2.SignedAngle(blackFish.right, whiteFish.right);
 
@@ -285,9 +322,11 @@ public class YingYangFish_AI : IEnemyController
                 yield return null;
             }
         }
+
+        SetNormalRotateSpeed();
     }
 
-    public IEnumerator IE_SwimAway(Vector3 end, float centerOffset, bool isBlack)
+    public IEnumerator IESwimAway(Vector3 end, float centerOffset, bool isBlack)
     {
         if (isBlack) { blackPositioned = false; SetBlackTargetRotateSpeed(sprintRotateSpeed); }
         else { whitePositioned = false; SetWhiteTargetRotateSpeed(sprintRotateSpeed); }
@@ -335,6 +374,31 @@ public class YingYangFish_AI : IEnemyController
         yield return null;
     }
 
+    public IEnumerator IESingleFishDive(bool isBlack, bool isleft)
+    {
+        yield return StartCoroutine(IECloseSwim(false));
+
+        float z = isleft ? -90 : 30;
+
+        bool finished = false;
+        Transform origin = isBlack ? blackOrigin : whiteOrigin;
+        yield return co_sprintToAngle = StartCoroutine(IESprintToAngle(isBlack, z));
+
+        if (isBlack) { SetBlackTargetRotateSpeed(idleRotateSpeed); black_rotateSpeed = sprintRotateSpeed * 2; }
+        else { SetWhiteTargetRotateSpeed(idleRotateSpeed); white_rotateSpeed = sprintRotateSpeed * 2; }
+
+        float x = isleft ? origin.position.x - 8 : origin.position.x + 15;
+        origin.DOMove(new Vector3(x, waterLevel.position.y - 6, 0), 1f)
+            .SetEase(Ease.InSine).OnComplete(() => finished = true);
+
+        yield return new WaitUntil(() => finished);
+    }
+
+    public IEnumerator IESingleFishJumpOut()
+    {
+        yield return null;
+    }
+
     #endregion Main AI Coroutines
 
     #region AI Utility Methods
@@ -377,7 +441,7 @@ public class YingYangFish_AI : IEnemyController
             actionList.Clear();
             CancelAllAction();
             CharacterUIManager.ShowBlackEdge(true);
-            yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
+            yield return co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
             yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(true));
             SetWhiteTargetRotateSpeed(idleRotateSpeed / 3);
             SetBlackTargetRotateSpeed(idleRotateSpeed / 3);
@@ -454,7 +518,7 @@ public class YingYangFish_AI : IEnemyController
         //yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(2));
         movingTarget = GetBoundaryFarOfPlayer();
         yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
-        yield return co_sprintBackEqual = StartCoroutine(SprintBackEqual());
+        yield return co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
 
         yield return new WaitForSeconds(1f);
         //water ball ultimate
@@ -684,10 +748,8 @@ public class YingYangFish_AI : IEnemyController
 
     public override IEnumerator IE_Activate()
     {
-        IN_COMBAT = true;
-        co_sprintBackEqual = StartCoroutine(SprintBackEqual());
+        co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
         yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
-        HealthUI.SetActive(true);
         StartAction();
     }
 
@@ -706,6 +768,14 @@ public class YingYangFish_AI : IEnemyController
         if (!isBossBreaking) { damageAmount *= 0.5f; }
 
         currentHealth -= damageAmount;
+
+        if (!IN_COMBAT)
+        {
+            IN_COMBAT = true;
+            HealthUI.SetActive(true);
+            EventInteract.SetActive(false);
+        }
+
         healthBar.fillAmount = (float)currentHealth / (float)maxHealth;
         DecreaseStun(stunValue);
 
@@ -743,6 +813,8 @@ public class YingYangFish_AI : IEnemyController
         if (!secondPhase)
         {
             StartCoroutine(IE_Activate());
+            IN_COMBAT = true;
+            HealthUI.SetActive(true);
             EventInteract.SetActive(false);
         }
         else
@@ -761,25 +833,17 @@ public class YingYangFish_AI : IEnemyController
         base.ForceDie();
     }
 
-    public void Swing()
-    {
-        InsertAction(swing);
-    }
+    public void Swing() => InsertAction(swing);
 
-    public void Splash_black()
-    {
-        InsertAction(splash_black);
-    }
+    public void Splash_black() => InsertAction(splash_black);
 
-    public void Splash_white()
-    {
-        InsertAction(splash_white);
-    }
+    public void Splash_white() => InsertAction(splash_white);
 
-    public void Dive()
-    {
-        InsertAction(dive);
-    }
+    public void Dive() => InsertAction(dive);
+
+    public void SingleSwing_black() => StartCoroutine(IESingleFishDive(true, false));
+
+    public void SingleSwing_white() => StartCoroutine(IESingleFishDive(false, true));
 
     public override IEnumerator BossBreak()
     {
@@ -809,7 +873,7 @@ public class YingYangFish_AI : IEnemyController
         VFXManager.instance.UnBulletTime();
         isBossBreaking = false;
         yield return new WaitForSeconds(1f);
-        yield return StartCoroutine(SprintBackEqual());
+        yield return StartCoroutine(IESprintBackEqual());
         StartAction();
         yield return null;
     }
@@ -825,6 +889,14 @@ public class YingYangFish_AI : IEnemyController
         black_targetRotateSpeed = 0;
         white_targetRotateSpeed = 0;
     }
+
+    public void SetBlackBusy() => isBlackBusy = true;
+
+    public void SetWhiteBusy() => isWhiteBusy = true;
+
+    public void SetBlackNotBusy() => isBlackBusy = false;
+
+    public void SetWhiteNotBusy() => isWhiteBusy = false;
 
     public void SetBlackTargetRotateSpeed(float speed)
     {

@@ -24,7 +24,7 @@ public abstract class IEnemyController : IDamagable
 
     #region STUN
 
-    [FoldoutGroup("stunning", nameof(maxStun), nameof(stunBar), nameof(currentStun), nameof(stunDuration))] public Void stunVoid1;
+    [FoldoutGroup("Stun", nameof(maxStun), nameof(stunBar), nameof(currentStun), nameof(stunDuration))] public Void stunVoid1;
     [SerializeField, HideInInspector] public float maxStun = 10;
     [SerializeField, HideInInspector] public Image stunBar;
     [SerializeField, HideInInspector] public float currentStun;
@@ -44,9 +44,9 @@ public abstract class IEnemyController : IDamagable
 
     #region BASIC_LOGIC
 
-    [FoldoutGroup("basic_logic", nameof(IN_COMBAT), nameof(canFlip), nameof(isFacingRight),
+    [FoldoutGroup("Basic Logic", nameof(IN_COMBAT), nameof(canFlip), nameof(isFacingRight),
         nameof(inAct), nameof(speed), nameof(leftBoundary), nameof(rightBoundary), nameof(GFX),
-        nameof(maxActionBreakCapacity), nameof(currentActionBreakAmount), nameof(breakDuration), nameof(selfPooler))]
+        nameof(selfPooler))]
     public Void logicvoid;
 
     [SerializeField, HideInInspector] public bool IN_COMBAT = false;
@@ -57,14 +57,18 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public Transform leftBoundary;
     [SerializeField, HideInInspector] public Transform rightBoundary;
     [SerializeField, HideInInspector] public GameObject GFX;
-    [SerializeField, HideInInspector] public int maxActionBreakCapacity = 10;
-    [SerializeField, HideInInspector] public int currentActionBreakAmount = 0;
-    [SerializeField, HideInInspector] public float breakDuration = 3f;
     [SerializeField, HideInInspector] public InternalObjectPooler selfPooler;
-
     [HideInInspector] public List<IEnemyAction> actionList = new List<IEnemyAction>();
 
     #endregion BASIC_LOGIC
+
+    [FoldoutGroup("Break Setting",
+       nameof(maxActionBreakCapacity), nameof(currentActionBreakAmount), nameof(breakDuration))]
+    public Void breakVoid;
+
+    [SerializeField, HideInInspector] public int maxActionBreakCapacity = 10;
+    [SerializeField, HideInInspector] public int currentActionBreakAmount = 0;
+    [SerializeField, HideInInspector] public float breakDuration = 3f;
 
     #region PRIVATE VARIABLES
 

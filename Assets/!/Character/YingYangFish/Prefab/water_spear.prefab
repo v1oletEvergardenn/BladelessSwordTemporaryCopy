@@ -129,6 +129,7 @@ MonoBehaviour:
   rotationSpeed: 100000
   stunDuration: 0.3
   lifeTime: 5
+  stunValue: 1
   stopLayer:
     serializedVersion: 2
     m_Bits: 3200
@@ -141,7 +142,7 @@ MonoBehaviour:
   isHostileToPlayer: 0
   isPerfect: 0
   showPivot: 1
-  pivotOffset: {x: 4.58, y: 0, z: 0}
+  pivotOffset: {x: -0.01, y: 0, z: 0}
   color: {r: 1, g: 0, b: 0, a: 1}
   rumbleDuration_normal: 0.1
   rumbleFrequncy_normal: {x: 0.63647956, y: 1.0466838}
@@ -341,7 +342,7 @@ TrailRenderer:
       key6: {r: 0, g: 0, b: 0, a: 0}
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 0
-      ctime1: 13493
+      ctime1: 24094
       ctime2: 65535
       ctime3: 0
       ctime4: 0
@@ -486,7 +487,7 @@ TrailRenderer:
       key6: {r: 0, g: 0, b: 0, a: 0}
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 0
-      ctime1: 13493
+      ctime1: 24094
       ctime2: 65535
       ctime3: 0
       ctime4: 0

@@ -26,12 +26,7 @@ public class YYF_splash_black : IEnemyAction
         if (factor == 0)
         {
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
-
-            bool finished = false;
-            bossAI.SetBlackTargetRotateSpeed(0);
-            bossAI.blackAnim.Play("sprint");
-            bossAI.blackOrigin.DORotate(new Vector3(0, 0, -180), bossAI.sprintRotateSpeed, RotateMode.FastBeyond360).SetEase(Ease.OutSine).SetSpeedBased(true).OnComplete(() => { finished = true; });
-            while (!finished) { yield return null; }
+            yield return bossAI.co_sprintToAngle = StartCoroutine(bossAI.IESprintToAngle(true, -180));
         }
         else if (factor == 1)
         {
@@ -69,7 +64,7 @@ public class YYF_splash_black : IEnemyAction
 
         if (factor == 0)
         {
-            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
             bossAI.SetNormalRotateSpeed();
         }
         else

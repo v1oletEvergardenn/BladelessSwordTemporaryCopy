@@ -37,7 +37,7 @@ public class YYF_Swing : IEnemyAction
         localFactor = factor;
         if (factor != 3)
         {
-            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
 
             if (bossAI.white_distanceToCenter > bossAI.minMaxDistanceTocenter.x)
             {

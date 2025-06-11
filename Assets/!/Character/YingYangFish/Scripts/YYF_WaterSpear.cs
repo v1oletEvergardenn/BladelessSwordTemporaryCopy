@@ -40,7 +40,7 @@ public class YYF_WaterSpear : IEnemyAction
         if (factor == 0)
         {
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
-            yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.SprintStartPoint());
+            yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.IESprintStartPoint());
             isBlack = bossAI.closerFish_Black;
         }
 
@@ -73,7 +73,7 @@ public class YYF_WaterSpear : IEnemyAction
         if (factor == 1 || factor == 3 || factor == 5)
         {
             while (!bossAI.blackPositioned) { yield return null; }
-            yield return StartCoroutine(bossAI.SprintStartPoint("black"));
+            yield return StartCoroutine(bossAI.IESprintStartPoint("black"));
             if (factor == 1 || factor == 3) { yield return new WaitForSeconds(0.6f); }
 
             isBlack = true;
@@ -81,7 +81,7 @@ public class YYF_WaterSpear : IEnemyAction
         else if (factor == 2 || factor == 4 || factor == 6)
         {
             while (!bossAI.whitePositioned) { yield return null; }
-            yield return StartCoroutine(bossAI.SprintStartPoint("white"));
+            yield return StartCoroutine(bossAI.IESprintStartPoint("white"));
             isBlack = false;
         }//white fish
 
@@ -134,7 +134,7 @@ public class YYF_WaterSpear : IEnemyAction
             {
                 if (bossAI.distanceToPlayer <= bossAI.swing.swingRange + 1)
                 {
-                    yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+                    yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
                     bossAI.InsertAction(bossAI.swing);
                 }
                 else if (Possibility(60))
@@ -154,7 +154,7 @@ public class YYF_WaterSpear : IEnemyAction
             bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
             //StartCoroutine(bossAI.IE_SwimAway(bossAI.waterSpearPos_black2.position, 10, true));
             //StartCoroutine(Act_coroutine(3));
-            StartCoroutine(bossAI.IE_SwimAway(player.transform.position + new Vector3(-15, 1), 10, true));
+            StartCoroutine(bossAI.IESwimAway(player.transform.position + new Vector3(-15, 1), 10, true));
         }
         else if (factor == 2)
         {
@@ -162,10 +162,10 @@ public class YYF_WaterSpear : IEnemyAction
             //StartCoroutine(bossAI.IE_SwimAway(bossAI.waterSpearPos_white2.position, 10, false));
             //StartCoroutine(Act_coroutine(4));
 
-            StartCoroutine(bossAI.IE_SwimAway(player.transform.position + new Vector3(15, 1), 10, false));
+            StartCoroutine(bossAI.IESwimAway(player.transform.position + new Vector3(15, 1), 10, false));
 
             while (!bossAI.blackPositioned || !bossAI.whitePositioned) { yield return null; }
-            yield return StartCoroutine(bossAI.SprintSamePos());
+            yield return StartCoroutine(bossAI.IESprintSamePos());
             StartCoroutine(Act_coroutine(3));
             yield return StartCoroutine(Act_coroutine(4));
         }
@@ -178,10 +178,10 @@ public class YYF_WaterSpear : IEnemyAction
         {
             bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);
             bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
-            StartCoroutine(bossAI.IE_SwimAway(bossAI.center.position, 10, false));
-            StartCoroutine(bossAI.IE_SwimAway(bossAI.center.position, 10, true));
+            StartCoroutine(bossAI.IESwimAway(bossAI.center.position, 10, false));
+            StartCoroutine(bossAI.IESwimAway(bossAI.center.position, 10, true));
             while (!bossAI.blackPositioned || !bossAI.whitePositioned) { yield return null; }
-            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.SprintBackEqual());
+            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
             bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);
             bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
             bossAI.finishedWaterSpearUltimate = true;
