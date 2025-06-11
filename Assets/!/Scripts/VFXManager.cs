@@ -229,8 +229,13 @@ public class VFXManager : MonoBehaviour
         }
     }
 
+    private float originalLightIntensity;
+    private float originalLightIntensity2;
+
     public static void StartBossBreakEffect()
     {
+        instance.originalLightIntensity = instance.globalLight.intensity;
+        instance.originalLightIntensity2 = instance.light_player_enemy.intensity;
         instance.StartCoroutine(instance.BossBreakEffectCoroutine(true));
     }
 
@@ -247,11 +252,11 @@ public class VFXManager : MonoBehaviour
         float from_breakValue = start ? 0f : 1f;
         float to_breakValue = start ? 1f : 0f;
 
-        float from_lightIntensity = start ? 1f : 0.5f;
-        float to_lightIntensity = start ? 0.5f : 1f;
+        float from_lightIntensity = start ? originalLightIntensity : 0.3f;
+        float to_lightIntensity = start ? 0.3f : originalLightIntensity;
 
-        float from_lightIntensity2 = start ? 0f : 0.8f;
-        float to_lightIntensity2 = start ? 0.8f : 0f;
+        float from_lightIntensity2 = start ? originalLightIntensity2 : 0.8f;
+        float to_lightIntensity2 = start ? 0.8f : originalLightIntensity2;
 
         Ease easeType = Ease.OutCubic;
 

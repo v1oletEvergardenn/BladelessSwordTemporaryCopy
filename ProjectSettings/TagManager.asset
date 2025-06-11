@@ -27,7 +27,7 @@ TagManager:
   - projectileCol
   - nonCollisionWithPlayer
   - Wall
-  - Map
+  - Distortion
   - Reflections
   - WaterPostProcessing
   - Obstructors
@@ -71,12 +71,12 @@ TagManager:
   - name: CameraSortingLayer
     uniqueID: 1178146749
     locked: 0
-  - name: 1
-    uniqueID: 4103203301
-    locked: 0
   - name: water
     uniqueID: 1329860743
     locked: 0
   - name: before_water
     uniqueID: 253207009
+    locked: 0
+  - name: distortionLayer
+    uniqueID: 3984331105
     locked: 0

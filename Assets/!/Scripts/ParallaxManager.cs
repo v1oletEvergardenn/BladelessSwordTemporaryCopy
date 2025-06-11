@@ -12,7 +12,7 @@ public class ParallaxManager : MonoBehaviour
     {
         foreach (layer i in layers)
         {
-            i.startPos = i.trans.position.x * (1 - i.movingSpeed);
+            i.startPos = i.trans.position.x;
             i.sprite = i.trans.GetComponent<SpriteRenderer>();
             i.spriteLength = i.sprite.bounds.size.x;
             if (i.repeat)
