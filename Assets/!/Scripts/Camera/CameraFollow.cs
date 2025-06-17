@@ -77,8 +77,13 @@ public class CameraFollow : MonoBehaviour
                 else
                 {
                     bound.Encapsulate(targets[i].position);
-                    bound.Encapsulate(targets[i].position + new Vector3(3, 3));
-                    bound.Encapsulate(targets[i].position - new Vector3(3, 3));
+                    Vector3 v = new Vector3(3, 3);
+                    if (targets[i].gameObject.TryGetComponent<CameraBoundOffset>(out CameraBoundOffset obj))
+                    {
+                        v = new Vector3(obj.offset, obj.offset);
+                    }
+                    bound.Encapsulate(targets[i].position + v);
+                    bound.Encapsulate(targets[i].position - v);
                 }
             }
         }

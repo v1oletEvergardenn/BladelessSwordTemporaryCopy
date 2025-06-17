@@ -5048,7 +5048,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 253207009
-  m_SortingLayer: 9
+  m_SortingLayer: 8
   m_SortingOrder: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -5110,7 +5110,7 @@ Transform:
   m_GameObject: {fileID: 468499999583083248}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 22.13, y: 355.78, z: -10}
+  m_LocalPosition: {x: 24.870005, y: 359.03, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5778,6 +5778,8 @@ GameObject:
   - component: {fileID: 2134144230316423650}
   - component: {fileID: 8327264030118221926}
   - component: {fileID: 8061707258888515261}
+  - component: {fileID: 8178977540978663186}
+  - component: {fileID: 5943958099297374646}
   m_Layer: 0
   m_Name: waterfall
   m_TagString: Untagged
@@ -5794,7 +5796,7 @@ Transform:
   m_GameObject: {fileID: 1577850963131404288}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -30.8, y: -4.970001, z: 0}
+  m_LocalPosition: {x: -2, y: -4.970001, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5846,7 +5848,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 32, y: 36.9}
+  m_Size: {x: 89.81, y: 36.9}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -5873,6 +5875,37 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8178977540978663186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1577850963131404288}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45321aabe980e4246818580af1995b08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pools:
+  - tag: wave
+    prefab: {fileID: 5409587824174892488, guid: 1d6ba098796f40241ada6b4617a42a3d, type: 3}
+    size: 50
+--- !u!114 &5943958099297374646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1577850963131404288}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d79ce766aa528943957a4f9fce98f1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MinMaxGap: {x: 0.5, y: 2}
+  MinMax_movingSpeed: {x: 23.5, y: 26.5}
+  spawnHeight: 29.2
 --- !u!1 &1919521099711302698
 GameObject:
   m_ObjectHideFlags: 0
@@ -5889,9 +5922,11 @@ GameObject:
   - component: {fileID: 8223395969468840134}
   - component: {fileID: 5168322296663647818}
   - component: {fileID: 8768790700616368342}
+  - component: {fileID: 1469504624518351883}
   - component: {fileID: 7512999745031216706}
   - component: {fileID: 1867401310611299842}
   - component: {fileID: 7523805028392415758}
+  - component: {fileID: 8132703760700001268}
   m_Layer: 13
   m_Name: YingYangFish
   m_TagString: Untagged
@@ -5908,7 +5943,7 @@ Transform:
   m_GameObject: {fileID: 1919521099711302698}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -18.62, y: 0, z: 0}
+  m_LocalPosition: {x: -25.7, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6060,13 +6095,13 @@ MonoBehaviour:
   leftBoundary: {fileID: 8333293142757944300}
   rightBoundary: {fileID: 1794003040807871199}
   GFX: {fileID: 4732354602251324167}
-  maxActionBreakCapacity: 10
-  currentActionBreakAmount: 0
-  breakDuration: 3
   selfPooler: {fileID: 3477908287905396071}
   actionList:
   - {fileID: 7523805028392415758}
   - {fileID: 7523805028392415758}
+  maxActionBreakCapacity: 10
+  currentActionBreakAmount: 0
+  breakDuration: 3
   isActing: 0
   initialAction: {fileID: 0}
   canMove: 0
@@ -6087,7 +6122,13 @@ MonoBehaviour:
   playerAttack: {fileID: 0}
   playerEnergy: {fileID: 0}
   playerController: {fileID: 0}
-  YingYangFish: {fileID: 0}
+  Dir: {x: 0, y: 0, z: -1}
+  blackSprite: {fileID: 0}
+  whiteSprite: {fileID: 0}
+  blackAnim: {fileID: 0}
+  whiteAnim: {fileID: 0}
+  centerAnim: {fileID: 0}
+  closerFish_Black: 0
   center: {fileID: 3703754871881656736}
   blackFish: {fileID: 8277116422729500247}
   whiteFish: {fileID: 5024315968629815413}
@@ -6095,35 +6136,35 @@ MonoBehaviour:
   whiteFishGFX: {fileID: 5850686962129906216}
   blackOrigin: {fileID: 7097692706519775388}
   whiteOrigin: {fileID: 8203389694549112143}
-  idleRotateSpeed: 30
+  idleRotateSpeed: 50
   sprintRotateSpeed: 100
-  waterSpearPos_black1: {fileID: 2512737453920171094}
-  waterSpearPos_black2: {fileID: 7965529028660884890}
-  waterSpearPos_white1: {fileID: 3280783084739180215}
-  waterSpearPos_white2: {fileID: 3178032065052171119}
-  endCanvas: {fileID: 8126346116493624611}
-  black_rotateSpeed: 0
-  white_rotateSpeed: 0
-  Dir: {x: 0, y: 0, z: -1}
   swimToCenterSpeed: 2
   minMaxDistanceTocenter: {x: 1, y: 3}
+  white_distanceToCenter: 0
+  black_distanceToCenter: 0
+  movingTarget: {fileID: 0}
+  black_rotateSpeed: 0
+  white_rotateSpeed: 0
+  black_targetRotateSpeed: 0
+  white_targetRotateSpeed: 0
+  endCanvas: {fileID: 8126346116493624611}
   waterLevel: {fileID: 6693982948266735782}
   EventInteract: {fileID: 4952234895950217888}
   black_particle: {fileID: 333476638976893826}
   white_particle: {fileID: 5748384552285873550}
-  black_tex: {fileID: 0}
-  white_tex: {fileID: 0}
-  blackSprite: {fileID: 0}
-  whiteSprite: {fileID: 0}
-  blackAnim: {fileID: 0}
-  whiteAnim: {fileID: 0}
-  centerAnim: {fileID: 0}
-  closerFish_Black: 0
-  white_distanceToCenter: 0
-  black_distanceToCenter: 0
-  movingTarget: {fileID: 0}
-  isCloseSwimming: 0
+  black_tex: {fileID: 21300000, guid: 5935765197cdd7540985afc848f0d6ed, type: 3}
+  white_tex: {fileID: 21300000, guid: 3426ba1bd2f139c41bd513db54628e4e, type: 3}
+  ultimateWave: {fileID: 2989069674961674455}
+  slash_effect: {fileID: 2869250000921346654}
+  waterDragon1: {fileID: 6752344687398231582}
+  waterSpearPos_black1: {fileID: 2512737453920171094}
+  waterSpearPos_black2: {fileID: 7965529028660884890}
+  waterSpearPos_white1: {fileID: 3280783084739180215}
+  waterSpearPos_white2: {fileID: 3178032065052171119}
   secondPhase: 0
+  blackPositioned: 0
+  whitePositioned: 0
+  finishedWaterSpearUltimate: 0
   ultimate_bullets:
   - {fileID: 1170147102132649585}
   - {fileID: 2311536940818952119}
@@ -6137,24 +6178,17 @@ MonoBehaviour:
   - {fileID: 3793765241706212287}
   - {fileID: 6089245138508720636}
   - {fileID: 1170147102132649585}
-  ultimateWave: {fileID: 2989069674961674455}
-  slash_effect: {fileID: 2869250000921346654}
-  waterDragon1: {fileID: 6752344687398231582}
-  waterDragon2: {fileID: 0}
-  waterDragon3: {fileID: 0}
-  waterDragon4: {fileID: 0}
-  Actions: 1
+  waterSpear: {fileID: 5168322296663647818}
+  swing: {fileID: 8768790700616368342}
+  singleSwing: {fileID: 1469504624518351883}
+  splash_white: {fileID: 7512999745031216706}
+  splash_black: {fileID: 1867401310611299842}
+  bubbleTrap: {fileID: 8132703760700001268}
+  dive: {fileID: 7523805028392415758}
+  Actions: 0
   void112: {fileID: 0}
   void114: {fileID: 0}
   void11: {fileID: 0}
-  waterSpear: {fileID: 5168322296663647818}
-  swing: {fileID: 8768790700616368342}
-  splash_white: {fileID: 7512999745031216706}
-  splash_black: {fileID: 1867401310611299842}
-  dive: {fileID: 7523805028392415758}
-  blackPositioned: 0
-  whitePositioned: 0
-  finishedWaterSpearUltimate: 0
 --- !u!114 &8223395969468840134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6207,7 +6241,7 @@ MonoBehaviour:
   waterSpearPos_black: {fileID: 5319081624295032701}
   waterSpearPos_white: {fileID: 8681078178340892211}
   spearDamage: 5
-  spearSpeed: 500
+  spearSpeed: 1250
   spear_stunDuration: 0.3
   stunValue: 25
 --- !u!114 &8768790700616368342
@@ -6234,6 +6268,7 @@ MonoBehaviour:
   playerEnergy: {fileID: 0}
   playerController: {fileID: 0}
   actionBreakAmount: 2
+  showRange: 1
   swingEffect: {fileID: 526537069569172611}
   swing_outline: {fileID: 2961732826002989648}
   swingAttack:
@@ -6246,6 +6281,44 @@ MonoBehaviour:
     cameraShake: 0.1
   swingRange: 6
   swingAttackDuration: 0.3
+  stunValue: 35
+--- !u!114 &1469504624518351883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919521099711302698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 871006e62ef29174483f0e92796c200f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anim: {fileID: 0}
+  controller: {fileID: 0}
+  sprite: {fileID: 0}
+  player: {fileID: 0}
+  playerIDamagable: {fileID: 0}
+  pooler: {fileID: 0}
+  vfx: {fileID: 0}
+  rb: {fileID: 0}
+  playerAttack: {fileID: 0}
+  playerEnergy: {fileID: 0}
+  playerController: {fileID: 0}
+  actionBreakAmount: 1
+  showRange: 1
+  swingEffect: {fileID: 0}
+  swing_outline: {fileID: 0}
+  swingAttack:
+    damage: 2
+    stun: 0.5
+    freezeTime: 0.2
+    repel: 20
+    rumble: {x: 0.25, y: 0.4}
+    rumbleDuration: 0.2
+    cameraShake: 0.1
+  swingRange: 0
+  swingAttackDuration: 0
   stunValue: 35
 --- !u!114 &7512999745031216706
 MonoBehaviour:
@@ -6339,7 +6412,30 @@ MonoBehaviour:
   actionBreakAmount: 1
   bossAI: {fileID: 4945668488642856685}
   swimEffect: {fileID: 4451548002843692454}
-  dive_end_pos: {fileID: 0}
+--- !u!114 &8132703760700001268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919521099711302698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2b65614c5dd444478ed4710c12184a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anim: {fileID: 0}
+  controller: {fileID: 0}
+  sprite: {fileID: 0}
+  player: {fileID: 0}
+  playerIDamagable: {fileID: 0}
+  pooler: {fileID: 0}
+  vfx: {fileID: 0}
+  rb: {fileID: 0}
+  playerAttack: {fileID: 0}
+  playerEnergy: {fileID: 0}
+  playerController: {fileID: 0}
+  actionBreakAmount: 1
 --- !u!1 &1946239840179078521
 GameObject:
   m_ObjectHideFlags: 0
@@ -6972,7 +7068,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 253207009
-  m_SortingLayer: 9
+  m_SortingLayer: 8
   m_SortingOrder: 0
   m_Sprite: {fileID: 7889777187970779677, guid: 9ef2d519172e4e745941a623cc250ef5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -7671,7 +7767,7 @@ MonoBehaviour:
       depthFromObstructors:
         _value: 0
       enableBelowWater:
-        _value: 1
+        _value: 0
       belowWaterUV:
         _value: {x: 0, y: 0, z: 0, w: 0}
       belowWaterDistortionStrength:
@@ -7862,7 +7958,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1329860743
-  m_SortingLayer: 8
+  m_SortingLayer: 7
   m_SortingOrder: 20
   m_Sprite: {fileID: 21300000, guid: ced0a51abbb19fa41be243a46a103728, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -8116,7 +8212,7 @@ Transform:
   m_GameObject: {fileID: 4093121629756450950}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 22.13, y: 358.78, z: -10}
+  m_LocalPosition: {x: 24.870005, y: 362.03, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8414,7 +8510,7 @@ Transform:
   m_GameObject: {fileID: 4441652990459818143}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 22.13, y: 355.78, z: -10}
+  m_LocalPosition: {x: 24.870005, y: 359.03, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8427,7 +8523,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4441652990459818143}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
@@ -8455,7 +8551,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 6
+  orthographic size: 0
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
@@ -8503,7 +8599,7 @@ MonoBehaviour:
     copyMainBackground: 0
     lastOrtographicSize: 6
     lastAspectRatio: 1.7777778
-  _run: 1
+  _run: 0
 --- !u!114 &4222631322272444626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9109,7 +9205,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 120fca63dbd473840b18b4881e57c368, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -9129,7 +9225,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1627579867
   m_SortingLayer: -3
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_Sprite: {fileID: -7671500264154600851, guid: 9ef2d519172e4e745941a623cc250ef5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -14162,7 +14258,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 253207009
-  m_SortingLayer: 9
+  m_SortingLayer: 8
   m_SortingOrder: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -14251,8 +14347,8 @@ MonoBehaviour:
     sprite: {fileID: 0}
     spriteLength: 0
     startPos: 0
-    movingSpeed: 1
-    repeat: 1
+    movingSpeed: 0.942
+    repeat: 0
   - trans: {fileID: 4591563818833795771}
     leftCopy: {fileID: 0}
     rightCopy: {fileID: 0}
@@ -14435,7 +14531,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 253207009
-  m_SortingLayer: 9
+  m_SortingLayer: 8
   m_SortingOrder: 0
   m_Sprite: {fileID: 7889777187970779677, guid: 9ef2d519172e4e745941a623cc250ef5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -14562,7 +14658,7 @@ Transform:
   m_GameObject: {fileID: 6262103376246145278}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 22.13, y: 355.78, z: -10}
+  m_LocalPosition: {x: 24.870005, y: 359.03, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15915,7 +16011,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1627579867
   m_SortingLayer: -3
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: -4606822421522802700, guid: 9ef2d519172e4e745941a623cc250ef5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -15986,7 +16082,7 @@ Transform:
   m_GameObject: {fileID: 8972430006008262177}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 22.13, y: 355.78, z: -10}
+  m_LocalPosition: {x: 24.870005, y: 359.03, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21075,7 +21171,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2754755220152578239, guid: 6de10fca9cbc0974abae617101dbe514, type: 3}
       propertyPath: m_Size.y
-      value: 24.17463
+      value: 33.614132
       objectReference: {fileID: 0}
     - target: {fileID: 2754755220152578239, guid: 6de10fca9cbc0974abae617101dbe514, type: 3}
       propertyPath: m_Offset.x
@@ -21083,7 +21179,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2754755220152578239, guid: 6de10fca9cbc0974abae617101dbe514, type: 3}
       propertyPath: m_Offset.y
-      value: -0.5558815
+      value: 4.16387
       objectReference: {fileID: 0}
     - target: {fileID: 4447901303710858200, guid: 6de10fca9cbc0974abae617101dbe514, type: 3}
       propertyPath: m_LocalPosition.x

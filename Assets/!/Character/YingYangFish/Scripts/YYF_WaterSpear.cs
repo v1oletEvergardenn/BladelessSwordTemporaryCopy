@@ -72,6 +72,7 @@ public class YYF_WaterSpear : IEnemyAction
 
         if (factor == 1 || factor == 3 || factor == 5)
         {
+            bossAI.SetBlackBusy();
             while (!bossAI.blackPositioned) { yield return null; }
             yield return StartCoroutine(bossAI.IESprintStartPoint("black"));
             if (factor == 1 || factor == 3) { yield return new WaitForSeconds(0.6f); }
@@ -80,6 +81,7 @@ public class YYF_WaterSpear : IEnemyAction
         }//black fish
         else if (factor == 2 || factor == 4 || factor == 6)
         {
+            bossAI.SetWhiteBusy();
             while (!bossAI.whitePositioned) { yield return null; }
             yield return StartCoroutine(bossAI.IESprintStartPoint("white"));
             isBlack = false;
@@ -87,12 +89,14 @@ public class YYF_WaterSpear : IEnemyAction
 
         if (!isBlack)
         {
+            bossAI.SetWhiteBusy();
             bossAI.whiteAnim.Play("spear_pre");
             bossAI.whiteAnim.SetBool("secondSpear", second);
             _spear = bossAI.selfPooler.SpawnFromPool("water_Spear", waterSpearPos_white.position).GetComponent<Spear>();
         }
         else
         {
+            bossAI.SetBlackBusy();
             bossAI.blackAnim.Play("spear_pre");
             bossAI.blackAnim.SetBool("secondSpear", second);
             _spear = bossAI.selfPooler.SpawnFromPool("water_Spear", waterSpearPos_black.position).GetComponent<Spear>();
@@ -145,6 +149,7 @@ public class YYF_WaterSpear : IEnemyAction
                 }
             }
 
+            if (isBlack) { bossAI.SetBlackNotBusy(); } else { bossAI.SetWhiteNotBusy(); }
             bossAI.SetNormalRotateSpeed();
             bossAI.AddActionBreak(actionBreakAmount);
             bossAI.EndAction();

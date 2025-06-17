@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 using static UnityEngine.RuleTile.TilingRuleOutput;
 using EditorAttributes;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
+[RequireComponent(typeof(Rigidbody2D))]
 public abstract class IProjectile : MonoBehaviour
 {
     [Header("Attributes")] public int damage = 10;
@@ -16,7 +16,7 @@ public abstract class IProjectile : MonoBehaviour
     public float stunDuration = 0.3f;
     public float lifeTime = 10f;
     public float stunValue = 1;
-    public LayerMask stopLayer = 1 << 7 | 1 << 10 | 1 << 11;
+    public LayerMask stopLayer = 1 << 7 | 1 << 10 | 1 << 11 | 1 << 18;
     [HideInInspector] public GameObject owner;
     [HideInInspector] public bool followTarget;
     [HideInInspector] public IDamagable target;
@@ -56,17 +56,29 @@ public abstract class IProjectile : MonoBehaviour
     }
 
     /// <summary>
-    /// set up the attributes to make the projectile resuable.
+    /// Initializes or resets the projectile's attributes for reuse, including direction, owner, speed, target, and various optional behaviors.
+    /// This method allows flexible configuration of the projectile's movement, damage, targeting, and interaction logic,
+    /// making it suitable for pooling and dynamic setup at runtime.
     /// </summary>
-    /// <param name="dir"> give initial direction of projectile</param>
-    /// <param name="_owner"> avoid collision with owner/sender</param>
-    /// <param name="additionSpeed"> adjust fly speed</param>
-    /// <param name="_followTarget"> bool to set if keep follow target</param>
-    /// <param name="_target"> give target of projectile, to set rotation or follow</param>
-    /// <<param name="_isHostileToPlayer"> default: true</param>
-    public virtual void SetUp(Vector3 dir, GameObject _owner, float additionSpeed = 0f, bool _followTarget = false,
-        IDamagable _target = null, bool _isHostileToPlayer = true,
-        int _damage = 0, float _speed = -1, float gravityScale = 0,
+    /// <param name="dir">The initial direction (in Euler angles) to orient the projectile.</param>
+    /// <param name="_owner">The GameObject that owns or fired the projectile (used to prevent self-collision).</param>
+    /// <param name="additionSpeed">Additional speed to add to the projectile's base speed (default: 0).</param>
+    /// <param name="_followTarget">If true, the projectile will continuously follow its target (default: false).</param>
+    /// <param name="_target">The target to follow or face, implementing IDamagable (default: null).</param>
+    /// <param name="_isHostileToPlayer">If true, the projectile is hostile to the player (default: true).</param>
+    /// <param name="_damage">Overrides the projectile's damage value if not zero (default: 0).</param>
+    /// <param name="_speed">Overrides the projectile's speed if not -1 (default: -1).</param>
+    /// <param name="gravityScale">Sets the Rigidbody2D's gravity scale (default: 0).</param>
+    /// <param name="_stunValue">Overrides the projectile's stun value if not zero (default: 0).</param>
+    public virtual void SetUp(Vector3 dir,
+        GameObject _owner,
+        float additionSpeed = 0f,
+        bool _followTarget = false,
+        IDamagable _target = null,
+        bool _isHostileToPlayer = true,
+        int _damage = 0,
+        float _speed = -1,
+        float gravityScale = 0,
         float _stunValue = 0)
     {
         ResetAttributes();
@@ -77,11 +89,7 @@ public abstract class IProjectile : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = gravityScale;
         if (_stunValue != 0) { stunValue = _stunValue; }
-
-        if (_damage != 0)
-        {
-            damage = _damage;
-        }
+        if (_damage != 0) damage = _damage;
         transform.eulerAngles = dir;// rotate to given direction
         if (target != null) { transform.rotation = CalculateWantedRotation(target.GetHitPos()); } //rotate to face target
         if (_speed != -1) { speed = _speed; originalSpeed = _speed; }
@@ -165,7 +173,7 @@ public abstract class IProjectile : MonoBehaviour
         return transform.position + transform.right * pivotOffset.x + transform.up * pivotOffset.y;
     }
 
-    private void OnDrawGizmosSelected()
+    public virtual void OnDrawGizmosSelected()
     {
         if (!showPivot) return;
         Gizmos.color = color;

@@ -8,7 +8,6 @@ public class YYF_Dive : IEnemyAction
 {
     public YingYangFish_AI bossAI;
     public GameObject swimEffect;
-    public Transform dive_end_pos;
 
     public Coroutine co_closeswim;
 
@@ -34,6 +33,7 @@ public class YYF_Dive : IEnemyAction
         bool ToLeft = true;
 
         Vector3 pos = bossAI.movingTarget.transform.position;
+        bossAI.SetBlackBusy(); bossAI.SetWhiteBusy();
 
         if (factor == 0 && (Mathf.Abs(pos.x - transform.position.x) <= 2))
         {
@@ -52,6 +52,7 @@ public class YYF_Dive : IEnemyAction
             bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
             bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);
 
+            //dive
             transform.DOMoveY(pos.y - 5, 2f).SetEase(Ease.InOutBack).OnComplete(() =>
             {
                 if (pos.x > transform.position.x) { ToLeft = false; swimEffect.transform.localScale = new Vector3(-1, 1, 1); }
@@ -76,15 +77,15 @@ public class YYF_Dive : IEnemyAction
             if (ToLeft) { transform.DOMove(new Vector3(pos.x + 5, bossAI.waterLevel.position.y - 7, 0), 1f); }
             else { transform.DOMove(new Vector3(pos.x - 5, bossAI.waterLevel.position.y - 7, 0), 1f); }
 
-            //play under water animation while moving
+            //swim effect moving
             while (Mathf.Abs(swimEffect.transform.position.x - pos.x) > 4)
             {
                 if (ToLeft) { swimEffect.transform.position -= new Vector3(10, 0, 0) * Time.deltaTime * 2; }
                 else { swimEffect.transform.position += new Vector3(10, 0, 0) * Time.deltaTime * 2; }
                 yield return null;
             }
-            //jump out
 
+            // prepare to jump out
             swimEffect.GetComponent<Animator>().Play("inverse");
             TryStopCoroutine(bossAI.co_sprintStartPoint);
             TryStopCoroutine(bossAI.co_IEcloseSwim);
@@ -114,15 +115,11 @@ public class YYF_Dive : IEnemyAction
 
             if (factor == 0) { pos = bossAI.movingTarget.transform.position; }
 
-            if (ToLeft)
-            {
-                transform.DOMove(new Vector3(pos.x - 1, bossAI.waterLevel.position.y + 6.5f, 0), 1f).SetEase(Ease.OutCubic);
-            }
-            else
-            {
-                transform.DOMove(new Vector3(pos.x + 1, bossAI.waterLevel.position.y + 6.5f, 0), 1f).SetEase(Ease.OutCubic);
-            }
+            //jump out
+            float x = ToLeft ? pos.x - 1 : pos.x + 1;
+            transform.DOMove(new Vector3(x, bossAI.waterLevel.position.y + 6.5f, 0), 1f).SetEase(Ease.OutCubic);
 
+            // during jumping out
             while (transform.position.y < bossAI.waterLevel.position.y + 6.5)
             {
                 if (transform.position.y > bossAI.waterLevel.position.y - 1)
@@ -162,6 +159,8 @@ public class YYF_Dive : IEnemyAction
         bossAI.EndAction();
         bossAI.blackAnim.SetBool("dive_end", false);
         bossAI.whiteAnim.SetBool("dive_end", false);
+        bossAI.SetBlackNotBusy();
+        bossAI.SetWhiteNotBusy();
         yield return null;
     }
 

@@ -23,6 +23,7 @@ public class YYF_splash_black : IEnemyAction
     //high and near
     public override IEnumerator Act_coroutine(float factor = 0)
     {
+        bossAI.SetBlackBusy();
         if (factor == 0)
         {
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
@@ -72,6 +73,7 @@ public class YYF_splash_black : IEnemyAction
             bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
         }
 
+        bossAI.SetBlackNotBusy();
         bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();
 

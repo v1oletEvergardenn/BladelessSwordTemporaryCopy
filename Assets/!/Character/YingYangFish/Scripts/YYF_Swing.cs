@@ -9,6 +9,7 @@ public class YYF_Swing : IEnemyAction
 {
     private YingYangFish_AI bossAI;
 
+    public bool showRange = true;
     public GameObject swingEffect;
     public GameObject swing_outline;
 
@@ -34,6 +35,8 @@ public class YYF_Swing : IEnemyAction
 
     public override IEnumerator Act_coroutine(float factor = 0)
     {
+        bossAI.SetBlackBusy();
+        bossAI.SetWhiteBusy();
         localFactor = factor;
         if (factor != 3)
         {
@@ -103,7 +106,8 @@ public class YYF_Swing : IEnemyAction
             bossAI.SetNormalRotateSpeed();
             if (factor == 1) { CharacterController2D.instance.FaceTarget(this.transform); }
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
-
+            bossAI.SetBlackNotBusy();
+            bossAI.SetWhiteNotBusy();
             bossAI.AddActionBreak(actionBreakAmount);
             bossAI.EndAction();
         }
@@ -175,6 +179,7 @@ public class YYF_Swing : IEnemyAction
 
     public void OnDrawGizmos()
     {
+        if (!showRange) return;
         Gizmos.DrawWireSphere(transform.position, swingRange);
     }
 }
