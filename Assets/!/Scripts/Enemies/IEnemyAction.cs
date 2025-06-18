@@ -1,7 +1,9 @@
-using System.Collections;
-using UnityEngine;
 using EditorAttributes;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 [Serializable]
 public abstract class IEnemyAction : MonoBehaviour
@@ -17,11 +19,15 @@ public abstract class IEnemyAction : MonoBehaviour
     [HideInInspector] public PlayerAttack playerAttack;
     [HideInInspector] public Energy playerEnergy;
     [HideInInspector] public CharacterController2D playerController;
+
+    [HideInInspector] public IEnemyController bossController;
     public int actionBreakAmount = 1;
+
     public Coroutine act_routine;
 
     public virtual void Start()
     {
+        bossController = GetComponent<IEnemyController>();
         playerIDamagable = Health.instance;
         player = playerIDamagable.gameObject;
         vfx = VFXManager.instance;
@@ -57,15 +63,51 @@ public abstract class IEnemyAction : MonoBehaviour
 
     public virtual IEnumerator ApplyAttackInCircle(float duration, float range, Transform attackPos, MeleeAttack melee)
     {
-        bool hitAlready = false;
+        bool hitPlayerAlready = false;
+        List<IDamagable> hitIdamagables = new List<IDamagable>();
+        List<IProjectile> hitProjectiles = new List<IProjectile>();
         float elapsedTime = 0f;
-        while (!hitAlready && elapsedTime <= duration)
+        while (elapsedTime <= duration)
         {
-            float d = Vector3.Distance(playerIDamagable.GetHitPos(), attackPos.position);
-            if (d <= range) { Hit(melee, attackPos); hitAlready = true; }
             elapsedTime += Time.deltaTime;
-            yield return null;
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPos.position, range);
+            foreach (Collider2D collider in colliders)
+            {
+                if (collider.gameObject != player)
+                {
+                    //Hit Idamagables
+                    if (collider.TryGetComponent<IDamagable>(out IDamagable idmg))
+                    {
+                        if (!bossController.subDamagables.Contains(idmg))
+                        {
+                            if (!hitIdamagables.Contains(idmg))
+                            {
+                                hitIdamagables.Add(idmg);
+                                foreach (IDamagable subIdmg in idmg.subDamagables) { hitIdamagables.Add(subIdmg); }
+                                idmg.Damage(melee.damage, this.transform, melee.stun);
+                            }
+                        }
+                    }
+                    //Hit Iprojectiles
+                    if (collider.TryGetComponent<IProjectile>(out IProjectile iProj))
+                    {
+                        if (!hitProjectiles.Contains(iProj))
+                        {
+                            hitProjectiles.Add(iProj);
+                            iProj.HitByMeleeAttack();
+                        }
+                    }
+                }
+            }
+
+            // hit player
+            if (!hitPlayerAlready)
+            {
+                float d = Vector3.Distance(playerIDamagable.GetHitPos(), attackPos.position);
+                if (d <= range) { Hit(melee, attackPos); hitPlayerAlready = true; }
+            }
         }
+
         yield return null;
     }
 

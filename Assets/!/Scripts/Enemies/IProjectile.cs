@@ -115,6 +115,10 @@ public abstract class IProjectile : MonoBehaviour
         vfx.SpawnHitEffect(false, GetPivot());
     }
 
+    public virtual void HitByMeleeAttack()
+    {
+    }
+
     public void ResetAttributes()
     {
         owner = null;

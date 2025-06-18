@@ -74,12 +74,13 @@ public class YYF_BubbleTrap : IEnemyAction
            .SetSpeedBased(true)
            .SetEase(Ease.Linear);
 
+        anim.Play("sprint_swim");
         //emitting bubbles
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.22f);
         elpasedTime = 0f;
         duration = 1.3f;
-        float emitGap = 0.15f;
+        float emitGap = 0.07f;
         float emitTimer = 0f;
         while (elpasedTime <= duration)
         {
@@ -87,7 +88,7 @@ public class YYF_BubbleTrap : IEnemyAction
             emitTimer += Time.deltaTime;
             if (emitTimer >= emitGap)
             {
-                Vector3 dir = (fish.position - origin.position).normalized;
+                Vector3 dir = (fish.position - (origin.position + new Vector3(0, jumpHeight))).normalized;
                 angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
                 Vector3 euler = new Vector3(0, 0, angle);
 
@@ -108,10 +109,13 @@ public class YYF_BubbleTrap : IEnemyAction
         origin.localScale = new Vector3(1, 1, 1);
         fish.DOLocalMoveY(3, 1f);
 
+        anim.Play("close_swim");
         //swim back
         yield return bossAI.co_singleReturnToCenter = StartCoroutine(bossAI.IEReturnToCenter(isBlack));
 
         //end
         bossAI.SetNotBusy(isBlack);
+        bossAI.AddActionBreak(actionBreakAmount);
+        bossAI.EndAction();
     }
 }

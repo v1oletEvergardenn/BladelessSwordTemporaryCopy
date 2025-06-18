@@ -493,7 +493,7 @@ AnimatorStateMachine:
     m_Position: {x: -260, y: 450, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -3911858256290315920}
-    m_Position: {x: -270, y: 520, z: 0}
+    m_Position: {x: -290, y: 550, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -669960184506786914}
     m_Position: {x: 0, y: 460, z: 0}
@@ -545,6 +545,12 @@ AnimatorStateMachine:
   - serializedVersion: 1
     m_State: {fileID: 605393528068007160}
     m_Position: {x: 410, y: 630, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: 7027177563849352668}
+    m_Position: {x: 320, y: 140, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: 2067943236204759858}
+    m_Position: {x: 350, y: 200, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -843,7 +849,33 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 84bf985940e2e6540b0c26a2acf24648, type: 2}
+  m_Motion: {fileID: 7400000, guid: 6bcc7165a218c2842ad4ecdad4cfab30, type: 2}
+  m_Tag: 
+  m_SpeedParameter: 
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: 
+--- !u!1102 &2067943236204759858
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: sprint_swim
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Transitions: []
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 0
+  m_Motion: {fileID: 7400000, guid: 577b576feab1d8648852738c151836e6, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -1147,6 +1179,32 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1102 &7027177563849352668
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: fast_swim
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Transitions: []
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 0
+  m_Motion: {fileID: 7400000, guid: 405dddc1d8ba4da46ad7aec9a8bfe59c, type: 2}
+  m_Tag: 
+  m_SpeedParameter: 
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: 
 --- !u!1101 &7465307919133217759
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1193,7 +1251,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 2fb6117ee0576c0449f5d3fa3777c02d, type: 2}
+  m_Motion: {fileID: 7400000, guid: daf38398c5ffe2542b62c04d191e05ee, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

@@ -8,7 +8,6 @@ using static UnityEditor.PlayerSettings;
 public class YYF_SingleSwing : IEnemyAction
 {
     private YingYangFish_AI bossAI;
-
     public bool showRange = true;
     public GameObject swingEffect;
     public GameObject swing_outline;
@@ -115,6 +114,8 @@ public class YYF_SingleSwing : IEnemyAction
 
         //end
         bossAI.SetNotBusy(isBlack);
+        bossAI.AddActionBreak(actionBreakAmount);
+        bossAI.EndAction();
     }
 
     public override void Hit(MeleeAttack melee, Transform attackPos)

@@ -87,7 +87,7 @@ SpriteRenderer:
   m_Size: {x: 6, y: 0.65}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!95 &8762254126324939098
@@ -149,9 +149,9 @@ MonoBehaviour:
   rumbleDuration_perfect: 0.51
   rumbleFrequncy_perfect: {x: 0.77287066, y: 1.5}
   cameraShakeForce: {x: 0, y: 0.2}
-  freezeTimeDuration: 0.2
+  freezeTimeDuration: 0.3
   slowTimeScale: 0.1
-  repelForce: 20
+  repelForce: 50
   vfx: {fileID: 0}
   gameManager: {fileID: 0}
   facingRight: 0

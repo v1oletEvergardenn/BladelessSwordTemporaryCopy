@@ -31,7 +31,7 @@ public class Spear : IProjectile
     {
         vfx.RumblePulse(rumbleFrequncy_perfect.x, rumbleFrequncy_perfect.y, rumbleDuration_perfect);
         vfx.CameraShake(cameraShakeForce.y);
-        vfx.SlowTimeForSeconds(0.3f, 0f);
+        vfx.SlowTimeForSeconds(freezeTimeDuration, slowTimeScale);
         isPerfect = true;
         vfx.SpawnHitEffect(true, gameManager.Player.GetComponent<PlayerAttack>().counterAttackPoint.position);
     }
@@ -53,7 +53,7 @@ public class Spear : IProjectile
                 if (collision.gameObject.layer == 14) { return; }
                 if (gameManager.Player.GetComponent<PlayerAttack>().isAttacking && gameManager.Player.GetComponent<CharacterController2D>().FacingRight != facingRight)
                 {
-                    target.Repel(50f, this.transform.right.x < 0 ? true : false);
+                    target.Repel(repelForce, this.transform.right.x < 0 ? true : false);
                     gameManager.Player.GetComponent<PlayerAttack>().CounterAttack(this, true);
                 }
                 else

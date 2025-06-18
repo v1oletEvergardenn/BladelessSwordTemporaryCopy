@@ -68,11 +68,11 @@ public class YingYangFish_AI : IEnemyController
     [HideInInspector] public float black_distanceToCenter = 0f;
     [HideInInspector] public Transform movingTarget;
 
-    private bool isCloseSwimming;
-    public float black_rotateSpeed;
-    public float white_rotateSpeed;
-    public float black_targetRotateSpeed;
-    public float white_targetRotateSpeed;
+    [HideInInspector] public bool isCloseSwimming;
+    [HideInInspector] public float black_rotateSpeed;
+    [HideInInspector] public float white_rotateSpeed;
+    [HideInInspector] public float black_targetRotateSpeed;
+    [HideInInspector] public float white_targetRotateSpeed;
 
     public bool isBlackBusy { get; private set; } = false;
 
@@ -168,6 +168,8 @@ public class YingYangFish_AI : IEnemyController
         SetWhiteTargetRotateSpeed(idleRotateSpeed);
         black_rotateSpeed = idleRotateSpeed;
         SetBlackTargetRotateSpeed(idleRotateSpeed);
+
+        isCloseSwimming = true;
     }
 
     private void Update()
@@ -304,27 +306,29 @@ public class YingYangFish_AI : IEnemyController
 
         if (close)
         {
+            isCloseSwimming = true;
             if (playAnim)
             {
                 whiteAnim.Play("close_swim_pre");
                 blackAnim.Play("close_swim_pre");
             }
 
-            while (white_distanceToCenter > minMaxDistanceTocenter.x)
+            while (white_distanceToCenter > minMaxDistanceTocenter.x || black_distanceToCenter > minMaxDistanceTocenter.x)
             {
-                whiteFish.position -= whiteFish.up * swimToCenterSpeed * Time.deltaTime;
-                blackFish.position -= blackFish.up * swimToCenterSpeed * Time.deltaTime;
+                if (white_distanceToCenter > minMaxDistanceTocenter.x) whiteFish.position -= whiteFish.up * swimToCenterSpeed * Time.deltaTime;
+                if (black_distanceToCenter > minMaxDistanceTocenter.x) blackFish.position -= blackFish.up * swimToCenterSpeed * Time.deltaTime;
                 yield return null;
             }
         }
         else
         {
             blackAnim.Play("sprint"); whiteAnim.Play("sprint");
-
-            while (white_distanceToCenter < minMaxDistanceTocenter.y)
+            isCloseSwimming = false;
+            while (white_distanceToCenter < minMaxDistanceTocenter.y || black_distanceToCenter < minMaxDistanceTocenter.y)
             {
-                whiteFish.position += whiteFish.up * swimToCenterSpeed * Time.deltaTime;
-                blackFish.position += blackFish.up * swimToCenterSpeed * Time.deltaTime;
+                if (white_distanceToCenter < minMaxDistanceTocenter.y) whiteFish.position += whiteFish.up * swimToCenterSpeed * Time.deltaTime;
+                if (black_distanceToCenter < minMaxDistanceTocenter.y) blackFish.position += blackFish.up * swimToCenterSpeed * Time.deltaTime;
+
                 yield return null;
             }
         }
@@ -964,6 +968,12 @@ public class YingYangFish_AI : IEnemyController
     {
         if (isBlack) { SetBlackBusy(); }
         else { SetWhiteBusy(); }
+    }
+
+    public void SetFishTargetRotateSpeed(bool isBlack, float speed)
+    {
+        if (isBlack) { black_targetRotateSpeed = speed; }
+        else { white_targetRotateSpeed = speed; }
     }
 
     public void SetBlackTargetRotateSpeed(float speed)

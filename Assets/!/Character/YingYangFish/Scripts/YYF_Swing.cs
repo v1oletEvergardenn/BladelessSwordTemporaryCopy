@@ -42,10 +42,7 @@ public class YYF_Swing : IEnemyAction
         {
             yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
 
-            if (bossAI.white_distanceToCenter > bossAI.minMaxDistanceTocenter.x)
-            {
-                yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
-            }
+            yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
         }
 
         bossAI.SetBlackTargetRotateSpeed(bossAI.idleRotateSpeed / 4);
@@ -54,6 +51,8 @@ public class YYF_Swing : IEnemyAction
         bossAI.whiteAnim.Play("swing");
         bossAI.blackAnim.Play("swing");
 
+        swing_outline.transform.SetParent(transform);
+        swing_outline.transform.localPosition = Vector3.zero;
         if (factor == 1)
         {
             yield return new WaitForSeconds(0.4f);
