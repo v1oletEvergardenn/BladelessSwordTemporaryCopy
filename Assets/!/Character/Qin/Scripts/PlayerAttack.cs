@@ -166,10 +166,10 @@ public class PlayerAttack : MonoBehaviour
 
         if (attackAnimTimer <= attackAnimDuration) { isInAttackAnim = true; } else { isInAttackAnim = false; }
 
-        if (attackTimer > attackGap) { isAttacking = false; isHS_attack = false; }
+        //if (attackTimer > attackGap) { isAttacking = false; isHS_attack = false; }
 
         if (counterAttackCheckTimer <= counterAttackCheckDuration) { CheckCounterAttack(); }
-        else { isAttacking = false; }
+        else { isAttacking = false; isHS_attack = false; }
     }
 
     #endregion Unity Lifecycle
@@ -179,8 +179,10 @@ public class PlayerAttack : MonoBehaviour
     public void Attack(bool attackLeft)
     {
         // Guard clauses for attack eligibility
-        if (isAttacking || !canAttack || controller.isFloating || attackTimer < attackGap)
-            return;
+
+        if (attackTimer < attackGap) return;
+        if (!canAttack) return;
+        if (controller.isFloating) return;
         if (activatedHS_point < 1 && !energy.AttackConsume()) { return; }
 
         // Set attack state
@@ -251,14 +253,15 @@ public class PlayerAttack : MonoBehaviour
     {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(counterAttackPoint.position, HS_attack_radius + 5);
 
-        IProjectile closestProjectile = null;
-        IDamagable closestDamagable = null;
-        float minProjDist = float.PositiveInfinity;
-        float minDmgDist = float.PositiveInfinity;
+        //IProjectile closestProjectile = null;
+        //IDamagable closestDamagable = null;
+        //float minProjDist = float.PositiveInfinity;
+        //float minDmgDist = float.PositiveInfinity;
 
-        var inRangeProjectiles = new List<IProjectile>();
-        var inRangeDamagables = new List<IDamagable>();
-
+        //var inRangeProjectiles = new List<IProjectile>();
+        //var inRangeDamagables = new List<IDamagable>();
+        float counterRadius = CounterAttackRadius + counterAttackPoint.localPosition.x;
+        float hsCheckDistance = HS_attack_radius + counterAttackPoint.localPosition.x;
         // Gather projectiles and damagables, and find closest of each
         foreach (Collider2D collider in colliders)
         {
@@ -266,69 +269,26 @@ public class PlayerAttack : MonoBehaviour
 
             if (collider.TryGetComponent<IProjectile>(out IProjectile proj))
             {
-                float dist = Vector3.Distance(proj.GetPivot(), health.GetHitPos());
-                if (dist < minProjDist)
+                if (proj.isHostileToPlayer && !proj.collided)
                 {
-                    minProjDist = dist;
-                    closestProjectile = proj;
+                    if (!IsInCounterDirection(proj.GetPivot())) continue;
+                    float dist = Vector2.Distance(proj.GetPivot(), health.GetHitPos());
+                    if (isHS_attack && dist <= hsCheckDistance) HS_CounterAttack(proj);//if hs attack
+                    else if (dist <= counterRadius)// if normal attack
+                    {
+                        if (counterAttackCheckTimer <= perfectCounterAttackCheckDuration) CounterAttack(proj, true);
+                        if (counterAttackCheckTimer <= counterAttackCheckDuration) CounterAttack(proj, false);
+                    }
                 }
-                inRangeProjectiles.Add(proj);
             }
 
             if (isHS_attack && collider.TryGetComponent<IDamagable>(out IDamagable dmg))
             {
-                float dist = Vector3.Distance(dmg.GetHitPos(), health.GetHitPos());
-                if (dist < minDmgDist)
-                {
-                    minDmgDist = dist;
-                    closestDamagable = dmg;
-                }
-                inRangeDamagables.Add(dmg);
-            }
-        }
-
-        float hsCheckDistance = HS_attack_radius + counterAttackPoint.localPosition.x;
-
-        if (isHS_attack)
-        {
-            // HS counter: damagables
-            foreach (var dmg in inRangeDamagables)
-            {
                 if (!IsInCounterDirection(dmg.GetHitPos())) continue;
-
-                float dist = Vector2.Distance(dmg.GetHitPos(), health.GetHitPos());
+                float dist = Vector3.Distance(dmg.GetHitPos(), health.GetHitPos());
                 if (dist <= hsCheckDistance) HSAttack(dmg);
             }
-
-            // HS counter: projectiles
-            foreach (var proj in inRangeProjectiles)
-            {
-                if (!proj.isHostileToPlayer || proj.collided) continue;
-                if (!IsInCounterDirection(proj.GetPivot())) continue;
-
-                float dist = Vector2.Distance(proj.GetPivot(), health.GetHitPos());
-                if (dist <= hsCheckDistance)
-                    HS_CounterAttack(proj);
-            }
         }
-        else if (closestProjectile != null && closestProjectile.isHostileToPlayer && !closestProjectile.collided)
-        {
-            float dist = Vector2.Distance(closestProjectile.GetPivot(), health.GetHitPos());
-            float counterRadius = CounterAttackRadius + counterAttackPoint.localPosition.x;
-
-            if (dist <= counterRadius)
-            {
-                if (counterAttackCheckTimer <= perfectCounterAttackCheckDuration)
-                {
-                    CounterAttack(closestProjectile, true); return;
-                }
-                if (counterAttackCheckTimer <= counterAttackCheckDuration)
-                {
-                    CounterAttack(closestProjectile, false); return;
-                }
-            }
-        }
-
         // Helper: checks if a target is in the correct direction for counter
         bool IsInCounterDirection(Vector3 targetPos)
         {
@@ -340,15 +300,14 @@ public class PlayerAttack : MonoBehaviour
 
     public void CounterAttack(IProjectile projectile, bool isPerfect)
     {
-        if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
-        isAttacking = false;
+        //if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
+        attackTimer = attackGap + 0.5f;
         canDefend = true;
-        attackTimer = attackGap;
-        counterAttackCheckTimer = counterAttackCheckDuration + 0.5f;
         if (isPerfect)
         {
             ModifyHSPoint(1);
             energy.ChangeEnergy(-energy.attack_energy_consumption);
+
             projectile.SetUp(direction, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * basicAttackDamage);
             projectile.PerfectCounterAttack();
             SoundManager.PlaySound("perfect_attack");
@@ -364,12 +323,11 @@ public class PlayerAttack : MonoBehaviour
     public void HS_CounterAttack(IProjectile projectile)
     {
         if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
-        isAttacking = false;
+        attackTimer = attackGap + 0.5f;
         canDefend = true;
-        attackTimer = attackGap;
-        counterAttackCheckTimer = counterAttackCheckDuration + 0.5f;
 
         energy.ChangeEnergy(-energy.attack_energy_consumption);
+
         projectile.SetUp(direction, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * basicAttackDamage);
         projectile.PerfectCounterAttack();
         SoundManager.PlaySound("perfect_attack");

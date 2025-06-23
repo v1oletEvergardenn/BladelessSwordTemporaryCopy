@@ -38,7 +38,7 @@ public class YYF_SingleSwing : IEnemyAction
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         // prepare
-        while (bossAI.isBlackBusy && bossAI.isWhiteBusy) yield return null;
+        while (bossAI.isBlackBusy && bossAI.isWhiteBusy) break;
 
         // initialize
         bool isBlack = true;
@@ -118,7 +118,7 @@ public class YYF_SingleSwing : IEnemyAction
         bossAI.EndAction();
     }
 
-    public override void Hit(MeleeAttack melee, Transform attackPos)
+    public override void HitPlayer(MeleeAttack melee, Transform attackPos)
     {
         int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
         bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;

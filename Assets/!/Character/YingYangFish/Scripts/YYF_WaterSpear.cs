@@ -63,7 +63,6 @@ public class YYF_WaterSpear : IEnemyAction
             if (bossAI.initialAction == bossAI.waterSpear && (playerEnergy.currentEnergy <= 5)) possiblity += 2;
             int i = UnityEngine.Random.Range(0, 10);
             addition = false; if (i < possiblity) { addition = true; }
-            addition = true;//////////////////////////////////test////////////////////////
         }
         if (factor == 1 || factor == 3 || factor == 5)
         {
@@ -144,7 +143,7 @@ public class YYF_WaterSpear : IEnemyAction
             }
 
             if (isBlack) { bossAI.SetBlackNotBusy(); } else { bossAI.SetWhiteNotBusy(); }
-            bossAI.SetNormalRotateSpeed();
+            bossAI.SetFishTargetRotateSpeed(isBlack, bossAI.idleRotateSpeed);
             bossAI.AddActionBreak(actionBreakAmount);
             bossAI.EndAction();
         }

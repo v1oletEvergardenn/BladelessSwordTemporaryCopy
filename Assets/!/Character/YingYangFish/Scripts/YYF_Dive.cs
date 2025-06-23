@@ -9,8 +9,6 @@ public class YYF_Dive : IEnemyAction
     public YingYangFish_AI bossAI;
     public GameObject swimEffect;
 
-    public Coroutine co_closeswim;
-
     public override void Start()
     {
         base.Start();
@@ -23,7 +21,8 @@ public class YYF_Dive : IEnemyAction
         {
             StopCoroutine(act_routine);
         }
-        if (co_closeswim != null) { StopCoroutine(co_closeswim); }
+        bossAI.blackAnim.SetBool("dive_end", false);
+        bossAI.whiteAnim.SetBool("dive_end", false);
     }
 
     public override IEnumerator Act_coroutine(float factor = 0)

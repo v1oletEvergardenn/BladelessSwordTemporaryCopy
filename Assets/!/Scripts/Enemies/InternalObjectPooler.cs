@@ -23,10 +23,11 @@ public class InternalObjectPooler : MonoBehaviour
         foreach (Pool pool in pools)
         {
             Queue<GameObject> objectPool = new Queue<GameObject>();
-
+            GameObject parent = new GameObject(pool.tag + " Pool");
+            parent.transform.SetParent(transform, false);
             for (int i = 0; i < pool.size; i++)
             {
-                GameObject obj = Instantiate(pool.prefab, this.transform);
+                GameObject obj = Instantiate(pool.prefab, parent.transform);
                 obj.SetActive(false);
                 objectPool.Enqueue(obj);
             }
@@ -49,9 +50,9 @@ public class InternalObjectPooler : MonoBehaviour
             return null;
         }
         GameObject obj = poolDictionary[tag].Dequeue();
-        obj.SetActive(true);
         obj.transform.position = position;
         obj.transform.rotation = rotation;
+        obj.SetActive(true);
 
         poolDictionary[tag].Enqueue(obj);
         return obj;
@@ -64,8 +65,8 @@ public class InternalObjectPooler : MonoBehaviour
             return null;
         }
         GameObject obj = poolDictionary[tag].Dequeue();
-        obj.SetActive(true);
         obj.transform.position = position;
+        obj.SetActive(true);
         if (randomRot)
         {
             float i = Random.Range(0f, 360f);

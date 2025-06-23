@@ -308,7 +308,7 @@ public class InputPlayer : MonoBehaviour
     /// </summary>
     private void TestEvent()
     {
-        VFXManager.instance.FailedToDoAction();
+        VFXManager.instance.BulletTime();
     }
 
     private void OnJump()

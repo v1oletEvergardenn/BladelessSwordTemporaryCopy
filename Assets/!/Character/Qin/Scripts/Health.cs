@@ -62,7 +62,7 @@ public class Health : IDamagable
     {
         if (stunned)
         {
-            if (stun_timer > 0) { stun_timer -= Time.deltaTime; }
+            if (stun_timer > 0) { stun_timer -= Time.unscaledDeltaTime; }
             else
             {
                 stunned = false;

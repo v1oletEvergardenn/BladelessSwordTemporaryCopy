@@ -188,6 +188,8 @@ public abstract class IProjectile : MonoBehaviour
     public virtual void Die()
     {
         this.gameObject.SetActive(false);
+        transform.position = Vector3.zero;
+        ResetAttributes();// Reset position to avoid issues when reusing the object from the pool
     }
 
     public Quaternion CalculateWantedRotation(Vector3 _targetPos)

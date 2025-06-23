@@ -34,7 +34,7 @@ public class GeneralProjectile : IProjectile
                 vfx.SlowTimeForSeconds(freezeTimeDuration, slowTimeScale);
                 gameManager.player_Idamagable.Repel(repelForce, transform.right.x < 0 ? true : false);
             }
-            anim.Play(anim_after_hit);
+            if (anim != null) anim.Play(anim_after_hit);
             vfx.SpawnEffectWithEnum(hitEffect, transform.position, isRed);
             //shakeManager.CameraShake(gameManager.impulseSource, cameraShakeForce.y);
             rb.velocity = Vector3.zero;
@@ -46,7 +46,7 @@ public class GeneralProjectile : IProjectile
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)
         {
-            anim.Play(anim_after_hit);
+            if (anim != null) anim.Play(anim_after_hit);
             vfx.SpawnEffectWithEnum(hitEffect, transform.position, isRed);
             rb.velocity = Vector3.zero;
             rb.gravityScale = 0;

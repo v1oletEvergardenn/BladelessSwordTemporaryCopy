@@ -41,7 +41,6 @@ public class YYF_Swing : IEnemyAction
         if (factor != 3)
         {
             yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
-
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
         }
 
@@ -82,6 +81,7 @@ public class YYF_Swing : IEnemyAction
             yield return new WaitForSeconds(0.3f);
         }
 
+        //move
         float x = transform.position.x + 5;
         if (bossAI.IsPlayerLeft()) { x = transform.position.x - 5; }
         transform.DOMoveX(x, 0.3f).SetEase(Ease.InQuint);
@@ -94,6 +94,7 @@ public class YYF_Swing : IEnemyAction
         swingEffect.transform.eulerAngles = bossAI.whiteFish.eulerAngles;
         swingEffect.SetActive(true);
 
+        //apply attack in circle
         StartCoroutine(ApplyAttackInCircle(swingAttackDuration, swingRange, transform, swingAttack));
         yield return new WaitForSeconds(.7f);
 
@@ -118,7 +119,19 @@ public class YYF_Swing : IEnemyAction
         }
     }
 
-    public override void Hit(MeleeAttack melee, Transform attackPos)
+    /// <summary>
+    /// Processes a melee attack on the player, applying damage, stun effects, and visual feedback.
+    /// </summary>
+    /// <remarks>The method determines the outcome of the attack based on the damage dealt: <list
+    /// type="bullet"> <item><description>If the player counters the attack, additional effects such as camera shake,
+    /// rumble, and time slow are applied, and the boss's stun value is reduced.</description></item>
+    /// <item><description>If the player defends, the attack is repelled with visual and feedback
+    /// effects.</description></item> <item><description>If the attack deals damage, the player is repelled with varying
+    /// intensity based on local factors.</description></item> </list> This method also handles special conditions, such
+    /// as triggering boss combo actions during specific health thresholds.</remarks>
+    /// <param name="melee">The melee attack details, including damage, stun, and other effects.</param>
+    /// <param name="attackPos">The position of the attack relative to the player.</param>
+    public override void HitPlayer(MeleeAttack melee, Transform attackPos)
     {
         int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
         bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;

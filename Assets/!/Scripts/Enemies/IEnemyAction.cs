@@ -73,19 +73,21 @@ public abstract class IEnemyAction : MonoBehaviour
             Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPos.position, range);
             foreach (Collider2D collider in colliders)
             {
-                if (collider.gameObject != player)
+                if (bossController.subDamagables.Contains(collider.GetComponent<IDamagable>())
+                    || collider.gameObject == this.gameObject)
+                {
+                    continue; // Skip if it's the boss itself or a sub-damagable of the boss
+                }
+                else if (collider.gameObject != player)
                 {
                     //Hit Idamagables
                     if (collider.TryGetComponent<IDamagable>(out IDamagable idmg))
                     {
-                        if (!bossController.subDamagables.Contains(idmg))
+                        if (!hitIdamagables.Contains(idmg))
                         {
-                            if (!hitIdamagables.Contains(idmg))
-                            {
-                                hitIdamagables.Add(idmg);
-                                foreach (IDamagable subIdmg in idmg.subDamagables) { hitIdamagables.Add(subIdmg); }
-                                idmg.Damage(melee.damage, this.transform, melee.stun);
-                            }
+                            hitIdamagables.Add(idmg);
+                            foreach (IDamagable subIdmg in idmg.subDamagables) { hitIdamagables.Add(subIdmg); }
+                            idmg.Damage(melee.damage, this.transform, melee.stun);
                         }
                     }
                     //Hit Iprojectiles
@@ -99,19 +101,19 @@ public abstract class IEnemyAction : MonoBehaviour
                     }
                 }
             }
-
             // hit player
             if (!hitPlayerAlready)
             {
                 float d = Vector3.Distance(playerIDamagable.GetHitPos(), attackPos.position);
-                if (d <= range) { Hit(melee, attackPos); hitPlayerAlready = true; }
+                if (d <= range) { HitPlayer(melee, attackPos); hitPlayerAlready = true; }
             }
+            yield return null;
         }
 
         yield return null;
     }
 
-    public virtual void Hit(MeleeAttack melee, Transform attackPos)
+    public virtual void HitPlayer(MeleeAttack melee, Transform attackPos)
     {
         int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
         bool direction = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
@@ -152,6 +154,33 @@ public abstract class IEnemyAction : MonoBehaviour
     public void TryStopCoroutine(Coroutine i)
     {
         if (i != null) { StopCoroutine(i); }
+    }
+
+    /// <summary>
+    /// Calculates the desired rotation to face a specified target position.
+    /// </summary>
+    /// <remarks>The calculated rotation is based on the angle between the object's current position and the
+    /// target position in the X-Y plane. The Z-axis rotation is adjusted accordingly.</remarks>
+    /// <param name="_targetPos">The target position in world space that the rotation should face.</param>
+    /// <returns>A <see cref="Quaternion"/> representing the rotation required to face the target position.</returns>
+    public Quaternion CalculateWantedRotation(Vector3 _targetPos, Vector3 _originPos)
+    {
+        return Quaternion.Euler(CalculateWantedEuler(_targetPos, _originPos));
+    }
+
+    /// <summary>
+    /// Calculates the desired Euler angle for rotation based on the position of a target relative to an origin.
+    /// </summary>
+    /// <remarks>This method is typically used to determine the rotation angle required to face a target
+    /// position from a given origin position in a 2D plane.</remarks>
+    /// <param name="_targetPos">The position of the target as a <see cref="Vector3"/>.</param>
+    /// <param name="_originPos">The position of the origin as a <see cref="Vector3"/>.</param>
+    /// <returns>A <see cref="Vector3"/> representing the Euler angle, where the Z component contains the angle in degrees
+    /// calculated using the arctangent of the difference in Y and X coordinates between the target and origin. The X
+    /// and Y components are set to 0.</returns>
+    public Vector3 CalculateWantedEuler(Vector3 _targetPos, Vector3 _originPos)
+    {
+        return new Vector3(0, 0, Mathf.Atan2(_targetPos.y - _originPos.y, _targetPos.x - _originPos.x) * Mathf.Rad2Deg);
     }
 }
 

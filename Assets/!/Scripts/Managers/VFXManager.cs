@@ -232,19 +232,19 @@ public class VFXManager : MonoBehaviour
     private float originalLightIntensity;
     private float originalLightIntensity2;
 
-    public static void StartBossBreakEffect()
+    private static void StartBossBreakEffect()
     {
         instance.originalLightIntensity = instance.globalLight.intensity;
         instance.originalLightIntensity2 = instance.light_player_enemy.intensity;
         instance.StartCoroutine(instance.BossBreakEffectCoroutine(true));
     }
 
-    public static void EndBossBreakEffect()
+    private static void EndBossBreakEffect()
     {
         instance.StartCoroutine(instance.BossBreakEffectCoroutine(false));
     }
 
-    public IEnumerator BossBreakEffectCoroutine(bool start)
+    private IEnumerator BossBreakEffectCoroutine(bool start)
     {
         breakEffect.enabled = true;
         float duration = 0.4f;
