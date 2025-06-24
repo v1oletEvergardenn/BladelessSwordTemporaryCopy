@@ -1,10 +1,9 @@
-using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class YYF_splash_black : IEnemyAction
+public class YYF_Splash : IEnemyAction
 {
     private YingYangFish_AI bossAI;
     public Transform shootPos;
@@ -20,26 +19,27 @@ public class YYF_splash_black : IEnemyAction
         bossAI = GetComponent<YingYangFish_AI>();
     }
 
-    //high and near
+    //low and far
     public override IEnumerator Act_coroutine(float factor = 0)
     {
-        bossAI.SetBlackBusy();
+        bossAI.SetWhiteBusy();
         if (factor == 0)
         {
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
-            yield return bossAI.co_sprintToAngle = StartCoroutine(bossAI.IESprintToAngle(true, -180));
+            yield return bossAI.co_sprintToAngle = StartCoroutine(bossAI.IESprintToAngle(false, -180));
         }
         else if (factor == 1)
         {
-            bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
-            bossAI.blackAnim.Play("sprint");
-            while (Mathf.Abs(180 - bossAI.blackFish.eulerAngles.z) >= 10)
+            bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);
+            bossAI.whiteAnim.Play("sprint");
+            while (Mathf.Abs(180 - bossAI.whiteFish.eulerAngles.z) >= 10)
             {
                 yield return null;
             }
-            bossAI.SetBlackTargetRotateSpeed(0);
+            bossAI.SetWhiteTargetRotateSpeed(0);
         }
-        bossAI.blackAnim.Play("splash");
+
+        bossAI.whiteAnim.Play("splash");
 
         yield return new WaitForSeconds(1f);
 
@@ -52,15 +52,7 @@ public class YYF_splash_black : IEnemyAction
 
         if (bossAI.initialAction == this)
         {
-            if (bossAI.distanceToPlayer <= bossAI.swing.swingRange)
-            {
-                bossAI.InsertAction(bossAI.swing);
-            }
-            else
-            {
-                bossAI.InsertAction(bossAI.waterSpear);
-                if (Possibility(50)) { bossAI.InsertAction(bossAI.splash_white); }
-            }
+            if (Possibility(50)) { bossAI.InsertAction(bossAI.waterSpear); }
         }
 
         if (factor == 0)
@@ -70,10 +62,10 @@ public class YYF_splash_black : IEnemyAction
         }
         else
         {
-            bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
+            bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);
         }
 
-        bossAI.SetBlackNotBusy();
+        bossAI.SetWhiteNotBusy();
         bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();
 
@@ -90,7 +82,7 @@ public class YYF_splash_black : IEnemyAction
                 _damage: damage,
                 _speed: shootDirecitons[index].y,
                 gravityScale: gravityScale,
-                  _stunValue: stunValue);
+                _stunValue: stunValue);
         }
         else
         {
@@ -99,7 +91,7 @@ public class YYF_splash_black : IEnemyAction
                 _damage: damage,
                 _speed: shootDirecitons[index].y,
                 gravityScale: gravityScale,
-                 _stunValue: stunValue);
+                _stunValue: stunValue);
         }
     }
 }

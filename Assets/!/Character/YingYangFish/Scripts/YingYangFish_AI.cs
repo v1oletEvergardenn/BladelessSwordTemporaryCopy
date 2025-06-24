@@ -124,18 +124,17 @@ public class YingYangFish_AI : IEnemyController
     #region Action Fields
 
     [FoldoutGroup("Action References", nameof(waterSpear), nameof(swing),
-        nameof(singleSwing), nameof(bubbleTrap), nameof(splash_white),
-        nameof(splash_black), nameof(dive), nameof(gatling))]
+        nameof(singleSwing), nameof(bubbleTrap), nameof(dive),
+        nameof(gatling), nameof(splash))]
     public Void actionRefsGroup;
 
     [SerializeField, HideInInspector] public YYF_WaterSpear waterSpear;
     [SerializeField, HideInInspector] public YYF_Swing swing;
     [SerializeField, HideInInspector] public YYF_SingleSwing singleSwing;
-    [SerializeField, HideInInspector] public YYF_splash_white splash_white;
-    [SerializeField, HideInInspector] public YYF_splash_black splash_black;
     [SerializeField, HideInInspector] public YYF_BubbleTrap bubbleTrap;
     [SerializeField, HideInInspector] public YYF_Dive dive;
     [SerializeField, HideInInspector] public YYF_Gatling gatling;
+    [SerializeField, HideInInspector] public YYF_Splash splash;
 
     public bool Actions;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("ForceDie", "ForceDie")] public Transform void112;
@@ -143,8 +142,7 @@ public class YingYangFish_AI : IEnemyController
     [ShowField(nameof(Actions))][SerializeField, ButtonField("StartAction", "StartAction")] public Transform void11;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("WaterSpear", "WaterSpear")] public Void void1;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Swing", "Swing")] public Void void8;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash_white", "Splash_white")] public Void void9;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash_black", "Splash_black")] public Void void13;
+    [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash", "Splash")] public Void void9;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("Dive", "Dive")] public Void void10;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("SingleSwing", "SingleSwing")] public Void voidSingleswing;
     [ShowField(nameof(Actions))][SerializeField, ButtonField("BubbleTrap", "BubbleTrap")] public Void voidbubble;
@@ -492,8 +490,6 @@ public class YingYangFish_AI : IEnemyController
         TryStopCoroutine(co_act);
         waterSpear.CancelAct();
         swing.CancelAct();
-        splash_white.CancelAct();
-        splash_black.CancelAct();
         dive.CancelAct();
 
         blackAnim.Play("black_idle");
@@ -571,12 +567,6 @@ public class YingYangFish_AI : IEnemyController
 
         yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
         SetNormalRotateSpeed();
-
-        // splash four times
-        yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
-        yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
-        yield return splash_black.act_routine = StartCoroutine(splash_black.Act_coroutine(1));
-        yield return splash_white.act_routine = StartCoroutine(splash_white.Act_coroutine(1));
 
         //water spear ultimate
         yield return co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
@@ -770,7 +760,7 @@ public class YingYangFish_AI : IEnemyController
 
     public override void StartAction()
     {
-        if (secondPhase) { return; }
+        if (secondPhase || DEAD) { return; }
         List<IEnemyAction> possibleActions = new List<IEnemyAction>();
         if (playerEnergy.currentEnergy <= 5)
         {
@@ -782,7 +772,6 @@ public class YingYangFish_AI : IEnemyController
             {
                 float i = Random.Range(0, 10);
                 if (i < 3) { possibleActions.Add(waterSpear); }
-                else if (i < 6) { possibleActions.Add(splash_white); }
                 else if (i < 10) { possibleActions.Add(dive); }
             }
             else
@@ -795,11 +784,6 @@ public class YingYangFish_AI : IEnemyController
         else
         {
             possibleActions.Add(swing);
-        }
-
-        if (!playerController.isGrounded)
-        {
-            possibleActions.Add(splash_black);
         }
 
         int index = Random.Range(0, possibleActions.Count);
@@ -817,7 +801,7 @@ public class YingYangFish_AI : IEnemyController
             {
                 movingTarget = GetFarTargetOutOfTwo(player, GetBoundaryFarOfPlayer());
                 if (Possibility(50)) { InsertAction(waterSpear); }
-                else { InsertAction(splash_white); InsertAction(waterSpear); }
+                else { InsertAction(waterSpear); }
             }
         }
     }
@@ -911,9 +895,7 @@ public class YingYangFish_AI : IEnemyController
 
     public void Swing() => InsertAction(swing);
 
-    public void Splash_black() => InsertAction(splash_black);
-
-    public void Splash_white() => InsertAction(splash_white);
+    public void Splash() => InsertAction(splash);
 
     public void Dive() => InsertAction(dive);
 

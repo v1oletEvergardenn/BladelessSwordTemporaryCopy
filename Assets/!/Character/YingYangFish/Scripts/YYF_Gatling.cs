@@ -101,6 +101,7 @@ public class YYF_Gatling : IEnemyAction
     {
         string selectedTag = bulletTags[Random.Range(0, bulletTags.Length)];
         IProjectile bullet = bossAI.selfPooler.SpawnFromPool(selectedTag, position, false).GetComponent<IProjectile>();
+
         bullet.SetUp(dir, this.transform.gameObject, _speed: bulletSpeed, _damage: bulletDamage);
     }
 }

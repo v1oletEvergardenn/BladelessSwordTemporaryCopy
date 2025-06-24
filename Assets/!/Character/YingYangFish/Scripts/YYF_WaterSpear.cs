@@ -22,9 +22,6 @@ public class YYF_WaterSpear : IEnemyAction
     private Spear spear;
     private Spear smallSpear1;
     private Spear smallSpear2;
-    private bool shooted = false;
-    private bool smallSpear1Shooted = false;
-    private bool smallSpear2Shooted = false;
 
     public override void Start()
     {
@@ -36,9 +33,9 @@ public class YYF_WaterSpear : IEnemyAction
     {
         if (act_routine != null) { StopCoroutine(act_routine); }
 
-        if (!shooted && spear != null) { spear.SetFalseActive(); }
-        if (!smallSpear1Shooted && smallSpear1 != null) { smallSpear1.SetFalseActive(); }
-        if (!smallSpear2Shooted && smallSpear2 != null) { smallSpear2.SetFalseActive(); }
+        if (spear != null) { print(1); spear.SetFalseActive(); }
+        if (smallSpear1 != null) { smallSpear1.SetFalseActive(); }
+        if (smallSpear2 != null) { smallSpear2.SetFalseActive(); }
     }
 
     public override IEnumerator Act_coroutine(float factor = 0)
@@ -53,7 +50,6 @@ public class YYF_WaterSpear : IEnemyAction
 
         //initial setup
         bossAI.SetFishTargetRotateSpeed(isBlack, 0);
-        shooted = false; smallSpear1Shooted = false; smallSpear2Shooted = false;
         Spear _spear; Spear _smallSpear1 = null; Spear _smallSpear2 = null;
         bool addition = false;
 
@@ -115,14 +111,13 @@ public class YYF_WaterSpear : IEnemyAction
         //launch spear
         if (addition)
         {
-            ShootSpear(_smallSpear1); smallSpear1Shooted = true;
+            ShootSpear(_smallSpear1); smallSpear1 = null;
             yield return new WaitForSeconds(0.2f);
-            ShootSpear(_smallSpear2); smallSpear2Shooted = true;
+            ShootSpear(_smallSpear2); smallSpear2 = null;
             yield return new WaitForSeconds(0.5f);
         }
 
-        ShootSpear(_spear); shooted = true;
-        spear = null; smallSpear1 = null; smallSpear2 = null;
+        ShootSpear(_spear); spear = null;
         yield return new WaitForSeconds(0.5f);
         //normal state
         if (factor == 0)
@@ -193,7 +188,6 @@ public class YYF_WaterSpear : IEnemyAction
         spear.collisionActive = true;
         spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed, _stunValue: stunValue);
         spear.stunDuration = spear_stunDuration;
-        shooted = true;
     }
 
     public void ShootSmallSpear(Spear spear)
@@ -201,6 +195,5 @@ public class YYF_WaterSpear : IEnemyAction
         spear.collisionActive = true;
         spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed, _stunValue: stunValue);
         spear.stunDuration = spear_stunDuration;
-        shooted = true;
     }
 }

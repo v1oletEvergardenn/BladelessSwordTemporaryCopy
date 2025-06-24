@@ -158,7 +158,6 @@ public class YYF_Swing : IEnemyAction
                 if (combo && !bossAI.secondPhase)
                 {
                     bossAI.movingTarget = bossAI.GetBoundaryFarOfPlayer();
-                    bossAI.InsertAction(bossAI.splash_white);
                     bossAI.InsertAction(bossAI.waterSpear);
                     bossAI.InsertAction(bossAI.dive);
                 }
