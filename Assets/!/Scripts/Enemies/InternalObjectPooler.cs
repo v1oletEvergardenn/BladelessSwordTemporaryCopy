@@ -52,6 +52,7 @@ public class InternalObjectPooler : MonoBehaviour
         GameObject obj = poolDictionary[tag].Dequeue();
         obj.transform.position = position;
         obj.transform.rotation = rotation;
+        obj.SetActive(false);
         obj.SetActive(true);
 
         poolDictionary[tag].Enqueue(obj);
@@ -66,6 +67,7 @@ public class InternalObjectPooler : MonoBehaviour
         }
         GameObject obj = poolDictionary[tag].Dequeue();
         obj.transform.position = position;
+        obj.SetActive(false);
         obj.SetActive(true);
         if (randomRot)
         {

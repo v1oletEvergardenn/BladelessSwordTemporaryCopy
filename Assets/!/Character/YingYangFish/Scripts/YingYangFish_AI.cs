@@ -23,6 +23,7 @@ public class YingYangFish_AI : IEnemyController
     [HideInInspector] public Coroutine co_singleFishDive;
     [HideInInspector] public Coroutine co_singleReturnToCenter;
     [HideInInspector] public Coroutine co_singleJumpToPos;
+    [HideInInspector] public Coroutine co_circling;
 
     #endregion COROUTINES
 
@@ -233,6 +234,14 @@ public class YingYangFish_AI : IEnemyController
         yield return new WaitUntil(() => finished);
     }
 
+    /// <summary>
+    /// Adjusts the rotation speeds and animations of two entities to align their directions within a specified angle
+    /// range.
+    /// </summary>
+    /// <remarks>This coroutine determines which entity is closer in alignment to the other and adjusts their
+    /// rotation speeds      and animations accordingly. The method ensures that the entities' directions align within a
+    /// range of 170 to 180 degrees.     The rotation speed is reset to idle once alignment is achieved.</remarks>
+    /// <returns>An enumerator that can be used to control the coroutine's execution.</returns>
     public IEnumerator IESprintBackEqual()
     {
         float closerFish = Vector2.SignedAngle(blackFish.right, whiteFish.right);
@@ -485,6 +494,8 @@ public class YingYangFish_AI : IEnemyController
         TryStopCoroutine(co_singleFishDive);
         TryStopCoroutine(co_singleReturnToCenter);
         TryStopCoroutine(co_singleJumpToPos);
+        TryStopCoroutine(co_circling);
+        center.GetComponent<SpriteRenderer>().sortingOrder = 1;
 
         actionList.Clear();
         TryStopCoroutine(co_act);

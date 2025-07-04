@@ -322,7 +322,7 @@ public class PlayerAttack : MonoBehaviour
 
     public void HS_CounterAttack(IProjectile projectile)
     {
-        if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
+        //if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
         attackTimer = attackGap + 0.5f;
         canDefend = true;
 

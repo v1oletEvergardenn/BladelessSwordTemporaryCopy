@@ -63,6 +63,11 @@ public class Bubble : IProjectile
         StartCoroutine(Explode());
     }
 
+    public override void Die()
+    {
+        StartCoroutine(Explode());
+    }
+
     public IEnumerator Explode()
     {
         if (collided) { yield break; }

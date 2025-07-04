@@ -59,7 +59,10 @@ public class CameraFollow : MonoBehaviour
     {
         Vector3 _tempOffset = offset;
         if (!useOffset) { _tempOffset = Vector3.zero; }
-        camFollow.position = new Vector3(Mathf.SmoothDamp(camFollow.position.x, player.transform.position.x + _tempOffset.x, ref xAmount, 0.1f), player.transform.position.y + _tempOffset.y, camFollow.position.z);
+        camFollow.position = new Vector3(Mathf.SmoothDamp(camFollow.position.x,
+            player.transform.position.x + _tempOffset.x, ref xAmount, 0.1f),
+            player.transform.position.y + _tempOffset.y,
+            camFollow.position.z);
 
         if (!activate) { return; }
 
@@ -100,7 +103,7 @@ public class CameraFollow : MonoBehaviour
             float orthoSize_height = (bound.size.y + 3) / 2;
             targetZoom = MathF.Max(orthoSize_width, orthoSize_height);
 
-            limitCam.m_Lens.OrthographicSize = Mathf.Lerp(limitCam.m_Lens.OrthographicSize, targetZoom, Time.deltaTime * 5);
+            limitCam.m_Lens.OrthographicSize = Mathf.Lerp(limitCam.m_Lens.OrthographicSize, targetZoom, Time.unscaledDeltaTime * 5);
             //currentLimit.x = Mathf.Lerp(minLimit.x, maxLimit.x, Mathf.InverseLerp(minZoom, targetZoom, limitCam.m_Lens.OrthographicSize));
             //currentLimit.y = Mathf.Lerp(minLimit.y, maxLimit.y, Mathf.InverseLerp(minZoom, targetZoom, limitCam.m_Lens.OrthographicSize));
         }
@@ -149,7 +152,7 @@ public class CameraFollow : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime < _flipYTime)
         {
-            elapsedTime += Time.deltaTime;
+            elapsedTime += Time.unscaledDeltaTime;
 
             yRotation = Mathf.Lerp(startRotation, endRotationAmount, (elapsedTime / _flipYTime));
             camFollow.rotation = Quaternion.Euler(0f, yRotation, 0f);
@@ -198,7 +201,7 @@ public class CameraFollow : MonoBehaviour
         Vector2 endAmount = desireOffset;
         while (elapsedTime < lerpTime)
         {
-            elapsedTime += Time.deltaTime;
+            elapsedTime += Time.unscaledDeltaTime;
             Vector2 lerpedPanAmount = Vector2.Lerp(startAmount, endAmount, (elapsedTime / lerpTime));
             offset = lerpedPanAmount;
 
