@@ -21,15 +21,17 @@ public class YYF_BubbleTrap : IEnemyAction
         bossAI = GetComponent<YingYangFish_AI>();
     }
 
+    public override bool CanAct()
+    {
+        if (bossAI.isWhiteBusy && bossAI.isBlackBusy) return false;
+        else return true;
+    }
+
     public override IEnumerator Act_coroutine(float factor = 0)
     {
-        while (bossAI.isBlackBusy && bossAI.isWhiteBusy) yield return null;
-
         bool isBlack = true;
         if (bossAI.isBlackBusy) { isBlack = false; }
-
-        if (isBlack) { bossAI.SetBlackBusy(); }
-        else { bossAI.SetWhiteBusy(); }
+        bossAI.SetBusy(isBlack);
 
         Animator anim = isBlack ? bossAI.blackAnim : bossAI.whiteAnim;
         Transform fish = isBlack ? bossAI.blackFish : bossAI.whiteFish;
@@ -105,7 +107,7 @@ public class YYF_BubbleTrap : IEnemyAction
             yield return null;
         }
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.3f);
         origin.localScale = new Vector3(1, 1, 1);
         fish.DOLocalMoveY(3, 1f);
 

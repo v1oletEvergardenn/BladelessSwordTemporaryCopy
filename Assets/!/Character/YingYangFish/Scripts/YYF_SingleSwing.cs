@@ -35,16 +35,18 @@ public class YYF_SingleSwing : IEnemyAction
         swing_outline.SetActive(false);
     }
 
+    public override bool CanAct()
+    {
+        if (bossAI.isWhiteBusy && bossAI.isBlackBusy) return false;
+        else return true;
+    }
+
     public override IEnumerator Act_coroutine(float factor = 0)
     {
-        // prepare
-        while (bossAI.isBlackBusy && bossAI.isWhiteBusy) break;
-
         // initialize
-        bool isBlack = true;
-        if (bossAI.isBlackBusy) { isBlack = false; }
+        bool isBlack = false;
+        if (bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = true; }
         bossAI.SetBusy(isBlack);
-
         //references
         Animator anim = isBlack ? bossAI.blackAnim : bossAI.whiteAnim;
         Transform fish = isBlack ? bossAI.blackFish : bossAI.whiteFish;
@@ -59,8 +61,8 @@ public class YYF_SingleSwing : IEnemyAction
         bool toLeft = target.x < origin.position.x;
 
         // move to appropriate x position
-        if (toLeft) { origin.DOMove(new Vector3(target.x, bossAI.waterLevel.position.y - 6, 0), 1f); }
-        else { origin.DOMove(new Vector3(target.x, bossAI.waterLevel.position.y - 6, 0), 1f); }
+        if (toLeft) { origin.DOMove(new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0), 1f); }
+        else { origin.DOMove(new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0), 1f); }
         yield return new WaitForSeconds(1);
 
         //reset to initial
@@ -75,7 +77,7 @@ public class YYF_SingleSwing : IEnemyAction
         origin.Rotate(bossAI.Dir, angle);
 
         //jump out
-        float temp_x = toLeft ? player.transform.position.x - 1 : player.transform.position.x + 1;
+        float temp_x = toLeft ? player.transform.position.x - 2 : player.transform.position.x + 2;
         origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 4.5f, 0), 0.5f).SetEase(Ease.OutSine);
 
         //pre swing attack
@@ -131,18 +133,8 @@ public class YYF_SingleSwing : IEnemyAction
             vfx.CameraShake(melee.cameraShake);
             vfx.RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
             vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
-
             //combo
             bossAI.DecreaseStun(stunValue);
-            if (bossAI.actionList.Count != 0 && bossAI.actionList[0] == this)
-            {
-                bool combo = false;
-                if (((float)bossAI.currentHealth / (float)bossAI.maxHealth) <= 0.5)
-                {
-                    combo = Possibility(70);
-                }
-                else { combo = Possibility(100); }
-            }
         }
         else if (dealtDamage == 1)//defend
         {

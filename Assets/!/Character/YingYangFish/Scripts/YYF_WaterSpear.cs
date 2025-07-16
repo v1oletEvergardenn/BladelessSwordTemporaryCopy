@@ -29,23 +29,38 @@ public class YYF_WaterSpear : IEnemyAction
         bossAI = GetComponent<YingYangFish_AI>();
     }
 
+    public override bool CanAct()
+    {
+        if (bossAI.isWhiteBusy && bossAI.isBlackBusy) return false;
+        else return true;
+    }
+
     public override void CancelAct()
     {
         if (act_routine != null) { StopCoroutine(act_routine); }
 
-        if (spear != null) { print(1); spear.SetFalseActive(); }
+        if (spear != null) { spear.SetFalseActive(); }
         if (smallSpear1 != null) { smallSpear1.SetFalseActive(); }
         if (smallSpear2 != null) { smallSpear2.SetFalseActive(); }
     }
 
+    /// <summary>
+    /// 1,3,5 = black fish
+    /// <para>2,4,6 = white fish</para>
+    /// <para>7 = combo from dive, if close to player, add swing</para>
+    /// </summary>
+    /// <param name="factor"></param>
+    /// <returns></returns>
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         bool isBlack = false;
+        if (!bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = bossAI.CheckCloserFish() == bossAI.blackFish; }
+        if (bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = true; }
+        bossAI.SetBusy(isBlack);
         if (factor == 0)
         {
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
-            yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.IESprintStartPoint());
-            isBlack = bossAI.closerFish_Black;
+            yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.IESprintStartPoint(isBlack ? "black" : "white"));
         }
 
         //initial setup
@@ -85,7 +100,6 @@ public class YYF_WaterSpear : IEnemyAction
         Transform waterSpearSpawnPos = isBlack ? waterSpearPos_black : waterSpearPos_white;
 
         //spawn spear
-        bossAI.SetBusy(isBlack);
         anim.Play("spear_pre");
         _spear = bossAI.selfPooler.SpawnFromPool("water_Spear", waterSpearSpawnPos.position).GetComponent<Spear>();
 
@@ -120,24 +134,48 @@ public class YYF_WaterSpear : IEnemyAction
         ShootSpear(_spear); spear = null;
         yield return new WaitForSeconds(0.5f);
         //normal state
+        if (factor == 7)
+        {
+            if (bossAI.distanceToPlayer <= bossAI.close_distance_threshhold) bossAI.AddAction(bossAI.swing);
+        }
         if (factor == 0)
         {
             if (bossAI.initialAction == bossAI.waterSpear)
             {
-                if (bossAI.distanceToPlayer <= bossAI.swing.swingRange + 1)
+                if (bossAI.distanceToPlayer <= bossAI.close_distance_threshhold)
                 {
-                    yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
-                    bossAI.InsertAction(bossAI.swing);
+                    //水凝枪 -> 翻腾/双摆尾
+                    //条件：在释放完水凝枪后，距离小于一定值。
+                    if (Possibility(50))
+                    {
+                        if (Possibility(50)) bossAI.AddAction(bossAI.swing);
+                        else bossAI.AddAction(bossAI.splash);
+                    }
+                    //水凝枪 -> 潜水 -> 压缩泡泡光线 = 泡泡牢笼/单摆尾。
+                    //条件：在释放完水凝枪后，距离小于一定值时（远离）
+                    else
+                    {
+                        bossAI.movingTarget = bossAI.GetBoundaryFarOfPlayer();
+                        bossAI.AddAction(bossAI.dive);
+
+                        bossAI.AddAction(bossAI.gatling);
+                        if (Possibility(50)) bossAI.AddAction(bossAI.singleSwing);
+                        else bossAI.AddAction(bossAI.bubbleTrap);
+                    }
                 }
-                else if (Possibility(60))
+
+                //水凝枪 -> 潜水 -> 双摆尾 ？双摆尾
+                //条件：在释放完水凝枪后，距离大于一定值时（靠近）
+                //？：成功弹反时有50 %。
+                if (bossAI.distanceToPlayer >= bossAI.far_distance_threshhold)
                 {
-                    //moving
-                    bossAI.InsertAction(bossAI.swing);
-                    bossAI.InsertAction(bossAI.dive);
+                    bossAI.movingTarget = player.transform;
+                    bossAI.AddAction(bossAI.dive);
+                    bossAI.AddAction(bossAI.swing, 4);
                 }
             }
 
-            if (isBlack) { bossAI.SetBlackNotBusy(); } else { bossAI.SetWhiteNotBusy(); }
+            bossAI.SetNotBusy(isBlack);
             bossAI.SetFishTargetRotateSpeed(isBlack, bossAI.idleRotateSpeed);
             bossAI.AddActionBreak(actionBreakAmount);
             bossAI.EndAction();
@@ -174,6 +212,7 @@ public class YYF_WaterSpear : IEnemyAction
             bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
             bossAI.finishedWaterSpearUltimate = true;
         }
+
         yield return null;
 
         void SetUp(Spear spear)

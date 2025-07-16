@@ -16,6 +16,7 @@ public class Energy : MonoBehaviour
 
     public int maxEnergy;
     public int currentEnergy;
+    public float energyPercentage;
     public Image energyBar;
 
     public Transform failedToDoActionSymbol;
@@ -62,6 +63,7 @@ public class Energy : MonoBehaviour
     private void Update()
     {
         restoreTimer += Time.unscaledDeltaTime;
+        energyPercentage = (float)currentEnergy / maxEnergy;
         if (controller.isFloating) { floating_timer += Time.unscaledDeltaTime; }
         if (playerAttack.isDefending) { defend_timer += Time.unscaledDeltaTime; }
         if (!playerAttack.isAttacking && playerAttack.anim.GetBool("storm") && !playerAttack.stormReady) { storm_timer += Time.unscaledDeltaTime; }

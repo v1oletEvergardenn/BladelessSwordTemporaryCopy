@@ -21,13 +21,18 @@ public class YYF_Splash : IEnemyAction
         bossAI = GetComponent<YingYangFish_AI>();
     }
 
+    public override bool CanAct()
+    {
+        return (!bossAI.isWhiteBusy && !bossAI.isBlackBusy);
+    }
+
     //low and far
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         bossAI.SetWhiteBusy();
         bossAI.SetBlackBusy();
-        //yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
-        //yield return bossAI.co_sprintToAngle = StartCoroutine(bossAI.IESprintToAngle(false, -180));
+        yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
+        yield return bossAI.co_sprintToAngle = StartCoroutine(bossAI.IESprintToAngle(false, -180));
         yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
         bossAI.SetFishTargetRotateSpeed(false, 0);
         bossAI.SetFishTargetRotateSpeed(true, 0);
@@ -49,6 +54,29 @@ public class YYF_Splash : IEnemyAction
         bossAI.SetBlackTargetRotateSpeed(bossAI.idleRotateSpeed);
         bossAI.SetWhiteTargetRotateSpeed(bossAI.idleRotateSpeed);
         yield return new WaitForSeconds(0.5f);
+
+        if (bossAI.initialAction = bossAI.splash)
+        {
+            if (bossAI.distanceToPlayer <= bossAI.close_distance_threshhold)
+            {
+                //翻腾->水凝枪 / 压缩泡泡光线
+                //条件：距离大于一定值。
+                if (Possibility(70)) bossAI.AddAction(bossAI.swing);
+                else { bossAI.movingTarget = bossAI.GetBoundaryFarOfPlayer(); bossAI.AddAction(bossAI.dive); }
+                //翻腾->潜水
+                //条件: 距离大于一定值时（靠近） or 距离小于一定值时（远离)。
+            }
+            else if (bossAI.distanceToPlayer >= bossAI.far_distance_threshhold)
+            {
+                //翻腾->双摆尾
+                //条件：距离小于一定值时。
+                if (Possibility(70)) bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.waterSpear, bossAI.gatling));
+                else { bossAI.movingTarget = bossAI.player; bossAI.AddAction(bossAI.dive); }
+                //翻腾->潜水
+                //条件: 距离大于一定值时（靠近） or 距离小于一定值时（远离）。
+            }
+        }
+
         bossAI.SetNormalRotateSpeed();
         bossAI.SetWhiteNotBusy();
         bossAI.SetBlackNotBusy();

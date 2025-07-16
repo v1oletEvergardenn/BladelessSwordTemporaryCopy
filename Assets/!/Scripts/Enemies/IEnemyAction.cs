@@ -56,6 +56,15 @@ public abstract class IEnemyAction : MonoBehaviour
         //OutLine_Activate(0);
     }
 
+    /// <summary>
+    /// Checks if the enemy can perform an action based on its current state.
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool CanAct()
+    {
+        return true;
+    }
+
     public virtual IEnumerator Act_coroutine(float factor = 0)
     {
         yield return null;
@@ -181,6 +190,15 @@ public abstract class IEnemyAction : MonoBehaviour
     public Vector3 CalculateWantedEuler(Vector3 _targetPos, Vector3 _originPos)
     {
         return new Vector3(0, 0, Mathf.Atan2(_targetPos.y - _originPos.y, _targetPos.x - _originPos.x) * Mathf.Rad2Deg);
+    }
+
+    public T RandomPick<T>(params T[] items)
+    {
+        if (items == null || items.Length == 0)
+            throw new ArgumentException("At least one item must be provided.");
+
+        int index = UnityEngine.Random.Range(0, items.Length);
+        return items[index];
     }
 }
 

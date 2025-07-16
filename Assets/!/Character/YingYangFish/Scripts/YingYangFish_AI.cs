@@ -57,7 +57,8 @@ public class YingYangFish_AI : IEnemyController
     #region ROTATION & MOVEMENT
 
     [FoldoutGroup("Rotation & Movement", nameof(idleRotateSpeed), nameof(sprintRotateSpeed),
-        nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter))]
+        nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter), nameof(far_distance_threshhold),
+        nameof(close_distance_threshhold))]
     public Void rotationMoveGroup;
 
     [SerializeField, HideInInspector] public float idleRotateSpeed;
@@ -75,9 +76,12 @@ public class YingYangFish_AI : IEnemyController
     [HideInInspector] public float black_targetRotateSpeed;
     [HideInInspector] public float white_targetRotateSpeed;
 
-    public bool isBlackBusy { get; private set; } = false;
+    [SerializeField, HideInInspector] public float far_distance_threshhold = 30f;
+    [SerializeField, HideInInspector] public float close_distance_threshhold = 10f;
 
-    public bool isWhiteBusy { get; private set; } = false;
+    public bool isBlackBusy = false;
+
+    public bool isWhiteBusy = false;
 
     #endregion ROTATION & MOVEMENT
 
@@ -173,9 +177,24 @@ public class YingYangFish_AI : IEnemyController
         isCloseSwimming = true;
     }
 
+    private float playerDistanceDelta = 0f;
+    private float playerDistanceTimer = 0f;
+
+    private Queue<float> playerDistanceCache = new();
+
     private void Update()
     {
         distanceToPlayer = Mathf.Abs(transform.position.x - player.position.x);
+        healthPercentage = currentHealth / maxHealth;
+        playerDistanceTimer += Time.deltaTime;
+        playerDistanceCache.Enqueue(distanceToPlayer);
+
+        if (playerDistanceTimer >= 3)
+        {
+            float distance_three_secs_ago = playerDistanceCache.Dequeue();
+            playerDistanceDelta = distanceToPlayer - distance_three_secs_ago;
+        }
+
         white_distanceToCenter = whiteFish.localPosition.magnitude;
         black_distanceToCenter = blackFish.localPosition.magnitude;
 
@@ -207,8 +226,8 @@ public class YingYangFish_AI : IEnemyController
     public IEnumerator IESprintStartPoint(string assignedFish = "null")
     {
         Transform closerFish = null;
-        while (closerFish == null) { closerFish = CheckCloserFish(); yield return null; }
-        if (assignedFish == "white") { closerFish = whiteFish; }
+        if (assignedFish == "null") while (closerFish == null) { closerFish = CheckCloserFish(); yield return null; }
+        else if (assignedFish == "white") { closerFish = whiteFish; }
         else if (assignedFish == "black") { closerFish = blackFish; }
         closerFish_Black = closerFish == blackFish ? true : false;
         bool isBlack = closerFish == blackFish ? true : false;
@@ -502,10 +521,6 @@ public class YingYangFish_AI : IEnemyController
         waterSpear.CancelAct();
         swing.CancelAct();
         dive.CancelAct();
-
-        blackAnim.Play("black_idle");
-        whiteAnim.Play("white_idle");
-
         SetBlackNotBusy();
         SetWhiteNotBusy();
 
@@ -758,9 +773,20 @@ public class YingYangFish_AI : IEnemyController
         {
             while (actionList.Count > 0 && actionList[0] != null)
             {
-                IEnemyAction action = actionList[0];
-                yield return action.act_routine = StartCoroutine(action.Act_coroutine());
+                EnemyActionCaller caller = actionList[0];
+                caller.action.act_routine = StartCoroutine(caller.action.Act_coroutine(caller.factor));
                 yield return null;
+
+                EnemyActionCaller next = null;
+                if (actionList.Count >= 2)
+                {
+                    next = actionList[1];
+                    if (next.action.CanAct())
+                    {
+                        next.action.act_routine = StartCoroutine(next.action.Act_coroutine(next.factor));
+                    }
+                }
+                yield return new WaitUntil(() => !isBlackBusy && !isWhiteBusy);
             }
             isActing = false;
             if (!secondPhase && currentActionBreakAmount >= maxActionBreakCapacity) { yield return StartCoroutine(Break()); }
@@ -773,46 +799,82 @@ public class YingYangFish_AI : IEnemyController
     {
         if (secondPhase || DEAD) { return; }
         List<IEnemyAction> possibleActions = new List<IEnemyAction>();
-        if (playerEnergy.currentEnergy <= 5)
+
+        bool isPlayerFar = distanceToPlayer >= far_distance_threshhold;
+        bool isPlayerClose = distanceToPlayer <= close_distance_threshhold;
+
+        //water spear --- if player qi less than certain amount or player distance is further than a certain amount
+        int energy_Threshhold = 5;
+        if (playerEnergy.currentEnergy <= energy_Threshhold) possibleActions.Add(waterSpear);
+
+        //splash --- if player is moving towards here for 3 seconds;
+        int playerDistanceDealaThreshhold = -20;
+        if (playerDistanceDelta <= playerDistanceDealaThreshhold) possibleActions.Add(splash);
+
+        // if player far
+        if (isPlayerFar)
         {
-            possibleActions.Add(waterSpear);
-        }
-        if (distanceToPlayer >= swing.swingRange - 1)
-        {
-            if (distanceToPlayer <= 12)
-            {
-                float i = Random.Range(0, 10);
-                if (i < 3) { possibleActions.Add(waterSpear); }
-                else if (i < 10) { possibleActions.Add(dive); }
-            }
+            float i = Random.Range(0, 10);
+            if (i < 3) { possibleActions.Add(waterSpear); } //30%
+            else if (i < 6) { possibleActions.Add(gatling); } //30%
             else
             {
-                float i = Random.Range(0, 10);
-                if (i < 5) { possibleActions.Add(waterSpear); }
-                else if (i < 10) { possibleActions.Add(dive); }
-            }
+                possibleActions.Add(dive);
+                movingTarget = player;// get near to player since too far
+            } // 40%
         }
-        else
+
+        // if player close
+        if (isPlayerClose)
         {
-            possibleActions.Add(swing);
+            float i = Random.Range(0, 10);
+            if (i < 3) { possibleActions.Add(swing); } //30%
+            else if (i < 6) { possibleActions.Add(splash); } //30%
+            else
+            {
+                possibleActions.Add(dive);
+                movingTarget = GetFarTargetOutOfTwo(player, GetBoundaryFarOfPlayer());
+                //get away from player since too close
+            } // 40%
         }
 
         int index = Random.Range(0, possibleActions.Count);
+        //initialAction = possibleActions[index];
         initialAction = possibleActions[index];
+        InsertAction(initialAction, 0);
 
-        actionList.Add(initialAction);
-        if (initialAction == dive)
+        if (initialAction == waterSpear)
         {
-            if ((float)playerEnergy.currentEnergy / (float)playerEnergy.maxEnergy <= 0.7f || playerAttack.currentHS_point < 2)
+            float i = Random.Range(0, 10);
+            //水凝枪 = 泡泡牢笼 || 条件: 释放水凝枪时30％
+            if (i < 3) { AddAction(bubbleTrap); }
+            //水凝枪 = 压缩泡泡光线 || 条件：释放水凝枪时30％。
+            else if (i < 6) { AddAction(gatling); } //30%
+            //水凝枪 = 单摆尾 || 条件：释放水凝枪时30%
+            else if (i < 9) { AddAction(singleSwing); }//30%
+        }
+        else if (initialAction == gatling)
+        {
+            float i = Random.Range(0, 10);
+            //压缩泡泡光线 = 泡泡牢笼 || 条件: 释放压缩泡泡光线时30％
+            if (i < 3) { AddAction(bubbleTrap); }
+            //压缩泡泡光线 = 单摆尾 || 条件：释放压缩泡泡光线时30 %
+            else if (i < 6) { AddAction(singleSwing); } //30%
+        }
+        else if (initialAction == dive)
+        {
+            //潜水->双摆尾 / 翻腾
+            //条件：当玩家角色气值小于60 % and 玩家角色心剑值小于2。 潜水的目的地设为玩家。
+            if (playerEnergy.energyPercentage < 0.6f || playerAttack.currentHS_point < 2)
             {
-                InsertAction(swing);
                 movingTarget = player;
+                AddAction(RandomPick<IEnemyAction>(swing, splash));
             }
-            else
+            else if (playerAttack.currentHS_point >= 2)
             {
-                movingTarget = GetFarTargetOutOfTwo(player, GetBoundaryFarOfPlayer());
-                if (Possibility(50)) { InsertAction(waterSpear); }
-                else { InsertAction(waterSpear); }
+                movingTarget = GetBoundaryFarOfPlayer();
+                AddAction(waterSpear);
+                AddAction(RandomPick<IEnemyAction>(singleSwing, bubbleTrap, gatling));
             }
         }
     }
@@ -896,7 +958,7 @@ public class YingYangFish_AI : IEnemyController
 
     public void WaterSpear()
     {
-        InsertAction(waterSpear);
+        AddAction(waterSpear);
     }
 
     public override void ForceDie()
@@ -904,22 +966,23 @@ public class YingYangFish_AI : IEnemyController
         base.ForceDie();
     }
 
-    public void Swing() => InsertAction(swing);
+    public void Swing() => AddAction(swing);
 
-    public void Splash() => InsertAction(splash);
+    public void Splash() => AddAction(splash);
 
-    public void Dive() => InsertAction(dive);
+    public void Dive() => AddAction(dive);
 
-    public void SingleSwing() => InsertAction(singleSwing);
+    public void SingleSwing() => AddAction(singleSwing);
 
-    public void BubbleTrap() => InsertAction(bubbleTrap);
+    public void BubbleTrap() => AddAction(bubbleTrap);
 
-    public void Gatling() => InsertAction(gatling);
+    public void Gatling() => AddAction(gatling);
 
     public override IEnumerator BossBreak()
     {
         isBossBreaking = true;
         CancelAllAction();
+        blackAnim.Play("break"); whiteAnim.Play("break");
         VFXManager.instance.BulletTime();
         float duration = stunDuration;
         float elapsed = 0f;

@@ -33,6 +33,19 @@ public class YYF_Swing : IEnemyAction
         swing_outline.SetActive(false);
     }
 
+    public override bool CanAct()
+    {
+        return (!bossAI.isWhiteBusy && !bossAI.isBlackBusy);
+    }
+
+    /// <summary>
+    ///1 = qte for counter attack, final phase
+    ///<para>2 = qte for sword teleport, final phase </para>
+    ///<para>3 = double swing, final phase  </para>
+    ///<para>4 = combo from water spear, if counter attacked, 50% chance double swing</para>
+    /// </summary>
+    /// <param name="factor"> </param>
+    /// <returns></returns>
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         bossAI.SetBlackBusy();
@@ -105,7 +118,6 @@ public class YYF_Swing : IEnemyAction
         {
             bossAI.SetNormalRotateSpeed();
             if (factor == 1) { CharacterController2D.instance.FaceTarget(this.transform); }
-            yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
             bossAI.SetBlackNotBusy();
             bossAI.SetWhiteNotBusy();
             bossAI.AddActionBreak(actionBreakAmount);
@@ -116,6 +128,12 @@ public class YYF_Swing : IEnemyAction
             CharacterController2D.instance.FaceTarget(this.transform);
             yield return StartCoroutine(Act_coroutine(3));
             yield return null;
+        }
+        else if (factor == 4)
+        {
+            bossAI.SetBlackNotBusy();
+            bossAI.SetWhiteNotBusy();
+            bossAI.EndAction();
         }
     }
 
@@ -146,21 +164,29 @@ public class YYF_Swing : IEnemyAction
             vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
 
             bossAI.DecreaseStun(stunValue);
-            if (bossAI.actionList.Count != 0 && bossAI.actionList[0] == this)
-            {
-                bool combo = false;
-                if (((float)bossAI.currentHealth / (float)bossAI.maxHealth) <= 0.5)
-                {
-                    combo = Possibility(70);
-                }
-                else { combo = Possibility(100); }
 
-                if (combo && !bossAI.secondPhase)
+            if (bossAI.initialAction = bossAI.swing)
+            {
+                bool b = Possibility((bossAI.currentHealth / bossAI.maxHealth) < 0.5 ? 70 : 50);
+                //双摆尾->潜水->水凝枪 = 单摆尾 / 泡泡牢笼 / 压缩泡泡光线。
+                //条件：玩家成功弹反双摆尾后有50 % 机率触发，若此时Boss血量低于50 % 则这个概率提升20 %。 在释放完双摆尾后潜入水中后立刻在远离玩家一定距离的点现身。
+                if (b)
                 {
                     bossAI.movingTarget = bossAI.GetBoundaryFarOfPlayer();
-                    bossAI.InsertAction(bossAI.waterSpear);
-                    bossAI.InsertAction(bossAI.dive);
+                    bossAI.AddAction(bossAI.dive);
+                    bossAI.AddAction(bossAI.waterSpear);
+                    bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.singleSwing, bossAI.bubbleTrap, bossAI.gatling));
                 }
+                //双摆尾->翻腾 / 双摆尾
+                //条件：成功弹反双摆尾时 or 被双摆尾成功击中时。
+                else
+                {
+                    bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.splash, bossAI.swing));
+                }
+            }
+            else if (localFactor == 4)//combo from water spear
+            {
+                bossAI.AddAction(bossAI.swing);
             }
         }
         else if (dealtDamage == 1)//defend
@@ -170,21 +196,18 @@ public class YYF_Swing : IEnemyAction
             vfx.CameraShake(melee.cameraShake);
             vfx.RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
             vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
+
+            if (bossAI.initialAction = bossAI.swing) bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.splash, bossAI.swing));
         }
         else if (dealtDamage == 0)//dealtDamage
         {
             vfx.SpawnHitEffect(true, playerIDamagable.GetHitPos());
-            if (localFactor == 2)
-            {
-                playerIDamagable.ForceRepel(melee.repel * 2, left);
-            }
-            else
-            {
-                playerIDamagable.Repel(melee.repel * 2, left);
-            }
-
+            if (localFactor == 2) { playerIDamagable.ForceRepel(melee.repel * 2, left); }
+            else { playerIDamagable.Repel(melee.repel * 2, left); }
             vfx.RumblePulse(melee.rumble.x, melee.rumble.y, melee.rumbleDuration);
             vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
+
+            if (bossAI.initialAction = bossAI.swing) bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.splash, bossAI.swing));
         }
     }
 

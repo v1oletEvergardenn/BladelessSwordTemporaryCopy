@@ -25,6 +25,11 @@ public class YYF_Dive : IEnemyAction
         bossAI.whiteAnim.SetBool("dive_end", false);
     }
 
+    public override bool CanAct()
+    {
+        return (!bossAI.isWhiteBusy && !bossAI.isBlackBusy);
+    }
+
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         //dive
@@ -38,7 +43,6 @@ public class YYF_Dive : IEnemyAction
         {
             pos = bossAI.movingTarget.transform.position;
             Debug.Log("too close, cancel action");
-            yield return null;
         }
         else
         {
@@ -47,7 +51,9 @@ public class YYF_Dive : IEnemyAction
                 pos = player.transform.position + new Vector3(-12, 0, 0);
             }
 
+            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
             bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
+            yield return new WaitForSeconds(0.2f);
             bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
             bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);
 
@@ -110,27 +116,20 @@ public class YYF_Dive : IEnemyAction
             bossAI.blackOrigin.Rotate(bossAI.Dir, angle);
             bossAI.whiteOrigin.Rotate(bossAI.Dir, angle);
 
-            bool isSwimming = false;
-
             if (factor == 0) { pos = bossAI.movingTarget.transform.position; }
 
             //jump out
             float x = ToLeft ? pos.x - 1 : pos.x + 1;
-            transform.DOMove(new Vector3(x, bossAI.waterLevel.position.y + 6.5f, 0), 1f).SetEase(Ease.OutCubic);
+            transform.DOMove(new Vector3(x, bossAI.waterLevel.position.y + 4.5f, 0), 1f).SetEase(Ease.OutCubic);
 
             // during jumping out
-            while (transform.position.y < bossAI.waterLevel.position.y + 6.5)
+            while (transform.position.y < bossAI.waterLevel.position.y + 4.5f)
             {
                 if (transform.position.y > bossAI.waterLevel.position.y - 1)
                 {
                     swimEffect.GetComponent<Animator>().Play("end");
-                    if (!isSwimming && (bossAI.actionList.Count <= 1 || bossAI.actionList[1] != bossAI.swing))
-                    {
-                        isSwimming = true;
-                        //bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
-                    }
                 }
-                if (transform.position.y > bossAI.waterLevel.position.y + 4)
+                if (transform.position.y > bossAI.waterLevel.position.y + 2)
                 {
                     bossAI.blackAnim.SetBool("dive_end", true);
                     bossAI.whiteAnim.SetBool("dive_end", true);
@@ -138,18 +137,7 @@ public class YYF_Dive : IEnemyAction
 
                 yield return null;
             }
-
-            Vector3 dest = transform.position - new Vector3(0, 2, 0);
-            Vector3 origin = transform.position;
-            float elpasedTime = 0f;
-
-            while (transform.position.y > bossAI.waterLevel.position.y + 4.5)
-            {
-                transform.position = Vector3.Lerp(origin, dest, elpasedTime / 0.5f);
-                elpasedTime += Time.deltaTime;
-
-                yield return null;
-            }
+            yield return new WaitForSeconds(0.1f);
         }
 
         swimEffect.SetActive(false);

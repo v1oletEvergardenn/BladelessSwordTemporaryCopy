@@ -27,6 +27,12 @@ public class YYF_Gatling : IEnemyAction
         StartCoroutine(CenterEnd());
     }
 
+    public override bool CanAct()
+    {
+        if (bossAI.isWhiteBusy && bossAI.isBlackBusy) return false;
+        else return true;
+    }
+
     public IEnumerator CenterEnd()
     {
         gatlingPos_black.GetComponent<Animator>().Play("end");
@@ -39,10 +45,12 @@ public class YYF_Gatling : IEnemyAction
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         bool isBlack = false;
+        if (!bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = bossAI.CheckCloserFish() == bossAI.blackFish; }
+        if (bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = true; }
+        bossAI.SetBusy(isBlack);
 
         yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
-        yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.IESprintStartPoint());
-        isBlack = bossAI.closerFish_Black;
+        yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.IESprintStartPoint(isBlack ? "black" : "white"));
 
         Animator anim = isBlack ? bossAI.blackAnim : bossAI.whiteAnim;
         Transform fish = isBlack ? bossAI.blackFish : bossAI.whiteFish;
@@ -87,9 +95,40 @@ public class YYF_Gatling : IEnemyAction
         gatlingSpawnPos.GetComponent<Animator>().Play("end");
 
         yield return new WaitForSeconds(0.5f);
+
+        if (bossAI.initialAction = bossAI.gatling)
+        {
+            //压缩泡泡光线->翻腾 / 双摆尾
+            //条件：距离小于一定值。
+            if (bossAI.distanceToPlayer <= bossAI.close_distance_threshhold)
+            {
+                //压缩泡泡光线->潜水->水凝枪 = 泡泡牢笼 / 单摆尾。
+                //条件：在释放完压缩泡泡光线后，距离小于一定值时（远离）
+                if (Possibility(50))
+                {
+                    bossAI.movingTarget = bossAI.GetBoundaryFarOfPlayer(); bossAI.AddAction(bossAI.dive);
+                    bossAI.AddAction(bossAI.waterSpear);
+                    bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.bubbleTrap, bossAI.singleSwing));
+                }
+                else
+                {
+                    bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.splash, bossAI.swing));
+                }
+            }
+            //压缩泡泡光线->潜水->翻腾 ？翻腾
+            //条件：在释放完水凝枪后，距离大于一定值时（靠近）
+            //？：释放后的2秒内Boss受到伤害时有50 %。
+            else if (bossAI.distanceToPlayer >= bossAI.far_distance_threshhold)
+            {
+                bossAI.movingTarget = bossAI.player;
+                bossAI.AddAction(bossAI.dive);
+                bossAI.AddAction(bossAI.splash);
+            }
+        }
+
         gatlingSpawnPos.gameObject.SetActive(false);
 
-        if (isBlack) { bossAI.SetBlackNotBusy(); } else { bossAI.SetWhiteNotBusy(); }
+        bossAI.SetNotBusy(isBlack);
         bossAI.SetFishTargetRotateSpeed(isBlack, bossAI.idleRotateSpeed);
         bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();

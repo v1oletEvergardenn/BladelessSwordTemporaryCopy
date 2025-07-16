@@ -18,6 +18,7 @@ public class Health : IDamagable
     private InputPlayer inputPlayer;
     public float maxHealth;
     private float currentHealth;
+    [HideInInspector] public float healthPercentage;
     private DamageFlash _damageFlash;
 
     public Image Health_segment;
@@ -60,6 +61,7 @@ public class Health : IDamagable
 
     private void Update()
     {
+        healthPercentage = currentHealth / maxHealth;
         if (stunned)
         {
             if (stun_timer > 0) { stun_timer -= Time.unscaledDeltaTime; }

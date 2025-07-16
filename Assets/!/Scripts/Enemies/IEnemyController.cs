@@ -1,4 +1,5 @@
 using EditorAttributes;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.U2D;
 using UnityEngine.UI;
+using Void = EditorAttributes.Void;
 
 [RequireComponent(typeof(DamageFlash), typeof(Rigidbody2D), typeof(IEnemyActionIdle))]
 public abstract class IEnemyController : IDamagable
@@ -16,6 +18,7 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public int maxHealth;
     [SerializeField, HideInInspector] public GameObject HealthUI;
     [SerializeField, HideInInspector] public Image healthBar;
+    [HideInInspector] public float healthPercentage;
     [HideInInspector] public int lastAttackId = -1;
     [HideInInspector] public float lastAttackTime = -1f;
     [HideInInspector] public const float attackCooldown = 0.05f; // 50ms window to prevent double hit
@@ -58,7 +61,7 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public Transform rightBoundary;
     [SerializeField, HideInInspector] public GameObject GFX;
     [SerializeField, HideInInspector] public InternalObjectPooler selfPooler;
-    [HideInInspector] public List<IEnemyAction> actionList = new List<IEnemyAction>();
+    [HideInInspector] public List<EnemyActionCaller> actionList = new List<EnemyActionCaller>();
 
     #endregion BASIC_LOGIC
 
@@ -123,7 +126,7 @@ public abstract class IEnemyController : IDamagable
     public virtual IEnemyAction NextAction()
     {
         if (actionList.Count < 2) { return null; }
-        return actionList[1];
+        return actionList[1].action;
     }
 
     /// <summary>
@@ -142,13 +145,22 @@ public abstract class IEnemyController : IDamagable
     /// </summary>
     /// <param name="action">The action to insert.</param>
     /// <param name="index">The index to insert at (default is 1).</param>
-    public virtual void InsertAction(IEnemyAction action, int index = 1)
+    public virtual void AddAction(IEnemyAction action, float factor = 0)
     {
-        if (actionList.Count == 0) { actionList.Add(action); }
-        else
+        EnemyActionCaller i = new EnemyActionCaller { action = action, factor = factor };
+        actionList.Add(i);
+        print(i.action);
+    }
+
+    public virtual void InsertAction(IEnemyAction action, int index, float factor = 0)
+    {
+        if (index < 0 || index > actionList.Count)
         {
-            actionList.Insert(index, action);
+            Debug.LogError("Index out of bounds for action list insertion.");
+            return;
         }
+        EnemyActionCaller i = new EnemyActionCaller { action = action, factor = factor };
+        actionList.Insert(index, i);
     }
 
     public Coroutine co_act;
@@ -160,8 +172,8 @@ public abstract class IEnemyController : IDamagable
     {
         while (actionList.Count > 0 && actionList[0] != null)
         {
-            IEnemyAction action = actionList[0];
-            yield return action.act_routine = StartCoroutine(action.Act_coroutine());
+            EnemyActionCaller caller = actionList[0];
+            yield return caller.action.act_routine = StartCoroutine(caller.action.Act_coroutine(caller.factor));
             yield return null;
         }
         isActing = false;
@@ -442,5 +454,21 @@ public abstract class IEnemyController : IDamagable
     {
     }
 
+    public T RandomPick<T>(params T[] items)
+    {
+        if (items == null || items.Length == 0)
+            throw new ArgumentException("At least one item must be provided.");
+
+        int index = UnityEngine.Random.Range(0, items.Length);
+        return items[index];
+    }
+
     #endregion UTILITY
+}
+
+[Serializable]
+public class EnemyActionCaller
+{
+    public IEnemyAction action;
+    public float factor;
 }
