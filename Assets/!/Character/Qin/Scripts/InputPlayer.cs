@@ -308,7 +308,7 @@ public class InputPlayer : MonoBehaviour
     /// </summary>
     private void TestEvent()
     {
-        VFXManager.instance.BulletTime();
+        FindObjectOfType<YingYangFish_AI>().Damage(1, this.transform, stunValue: 1000);
     }
 
     private void OnJump()

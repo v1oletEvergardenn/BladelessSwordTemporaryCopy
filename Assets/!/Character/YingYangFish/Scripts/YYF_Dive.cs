@@ -46,11 +46,6 @@ public class YYF_Dive : IEnemyAction
         }
         else
         {
-            if (factor == 1)
-            {
-                pos = player.transform.position + new Vector3(-12, 0, 0);
-            }
-
             yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
             bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
             yield return new WaitForSeconds(0.2f);
@@ -62,7 +57,7 @@ public class YYF_Dive : IEnemyAction
             {
                 if (pos.x > transform.position.x) { ToLeft = false; swimEffect.transform.localScale = new Vector3(-1, 1, 1); }
                 else { swimEffect.transform.localScale = new Vector3(1, 1, 1); }
-                if (factor == 0) { pos = bossAI.movingTarget.transform.position; }
+                pos = bossAI.movingTarget.transform.position;
                 if (ToLeft) { swimEffect.transform.position = new Vector3(pos.x + 15, bossAI.waterLevel.position.y, 0); }
                 else { swimEffect.transform.position = new Vector3(pos.x - 15, bossAI.waterLevel.position.y, 0); }
                 transform.DOMove(new Vector3(swimEffect.transform.position.x, bossAI.waterLevel.position.y - 6, 0), 1f).OnComplete(() =>
@@ -77,7 +72,7 @@ public class YYF_Dive : IEnemyAction
 
             swimEffect.SetActive(true);
 
-            if (factor == 0) { pos = bossAI.movingTarget.transform.position; }
+            pos = bossAI.movingTarget.transform.position;
 
             if (ToLeft) { transform.DOMove(new Vector3(pos.x + 5, bossAI.waterLevel.position.y - 7, 0), 1f); }
             else { transform.DOMove(new Vector3(pos.x - 5, bossAI.waterLevel.position.y - 7, 0), 1f); }
@@ -116,7 +111,7 @@ public class YYF_Dive : IEnemyAction
             bossAI.blackOrigin.Rotate(bossAI.Dir, angle);
             bossAI.whiteOrigin.Rotate(bossAI.Dir, angle);
 
-            if (factor == 0) { pos = bossAI.movingTarget.transform.position; }
+            pos = bossAI.movingTarget.transform.position;
 
             //jump out
             float x = ToLeft ? pos.x - 1 : pos.x + 1;
@@ -175,6 +170,7 @@ public class YYF_Dive : IEnemyAction
 
     public void Sprint()
     {
+        return;
         bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
     }
 }

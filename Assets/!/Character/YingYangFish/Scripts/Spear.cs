@@ -51,7 +51,9 @@ public class Spear : IProjectile
             if (collision.gameObject == gameManager.Player)
             {
                 if (collision.gameObject.layer == 14) { return; }
-                if (gameManager.Player.GetComponent<PlayerAttack>().isAttacking && gameManager.Player.GetComponent<CharacterController2D>().FacingRight != facingRight)
+                if ((gameManager.Player.GetComponent<PlayerAttack>().isAttacking &&
+                    gameManager.Player.GetComponent<CharacterController2D>().FacingRight != facingRight)
+                    || gameManager.Player.GetComponent<PlayerAttack>().isOnStorm)
                 {
                     target.Repel(repelForce, this.transform.right.x < 0 ? true : false);
                     gameManager.Player.GetComponent<PlayerAttack>().CounterAttack(this, true);

@@ -149,7 +149,6 @@ public abstract class IEnemyController : IDamagable
     {
         EnemyActionCaller i = new EnemyActionCaller { action = action, factor = factor };
         actionList.Add(i);
-        print(i.action);
     }
 
     public virtual void InsertAction(IEnemyAction action, int index, float factor = 0)

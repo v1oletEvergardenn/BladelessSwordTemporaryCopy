@@ -77,4 +77,20 @@ public class InternalObjectPooler : MonoBehaviour
         poolDictionary[tag].Enqueue(obj);
         return obj;
     }
+
+    public void SetPoolDisactive()
+    {
+        if (poolDictionary == null) return;
+
+        foreach (var queue in poolDictionary.Values)
+        {
+            foreach (var obj in queue)
+            {
+                if (obj != null && obj.activeSelf)
+                {
+                    obj.SetActive(false);
+                }
+            }
+        }
+    }
 }

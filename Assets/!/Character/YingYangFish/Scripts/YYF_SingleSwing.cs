@@ -81,6 +81,7 @@ public class YYF_SingleSwing : IEnemyAction
         origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 4.5f, 0), 0.5f).SetEase(Ease.OutSine);
 
         //pre swing attack
+
         yield return new WaitForSeconds(0.3f);
         anim.Play("swing", 0, 0.5f);
         swing_outline.transform.SetParent(origin);
@@ -104,8 +105,38 @@ public class YYF_SingleSwing : IEnemyAction
         swingEffect.SetActive(true);
         StartCoroutine(ApplyAttackInCircle(swingAttackDuration, swingRange, origin, swingAttack));
 
+        if (factor == 1)
+        {
+            yield return new WaitForSeconds(0.8f);
+            swingEffect.SetActive(false);
+            swing_outline.SetActive(false);
+            anim.Play("swing", 0, 0.5f);
+            swing_outline.transform.SetParent(origin);
+            swing_outline.transform.position = origin.position;
+            swing_outline.SetActive(true);
+
+            //swing attack movement
+            yield return new WaitForSeconds(0.3f);
+            x = origin.position.x + 5;
+            if (player.transform.position.x <= fish.position.x) { x = origin.position.x - 5; }
+            origin.DOMoveX(x, 0.3f).SetEase(Ease.InQuint);
+
+            //actual attack
+            yield return new WaitForSeconds(0.2f);
+            anim.Play("swing_attack");
+            dirToPlayer = player.transform.position - swingEffect.transform.position;
+            angleToPlayer = Mathf.Atan2(dirToPlayer.y, dirToPlayer.x) * Mathf.Rad2Deg;
+            swingEffect.transform.eulerAngles = new Vector3(0, 0, angleToPlayer);
+            swingEffect.transform.SetParent(origin);
+            swingEffect.transform.position = origin.position;
+            swingEffect.SetActive(true);
+            StartCoroutine(ApplyAttackInCircle(swingAttackDuration, swingRange, origin, swingAttack));
+        }
+
         //dive again
-        yield return bossAI.co_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack, origin.position.x >= transform.position.x));
+        if (isBlack) bossAI.isReturnDive_black = true;
+        else bossAI.isReturnDive_white = true;
+        yield return bossAI.co_return_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack, origin.position.x >= transform.position.x));
         swingEffect.SetActive(false);
         swing_outline.SetActive(false);
         origin.localScale = new Vector3(1, 1, 1);

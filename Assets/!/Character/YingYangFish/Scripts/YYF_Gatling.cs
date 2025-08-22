@@ -60,6 +60,8 @@ public class YYF_Gatling : IEnemyAction
 
         anim.Play("gatling_pre");
         gatlingSpawnPos.gameObject.SetActive(true);
+
+        if (factor == 1) { yield return new WaitForSeconds(5f); }
         // --- Gatling shooting logic ---
         float elapsed = 0f;
 

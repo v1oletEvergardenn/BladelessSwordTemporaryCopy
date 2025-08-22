@@ -412,6 +412,10 @@ public class YingYangFish_AI : IEnemyController
         yield return null;
     }
 
+    public bool isReturnDive_black = false;
+    public bool isReturnDive_white = false;
+    public Coroutine co_return_singleFishDive;
+
     public IEnumerator IESingleFishDive(bool isBlack, bool isleft)
     {
         if (isBlack) { blackAnim.Play("sprint"); SetBlackTargetRotateSpeed(sprintRotateSpeed); }
@@ -438,6 +442,9 @@ public class YingYangFish_AI : IEnemyController
             .SetEase(Ease.InSine).OnComplete(() => finished = true);
 
         yield return new WaitUntil(() => finished);
+        origin.localScale = new Vector3(1, 1, 1);
+        isReturnDive_black = false;
+        isReturnDive_white = false;
     }
 
     public IEnumerator IESingleFishJumpOut(bool isBlack, Transform _target, Vector3 offset)
@@ -482,9 +489,40 @@ public class YingYangFish_AI : IEnemyController
         anim.SetBool("dive_end", false);
     }
 
+    public bool isReturningToCenter_black = false;
+    public bool isReturningToCenter_white = false;
+    private Coroutine co_return_singleJumpToPos;
+
     public IEnumerator IEReturnToCenter(bool isBlack)
     {
-        yield return co_singleJumpToPos = StartCoroutine(IESingleFishJumpOut(isBlack, transform, Vector3.zero));
+        if (isBlack) isReturningToCenter_black = true;
+        else isReturningToCenter_white = true;
+        yield return co_return_singleJumpToPos = StartCoroutine(IESingleFishJumpOut(isBlack, transform, Vector3.zero));
+        if (isBlack) isReturningToCenter_black = false;
+        else isReturningToCenter_white = false;
+    }
+
+    public IEnumerator IEReturnToInitialState(bool isBlack)
+    {
+        Transform origin = isBlack ? blackOrigin : whiteOrigin;
+        Transform fish = isBlack ? blackFish : whiteFish;
+        if (origin.localPosition != Vector3.zero)
+        {
+            if (!(isBlack ? isReturnDive_black : isReturnDive_white))
+            {
+                if (fish.position.y > waterLevel.position.y)
+                {
+                    yield return StartCoroutine(IESingleFishDive(isBlack, origin.position.x >= transform.position.x));
+                }
+            }
+
+            if (!(isBlack ? isReturningToCenter_black : isReturningToCenter_white))
+            {
+                yield return new WaitUntil(() => !(isBlack ? isReturnDive_black : isReturnDive_white));
+                yield return StartCoroutine(IEReturnToCenter(isBlack));
+            }
+            yield return new WaitUntil(() => !(isBlack ? isReturningToCenter_black : isReturningToCenter_white) && !(isBlack ? isReturnDive_black : isReturnDive_white));
+        }
     }
 
     #endregion Main AI Coroutines
@@ -511,9 +549,10 @@ public class YingYangFish_AI : IEnemyController
         TryStopCoroutine(co_sprintBackEqual);
         TryStopCoroutine(co_sprintToAngle);
         TryStopCoroutine(co_singleFishDive);
-        TryStopCoroutine(co_singleReturnToCenter);
+        //TryStopCoroutine(co_singleReturnToCenter);
         TryStopCoroutine(co_singleJumpToPos);
         TryStopCoroutine(co_circling);
+
         center.GetComponent<SpriteRenderer>().sortingOrder = 1;
 
         actionList.Clear();
@@ -521,9 +560,13 @@ public class YingYangFish_AI : IEnemyController
         waterSpear.CancelAct();
         swing.CancelAct();
         dive.CancelAct();
+        singleSwing.CancelAct();
+        bubbleTrap.CancelAct();
+        gatling.CancelAct();
         SetBlackNotBusy();
         SetWhiteNotBusy();
-
+        blackOrigin.DOKill();
+        whiteOrigin.DOKill();
         SetNormalRotateSpeed();
     }
 
@@ -536,9 +579,19 @@ public class YingYangFish_AI : IEnemyController
         if (!secondPhase)
         {
             DEAD = true;
+
+            //clear
             actionList.Clear();
             CancelAllAction();
+            selfPooler.SetPoolDisactive();
+
+            //UI
             CharacterUIManager.ShowBlackEdge(true);
+
+            // wait until fish back to initial state
+            StartCoroutine(IEReturnToInitialState(true));
+            StartCoroutine(IEReturnToInitialState(false));
+            yield return new WaitUntil(() => blackOrigin.localPosition == Vector3.zero && whiteOrigin.localPosition == Vector3.zero);
             yield return co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
             yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(true));
             SetWhiteTargetRotateSpeed(idleRotateSpeed / 3);
@@ -546,10 +599,11 @@ public class YingYangFish_AI : IEnemyController
             whiteAnim.Play("close_swim");
             blackAnim.Play("close_swim");
 
+            //dive, move to center of map
             yield return StartCoroutine(ChangeYPos(-6));
             transform.DOMove(new Vector3(GetCenterXOfMap(), waterLevel.position.y - 6, 0), 1.8f);
             yield return new WaitForSeconds(1.8f);
-            yield return StartCoroutine(ChangeYPos(2));
+            yield return StartCoroutine(ChangeYPos(2));// up
 
             centerAnim.Play("center_break");
             SoundManager.PlaySound("glass_break");
@@ -560,11 +614,16 @@ public class YingYangFish_AI : IEnemyController
 
     public IEnumerator secondPhaseAnim()
     {
+        //disable player's actions
         InputMaster.instance.DisableAllActions();
         GameManager.instance.isInPerformingState = true;
+
+        //event: player run to the left
         yield return StartCoroutine(playerController.RunToPosition(transform.position - new Vector3(2, 0, 0)));
         playerController.FaceTarget(this.transform);
         yield return new WaitForSeconds(0.5f);
+
+        //speed up fish rotate speed
         sprintRotateSpeed *= 1.5f;
         idleRotateSpeed *= 1.5f;
         EventInteract.SetActive(false);
@@ -577,6 +636,7 @@ public class YingYangFish_AI : IEnemyController
         StartCoroutine(ChangeYPos(4.5f));
         centerAnim.Play("center_fade");
 
+        //circling
         StartCoroutine(EmojiDuringCircling());
         yield return StartCoroutine(Circling(3.5f));
 
@@ -589,11 +649,18 @@ public class YingYangFish_AI : IEnemyController
     {
         //swing qte
         yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(1));
-        yield return dive.act_routine = StartCoroutine(dive.Act_coroutine(1));
 
+        //move to left boundary
+        movingTarget = leftBoundary;
+        yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
         yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
         SetNormalRotateSpeed();
 
+        //double single swing and bubble gatling
+        singleSwing.act_routine = StartCoroutine(singleSwing.Act_coroutine(1));
+        yield return gatling.act_routine = StartCoroutine(gatling.Act_coroutine(1));
+
+        yield return new WaitUntil(() => !isBlackBusy && !isWhiteBusy);
         //water spear ultimate
         yield return co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
         StartCoroutine(IESwimAway(waterSpearPos_black1.position, 10, true));
@@ -605,10 +672,13 @@ public class YingYangFish_AI : IEnemyController
         while (!finishedWaterSpearUltimate) { yield return null; }
 
         //swing ultimate
+        // move to player
         movingTarget = player;
         yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
         yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(2));
-        movingTarget = GetBoundaryFarOfPlayer();
+
+        //move to right boundary
+        movingTarget = rightBoundary;
         yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
         yield return co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
 
@@ -616,24 +686,35 @@ public class YingYangFish_AI : IEnemyController
         //water ball ultimate
         black_targetRotateSpeed = idleRotateSpeed / 3;
         white_targetRotateSpeed = idleRotateSpeed / 3;
+
+        //circling
         StartCoroutine(Circling(30f));
         StartCoroutine(ChangeYPos(4));
         yield return new WaitForSeconds(1f);
+
+        //ultimate wave show up
         ultimateWave.SetActive(true);
         ultimateWave.transform.position = new Vector3(transform.position.x, waterLevel.position.y, 0);
 
+        //charge up for 2 seconds
         yield return new WaitForSeconds(2f);
+
+        //ultimate water ball bullets shooting
         float[] bulletDelays = { 0f, 0.5f, 0.7f, 1.2f, 1.7f, 1.9f, 3f, 3.2f, 3.4f, 3.6f, 3.8f, 4f };
         for (int i = 0; i < bulletDelays.Length; i++)
         {
             StartCoroutine(SpawnUltimateBullet(i, bulletDelays[i]));
         }
+
+        //water dragons
         yield return new WaitForSeconds(1f);
         waterDragon1.gameObject.SetActive(true);
         yield return new WaitForSeconds(5f);
 
+        //player run to position
         yield return StartCoroutine(playerController.RunToPosition(transform.position - new Vector3(14f, 0, 0)));
 
+        //sword teleport jump qte
         playerController.rb.velocity = Vector3.zero;
         InputMaster.instance.StartMustSuccessQTE(InputKeyType.swordTeleport_key, player.transform.position + new Vector3(0, 4, 0),
             0.4f, () => { playerController.DesignatedPositionTeleport(player.transform.position + new Vector3(5, 7.5f, 0)); });
@@ -646,7 +727,7 @@ public class YingYangFish_AI : IEnemyController
         playerController.anim.Play("slash_pre");
         yield return new WaitForSeconds(0.1f);
 
-        //slash animation pr
+        //slash qte
 
         InputMaster.instance.StartMustSuccessQTE(InputKeyType.right_attack_key, player.transform.position + new Vector3(2, 2, 0),
            0.4f, () =>
@@ -666,7 +747,8 @@ public class YingYangFish_AI : IEnemyController
         blackSprite.sprite = black_tex; whiteSprite.sprite = white_tex;
         VFXManager.instance.SlowTimeForSeconds(0.5f, 0);
         yield return new WaitForSeconds(0.1f);
-        //CancelAllAction();
+
+        //end
         SetWhiteTargetRotateSpeed(0); white_rotateSpeed = 0;
         SetBlackTargetRotateSpeed(0); black_rotateSpeed = 0;
 
@@ -802,27 +884,14 @@ public class YingYangFish_AI : IEnemyController
 
         bool isPlayerFar = distanceToPlayer >= far_distance_threshhold;
         bool isPlayerClose = distanceToPlayer <= close_distance_threshhold;
-
+        float waterSpearRange = 10f;
         //water spear --- if player qi less than certain amount or player distance is further than a certain amount
         int energy_Threshhold = 5;
         if (playerEnergy.currentEnergy <= energy_Threshhold) possibleActions.Add(waterSpear);
 
         //splash --- if player is moving towards here for 3 seconds;
-        int playerDistanceDealaThreshhold = -20;
-        if (playerDistanceDelta <= playerDistanceDealaThreshhold) possibleActions.Add(splash);
-
-        // if player far
-        if (isPlayerFar)
-        {
-            float i = Random.Range(0, 10);
-            if (i < 3) { possibleActions.Add(waterSpear); } //30%
-            else if (i < 6) { possibleActions.Add(gatling); } //30%
-            else
-            {
-                possibleActions.Add(dive);
-                movingTarget = player;// get near to player since too far
-            } // 40%
-        }
+        int playerDistanceDeltaThreshhold = -20;
+        if (playerDistanceDelta <= playerDistanceDeltaThreshhold) possibleActions.Add(splash);
 
         // if player close
         if (isPlayerClose)
@@ -836,6 +905,18 @@ public class YingYangFish_AI : IEnemyController
                 movingTarget = GetFarTargetOutOfTwo(player, GetBoundaryFarOfPlayer());
                 //get away from player since too close
             } // 40%
+        }
+
+        if (distanceToPlayer >= waterSpearRange)
+        {
+            possibleActions.Add(RandomPick<IEnemyAction>(gatling, waterSpear));
+        }
+
+        // if player far
+        if (isPlayerFar)
+        {
+            possibleActions.Add(dive);
+            movingTarget = player;// get near to player since too far
         }
 
         int index = Random.Range(0, possibleActions.Count);
@@ -1007,6 +1088,9 @@ public class YingYangFish_AI : IEnemyController
         VFXManager.instance.UnBulletTime();
         isBossBreaking = false;
         yield return new WaitForSeconds(1f);
+        StartCoroutine(IEReturnToInitialState(true));
+        StartCoroutine(IEReturnToInitialState(false));
+        yield return new WaitUntil(() => blackOrigin.localPosition == Vector3.zero && whiteOrigin.localPosition == Vector3.zero);
         yield return StartCoroutine(IESprintBackEqual());
         StartAction();
         yield return null;
@@ -1052,6 +1136,7 @@ public class YingYangFish_AI : IEnemyController
 
     public void SetBlackTargetRotateSpeed(float speed)
     {
+        print(1);
         black_targetRotateSpeed = speed;
     }
 

@@ -170,6 +170,8 @@ public class PlayerAttack : MonoBehaviour
 
         if (counterAttackCheckTimer <= counterAttackCheckDuration) { CheckCounterAttack(); }
         else { isAttacking = false; isHS_attack = false; }
+
+        if (isOnStorm) StormCounterAttack();
     }
 
     #endregion Unity Lifecycle
@@ -524,19 +526,24 @@ public class PlayerAttack : MonoBehaviour
                 SoundManager.PlaySound("storm");
                 storm.SetActive(true);
                 Invoke("EndStorm", stormDuration);
-                Collider2D[] colliders = Physics2D.OverlapCircleAll(storm.transform.position, storm_radius, repelLayer);
-                foreach (Collider2D collider in colliders)
-                {
-                    if (collider.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
-                    {
-                        bool goingLeft = storm.transform.position.x > collider.transform.position.x;
-                        Vector2 dir = goingLeft ? new Vector2(-1, 0) : new Vector2(1, 0);
-                        rb.AddForce(repelForce * dir, ForceMode2D.Impulse);
-                    }
-                }
+                StormCounterAttack();
             }
             combatTimer = 2;
             stormReady = false;
+        }
+    }
+
+    public void StormCounterAttack()
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(storm.transform.position, storm_radius, repelLayer);
+        foreach (Collider2D collider in colliders)
+        {
+            if (collider.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
+            {
+                bool goingLeft = storm.transform.position.x > collider.transform.position.x;
+                Vector2 dir = goingLeft ? new Vector2(-1, 0) : new Vector2(1, 0);
+                rb.AddForce(repelForce * dir, ForceMode2D.Impulse);
+            }
         }
     }
 
