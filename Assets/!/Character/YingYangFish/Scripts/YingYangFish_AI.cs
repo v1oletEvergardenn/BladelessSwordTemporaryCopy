@@ -946,12 +946,12 @@ public class YingYangFish_AI : IEnemyController
         {
             //潜水->双摆尾 / 翻腾
             //条件：当玩家角色气值小于60 % and 玩家角色心剑值小于2。 潜水的目的地设为玩家。
-            if (playerEnergy.energyPercentage < 0.6f || playerAttack.currentHS_point < 2)
+            if (playerEnergy.energyPercentage < 0.6f || HeartSwordAbilities.instance.currentHS_point < 2)
             {
                 movingTarget = player;
                 AddAction(RandomPick<IEnemyAction>(swing, splash));
             }
-            else if (playerAttack.currentHS_point >= 2)
+            else if (HeartSwordAbilities.instance.currentHS_point >= 2)
             {
                 movingTarget = GetBoundaryFarOfPlayer();
                 AddAction(waterSpear);
@@ -1136,7 +1136,6 @@ public class YingYangFish_AI : IEnemyController
 
     public void SetBlackTargetRotateSpeed(float speed)
     {
-        print(1);
         black_targetRotateSpeed = speed;
     }
 

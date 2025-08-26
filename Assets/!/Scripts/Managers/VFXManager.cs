@@ -16,6 +16,7 @@ public enum Hit_Effect
 {
     slash,
     largeSlash,
+    hs_hit,
 }
 
 /// <summary>
@@ -76,7 +77,7 @@ public class VFXManager : MonoBehaviour
         target.Repel(melee.repel, left);
         CameraShake(melee.cameraShake);
         RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
-        SlowTimeForSeconds(melee.freezeTime, 0f);
+        SlowTimeForSeconds(melee.freezeTime, 0.2f);
     }
 
     public void MeleeAttackEffect(MeleeAttack melee, IDamagable target)
@@ -84,7 +85,7 @@ public class VFXManager : MonoBehaviour
         SpawnHitEffect(true, target.GetHitPos());
         CameraShake(melee.cameraShake);
         RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
-        SlowTimeForSeconds(melee.freezeTime, 0f);
+        SlowTimeForSeconds(melee.freezeTime, 0.2f);
     }
 
     #endregion MainMethods
@@ -327,6 +328,12 @@ public class VFXManager : MonoBehaviour
         return i;
     }
 
+    public GameObject SpawnHeartSwordHitEffect(Vector3 position)
+    {
+        GameObject i = objectPooler.SpawnFromPool("HS_hit_effect", position, true);
+        return i;
+    }
+
     /// <summary>
     /// Spawns a large slash effect at the given position.
     /// </summary>
@@ -371,7 +378,10 @@ public class VFXManager : MonoBehaviour
         {
             return SpawnLargeSlashEffect(position, isRed);
         }
-
+        else if (i == Hit_Effect.hs_hit)
+        {
+            return SpawnHeartSwordHitEffect(position);
+        }
         return null;
     }
 

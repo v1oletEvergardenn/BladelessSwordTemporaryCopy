@@ -26,6 +26,7 @@ public class InputPlayer : MonoBehaviour
     private Health health;
     private Energy energy;
     public static InputPlayer instance;
+    private HeartSwordAbilities hSAbilitiesManager;
 
     #endregion Singleton & References
 
@@ -94,6 +95,8 @@ public class InputPlayer : MonoBehaviour
         energy = GetComponent<Energy>();
         inputMaster = InputMaster.instance;
         health = GetComponent<Health>();
+        hSAbilitiesManager = HeartSwordAbilities.instance;
+
         gameManager = GameManager.instance;
         gameManager.playerInput = this;
         gameManager.player_Idamagable = Health.instance;
@@ -247,12 +250,21 @@ public class InputPlayer : MonoBehaviour
 
     private void HandleAttackInput()
     {
-        if (!learnedAttack) return;
-
         bool leftPressed = inputMaster._attackLeftAction.IsPressed();
         bool rightPressed = inputMaster._attackRightAction.IsPressed();
         bool rightJustPressed = inputMaster._attackRightAction.WasPressedThisFrame();
         bool leftJustPressed = inputMaster._attackLeftAction.WasPressedThisFrame();
+
+        if (controller.isFloating) return;
+        //checks if any active heart sword ability is triggered by attack key
+        //if does, cancel the attack input and perform the ability instead
+        if (hSAbilitiesManager.currentActivatedAbility != null && hSAbilitiesManager.currentActivatedAbility.isTriggeredByAttackKey)
+        {
+            bool success = false;
+            if (leftJustPressed) { success = hSAbilitiesManager.currentActivatedAbility.PerformAbility(true); }
+            else if (rightJustPressed) { success = hSAbilitiesManager.currentActivatedAbility.PerformAbility(false); }
+            if (success) return;
+        }
 
         if (!leftPressed && rightJustPressed)
         {
@@ -278,9 +290,18 @@ public class InputPlayer : MonoBehaviour
 
     private void HandleAbilityInput()
     {
-        if (inputMaster._AbilityX.WasPressedThisFrame()) { playerAttack.ActivateHS(); }//ability X;
-        if (inputMaster._AbilityY.WasPressedThisFrame()) { }//ability Y;
-        if (inputMaster._AbilityB.WasPressedThisFrame()) { }//ability B;
+        if (!inputMaster._AbilityB.IsPressed() && !inputMaster._AbilityX.IsPressed() && !inputMaster._AbilityY.IsPressed())
+        {
+            hSAbilitiesManager.currentActivatedAbility = null;
+            hSAbilitiesManager.abilityX.isActive = false;
+            hSAbilitiesManager.abilityY.isActive = false;
+            hSAbilitiesManager.abilityB.isActive = false;
+            return;
+        }
+
+        if (inputMaster._AbilityX.WasPressedThisFrame()) { hSAbilitiesManager.ActivateAbility(hSAbilitiesManager.abilityX); return; }
+        if (inputMaster._AbilityY.WasPressedThisFrame()) { hSAbilitiesManager.ActivateAbility(hSAbilitiesManager.abilityY); return; }
+        if (inputMaster._AbilityB.WasPressedThisFrame()) { hSAbilitiesManager.ActivateAbility(hSAbilitiesManager.abilityB); return; }
     }
 
     private void HandleDefendInput()
@@ -308,7 +329,7 @@ public class InputPlayer : MonoBehaviour
     /// </summary>
     private void TestEvent()
     {
-        FindObjectOfType<YingYangFish_AI>().Damage(1, this.transform, stunValue: 1000);
+        Time.timeScale = 0.2f;
     }
 
     private void OnJump()
@@ -414,7 +435,7 @@ public class InputPlayer : MonoBehaviour
             pointerSpriteRenderer.size = new Vector2(visualLength / 2, 0.155f);
 
             // Update attack direction for use in attack logic
-            playerAttack.direction = new Vector3(0, 0, pointer.rotation.eulerAngles.z);
+            playerAttack.pointerDirection = new Vector3(0, 0, pointer.rotation.eulerAngles.z);
         }
         else if (leftAttackDir != Vector2.zero)
         {
@@ -432,7 +453,7 @@ public class InputPlayer : MonoBehaviour
             }
             pointerSpriteRenderer.size = new Vector2(visualLength, 0.155f);
 
-            playerAttack.direction = new Vector3(0, 0, pointer.rotation.eulerAngles.z);
+            playerAttack.pointerDirection = new Vector3(0, 0, pointer.rotation.eulerAngles.z);
         }
         else
         {
@@ -440,7 +461,7 @@ public class InputPlayer : MonoBehaviour
             pointerSpriteRenderer.sprite = leftPointer;
             pointer.rotation = transform.rotation;
             pointerSpriteRenderer.size = new Vector2(1.55f, 0.15f);
-            playerAttack.direction = controller.FacingRight ? Vector3.zero : new Vector3(0, 0, -180);
+            playerAttack.pointerDirection = controller.FacingRight ? Vector3.zero : new Vector3(0, 0, -180);
             playerAttack.isAimingRightStick = false;
         }
     }

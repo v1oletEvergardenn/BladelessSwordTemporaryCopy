@@ -43,7 +43,7 @@ public class AnimSetBool : MonoBehaviour
         controller.canFlip = b;
         controller.canJump = b;
         playerAttack.canAttack = b;
-        // playerAttack.canLaunchBoomerang = b;
+        controller.canTeleport = b;
         playerAttack.canStorm = b;
     }
 
@@ -55,7 +55,6 @@ public class AnimSetBool : MonoBehaviour
         controller.canFlip = b;
         controller.canJump = b;
         playerAttack.canAttack = b;
-        //playerAttack.canLaunchBoomerang = b;
         playerAttack.canStorm = b;
     }
 
@@ -68,9 +67,9 @@ public class AnimSetBool : MonoBehaviour
         controller.canFlip = b;
         controller.canJump = b;
         playerAttack.canAttack = b;
-        //playerAttack.canLaunchBoomerang = b;
         playerAttack.canStorm = b;
         playerAttack.canDefend = b;
+        controller.canTeleport = b;
     }
 
     public void Anim_Attack(int i)
@@ -86,10 +85,21 @@ public class AnimSetBool : MonoBehaviour
         controller.canFlip = b;
         controller.canJump = b;
         playerAttack.canAttack = b;
-        // playerAttack.canLaunchBoomerang = b;
+        controller.canTeleport = b;
         playerAttack.canStorm = b;
         playerAttack.canDefend = b;
-        playerAttack.isAttacking = !b;
+        playerAttack.isCounterAttacking = !b;
+    }
+
+    public void Anim_Move(int i)
+    {
+        bool b = i == 1 ? true : false;
+
+        playerAttack.canAttack = b;
+        playerAttack.canStorm = b;
+        playerAttack.canDefend = b;
+        controller.canTeleport = b;
+        controller.canDoubleJump = b;
     }
 
     public void TranslateDistance(float x)

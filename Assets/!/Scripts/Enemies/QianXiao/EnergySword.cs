@@ -26,7 +26,7 @@ public class EnergySword : IProjectile
                 vfx.RumblePulse(rumbleFrequncy_normal.x, rumbleFrequncy_normal.y, rumbleDuration_normal);
                 if (isRed)
                 {
-                    if (gameManager.Player.GetComponent<PlayerAttack>().isAttacking && gameManager.Player.GetComponent<CharacterController2D>().FacingRight != facingRight)
+                    if (gameManager.Player.GetComponent<PlayerAttack>().isCounterAttacking && gameManager.Player.GetComponent<CharacterController2D>().FacingRight != facingRight)
                     {
                         target.Repel(50f, this.transform.right.x < 0 ? true : false);
                         gameManager.Player.GetComponent<PlayerAttack>().CounterAttack(this, true);

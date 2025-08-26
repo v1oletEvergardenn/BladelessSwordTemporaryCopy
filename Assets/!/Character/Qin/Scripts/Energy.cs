@@ -66,7 +66,7 @@ public class Energy : MonoBehaviour
         energyPercentage = (float)currentEnergy / maxEnergy;
         if (controller.isFloating) { floating_timer += Time.unscaledDeltaTime; }
         if (playerAttack.isDefending) { defend_timer += Time.unscaledDeltaTime; }
-        if (!playerAttack.isAttacking && playerAttack.anim.GetBool("storm") && !playerAttack.stormReady) { storm_timer += Time.unscaledDeltaTime; }
+        if (!playerAttack.isCounterAttacking && playerAttack.anim.GetBool("storm") && !playerAttack.stormReady) { storm_timer += Time.unscaledDeltaTime; }
         if (floating_timer >= floating_consumption_frequency)
         {
             FloatingConsume();

@@ -55,6 +55,7 @@ public class CharacterController2D : MonoBehaviour
     [HideInInspector] public Vector3 runToTarget;
     [HideInInspector] public float gravity;
     private bool runToLeft = false;
+    [HideInInspector] public bool canSwitchNormalAnim = true;
 
     #endregion Movement Variables
 
@@ -103,6 +104,7 @@ public class CharacterController2D : MonoBehaviour
     [HideInInspector] public bool canMove = true;
     [HideInInspector] public bool canJump = true;
     [HideInInspector] public bool canDoubleJump = true;
+    [HideInInspector] public bool canTeleport = true;
 
     #endregion State Flags
 
@@ -111,9 +113,7 @@ public class CharacterController2D : MonoBehaviour
     private void Awake()
     {
         if (instance == null)
-        {
             instance = this;
-        }
         FacingRight = true;
         rb = GetComponent<Rigidbody2D>();
         playerAttack = GetComponent<PlayerAttack>();
@@ -128,97 +128,26 @@ public class CharacterController2D : MonoBehaviour
         _fallSpeedYDampingChangeThreshold = CameraManager.instance._fallSpeedYDampingChangeThreshold;
         inputPlayer = InputPlayer.instance;
         gravity = rb.gravityScale;
-        canFlip = true;
-        canMove = true;
-        canJump = true;
-        canDoubleJump = true;
+        canFlip = canMove = canJump = canDoubleJump = true;
     }
 
     private void Update()
     {
-        if (isGrounded && !isJumping) { coyoteTimer = coyoteTime; }
-        else { coyoteTimer -= VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime; }
+        UpdateCoyoteTimer();
         isFloating = Float();
-
         teleportTimer += VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
-
-        //falling check
-        if (rb.velocity.y < -1 && !isGrounded && !isFalling)
-        {
-            if (!playerAttack.isDefending)
-            {
-                if (
-                anim.GetCurrentAnimatorStateInfo(0).IsName((playerAttack.isHS_attack ? "HS_" : "") + "attack_run_" + playerAttack.attackIndex) ||
-                 anim.GetCurrentAnimatorStateInfo(0).IsName((playerAttack.isHS_attack ? "HS_" : "") + "attack_idle_" + playerAttack.attackIndex) ||
-                 anim.GetCurrentAnimatorStateInfo(0).IsName((playerAttack.isHS_attack ? "HS_" : "") + "attack_jump_" + playerAttack.attackIndex))
-                {
-                    float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                    anim.Play((playerAttack.isHS_attack ? "HS_" : "") + "attack_fall_" + playerAttack.attackIndex, 0, duration);
-                }//swtich attack animation
-                else if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack_jump_after") ||
-                    anim.GetCurrentAnimatorStateInfo(0).IsName("attack_idle_after"))
-                {
-                    float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                    anim.Play("attack_fall_after", 0, duration);
-                }//switch attack after animation
-                else if ((anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_jump") ||
-                       anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_idle") ||
-                       anim.GetCurrentAnimatorStateInfo(0).IsName("storm_ready_run")))
-                {
-                    float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                    anim.Play("storm_ready_fall", 0, duration);
-                }
-                else if ((anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_jump") ||
-                       anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_idle") ||
-                       anim.GetCurrentAnimatorStateInfo(0).IsName("storm_pre_run")))
-                {
-                    float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                    anim.Play("storm_pre_fall", 0, duration);
-                }
-                else if ((anim.GetCurrentAnimatorStateInfo(0).IsName("tele_pre_jump")))
-                {
-                    float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                    anim.Play("tele_pre_fall", 0, duration);
-                }
-                else
-                {
-                    if (playerAttack.isPreparingStorm) { anim.Play("storm_ready_fall"); }
-                    else { PlayAnimClipInCombat("pre_fall", "pre_fall_combat"); }
-                }//play normal falling animation if not attacking
-            }
-
-            isFalling = true;
-            isJumping = false;
-        }
-        else if (isGrounded) { isFalling = false; }
-
-        //check if falling past the threshold to change camera Daming speed
-        if (rb.velocity.y < _fallSpeedYDampingChangeThreshold && !CameraManager.instance.isLerpingYDaming && !CameraManager.instance.lerpedFromPlayerFalling)
-        {
-            CameraManager.instance.LerpYDamping(true);
-            CameraFollow.instance.ChangeOffset(CameraFollow.instance.fallingOffset);
-        }
-        //if we are standing still or not falling, set the damping back to normal
-        if (rb.velocity.y >= 0 && !CameraManager.instance.isLerpingYDaming && CameraManager.instance.lerpedFromPlayerFalling)
-        {
-            CameraManager.instance.lerpedFromPlayerFalling = false;
-            CameraManager.instance.LerpYDamping(false);
-            CameraFollow.instance.ChangeOffset(CameraFollow.instance.normalOffset);
-        }
-
-        if (isRunningToTarget) { CheckRunToPos(); }
+        HandleFallingAnimation();
+        HandleCameraDamping();
+        if (isRunningToTarget) CheckRunToPos();
     }
 
     private void FixedUpdate()
     {
         if (VFXManager.isInBulletTime)
         {
-            // Apply gravity manually
             rb.velocity += Physics2D.gravity * rb.gravityScale * Time.unscaledDeltaTime;
-            // Move position manually
             rb.MovePosition(rb.position + rb.velocity * Time.unscaledDeltaTime);
         }
-
         GroundCheck();
     }
 
@@ -230,111 +159,36 @@ public class CharacterController2D : MonoBehaviour
     {
         if (!canMove)
         {
-            anim.SetBool("isRunning", false);
-            isRunning = false;
+            SetRunningState(false);
             rb.velocity = Vector3.SmoothDamp(
-                  rb.velocity,
-                  new Vector2(0, rb.velocity.y),
-                  ref m_Velocity,
-                  m_MovementSmoothing,
-                  Mathf.Infinity,
-                  VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime
-  );
+                rb.velocity,
+                new Vector2(0, rb.velocity.y),
+                ref m_Velocity,
+                m_MovementSmoothing,
+                Mathf.Infinity,
+                VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime
+            );
             return;
         }
 
         if (!(isGrounded || m_AirControl))
             return;
 
-        string hsPrefix = playerAttack.isHS_attack ? "HS_" : "";
         float speed = runSpeed;
         bool moving = move != 0;
-        anim.SetBool("isRunning", moving);
-        isRunning = moving;
+        SetRunningState(moving);
 
-        // Air control logic
         if (!isGrounded && m_AirControl)
         {
             speed = isFloating ? 0f : airRunSpeed;
-            isRunning = false;
-            anim.SetBool("isRunning", false);
+            SetRunningState(false);
         }
 
-        // Cache animation state info
         var state = anim.GetCurrentAnimatorStateInfo(0);
 
-        // Animation transitions when grounded and not jumping
         if (isGrounded && !isJumping)
-        {
-            float duration = state.normalizedTime;
+            HandleGroundedAnimationTransitions(state, moving);
 
-            if (isRunning)
-            {
-                if (state.IsName(hsPrefix + "attack_run_" + playerAttack.attackIndex)
-                    && playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
-                {
-                    if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
-                    {
-                        anim.Play(hsPrefix + "attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
-                    }
-                    else
-                    {
-                        if (anim.GetBool("storm"))
-                            anim.Play("storm_pre_run");
-                        else
-                            anim.Play("run_combat");
-                    }
-                }
-                else if (state.IsName(hsPrefix + "attack_idle_" + playerAttack.attackIndex))
-                {
-                    anim.Play(hsPrefix + "attack_run_" + playerAttack.attackIndex, 0, duration);
-                }
-                else if (state.IsName("drawback_idle"))
-                {
-                    anim.Play("drawback_run", 0, duration);
-                }
-                else if (IsStormReadyState(state))
-                {
-                    if (!state.IsName("storm_ready_run")) { anim.Play("storm_ready_run", 0, duration); }
-                }
-                else if (IsStormPreState(state))
-                {
-                    if (!state.IsName("storm_pre_run")) { anim.Play("storm_pre_run", 0, duration); }
-                }
-            }
-            else // Not running
-            {
-                if (state.IsName(hsPrefix + "attack_run_" + playerAttack.attackIndex))
-                {
-                    anim.Play(hsPrefix + "attack_idle_" + playerAttack.attackIndex, 0, duration);
-                }
-                else if (state.IsName("drawback_run"))
-                {
-                    anim.Play("drawback_idle", 0, duration);
-                }
-                else if (state.IsName("attack_jump_after") ||
-                         state.IsName("attack_fall_after"))
-                {
-                    anim.Play("attack_idle_after", 0, duration);
-                }
-                else if (IsStormReadyState(state))
-                {
-                    if (!state.IsName("storm_ready_idle"))
-                    {
-                        anim.Play("storm_ready_idle", 0, duration);
-                    }
-                }
-                else if (IsStormPreState(state))
-                {
-                    if (!state.IsName("storm_pre_idle"))
-                    {
-                        anim.Play("storm_pre_idle", 0, duration);
-                    }
-                }
-            }
-        }
-
-        // Apply horizontal movement
         Vector3 targetVelocity = new Vector2(move * speed, rb.velocity.y);
         rb.velocity = Vector3.SmoothDamp(
             rb.velocity,
@@ -345,51 +199,14 @@ public class CharacterController2D : MonoBehaviour
             VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime
         );
 
-        // Handle flipping
-        if (isRunningToTarget)
-        {
-            if (playerAttack.isAttacking && playerAttack.isAttackingLeft == FacingRight)
-            {
-                Flip();
-            }
-            else if (!playerAttack.isAttacking)
-            {
-                if (move > 0 && !FacingRight) Flip();
-                else if (move < 0 && FacingRight) Flip();
-            }
-        }
-        else if (playerAttack.isAttacking)
-        {
-            if (playerAttack.isAttackingLeft == FacingRight) { Flip(); }
-        }
-        else
-        {
-            if (move > 0 && !FacingRight) Flip();
-            else if (move < 0 && FacingRight) Flip();
-        }
-
-        // Local helper functions for animation state checks
-        bool IsStormReadyState(AnimatorStateInfo s) =>
-            s.IsName("storm_ready_idle") ||
-            s.IsName("storm_ready_jump") ||
-            s.IsName("storm_ready_fall") ||
-            s.IsName("storm_ready_run");
-
-        bool IsStormPreState(AnimatorStateInfo s) =>
-            s.IsName("storm_pre_idle") ||
-            s.IsName("storm_pre_jump") ||
-            s.IsName("storm_pre_fall") ||
-             s.IsName("storm_pre_run");
+        HandleFlipping(move);
     }
 
     public void CheckRunToPos()
     {
-        float dir = -1;
-        if (!runToLeft) { dir = 1; }
+        float dir = runToLeft ? -1 : 1;
         if (runToTarget.x < transform.position.x == runToLeft)
-        {
             Move(dir);
-        }
         else
         {
             Move(0);
@@ -412,58 +229,10 @@ public class CharacterController2D : MonoBehaviour
         isGrounded = true;
         canDoubleJump = true;
         floatTriggered = false;
-        // Cache animation state info
         var state = anim.GetCurrentAnimatorStateInfo(0);
 
-        // If just landed (was not grounded last frame)
         if (!wasGrounded)
-        {
-            if (!isJumping && !playerAttack.isDefending)
-            {
-                if (!state.IsName("slash") && !state.IsName("slash_end"))
-                {
-                    PlayAnimClipInCombat("land", "land_combat");
-                }
-                isFalling = false;
-                isJumping = false;
-            }
-
-            CameraFollow.instance.ChangeOffset(CameraFollow.instance.normalOffset);
-
-            string hsPrefix = playerAttack.isHS_attack ? "HS_" : "";
-
-            if (!isJumping &&
-                (state.IsName(hsPrefix + "attack_jump_" + playerAttack.attackIndex) ||
-                 state.IsName(hsPrefix + "attack_fall_" + playerAttack.attackIndex)))
-            {
-                float duration = state.normalizedTime;
-                if (isRunning)
-                {
-                    if (playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
-                    {
-                        if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
-                        {
-                            anim.Play(hsPrefix + "attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
-                        }
-                        else
-                        {
-                            if (anim.GetBool("storm"))
-                                anim.Play("storm_pre_run");
-                            else
-                                anim.Play("run_combat");
-                        }
-                    }
-                    else
-                    {
-                        anim.Play(hsPrefix + "attack_run_" + playerAttack.attackIndex, 0, duration);
-                    }
-                }
-                else
-                {
-                    anim.Play(hsPrefix + "attack_idle_" + playerAttack.attackIndex, 0, duration);
-                }
-            }
-        }
+            HandleLandingAnimation(state);
     }
 
     #endregion Basic Movement
@@ -472,37 +241,40 @@ public class CharacterController2D : MonoBehaviour
 
     private bool Float()
     {
-        if (!canJump) { return false; }
+        if (!canJump) return false;
 
         if (input_floating && !isGrounded && isFalling && canDoubleJump && !playerAttack.isPreparingStorm && !playerAttack.isDefending)
         {
-            if (!floatTriggered) { SoundManager.PlaySound("sword_jump_floating"); floatTriggered = true; }
-            //if (!energy.FloatingConsume()) { return false; }
+            if (!floatTriggered)
+            {
+                SoundManager.PlaySound("sword_jump_floating");
+                floatTriggered = true;
+            }
             float x = rb.velocity.x;
             rb.velocity = new Vector2(x, (VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime) * -floatingSpeed);
             if (!isFloating)
-            {
                 PlayAnimClipInCombat("sword_jump_pre", "sword_jump_pre_combat");
+            if (!resetRumbleJump)
+            {
+                Gamepad.current.SetMotorSpeeds(floatingRumblingSpeed.x, 0);
+                resetRumbleJump = true;
             }
-            if (!resetRumbleJump) { Gamepad.current.SetMotorSpeeds(floatingRumblingSpeed.x, 0); resetRumbleJump = true; }
             return true;
-        }//is going to float
+        }
         else
         {
-            if (resetRumbleJump) { Gamepad.current.SetMotorSpeeds(0f, 0f); resetRumbleJump = false; }
+            if (resetRumbleJump)
+            {
+                Gamepad.current.SetMotorSpeeds(0f, 0f);
+                resetRumbleJump = false;
+            }
             return false;
         }
-    } //floating check
+    }
 
     public void Jump()
     {
-        if (!canJump) return;
-
-        // Only allow jump if within coyote time
-        if (coyoteTimer <= 0f) return;
-
-        // Cache HS prefix for animation names
-        string hsPrefix = playerAttack.isHS_attack ? "HS_" : "";
+        if (!canJump || coyoteTimer <= 0f) return;
 
         coyoteTimer = 0f;
         isGrounded = false;
@@ -511,86 +283,37 @@ public class CharacterController2D : MonoBehaviour
         isJumping = true;
 
         var state = anim.GetCurrentAnimatorStateInfo(0);
+        float duration = state.normalizedTime;
 
-        // Attack jump/fall/back transitions
-        if (state.IsName(hsPrefix + "attack_run_" + playerAttack.attackIndex) ||
-            state.IsName(hsPrefix + "attack_idle_" + playerAttack.attackIndex) ||
-            state.IsName(hsPrefix + "attack_back_" + playerAttack.attackIndex))
-        {
-            float duration = state.normalizedTime;
-            if (playerAttack.attackIndex == 1)
-                anim.Play(hsPrefix + "attack_jump_" + playerAttack.attackIndex, 0, duration - (36f / 71f));
-            else
-                anim.Play(hsPrefix + "attack_jump_" + playerAttack.attackIndex, 0, duration);
+        if (HandleJumpAnimationTransitions(state, duration))
             return;
-        }
 
-        // Attack after transitions
-        if (state.IsName(hsPrefix + "attack_fall_after") ||
-            state.IsName(hsPrefix + "attack_idle_after"))
-        {
-            float duration = state.normalizedTime;
-            anim.Play(hsPrefix + "attack_jump_after", 0, duration);
-            return;
-        }
-
-        // Storm ready transitions
-        if (IsStormReadyState(state))
-        {
-            float duration = state.normalizedTime;
-            anim.Play("storm_ready_jump", 0, duration);
-            return;
-        }
-
-        // Storm pre transitions
-        if (IsStormPreState(state))
-        {
-            float duration = state.normalizedTime;
-            anim.Play("storm_pre_jump", 0, duration);
-            return;
-        }
-
-        // Default jump
-        PlayAnimClipInCombat("jump", "jump_combat");
-
-        // Local helper functions for animation state checks
-        bool IsStormReadyState(AnimatorStateInfo s) =>
-            s.IsName("storm_ready_idle") ||
-            s.IsName("storm_ready_jump") ||
-            s.IsName("storm_ready_fall") ||
-            s.IsName("storm_ready_run");
-
-        bool IsStormPreState(AnimatorStateInfo s) =>
-            s.IsName("storm_pre_idle") ||
-            s.IsName("storm_pre_jump") ||
-            s.IsName("storm_pre_fall") ||
-             s.IsName("storm_pre_run");
+        if (canSwitchNormalAnim)
+            PlayAnimClipInCombat("jump", "jump_combat");
     }
 
     public void DoubleJump(float holdTime)
     {
-        if (!canDoubleJump) { return; }
+        if (!canDoubleJump || isGrounded) return;
+
         float x = rb.velocity.x;
         float strength = Mathf.Lerp(MinDoubleJumpForceMultiplier, DoubleJumpForceMultiplier, holdTime / DoubleJumpForceTime);
-        if (canDoubleJump && !isGrounded)
-        {
-            SoundManager.PlaySound("sword_jump");
-            rb.velocity = new Vector2(x, m_JumpForce * strength);
-            canDoubleJump = false;
-            isFloating = false;
-            isFalling = false;
-            isJumping = true;
 
-            //counter attack
-            PlayAnimClipInCombat("sword_jump_after", "sword_jump_after_combat");
-            bool hit = playerAttack.JumpAttack();
-            if (hit)
-            {
-                canDoubleJump = true;
-                floatTriggered = false;
-            }
+        SoundManager.PlaySound("sword_jump");
+        rb.velocity = new Vector2(x, m_JumpForce * strength);
+        canDoubleJump = false;
+        isFloating = false;
+        isFalling = false;
+        isJumping = true;
+
+        PlayAnimClipInCombat("sword_jump_after", "sword_jump_after_combat");
+        bool hit = playerAttack.JumpAttack();
+        if (hit)
+        {
+            canDoubleJump = true;
+            floatTriggered = false;
         }
-    }//double jump and jump counter attack
+    }
 
     #endregion Jump & Floating
 
@@ -598,33 +321,35 @@ public class CharacterController2D : MonoBehaviour
 
     public void Flip(bool ignoreCamFollowFlip = false)
     {
-        if (!canFlip) { return; }
-        if (playerAttack.isInAttackAnim) { return; }
+        if (!canFlip) return;
 
-        if (playerAttack.isAttacking)
+        if (playerAttack.attackTimer <= playerAttack.attackAnimationTime)
         {
-            if (playerAttack.isAttackingLeft == FacingRight) { }
+            if (playerAttack.isAttackingLeft != FacingRight) return;
         }
         else
         {
-            if (anim.GetCurrentAnimatorStateInfo(0).IsName((playerAttack.isHS_attack ? "HS_" : "") + "attack_back_" + playerAttack.attackIndex)) { return; }
+            var state = anim.GetCurrentAnimatorStateInfo(0);
+            if (state.IsName("attack_back_" + playerAttack.attackIndex) ||
+                state.IsName("HS_attack_back_" + playerAttack.attackIndex))
+                return;
         }
-        //flip player
+
         FacingRight = !FacingRight;
         transform.Rotate(new Vector3(0, 1, 0), 180);
-        //pointer.Rotate(new Vector3(0, 1, 0), 180);
         playerAttack.counterAttackPoint.Rotate(new Vector3(1, 0, 0), 180);
+
         if (!ignoreCamFollowFlip && camFollowDirection != FacingRight)
         {
             camFollowDirection = !camFollowDirection;
             camFollow.CallTurn();
         }
-    }//flip the character
+    }
 
     public void FaceTarget(Transform target)
     {
-        if (target.position.x <= transform.position.x && FacingRight
-            || target.position.x > transform.position.x && !FacingRight)
+        if ((target.position.x <= transform.position.x && FacingRight) ||
+            (target.position.x > transform.position.x && !FacingRight))
         {
             Flip();
         }
@@ -638,11 +363,9 @@ public class CharacterController2D : MonoBehaviour
 
     public void SwordTeleport()
     {
-        if (teleportTimer <= teleportCD) { return; }
-        if (!energy.TeleportConsume()) return;
+        if (teleportTimer <= teleportCD || !energy.TeleportConsume()) return;
         teleportTimer = 0f;
         teleported = false;
-
         co_teleport = StartCoroutine(TeleportCoroutine(FacingRight));
     }
 
@@ -656,9 +379,7 @@ public class CharacterController2D : MonoBehaviour
         runToTarget = target;
         yield return new WaitUntil(() => !isRunningToTarget);
         if (originalEnabled)
-        {
             InputMaster.instance._defendAction.Enable();
-        }
     }
 
     public void DesignatedPositionTeleport(Vector3 pos)
@@ -672,22 +393,21 @@ public class CharacterController2D : MonoBehaviour
         Vector3 start = transform.position + new Vector3(0f, 1.2f, 0f);
         Vector3 dir = pos - start;
 
-        if (dir.x <= 0 && FacingRight) { Flip(); }
-        else if (dir.x >= 0 && !FacingRight) { Flip(); }
+        if ((dir.x <= 0 && FacingRight) || (dir.x >= 0 && !FacingRight))
+            Flip();
+
         gameObject.layer = 14; //player_dash
         AnimSetBool.instance.Anim_Teleport(0);
-        if (isFalling) { anim.Play("tele_pre_fall"); }
-        else if (isJumping) { anim.Play("tele_pre_jump"); }
-        else { anim.Play("tele_pre_idle"); }
+        if (isFalling) anim.Play("tele_pre_fall");
+        else if (isJumping) anim.Play("tele_pre_jump");
+        else anim.Play("tele_pre_idle");
+
         TeleportSword.transform.position = start;
-
-        // Set rotation to face the target position at the start
         TeleportSword.transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
-
         TeleportSword.SetActive(true);
 
         bool finished = false;
-        TeleportSword.transform.DOMove(pos, TeleportDuration).SetEase(Ease.Linear).OnComplete(() => { finished = true; });
+        TeleportSword.transform.DOMove(pos, TeleportDuration).SetEase(Ease.Linear).OnComplete(() => finished = true);
 
         yield return new WaitUntil(() => finished);
         TeleportToSword();
@@ -697,16 +417,23 @@ public class CharacterController2D : MonoBehaviour
 
     public IEnumerator TeleportCoroutine(bool right)
     {
+        if (!canTeleport) yield break;
+
         if (playerAttack.isAimingRightStick)
         {
-            if (inputPlayer.rightPointLeft == FacingRight) { Flip(); }
+            if (inputPlayer.rightPointLeft == FacingRight) Flip();
         }
-        else if (inputPlayer.leftAttackDir != Vector2.zero) { if (inputPlayer.leftPointLeft == FacingRight) { Flip(); } }
+        else if (inputPlayer.leftAttackDir != Vector2.zero)
+        {
+            if (inputPlayer.leftPointLeft == FacingRight) Flip();
+        }
+
         gameObject.layer = 14; //player_dash
         AnimSetBool.instance.Anim_Teleport(0);
-        if (isFalling) { anim.Play("tele_pre_fall"); }
-        else if (isJumping) { anim.Play("tele_pre_jump"); }
-        else { anim.Play("tele_pre_idle"); }
+        if (isFalling) anim.Play("tele_pre_fall");
+        else if (isJumping) anim.Play("tele_pre_jump");
+        else anim.Play("tele_pre_idle");
+
         TeleportSword.transform.position = transform.position + new Vector3(0f, 1.2f, 0f);
         TeleportSword.transform.eulerAngles = inputPlayer.pointer.transform.eulerAngles;
         TeleportSword.SetActive(true);
@@ -715,8 +442,8 @@ public class CharacterController2D : MonoBehaviour
         bool finished = false;
         TeleportSword.transform.DOMove(targetPos, TeleportDuration)
             .SetEase(Ease.Linear)
-            .SetUpdate(VFXManager.isInBulletTime ? true : false)
-            .OnComplete(() => { finished = true; });
+            .SetUpdate(VFXManager.isInBulletTime)
+            .OnComplete(() => finished = true);
 
         yield return new WaitUntil(() => finished);
         TeleportToSword();
@@ -726,24 +453,17 @@ public class CharacterController2D : MonoBehaviour
 
     public void TeleportToSword()
     {
-        if (teleported) { return; }
+        if (teleported) return;
         teleported = true;
         gameObject.layer = 6; //player_dash
+
         RaycastHit2D hit = Physics2D.Raycast(TeleportSword.transform.position, Vector2.down, 1.2f, teleportCheckLayer);
         RaycastHit2D hit_horizontal = Physics2D.Raycast(TeleportSword.transform.position, TeleportSword.transform.right, 0.7f, teleportCheckLayer);
-        float offset_y = 0f;
+        float offset_y = hit.collider != null ? 1.2f - hit.distance : 0f;
         float offset_x = 0f;
-        if (hit.collider != null)
-        {
-            offset_y = 1.2f - hit.distance;
-        }
         if (hit_horizontal.collider != null)
         {
-            offset_x = hit_horizontal.distance + 0.1f;
-            if (FacingRight)
-            {
-                offset_x = -hit_horizontal.distance - 0.1f;
-            }
+            offset_x = FacingRight ? -hit_horizontal.distance - 0.1f : hit_horizontal.distance + 0.1f;
         }
         rb.velocity = Vector3.zero;
 
@@ -752,11 +472,11 @@ public class CharacterController2D : MonoBehaviour
         TeleportSword.SetActive(false);
         anim.SetBool("isCombat", true);
         PlayerAttack.instance.combatTimer = 2f;
-        if (isFalling) { anim.Play("tele_fall"); }
-        else if (isRunning) { anim.Play("tele_run"); }
-        else { anim.Play("tele_idle"); }
+        if (isFalling) anim.Play("tele_fall");
+        else if (isRunning) anim.Play("tele_run");
+        else anim.Play("tele_idle");
         transform.position = TeleportSword.transform.position + new Vector3(offset_x, offset_y - 1.2f, 0);
-        rb.velocity = new Vector2(0, 0f);
+        rb.velocity = Vector2.zero;
     }
 
     #endregion Teleportation
@@ -770,22 +490,303 @@ public class CharacterController2D : MonoBehaviour
 
     public void StopMovement()
     {
-        if (isJumping) { return; }
+        if (isJumping) return;
         rb.velocity = Vector3.zero;
     }
 
     public void PlayAnimClipInCombat(string normalClip, string combatClip)
     {
-        if (playerAttack.isInCombat) { anim.Play(combatClip); }
-        else { anim.Play(normalClip); }
+        anim.Play(playerAttack.isInCombat ? combatClip : normalClip);
     }
 
-    public Quaternion CalculateWantedRotation(Vector3 _targetPos)
+    public Quaternion CalculateWantedRotation(Vector3 targetPos)
     {
-        float angle = Mathf.Atan2(_targetPos.y - transform.position.y, _targetPos.x - transform.position.x) * Mathf.Rad2Deg;
-        Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
-        return targetRotation;
+        float angle = Mathf.Atan2(targetPos.y - transform.position.y, targetPos.x - transform.position.x) * Mathf.Rad2Deg;
+        return Quaternion.Euler(0, 0, angle);
     }
 
     #endregion Utility
+
+    #region Private Helpers
+
+    private void UpdateCoyoteTimer()
+    {
+        if (isGrounded && !isJumping)
+            coyoteTimer = coyoteTime;
+        else
+            coyoteTimer -= VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
+    }
+
+    private void SetRunningState(bool running)
+    {
+        anim.SetBool("isRunning", running);
+        isRunning = running;
+    }
+
+    private void HandleFallingAnimation()
+    {
+        if (rb.velocity.y < -1 && !isGrounded && !isFalling)
+        {
+            if (!playerAttack.isDefending)
+            {
+                var state = anim.GetCurrentAnimatorStateInfo(0);
+                float duration = state.normalizedTime;
+                if (IsAttackRunState(state) || IsAttackJumpState(state) || IsAttackIdleState(state))
+                    anim.Play("attack_fall_" + playerAttack.attackIndex, 0, duration);
+                else if (IsHSAttackRunState(state) || IsHSAttackJumpState(state) || IsHSAttackIdleState(state))
+                    anim.Play("HS_attack_fall_" + playerAttack.attackIndex, 0, duration);
+                else if (IsAttackAfterState(state))
+                    anim.Play("attack_fall_after", 0, duration);
+                else if (IsStormReadyState(state))
+                    anim.Play("storm_ready_fall", 0, duration);
+                else if (IsStormPreState(state))
+                    anim.Play("storm_pre_fall", 0, duration);
+                else if (state.IsName("tele_pre_jump"))
+                    anim.Play("tele_pre_fall", 0, duration);
+                else
+                {
+                    if (playerAttack.isPreparingStorm)
+                        anim.Play("storm_ready_fall");
+                    else if (canSwitchNormalAnim)
+                        PlayAnimClipInCombat("pre_fall", "pre_fall_combat");
+                }
+            }
+            isFalling = true;
+            isJumping = false;
+        }
+        else if (isGrounded)
+        {
+            isFalling = false;
+        }
+    }
+
+    private void HandleCameraDamping()
+    {
+        if (rb.velocity.y < _fallSpeedYDampingChangeThreshold && !CameraManager.instance.isLerpingYDaming && !CameraManager.instance.lerpedFromPlayerFalling)
+        {
+            CameraManager.instance.LerpYDamping(true);
+            CameraFollow.instance.ChangeOffset(CameraFollow.instance.fallingOffset);
+        }
+        if (rb.velocity.y >= 0 && !CameraManager.instance.isLerpingYDaming && CameraManager.instance.lerpedFromPlayerFalling)
+        {
+            CameraManager.instance.lerpedFromPlayerFalling = false;
+            CameraManager.instance.LerpYDamping(false);
+            CameraFollow.instance.ChangeOffset(CameraFollow.instance.normalOffset);
+        }
+    }
+
+    private void HandleGroundedAnimationTransitions(AnimatorStateInfo state, bool isRunning)
+    {
+        float duration = state.normalizedTime;
+        if (isRunning)
+        {
+            if (IsAttackRunState(state) && playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
+            {
+                if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
+                    anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
+                else if (playerAttack.attackIndex == 2)
+                    anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration);
+                else
+                    anim.Play(anim.GetBool("storm") ? "storm_pre_run" : "run_combat");
+            }
+            else if (IsHSAttackRunState(state) && playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
+            {
+                if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
+                    anim.Play("HS_attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
+                else if (playerAttack.attackIndex == 2)
+                    anim.Play("HS_attack_back_" + playerAttack.attackIndex, 0, duration);
+                else
+                    anim.Play(anim.GetBool("storm") ? "storm_pre_run" : "run_combat");
+            }
+            else if (state.IsName("attack_idle_" + playerAttack.attackIndex))
+                anim.Play("attack_run_" + playerAttack.attackIndex, 0, duration);
+            else if (state.IsName("HS_attack_idle_" + playerAttack.attackIndex))
+                anim.Play("HS_attack_run_" + playerAttack.attackIndex, 0, duration);
+            else if (state.IsName("drawback_idle"))
+                anim.Play("drawback_run", 0, duration);
+            else if (IsStormReadyState(state) && !state.IsName("storm_ready_run"))
+                anim.Play("storm_ready_run", 0, duration);
+            else if (IsStormPreState(state) && !state.IsName("storm_pre_run"))
+                anim.Play("storm_pre_run", 0, duration);
+        }
+        else
+        {
+            if (IsAttackRunState(state))
+                anim.Play("attack_idle_" + playerAttack.attackIndex, 0, duration);
+            else if (IsHSAttackRunState(state))
+                anim.Play("HS_attack_idle_" + playerAttack.attackIndex, 0, duration);
+            else if (state.IsName("drawback_run"))
+                anim.Play("drawback_idle", 0, duration);
+            else if (IsAttackAfterState(state))
+                anim.Play("attack_idle_after", 0, duration);
+            else if (IsStormReadyState(state) && !state.IsName("storm_ready_idle"))
+                anim.Play("storm_ready_idle", 0, duration);
+            else if (IsStormPreState(state) && !state.IsName("storm_pre_idle"))
+                anim.Play("storm_pre_idle", 0, duration);
+        }
+    }
+
+    private void HandleLandingAnimation(AnimatorStateInfo state)
+    {
+        if (!isJumping && !playerAttack.isDefending)
+        {
+            if (!state.IsName("slash") && !state.IsName("slash_end") && canSwitchNormalAnim)
+                PlayAnimClipInCombat("land", "land_combat");
+            isFalling = false;
+            isJumping = false;
+        }
+        CameraFollow.instance.ChangeOffset(CameraFollow.instance.normalOffset);
+
+        float duration = state.normalizedTime;
+        if (!isJumping && IsAttackJumpOrFallState(state))
+        {
+            if (isRunning)
+            {
+                if (playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
+                {
+                    if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
+                        anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
+                    else if (playerAttack.attackIndex == 2)
+                        anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration);
+                    else
+                        anim.Play(anim.GetBool("storm") ? "storm_pre_run" : "run_combat");
+                }
+                else
+                    anim.Play("attack_run_" + playerAttack.attackIndex, 0, duration);
+            }
+            else
+                anim.Play("attack_idle_" + playerAttack.attackIndex, 0, duration);
+        }
+        else if (!isJumping && IsHSAttackJumpOrFallState(state))
+        {
+            if (isRunning)
+            {
+                if (playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
+                {
+                    if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
+                        anim.Play("HS_attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
+                    else if (playerAttack.attackIndex == 2)
+                        anim.Play("HS_attack_back_" + playerAttack.attackIndex, 0, duration);
+                }
+                else
+                    anim.Play("HS_attack_run_" + playerAttack.attackIndex, 0, duration);
+            }
+            else
+                anim.Play("HS_attack_idle_" + playerAttack.attackIndex, 0, duration);
+        }
+    }
+
+    private bool HandleJumpAnimationTransitions(AnimatorStateInfo state, float duration)
+    {
+        if (IsAttackRunOrIdleState(state))
+        {
+            anim.Play("attack_jump_" + playerAttack.attackIndex, 0, duration);
+            return true;
+        }
+        if (IsHSAttackRunOrIdleState(state))
+        {
+            anim.Play("HS_attack_jump_" + playerAttack.attackIndex, 0, duration);
+            return true;
+        }
+        if (state.IsName("attack_back_" + playerAttack.attackIndex))
+        {
+            anim.Play("attack_jump_1", 0, duration * (35f / 71f));
+            playerAttack.attackIndex = 1;
+            return true;
+        }
+        if (state.IsName("HS_attack_back_" + playerAttack.attackIndex))
+        {
+            anim.Play("HS_attack_jump_1", 0, duration * (35f / 71f));
+            playerAttack.attackIndex = 1;
+            return true;
+        }
+        if (IsAttackAfterState(state))
+        {
+            anim.Play("attack_jump_after", 0, duration);
+            return true;
+        }
+        if (IsHSAttackAfterState(state))
+        {
+            anim.Play("HS_attack_jump_after", 0, duration);
+            return true;
+        }
+        if (IsStormReadyState(state))
+        {
+            anim.Play("storm_ready_jump", 0, duration);
+            return true;
+        }
+        if (IsStormPreState(state))
+        {
+            anim.Play("storm_pre_jump", 0, duration);
+            return true;
+        }
+        return false;
+    }
+
+    private void HandleFlipping(float move)
+    {
+        if (isRunningToTarget)
+        {
+            if (playerAttack.isCounterAttacking && playerAttack.isAttackingLeft == FacingRight)
+                Flip();
+            else if (!playerAttack.isCounterAttacking)
+            {
+                if (move > 0 && !FacingRight) Flip();
+                else if (move < 0 && FacingRight) Flip();
+            }
+        }
+        else if (playerAttack.isCounterAttacking)
+        {
+            if (playerAttack.isAttackingLeft == FacingRight) Flip();
+        }
+        else
+        {
+            if (move > 0 && !FacingRight) Flip();
+            else if (move < 0 && FacingRight) Flip();
+        }
+    }
+
+    // Animation state helpers
+
+    private bool IsAttackIdleState(AnimatorStateInfo s) => s.IsName("attack_idle_" + playerAttack.attackIndex);
+
+    private bool IsAttackRunState(AnimatorStateInfo s) => s.IsName("attack_run_" + playerAttack.attackIndex);
+
+    private bool IsAttackJumpState(AnimatorStateInfo s) => s.IsName("attack_jump_" + playerAttack.attackIndex);
+
+    private bool IsAttackFallState(AnimatorStateInfo s) => s.IsName("attack_fall_" + playerAttack.attackIndex);
+
+    private bool IsHSAttackJumpState(AnimatorStateInfo s) => s.IsName("HS_attack_jump_" + playerAttack.attackIndex);
+
+    private bool IsHSAttackFallState(AnimatorStateInfo s) => s.IsName("HS_attack_fall_" + playerAttack.attackIndex);
+
+    private bool IsHSAttackRunState(AnimatorStateInfo s) => s.IsName("HS_attack_run_" + playerAttack.attackIndex);
+
+    private bool IsHSAttackIdleState(AnimatorStateInfo s) => s.IsName("HS_attack_idle_" + playerAttack.attackIndex);
+
+    private bool IsAttackAfterState(AnimatorStateInfo s) => s.IsName("attack_jump_after") || s.IsName("attack_idle_after");
+
+    private bool IsHSAttackAfterState(AnimatorStateInfo s) => s.IsName("HS_attack_fall_after") || s.IsName("HS_attack_idle_after");
+
+    private bool IsStormReadyState(AnimatorStateInfo s) =>
+        s.IsName("storm_ready_idle") || s.IsName("storm_ready_jump") ||
+        s.IsName("storm_ready_fall") || s.IsName("storm_ready_run");
+
+    private bool IsStormPreState(AnimatorStateInfo s) =>
+        s.IsName("storm_pre_idle") || s.IsName("storm_pre_jump") ||
+        s.IsName("storm_pre_fall") || s.IsName("storm_pre_run");
+
+    private bool IsAttackRunOrIdleState(AnimatorStateInfo s) =>
+        s.IsName("attack_run_" + playerAttack.attackIndex) || s.IsName("attack_idle_" + playerAttack.attackIndex);
+
+    private bool IsHSAttackRunOrIdleState(AnimatorStateInfo s) =>
+        s.IsName("HS_attack_run_" + playerAttack.attackIndex) || s.IsName("HS_attack_idle_" + playerAttack.attackIndex);
+
+    private bool IsAttackJumpOrFallState(AnimatorStateInfo s) =>
+        s.IsName("attack_jump_" + playerAttack.attackIndex) || s.IsName("attack_fall_" + playerAttack.attackIndex);
+
+    private bool IsHSAttackJumpOrFallState(AnimatorStateInfo s) =>
+        s.IsName("HS_attack_jump_" + playerAttack.attackIndex) || s.IsName("HS_attack_fall_" + playerAttack.attackIndex);
+
+    #endregion Private Helpers
 }

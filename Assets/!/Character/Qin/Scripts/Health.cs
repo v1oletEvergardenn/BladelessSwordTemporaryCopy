@@ -178,7 +178,7 @@ public class Health : IDamagable
                 anim.Play("defend_hit");
                 return 1;
             }
-            if (playerAttack.isAttacking) { playerAttack.CounterMeleeAttack(); return 2; }
+            if (playerAttack.isCounterAttacking) { playerAttack.CounterMeleeAttack(); return 2; }
         }
         DamageDirectlyWithStun(damageAmount, t);
         return 0;
