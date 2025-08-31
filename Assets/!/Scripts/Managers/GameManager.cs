@@ -9,9 +9,9 @@ public class GameManager : MonoBehaviour
     private InputMaster inputManager;
 
     public static GameManager instance;
-    [HideInInspector] public GameObject Player;
+    [HideInInspector] public GameObject player;
     public AnimationCurve outline_flash_anim_curve;
-    [HideInInspector] public Health player_Idamagable;
+    [HideInInspector] public Health playerhealth;
     [HideInInspector] public PlayerAttack playerAttack;
     [HideInInspector] public InputPlayer playerInput;
     public CharacterController2D player_controller;
@@ -66,39 +66,39 @@ public class GameManager : MonoBehaviour
     {
         if (skill == PlayerSkillsType.Movement)
         {
-            Player.GetComponent<InputPlayer>().learnedMovement = true;
+            player.GetComponent<InputPlayer>().learnedMovement = true;
         }
         else if (skill == PlayerSkillsType.Jump)
         {
-            Player.GetComponent<InputPlayer>().learnedJump = true;
+            player.GetComponent<InputPlayer>().learnedJump = true;
         }
         else if (skill == PlayerSkillsType.DoubleJump)
         {
-            Player.GetComponent<InputPlayer>().learnedDoubleJump = true;
+            player.GetComponent<InputPlayer>().learnedDoubleJump = true;
         }
         else if (skill == PlayerSkillsType.Teleport)
         {
-            Player.GetComponent<InputPlayer>().learnedTeleport = true;
+            player.GetComponent<InputPlayer>().learnedTeleport = true;
         }
         else if (skill == PlayerSkillsType.Attack)
         {
-            Player.GetComponent<InputPlayer>().learnedAttack = true;
+            player.GetComponent<InputPlayer>().learnedAttack = true;
         }
         else if (skill == PlayerSkillsType.Boomerang)
         {
-            Player.GetComponent<InputPlayer>().learnedBoomerang = true;
+            player.GetComponent<InputPlayer>().learnedBoomerang = true;
         }
         else if (skill == PlayerSkillsType.Barrier)
         {
-            Player.GetComponent<InputPlayer>().learnedStorm = true;
+            player.GetComponent<InputPlayer>().learnedStorm = true;
         }
         else if (skill == PlayerSkillsType.Defend)
         {
-            Player.GetComponent<InputPlayer>().learnedDefend = true;
+            player.GetComponent<InputPlayer>().learnedDefend = true;
         }
         else if (skill == PlayerSkillsType.HeartSword)
         {
-            Player.GetComponent<InputPlayer>().learnedHeartSword = true;
+            player.GetComponent<InputPlayer>().learnedHeartSword = true;
         }
     }
 

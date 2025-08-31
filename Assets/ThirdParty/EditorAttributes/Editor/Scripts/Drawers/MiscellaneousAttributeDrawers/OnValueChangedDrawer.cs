@@ -1,42 +1,42 @@
-using EditorAttributes.Editor.Utility;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
+using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
-    [CustomPropertyDrawer(typeof(OnValueChangedAttribute))]
-    public class OnValueChangedDrawer : PropertyDrawerBase
-    {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            var onValueChangedAttribute = attribute as OnValueChangedAttribute;
-            var target = property.serializedObject.targetObject;
+	[CustomPropertyDrawer(typeof(OnValueChangedAttribute))]
+	public class OnValueChangedDrawer : PropertyDrawerBase
+	{
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var onValueChangedAttribute = attribute as OnValueChangedAttribute;
+			ReflectionUtility.GetNestedObjectType(property, out object target);
 
-            var root = new VisualElement();
-            var propertyField = DrawProperty(property);
+			var root = new VisualElement();
+			var propertyField = CreatePropertyField(property);
 
-            var function = ReflectionUtility.FindFunction(onValueChangedAttribute.FunctionName, property);
-            var functionParameters = function.GetParameters();
+			var function = ReflectionUtility.FindFunction(onValueChangedAttribute.FunctionName, property);
+			var functionParameters = function.GetParameters();
 
-            if (functionParameters.Length == 0)
-            {
-                root.schedule.Execute(() =>
-                {
-                    var field = propertyField.Q(className: "unity-property-field") as PropertyField;
+			if (functionParameters.Length == 0)
+			{
+				root.Add(propertyField);
 
-                    field.RegisterValueChangeCallback((callback) => function.Invoke(target, null));
-                }).ExecuteLater(1);
+				ExecuteLater(propertyField, () =>
+				{
+					var field = propertyField.Q(className: PropertyField.ussClassName) as PropertyField;
 
-                root.Add(propertyField);
-            }
-            else
-            {
-                root.Add(propertyField);
-                root.Add(new HelpBox("Function cannot have parameters", HelpBoxMessageType.Error));
-            }
+					field.RegisterValueChangeCallback((callback) => function.Invoke(target, null));
+				});
+			}
+			else
+			{
+				root.Add(propertyField);
+				root.Add(new HelpBox("The function cannot have parameters", HelpBoxMessageType.Error));
+			}
 
-            return root;
-        }
-    }
+			return root;
+		}
+	}
 }

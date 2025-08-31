@@ -92,7 +92,7 @@ public class Shooter : MonoBehaviour
         _bullet.rotationSpeed = bulletRotationSpeed;
         if (aimPlayer)
         {
-            _bullet.SetUp(shootPosition.eulerAngles, this.gameObject, 0, follow_player, GameManager.instance.Player.GetComponent<IDamagable>(), _damage: Damage, _speed: bulletSpeed);
+            _bullet.SetUp(shootPosition.eulerAngles, this.gameObject, 0, follow_player, GameManager.instance.player.GetComponent<IDamagable>(), _damage: Damage, _speed: bulletSpeed);
         }
         else
         {

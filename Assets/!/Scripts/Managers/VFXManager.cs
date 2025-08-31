@@ -110,6 +110,11 @@ public class VFXManager : MonoBehaviour
         }
     }
 
+    public void RumblePulse(Vector2 frequency, float duration)
+    {
+        RumblePulse(frequency.x, frequency.y, duration);
+    }
+
     /// <summary>
     /// Starts continuous rumble on the current gamepad.
     /// </summary>

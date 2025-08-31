@@ -34,7 +34,7 @@ public class BeamHitBox : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject == GameManager.instance.Player)
+        if (collision.gameObject == GameManager.instance.player)
         {
             inrange = true;
         }
@@ -42,7 +42,7 @@ public class BeamHitBox : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject == GameManager.instance.Player)
+        if (collision.gameObject == GameManager.instance.player)
         {
             inrange = false;
         }
@@ -51,10 +51,10 @@ public class BeamHitBox : MonoBehaviour
     public void DealDamage()
     {
         damageTimer = 0f;
-        if (!GameManager.instance.Player.GetComponent<PlayerAttack>().isDefending)
+        if (!GameManager.instance.player.GetComponent<PlayerAttack>().isDefending)
         {
-            GameManager.instance.player_Idamagable.Damage(damageAmount, null, 0.2f);
+            GameManager.instance.playerhealth.Damage(damageAmount, null, 0.2f);
         }
-        vfx.SpawnSlashEffect(GameManager.instance.player_Idamagable.GetHitPos());
+        vfx.SpawnSlashEffect(GameManager.instance.playerhealth.GetHitPos());
     }
 }

@@ -1,61 +1,62 @@
 using System.IO;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace EditorAttributes.Editor
 {
-    [CustomPropertyDrawer(typeof(FolderPathAttribute))]
+	[CustomPropertyDrawer(typeof(FolderPathAttribute))]
     public class FolderPathDrawer : PropertyDrawerBase
     {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            var folderPathAttribute = attribute as FolderPathAttribute;
-            var root = new VisualElement();
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var folderPathAttribute = attribute as FolderPathAttribute;
+			var root = new VisualElement();
 
-            if (property.propertyType != SerializedPropertyType.String)
-            {
-                root.Add(new HelpBox("The FolderPath Attribute can only be attached to a string", HelpBoxMessageType.Error));
-                return root;
-            }
+			if (property.propertyType != SerializedPropertyType.String)
+			{
+				root.Add(new HelpBox("The FolderPath Attribute can only be attached to a string", HelpBoxMessageType.Error));
+				return root;
+			}
 
-            var folderPath = property.stringValue;
+			var folderPath = property.stringValue;
 
-            var propertyField = DrawProperty(property);
-            var button = new Button(() =>
-            {
-                folderPath = EditorUtility.OpenFolderPanel("Select folder", "Assets", "");
-            });
+			var propertyField = CreatePropertyField(property);
+			var button = new Button(() => folderPath = EditorUtility.OpenFolderPanel("Select folder", "Assets", ""));
 
-            var buttonIcon = new Image() { image = EditorGUIUtility.IconContent("d_Folder Icon").image };
+			var buttonIcon = new Image() { image = EditorGUIUtility.IconContent("d_Folder Icon").image };
 
-            UpdateVisualElement(root, () =>
-            {
-                if (folderPathAttribute.GetRelativePath && !string.IsNullOrEmpty(folderPath))
-                {
-                    string projectRoot = Application.dataPath[..^"Assets".Length];
+			button.style.width = 40f;
+			button.style.height = 20f;
+			propertyField.style.flexGrow = 1f;
+			root.style.flexDirection = FlexDirection.Row;
 
-                    folderPath = Path.GetRelativePath(projectRoot, folderPath);
-                }
+			button.Add(buttonIcon);
+			root.Add(propertyField);
+			root.Add(button);
 
-                if (property.hasMultipleDifferentValues)
-                    return;
+			var textField = new TextField();
 
-                property.stringValue = folderPath;
-                propertyField.Q<TextField>().value = folderPath;
-                property.serializedObject.ApplyModifiedProperties();
-            });
+			ExecuteLater(propertyField, () => textField = propertyField.Q<TextField>());
 
-            button.style.width = 40f;
-            button.style.height = 20f;
-            propertyField.style.flexGrow = 1f;
-            root.style.flexDirection = FlexDirection.Row;
+			UpdateVisualElement(propertyField, () =>
+			{
+				if (folderPathAttribute.GetRelativePath && !string.IsNullOrEmpty(folderPath))
+				{
+					string projectRoot = Application.dataPath[..^"Assets".Length];
 
-            button.Add(buttonIcon);
-            root.Add(propertyField);
-            root.Add(button);
+					folderPath = Path.GetRelativePath(projectRoot, folderPath);
+				}
 
-            return root;
-        }
-    }
+				if (property.hasMultipleDifferentValues)
+					return;
+
+				textField.value = folderPath;
+				property.stringValue = folderPath;
+				property.serializedObject.ApplyModifiedProperties();
+			});
+
+			return root;
+		}
+	}
 }

@@ -29,11 +29,11 @@ public class Spear : IProjectile
 
     public override void PerfectCounterAttack()
     {
-        vfx.RumblePulse(rumbleFrequncy_perfect.x, rumbleFrequncy_perfect.y, rumbleDuration_perfect);
-        vfx.CameraShake(cameraShakeForce.y);
-        vfx.SlowTimeForSeconds(freezeTimeDuration, slowTimeScale);
+        vfx.RumblePulse(hitEffectSettings.frequncy_perfect, hitEffectSettings.rumbleDuration);
+        vfx.CameraShake(hitEffectSettings.cameraShakeForce.y);
+        vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
         isPerfect = true;
-        vfx.SpawnHitEffect(true, gameManager.Player.GetComponent<PlayerAttack>().counterAttackPoint.position);
+        vfx.SpawnHitEffect(true, gameManager.player.GetComponent<PlayerAttack>().counterAttackPoint.position);
     }
 
     public override void NormalCounterAttack()
@@ -48,20 +48,20 @@ public class Spear : IProjectile
         if (target != null && collision.gameObject != owner && !collided)
         {
             if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
-            if (collision.gameObject == gameManager.Player)
+            if (collision.gameObject == gameManager.player)
             {
                 if (collision.gameObject.layer == 14) { return; }
-                if ((gameManager.Player.GetComponent<PlayerAttack>().isCounterAttacking &&
-                    gameManager.Player.GetComponent<CharacterController2D>().FacingRight != facingRight)
-                    || gameManager.Player.GetComponent<PlayerAttack>().isOnStorm)
+                if ((gameManager.player.GetComponent<PlayerAttack>().isCounterAttacking &&
+                    gameManager.player.GetComponent<CharacterController2D>().FacingRight != facingRight)
+                    || gameManager.player.GetComponent<PlayerAttack>().isOnStorm)
                 {
-                    target.Repel(repelForce, this.transform.right.x < 0 ? true : false);
-                    gameManager.Player.GetComponent<PlayerAttack>().CounterAttack(this, true);
+                    target.Repel(hitEffectSettings.repelForce, this.transform.right.x < 0 ? true : false);
+                    gameManager.player.GetComponent<PlayerAttack>().CounterAttack(this, true);
                 }
                 else
                 {
-                    vfx.RumblePulse(rumbleFrequncy_normal.x, rumbleFrequncy_normal.y, rumbleDuration_normal);
-                    vfx.CameraShake(cameraShakeForce.y);
+                    vfx.RumblePulse(hitEffectSettings.frequency_norm, hitEffectSettings.rumbleDuration);
+                    vfx.CameraShake(hitEffectSettings.cameraShakeForce.y);
                     vfx.SlowTimeForSeconds(0.1f, 0f);
                     vfx.SpawnHitEffect(false, GetPivot());
                     target.Damage(damage, transform, stunDuration, stunValue: stunValue);

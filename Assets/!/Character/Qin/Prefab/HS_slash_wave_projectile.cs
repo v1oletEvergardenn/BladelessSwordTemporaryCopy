@@ -22,14 +22,14 @@ public class HS_slash_wave_projectile : IProjectile
         {
             if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
 
-            if (collision.gameObject == gameManager.Player)
+            if (collision.gameObject == gameManager.player)
             {
                 if (collision.gameObject.layer == 14) { return; }
                 if (!isHostileToPlayer) { return; }
 
-                vfx.RumblePulse(rumbleFrequncy_normal.x, rumbleFrequncy_normal.y, rumbleDuration_normal);
-                vfx.SlowTimeForSeconds(freezeTimeDuration, slowTimeScale);
-                gameManager.player_Idamagable.Repel(repelForce, transform.right.x < 0 ? true : false);
+                vfx.RumblePulse(hitEffectSettings.frequency_norm, hitEffectSettings.rumbleDuration);
+                vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
+                gameManager.playerhealth.Repel(hitEffectSettings.repelForce, transform.right.x < 0 ? true : false);
             }
 
             vfx.SpawnEffectWithEnum(Hit_Effect.hs_hit, target.GetHitPos());
@@ -38,7 +38,8 @@ public class HS_slash_wave_projectile : IProjectile
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)
         {
             if (anim != null) anim.Play(anim_after_hit);
-            vfx.SpawnEffectWithEnum(Hit_Effect.hs_hit, target.GetHitPos());
+            if (target != null) vfx.SpawnEffectWithEnum(Hit_Effect.hs_hit, target.GetHitPos());
+            else vfx.SpawnEffectWithEnum(Hit_Effect.hs_hit, transform.position);
             collided = true;
             Invoke("Die", death_delay_time_after_hit);
         }
@@ -46,7 +47,7 @@ public class HS_slash_wave_projectile : IProjectile
 
     public override void HitByMeleeAttack()
     {
-        vfx.SpawnEffectWithEnum(Hit_Effect.hs_hit, target.GetHitPos());
+        vfx.SpawnEffectWithEnum(Hit_Effect.hs_hit, transform.position);
         collided = true;
         Invoke("Die", death_delay_time_after_hit);
     }

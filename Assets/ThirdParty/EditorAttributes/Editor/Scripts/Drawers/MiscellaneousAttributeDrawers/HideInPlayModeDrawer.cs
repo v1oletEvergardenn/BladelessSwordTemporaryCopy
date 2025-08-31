@@ -6,14 +6,14 @@ namespace EditorAttributes.Editor
     [CustomPropertyDrawer(typeof(HideInPlayModeAttribute))]
     public class HideInPlayModeDrawer : PropertyDrawerBase
     {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            var root = new VisualElement();
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var root = new VisualElement();
 
-            if (!EditorApplication.isPlayingOrWillChangePlaymode)
-                root.Add(DrawProperty(property));
+			if (!EditorApplication.isPlayingOrWillChangePlaymode)
+				root.Add(CreatePropertyField(property));
 
-            return root;
-        }
-    }
+			return root;
+		}
+	}
 }

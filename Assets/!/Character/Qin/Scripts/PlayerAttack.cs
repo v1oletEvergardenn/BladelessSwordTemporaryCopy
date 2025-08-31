@@ -232,7 +232,7 @@ public class PlayerAttack : MonoBehaviour
         canDefend = true;
         if (isPerfect)
         {
-            hSAbilitiesManager.ModifyHSPoint(1);
+            hSAbilitiesManager.ModifyHSPoint(0.5f);
             energy.ChangeEnergy(-energy.attack_energy_consumption);
 
             projectile.SetUp(pointerDirection, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * basicAttackDamage);
@@ -241,6 +241,7 @@ public class PlayerAttack : MonoBehaviour
         }
         else
         {
+            hSAbilitiesManager.ModifyHSPoint(0.2f);
             projectile.SetUp(pointerDirection, this.gameObject, 30, _isHostileToPlayer: false, _damage: projectile.damage * basicAttackDamage);
             projectile.NormalCounterAttack();
             SoundManager.PlaySound("normal_counter_attack");
@@ -284,6 +285,7 @@ public class PlayerAttack : MonoBehaviour
 
     private void JumpCounterAttack(IProjectile projectile)
     {
+        hSAbilitiesManager.ModifyHSPoint(0.5f);
         Vector3 v = new Vector3(0, 0, -90);
         SoundManager.PlaySound("normal_counter_attack");
         projectile.SetUp(v, this.gameObject, 100, _isHostileToPlayer: false);

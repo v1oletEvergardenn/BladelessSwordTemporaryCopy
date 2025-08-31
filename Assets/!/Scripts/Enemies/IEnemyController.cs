@@ -1,4 +1,5 @@
 using EditorAttributes;
+using Microlight.MicroBar;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ public abstract class IEnemyController : IDamagable
     [FoldoutGroup("Health", nameof(maxHealth), nameof(HealthUI), nameof(healthBar))] public Void healthVoid;
     [SerializeField, HideInInspector] public int maxHealth;
     [SerializeField, HideInInspector] public GameObject HealthUI;
-    [SerializeField, HideInInspector] public Image healthBar;
+    [SerializeField, HideInInspector] public MicroBar healthBar;
     [HideInInspector] public float healthPercentage;
     [HideInInspector] public int lastAttackId = -1;
     [HideInInspector] public float lastAttackTime = -1f;
@@ -29,7 +30,7 @@ public abstract class IEnemyController : IDamagable
 
     [FoldoutGroup("Stun", nameof(maxStun), nameof(stunBar), nameof(currentStun), nameof(stunDuration))] public Void stunVoid1;
     [SerializeField, HideInInspector] public float maxStun = 10;
-    [SerializeField, HideInInspector] public Image stunBar;
+    [SerializeField, HideInInspector] public MicroBar stunBar;
     [SerializeField, HideInInspector] public float currentStun;
     [SerializeField, HideInInspector] public float stunDuration = 5f;
     [HideInInspector] public bool isBossBreaking = false;
@@ -108,8 +109,8 @@ public abstract class IEnemyController : IDamagable
         anim = GFX.GetComponent<Animator>();
         currentHealth = maxHealth;
         currentStun = maxStun;
-        healthBar.fillAmount = currentHealth / maxHealth;
-        stunBar.fillAmount = currentStun / maxStun;
+        healthBar.Initialize(maxHealth);
+        stunBar.Initialize(maxStun);
         flash = GetComponent<DamageFlash>();
         rb = GetComponent<Rigidbody2D>();
         outline_flash_anim_curve = GameManager.instance.outline_flash_anim_curve;
@@ -407,7 +408,7 @@ public abstract class IEnemyController : IDamagable
         currentStun = Mathf.Clamp(currentStun, 0, maxStun);
 
         if (stunBar != null && maxStun > 0)
-            stunBar.fillAmount = Mathf.Clamp01((float)currentStun / maxStun);
+            stunBar.UpdateBar(currentStun);
 
         if (currentStun <= 0)
         {
@@ -433,14 +434,14 @@ public abstract class IEnemyController : IDamagable
             currentStun = Mathf.Lerp(startStun, maxStun, t);
 
             if (stunBar != null && maxStun > 0)
-                stunBar.fillAmount = Mathf.Clamp01(currentStun / maxStun);
+                stunBar.UpdateBar(currentStun);
 
             yield return null;
         }
 
         currentStun = maxStun;
         if (stunBar != null && maxStun > 0)
-            stunBar.fillAmount = 1f;
+            stunBar.UpdateBar(maxStun);
 
         VFXManager.instance.UnBulletTime();
         isBossBreaking = false;

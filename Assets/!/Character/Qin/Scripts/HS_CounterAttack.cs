@@ -27,7 +27,7 @@ public class HS_CounterAttack : IHeartSwordAbility
         if (playerAttack.attackTimer < playerAttack.attackGap) return false;
         if (hSAbilityManager.currentHS_point < HS_Cost) { return false; }
 
-        hSAbilityManager.currentHS_point -= HS_Cost;
+        hSAbilityManager.ModifyHSPoint(-HS_Cost);
         isPerforming = true;
         playerAttack.InitializeAttack(isLeft);
         hsHitEffectPlayed = false;

@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 3850615511808534380}
   - component: {fileID: 1237467178448141509}
   - component: {fileID: 2039049659472110526}
-  - component: {fileID: 6559019561164354363}
   - component: {fileID: 3608762408273963208}
+  - component: {fileID: -6347217690368714330}
   m_Layer: 8
   m_Name: gutling_bullet_1
   m_TagString: Untagged
@@ -136,53 +136,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &6559019561164354363
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 779238387317750219}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d28ea8584c3fdbf40bce56cfcf5d2722, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 0
-  speed: 100
-  originalSpeed: 0
-  rotationSpeed: 100
-  stunDuration: 0.1
-  lifeTime: 10
-  stunValue: 1
-  stopLayer:
-    serializedVersion: 2
-    m_Bits: 265344
-  owner: {fileID: 0}
-  followTarget: 0
-  target: {fileID: 0}
-  rb: {fileID: 0}
-  collided: 0
-  lifeTimer: 0
-  isHostileToPlayer: 0
-  isPerfect: 0
-  showPivot: 0
-  pivotOffset: {x: 0, y: 0, z: 0}
-  color: {r: 1, g: 0, b: 0, a: 1}
-  rumbleDuration_normal: 0.1
-  rumbleFrequncy_normal: {x: 0.25, y: 0.4}
-  rumbleDuration_perfect: 0.15
-  rumbleFrequncy_perfect: {x: 0.5, y: 1}
-  cameraShakeForce: {x: 0, y: 0.1}
-  freezeTimeDuration: 0
-  slowTimeScale: 1
-  repelForce: 0
-  vfx: {fileID: 0}
-  gameManager: {fileID: 0}
-  anim_after_hit: hit
-  death_delay_time_after_hit: 0.3
-  hitEffect: 0
-  isRed: 0
 --- !u!61 &3608762408273963208
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -228,3 +181,49 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.6875, y: 0.1875}
   m_EdgeRadius: 0
+--- !u!114 &-6347217690368714330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 779238387317750219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5d3397af20a0184fbb582a9cccf741c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 10
+  speed: 0
+  originalSpeed: 0
+  rotationSpeed: 100
+  stunDuration: 0.1
+  lifeTime: 10
+  stunValue: 1
+  stopLayer:
+    serializedVersion: 2
+    m_Bits: 265344
+  showPivot: 0
+  pivotOffset: {x: 0, y: 0, z: 0}
+  color: {r: 1, g: 0, b: 0, a: 1}
+  hitEffectSettings:
+    rumbleDuration: 0.129
+    frequency_norm: {x: 0.18096516, y: 0.3297587}
+    frequncy_perfect: {x: 0.5308311, y: 0.6756032}
+    freezeTime: 0
+    Time_scale: 1
+    repelForce: 10
+    cameraShakeForce: {x: 0.023592494, y: 0.048729107}
+  vfx: {fileID: 0}
+  gameManager: {fileID: 0}
+  owner: {fileID: 0}
+  followTarget: 0
+  target: {fileID: 0}
+  rb: {fileID: 0}
+  collided: 0
+  lifeTimer: 0
+  isHostileToPlayer: 0
+  isPerfect: 0
+  anim_after_hit: hit
+  death_delay_time_after_hit: 0.3
+  hitEffect: 0

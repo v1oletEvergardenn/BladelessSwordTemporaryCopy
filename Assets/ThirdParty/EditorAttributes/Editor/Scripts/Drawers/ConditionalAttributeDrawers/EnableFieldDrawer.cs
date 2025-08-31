@@ -1,32 +1,32 @@
-using EditorAttributes.Editor.Utility;
 using UnityEditor;
 using UnityEngine.UIElements;
+using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
-    [CustomPropertyDrawer(typeof(EnableFieldAttribute))]
+	[CustomPropertyDrawer(typeof(EnableFieldAttribute))]
     public class EnableFieldDrawer : PropertyDrawerBase
     {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            var enableAttribute = attribute as EnableFieldAttribute;
-            var conditionalProperty = ReflectionUtility.GetValidMemberInfo(enableAttribute.ConditionName, property);
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var enableAttribute = attribute as EnableFieldAttribute;
+			var conditionalProperty = ReflectionUtility.GetValidMemberInfo(enableAttribute.ConditionName, property);
 
-            var root = new VisualElement();
-            var errorBox = new HelpBox();
+			var root = new VisualElement();
+			var errorBox = new HelpBox();
 
-            var propertyField = DrawProperty(property);
+			var propertyField = CreatePropertyField(property);
 
-            UpdateVisualElement(root, () =>
-            {
-                propertyField.SetEnabled(GetConditionValue(conditionalProperty, enableAttribute, property, errorBox));
+			root.Add(propertyField);
 
-                DisplayErrorBox(root, errorBox);
-            });
+			UpdateVisualElement(root, () =>
+			{
+				propertyField.SetEnabled(GetConditionValue(conditionalProperty, enableAttribute, property, errorBox));
 
-            root.Add(propertyField);
+				DisplayErrorBox(root, errorBox);
+			});
 
-            return root;
-        }
-    }
+			return root;
+		}
+	}
 }

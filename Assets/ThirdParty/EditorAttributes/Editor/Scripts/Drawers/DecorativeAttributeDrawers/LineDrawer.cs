@@ -1,40 +1,28 @@
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
-using ColorUtility = EditorAttributes.Editor.Utility.ColorUtility;
+using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
-    [CustomPropertyDrawer(typeof(LineAttribute))]
+	[CustomPropertyDrawer(typeof(LineAttribute))]
     public class LineDrawer : DecoratorDrawer
     {
-        public override VisualElement CreatePropertyGUI()
-        {
-            var lineAttribute = attribute as LineAttribute;
+		public override VisualElement CreatePropertyGUI()
+		{
+			var lineAttribute = attribute as LineAttribute;
 
-            var root = new VisualElement();
-            var line = new VisualElement();
+			var root = new VisualElement();
+			var line = new VisualElement();
+			var errorBox = new HelpBox();
 
-            line.style.height = 3f;
-            line.style.marginBottom = 5f;
-            line.style.marginTop = 5f;
+			line.style.marginBottom = 5f;
+			line.style.marginTop = 5f;
+			line.style.height = lineAttribute.LineThickness;			
+			line.style.backgroundColor = ColorUtils.GetColorFromAttribute(lineAttribute, lineAttribute.A, errorBox);
 
-            if (UnityEngine.ColorUtility.TryParseHtmlString(lineAttribute.HexColor, out Color color))
-            {
-                line.style.backgroundColor = color;
-                root.Add(line);
+			root.Add(line);
 
-                return root;
-            }
-            else if (!string.IsNullOrEmpty(lineAttribute.HexColor))
-            {
-                root.Add(new HelpBox($"The provided value {lineAttribute.HexColor} is not a valid Hex color", HelpBoxMessageType.Error));
-            }
-
-            line.style.backgroundColor = ColorUtility.GUIColorToColor(lineAttribute, lineAttribute.A);
-            root.Add(line);
-
-            return root;
-        }
-    }
+			return root;
+		}
+	}
 }

@@ -155,7 +155,17 @@ public class YingYangFish_AI : IEnemyController
 
     #endregion Action Fields
 
+    public static YingYangFish_AI instance;
+
     #region Unity Lifecycle
+
+    public void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+    }
 
     public override void Start()
     {
@@ -990,7 +1000,7 @@ public class YingYangFish_AI : IEnemyController
             EventInteract.SetActive(false);
         }
 
-        healthBar.fillAmount = (float)currentHealth / (float)maxHealth;
+        healthBar.UpdateBar(currentHealth);
         DecreaseStun(stunValue);
 
         if (currentHealth <= 0)
@@ -1076,14 +1086,14 @@ public class YingYangFish_AI : IEnemyController
             currentStun = Mathf.Lerp(startStun, maxStun, t);
 
             if (stunBar != null && maxStun > 0)
-                stunBar.fillAmount = Mathf.Clamp01(currentStun / maxStun);
+                stunBar.UpdateBar(currentStun);
 
             yield return null;
         }
 
         currentStun = maxStun;
         if (stunBar != null && maxStun > 0)
-            stunBar.fillAmount = 1f;
+            stunBar.UpdateBar(maxStun);
 
         VFXManager.instance.UnBulletTime();
         isBossBreaking = false;

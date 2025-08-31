@@ -6,18 +6,18 @@ namespace EditorAttributes.Editor
     [CustomPropertyDrawer(typeof(IndentPropertyAttribute))]
     public class IndentPropertyDrawer : PropertyDrawerBase
     {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            var indentPropertyAttribute = attribute as IndentPropertyAttribute;
-
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var indentPropertyAttribute = attribute as IndentPropertyAttribute;
+            
             var root = new VisualElement();
-            var propertyField = DrawProperty(property);
+			var propertyField = CreatePropertyField(property);
 
-            propertyField.style.marginLeft = indentPropertyAttribute.IndentLevel;
+			propertyField.style.marginLeft = indentPropertyAttribute.IndentLevel;
 
             root.Add(propertyField);
 
-            return root;
-        }
+			return root;
+		}
     }
 }

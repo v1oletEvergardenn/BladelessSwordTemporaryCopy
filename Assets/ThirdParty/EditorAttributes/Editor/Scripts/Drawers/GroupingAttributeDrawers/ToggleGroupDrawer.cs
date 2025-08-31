@@ -1,93 +1,124 @@
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
 using UnityEngine.UIElements;
+using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
-    [CustomPropertyDrawer(typeof(ToggleGroupAttribute))]
-    public class ToggleGroupDrawer : PropertyDrawerBase
-    {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            var toggleGroup = attribute as ToggleGroupAttribute;
-            var isFoldedSaveKey = $"{property.serializedObject.targetObject}_{property.propertyPath}_IsFolded";
-            var isToggledSaveKey = $"{property.serializedObject.targetObject}_{property.propertyPath}_IsToggled";
+	[CustomPropertyDrawer(typeof(ToggleGroupAttribute))]
+	public class ToggleGroupDrawer : PropertyDrawerBase
+	{
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var toggleGroup = attribute as ToggleGroupAttribute;
+			var foldoutSaveKey = CreatePropertySaveKey(property, "IsToggleGroupFolded");
+			var toggleSaveKey = CreatePropertySaveKey(property, "IsToggleGroupToggled");
 
-            var root = new VisualElement();
+			var root = new VisualElement();
 
-            var foldout = new Foldout
-            {
-                text = toggleGroup.GroupName,
-                style = { unityFontStyleAndWeight = FontStyle.Bold },
-                value = EditorPrefs.GetBool(isFoldedSaveKey)
-            };
+			var foldout = new Foldout
+			{
+				text = toggleGroup.GroupName,
+				tooltip = property.tooltip,
+				style = { unityFontStyleAndWeight = FontStyle.Bold },
+				value = EditorPrefs.GetBool(foldoutSaveKey)
+			};
 
-            var toggleBox = new Toggle()
-            {
-                text = "",
-                style = { marginRight = 10f },
-                value = EditorPrefs.GetBool(isToggledSaveKey)
-            };
+			var toggleBox = new Toggle()
+			{
+				text = "",
+				style = { marginRight = 10f },
+				value = property.propertyType == SerializedPropertyType.Boolean ? property.boolValue : EditorPrefs.GetBool(toggleSaveKey)
+			};
 
-            foldout.contentContainer.SetEnabled(toggleBox.value);
+			foldout.contentContainer.SetEnabled(toggleBox.value);
 
-            if (toggleGroup.DrawInBox)
-                ApplyBoxStyle(foldout.contentContainer);
+			if (toggleGroup.DrawInBox)
+				ApplyBoxStyle(foldout.contentContainer);
 
-            foldout.schedule.Execute(() =>
-            {
-                var toggle = foldout.Q<Toggle>();
+			root.Add(toggleBox);
 
-                toggle.style.backgroundColor = canApplyGlobalColor ? EditorExtension.GLOBAL_COLOR / 3f : new Color(0.1f, 0.1f, 0.1f, 0.2f);
+			foreach (string variableName in toggleGroup.FieldsToGroup)
+			{
+				var propertyField = CreateField(variableName, property, root);
 
-                var parentElement = foldout.Q<Label>().parent;
+				foldout.Add(propertyField);
+			}
 
-                parentElement.Insert(1, toggleBox);
-            }).ExecuteLater(1);
+			toggleBox.RegisterValueChangedCallback((callback) =>
+			{
+				if (property.propertyType == SerializedPropertyType.Boolean)
+				{
+					property.boolValue = callback.newValue;
+					property.serializedObject.ApplyModifiedProperties();
+				}
+				else
+				{
+					EditorPrefs.SetBool(toggleSaveKey, callback.newValue); // The value is already serialized via the property, there is no point in saving it.
+				}
 
-            root.Add(toggleBox);
+				foldout.contentContainer.SetEnabled(callback.newValue);
+			});
 
-            foreach (string variableName in toggleGroup.FieldsToGroup)
-            {
-                var variableProperty = FindNestedProperty(property, variableName);
+			root.Add(foldout);
 
-                // Check for serialized properties since they have a weird naming when serialized and they cannot be found by the normal name
-                variableProperty ??= FindNestedProperty(property, $"<{variableName}>k__BackingField");
+			ExecuteLater(foldout, () =>
+			{
+				var toggle = foldout.Q<Toggle>();
 
-                if (variableProperty != null)
-                {
-                    var properyField = DrawProperty(variableProperty);
+				toggle.style.backgroundColor = CanApplyGlobalColor ? EditorExtension.GLOBAL_COLOR / 3f : new Color(0.1f, 0.1f, 0.1f, 0.2f);
 
-                    properyField.style.unityFontStyleAndWeight = FontStyle.Normal;
-                    properyField.schedule.Execute(() => properyField.Q<Label>().style.marginRight = toggleGroup.WidthOffset).ExecuteLater(1);
+				var parentElement = foldout.Q<Label>().parent;
 
-                    foldout.Add(properyField);
-                }
-                else
-                {
-                    foldout.Add(new HelpBox($"{variableName} is not a valid field", HelpBoxMessageType.Error));
-                    break;
-                }
-            }
+				parentElement.Insert(1, toggleBox);
 
-            foldout.RegisterValueChangedCallback((callback) => EditorPrefs.SetBool(isFoldedSaveKey, callback.newValue));
-            toggleBox.RegisterValueChangedCallback((callback) =>
-            {
-                if (property.propertyType == SerializedPropertyType.Boolean)
-                {
-                    property.boolValue = callback.newValue;
-                    property.serializedObject.ApplyModifiedProperties();
-                }
+				// Register this callback later since value changed callbacks are called on inspector initalization and we don't want to save values on initalization
+				foldout.RegisterValueChangedCallback((callback) => EditorPrefs.SetBool(foldoutSaveKey, callback.newValue));
+			});
 
-                foldout.contentContainer.SetEnabled(callback.newValue);
+			if (property.propertyType == SerializedPropertyType.Boolean)
+				UpdateVisualElement(toggleBox, () => toggleBox.value = property.boolValue);
 
-                EditorPrefs.SetBool(isFoldedSaveKey, foldout.value);
-                EditorPrefs.SetBool(isToggledSaveKey, callback.newValue);
-            });
+			return root;
+		}
 
-            root.Add(foldout);
+		private VisualElement CreateField(string variableName, SerializedProperty property, VisualElement root)
+		{
+			VisualElement field;
 
-            return root;
-        }
-    }
+			var variableProperty = FindNestedProperty(property, GetSerializedPropertyName(variableName, property));
+
+			if (variableProperty == null)
+				return new HelpBox($"<b>{variableName}</b> is not a valid field or property", HelpBoxMessageType.Error);
+
+			field = CreatePropertyField(variableProperty);
+
+			field.style.unityFontStyleAndWeight = FontStyle.Normal;
+
+			// Slightly move foldouts for serialized objects
+			if (variableProperty.propertyType == SerializedPropertyType.Generic && variableProperty.type != "UnityEvent" && !ReflectionUtility.IsPropertyCollection(variableProperty))
+				field.style.marginLeft = 10f;
+
+			root.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+
+			void OnGeometryChanged(GeometryChangedEvent changeEvent)
+			{
+				// Force update this logic to make sure fields are visible
+				UpdateVisualElement(field, () =>
+				{
+					var hiddenField = field.Q<VisualElement>(HidePropertyDrawer.HIDDEN_PROPERTY_ID);
+
+					if (hiddenField != null)
+					{
+						hiddenField.name = GROUPED_PROPERTY_ID;
+						hiddenField.style.display = DisplayStyle.Flex;
+					}
+				}, 100L).ForDuration(400L);
+
+				root.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+			}
+
+			return field;
+		}
+	}
 }

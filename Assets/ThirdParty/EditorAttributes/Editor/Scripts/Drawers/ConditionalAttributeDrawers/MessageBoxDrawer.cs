@@ -1,45 +1,52 @@
-using EditorAttributes.Editor.Utility;
 using UnityEditor;
 using UnityEngine.UIElements;
+using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
-    [CustomPropertyDrawer(typeof(MessageBoxAttribute))]
+	[CustomPropertyDrawer(typeof(MessageBoxAttribute))]
     public class MessageBoxDrawer : PropertyDrawerBase
     {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            var messageBoxAttribute = attribute as MessageBoxAttribute;
-            var conditionalProperty = ReflectionUtility.GetValidMemberInfo(messageBoxAttribute.ConditionName, property);
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var messageBoxAttribute = attribute as MessageBoxAttribute;
 
-            var root = new VisualElement();
-            var errorBox = new HelpBox();
-            var messageBox = new HelpBox("", (HelpBoxMessageType)messageBoxAttribute.MessageType);
+			var conditionalProperty = ReflectionUtility.GetValidMemberInfo(messageBoxAttribute.ConditionName, property);
 
-            if (canApplyGlobalColor)
-            {
-                messageBox.style.color = EditorExtension.GLOBAL_COLOR;
-                messageBox.style.backgroundColor = EditorExtension.GLOBAL_COLOR / 2f;
-            }
+			var root = new VisualElement();
+			var messageBox = new HelpBox(string.Empty, (HelpBoxMessageType)messageBoxAttribute.MessageType);
+			var errorBox = new HelpBox();
 
-            UpdateVisualElement(root, () =>
-            {
-                if (GetConditionValue(conditionalProperty, messageBoxAttribute, property, errorBox))
-                {
-                    messageBox.text = GetDynamicString(messageBoxAttribute.Message, property, messageBoxAttribute, errorBox);
-                    root.Add(messageBox);
-                }
-                else
-                {
-                    RemoveElement(root, messageBox);
-                }
+			var propertyField = CreatePropertyField(property);
 
-                DisplayErrorBox(root, errorBox);
-            });
+			if (CanApplyGlobalColor)
+			{
+				messageBox.style.color = EditorExtension.GLOBAL_COLOR;
+				messageBox.style.backgroundColor = EditorExtension.GLOBAL_COLOR / 2f;
+			}
 
-            root.Add(DrawProperty(property));
+			root.Add(propertyField);
 
-            return root;
-        }
-    }
+			UpdateVisualElement(propertyField, () =>
+			{
+				if (GetConditionValue(conditionalProperty, messageBoxAttribute, property, errorBox))
+				{
+					messageBox.text = GetDynamicString(messageBoxAttribute.Message, property, messageBoxAttribute, errorBox);
+			
+					AddElement(root, messageBox);
+			
+					if (messageBoxAttribute.DrawAbove)
+						messageBox.PlaceBehind(propertyField);
+				}
+				else
+				{
+					RemoveElement(root, messageBox);
+				}
+			
+				DisplayErrorBox(root, errorBox);
+			});
+
+			return root;
+		}
+	}
 }

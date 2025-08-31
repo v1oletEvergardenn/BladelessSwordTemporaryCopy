@@ -18,7 +18,7 @@ public class EnergyBubble : IProjectile
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
         if (target != null && collision.gameObject != owner && !collided)
         {
-            if (collision.gameObject == gameManager.Player) { return; }
+            if (collision.gameObject == gameManager.player) { return; }
             End();
             vfx.SpawnSlashEffect(transform.position, true);
             rb.velocity = Vector3.zero;

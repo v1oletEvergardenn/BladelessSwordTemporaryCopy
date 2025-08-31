@@ -22,7 +22,7 @@ public class HS_SlashWave : IHeartSwordAbility
     {
         if (!CheckEnoughHeartSwordPoints()) return false;
         if (isPerforming) return false;
-
+        hSAbilityManager.ModifyHSPoint(-HS_Cost);
         animSet.Anim_Move(0);
         largeSlash = isLeft;
         hsHitEffectPlayed = false;

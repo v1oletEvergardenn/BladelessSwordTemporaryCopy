@@ -13,12 +13,20 @@ public class YYF_Gatling : IEnemyAction
     public float shootInterval = 0.2f;
     public float shootDuration = 5f;
     public float bulletSpeed = 100f;
-    public int bulletDamage = 10;
+    public float bulletDamage = 10;
+
+    public float damageCooldown = 0.2f;
+    private float damageTimer = 0f;
 
     public override void Start()
     {
         base.Start();
         bossAI = GetComponent<YingYangFish_AI>();
+    }
+
+    private void Update()
+    {
+        damageTimer += Time.deltaTime;
     }
 
     public override void CancelAct()
@@ -144,5 +152,16 @@ public class YYF_Gatling : IEnemyAction
         IProjectile bullet = bossAI.selfPooler.SpawnFromPool(selectedTag, position, false).GetComponent<IProjectile>();
 
         bullet.SetUp(dir, this.transform.gameObject, _speed: bulletSpeed, _damage: bulletDamage);
+    }
+
+    public void Hit(Gatling_bubbles bubble)
+    {
+        bool dealDamage = damageTimer >= damageCooldown;
+        GameManager.instance.playerhealth.Damage(
+            dealDamage ? bubble.damage : 0,
+            transform,
+            bubble.stunDuration,
+            stunValue: bubble.stunValue);
+        if (dealDamage) damageTimer = 0f;
     }
 }

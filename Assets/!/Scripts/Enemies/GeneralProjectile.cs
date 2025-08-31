@@ -25,14 +25,14 @@ public class GeneralProjectile : IProjectile
         {
             if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
 
-            if (collision.gameObject == gameManager.Player)
+            if (collision.gameObject == gameManager.player)
             {
                 if (collision.gameObject.layer == 14) { return; }
                 if (!isHostileToPlayer) { return; }
 
-                vfx.RumblePulse(rumbleFrequncy_normal.x, rumbleFrequncy_normal.y, rumbleDuration_normal);
-                vfx.SlowTimeForSeconds(freezeTimeDuration, slowTimeScale);
-                gameManager.player_Idamagable.Repel(repelForce, transform.right.x < 0 ? true : false);
+                vfx.RumblePulse(hitEffectSettings.frequency_norm, hitEffectSettings.rumbleDuration);
+                vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
+                gameManager.playerhealth.Repel(hitEffectSettings.repelForce, transform.right.x < 0 ? true : false);
             }
             if (anim != null) anim.Play(anim_after_hit);
             vfx.SpawnEffectWithEnum(hitEffect, transform.position, isRed);

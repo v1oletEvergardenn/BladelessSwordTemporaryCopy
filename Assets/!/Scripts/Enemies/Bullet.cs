@@ -6,7 +6,7 @@ public class Bullet : IProjectile
 
     public override void SetUp(Vector3 dir, GameObject _owner, float additionSpeed = 0f, bool _followTarget = false,
         IDamagable _target = null, bool _isHostileToPlayer = true,
-        int _damage = 0, float _speed = -1, float gravityScale = 0, float _stunValue = 0)
+        float _damage = 0, float _speed = -1, float gravityScale = 0, float _stunValue = 0)
     {
         ResetAttributes();
         owner = _owner;
@@ -31,7 +31,7 @@ public class Bullet : IProjectile
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
         if (target != null && collision.gameObject != owner && !collided)
         {
-            if (collision.gameObject == gameManager.Player && collision.gameObject.layer == 14 && !dodged)
+            if (collision.gameObject == gameManager.player && collision.gameObject.layer == 14 && !dodged)
             {
                 owner.GetComponent<Shooter>().dodgedTimes += 1;
                 dodged = true;
@@ -41,7 +41,7 @@ public class Bullet : IProjectile
             vfx.SpawnHitEffect(false, GetPivot());
             target.Damage(damage, transform, stunDuration);
             this.gameObject.SetActive(false);
-            if (collision.gameObject == gameManager.Player && gameManager.Player.GetComponent<PlayerAttack>().isDefending && owner.GetComponent<Shooter>().defendTest)
+            if (collision.gameObject == gameManager.player && gameManager.player.GetComponent<PlayerAttack>().isDefending && owner.GetComponent<Shooter>().defendTest)
             {
                 owner.GetComponent<ShooterOnHIt>().Die?.Invoke();
             }

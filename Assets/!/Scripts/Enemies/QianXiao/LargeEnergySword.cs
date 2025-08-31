@@ -21,7 +21,7 @@ public class LargeEnergySword : IProjectile
     {
         base.Start();
         anim = GetComponent<Animator>();
-        player = GameManager.instance.Player.transform;
+        player = GameManager.instance.player.transform;
         qianXiaoAI = QianXiaoAI.instance;
         QX_throw_sword = qianXiaoAI.GetComponent<QX_throw_sword>();
     }
@@ -108,7 +108,7 @@ public class LargeEnergySword : IProjectile
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
         if (target != null && !collided)
         {
-            if (isHostileToPlayer && collision.gameObject == gameManager.Player)
+            if (isHostileToPlayer && collision.gameObject == gameManager.player)
             {
                 QX_throw_sword.TeleportThrust();
                 Die();
@@ -138,13 +138,8 @@ public class LargeEnergySword : IProjectile
             if (collider.gameObject.layer == 6)
             {
                 vfx.SpawnSlashEffect(player.GetComponent<Health>().GetHitPos(), true);
-                GameManager.instance.player_Idamagable.Damage(damage, transform, stunDuration);
+                GameManager.instance.playerhealth.Damage(damage, transform, stunDuration);
             }
         }
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.DrawWireSphere(transform.position, explodeRange);
     }
 }

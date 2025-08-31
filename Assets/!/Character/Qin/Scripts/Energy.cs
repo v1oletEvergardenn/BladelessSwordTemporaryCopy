@@ -1,3 +1,4 @@
+using Microlight.MicroBar;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,15 +10,10 @@ public class Energy : MonoBehaviour
     private CharacterController2D controller;
     private InputPlayer playerInput;
 
-    public Image Energy_segment;
-    public Transform energy_parent;
-    public List<Image> segments = new List<Image>();
-    private Color originalColor;
-
     public int maxEnergy;
     public int currentEnergy;
     public float energyPercentage;
-    public Image energyBar;
+    public MicroBar energyBar;
 
     public Transform failedToDoActionSymbol;
 
@@ -56,8 +52,7 @@ public class Energy : MonoBehaviour
         playerAttack = GetComponent<PlayerAttack>();
         controller = GetComponent<CharacterController2D>();
         playerInput = GetComponent<InputPlayer>();
-        originalColor = Energy_segment.color;
-        UpdateEnergySegment();
+        energyBar.Initialize(maxEnergy);
     }
 
     private void Update()
@@ -95,36 +90,13 @@ public class Energy : MonoBehaviour
     public void IncreaseMaxEnergy(int i)
     {
         maxEnergy += i;
-        UpdateEnergySegment();
-    }
-
-    private void UpdateEnergySegment()
-    {
-        for (int i = 0; i < maxEnergy; i++)
-        {
-            if (i >= segments.Count)
-            {
-                Image _image = Instantiate(Energy_segment, energy_parent).GetComponent<Image>();
-                segments.Add(_image);
-            }
-        }
     }
 
     public void ChangeEnergy(int amount)
     {
         currentEnergy -= amount;
         currentEnergy = Mathf.Clamp(currentEnergy, 0, maxEnergy);
-        for (int i = 0; i < maxEnergy; i++)
-        {
-            if (i < currentEnergy)
-            {
-                segments[i].color = originalColor;
-            }
-            else
-            {
-                segments[i].color = new Color(0, 0, 0, 0);
-            }
-        }
+        energyBar.UpdateBar(currentEnergy);
     }
 
     public bool AttackConsume()

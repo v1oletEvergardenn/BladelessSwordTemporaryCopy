@@ -1,104 +1,140 @@
-using EditorAttributes.Editor.Utility;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
 using UnityEngine.UIElements;
-using ColorUtility = EditorAttributes.Editor.Utility.ColorUtility;
+using UnityEditor.UIElements;
+using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
-    [CustomPropertyDrawer(typeof(DataTableAttribute))]
-    public class DataTableDrawer : PropertyDrawerBase
-    {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            var dataTableAttribute = attribute as DataTableAttribute;
-            var root = new VisualElement();
+	[CustomPropertyDrawer(typeof(DataTableAttribute))]
+	public class DataTableDrawer : PropertyDrawerBase
+	{
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var dataTableAttribute = attribute as DataTableAttribute;
+			var root = new VisualElement();
 
-            if (property.propertyType != SerializedPropertyType.Generic)
-            {
-                var errorBox = new HelpBox("The DataTableAttribute can only be attached to serialized structs or classes and collections containing them", HelpBoxMessageType.Error);
-                root.Add(errorBox);
-                return root;
-            }
+			if (property.propertyType != SerializedPropertyType.Generic)
+			{
+				var errorBox = new HelpBox("The DataTableAttribute can only be attached to serialized structs or classes and collections containing them", HelpBoxMessageType.Error);
+				root.Add(errorBox);
+				return root;
+			}
 
-            property.isExpanded = true;
+			property.isExpanded = true;
 
-            root.style.flexDirection = FlexDirection.Row;
+			root.style.flexDirection = FlexDirection.Row;
 
-            if (dataTableAttribute.DrawInBox)
-                ApplyBoxStyle(root);
+			if (dataTableAttribute.DrawInBox)
+				ApplyBoxStyle(root);
 
-            var label = new Label(property.displayName)
-            {
-                style = {
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    marginRight = 50f,
-                    maxWidth = 50f,
-                    alignSelf = Align.Center,
-                    color = EditorExtension.GLOBAL_COLOR
-                }
-            };
+			var label = new Label(property.displayName)
+			{
+				tooltip = property.tooltip,
+				style = {
+					overflow = Overflow.Hidden,
+					unityFontStyleAndWeight = FontStyle.Bold,
+					marginRight = 50f,
+					maxWidth = 100f,
+					width = 100f,
+					alignSelf = Align.Center,
+					color = EditorExtension.GLOBAL_COLOR
+				}
+			};
 
-            root.Add(label);
+			root.Add(label);
 
-            var serializedProperty = property.Copy();
-            int initialDepth = serializedProperty.depth;
+			var serializedProperty = property.Copy();
+			int initialDepth = serializedProperty.depth;
 
-            while (serializedProperty.NextVisible(true) && serializedProperty.depth > initialDepth)
-            {
-                if (serializedProperty.propertyType == SerializedPropertyType.Generic || serializedProperty.propertyType == SerializedPropertyType.Vector4 || serializedProperty.propertyType == SerializedPropertyType.ArraySize)
-                {
-                    var errorBox = new HelpBox("Collection, UnityEvent and Serialized object types are not supported", HelpBoxMessageType.Error);
-                    root.Add(errorBox);
-                    break;
-                }
+			while (serializedProperty.NextVisible(true) && serializedProperty.depth > initialDepth)
+			{
+				if (serializedProperty.propertyType is SerializedPropertyType.Generic or SerializedPropertyType.Vector4 or SerializedPropertyType.ArraySize)
+				{
+					var errorBox = new HelpBox("Collection, UnityEvent and Serialized Object types are not supported", HelpBoxMessageType.Error);
+					root.Add(errorBox);
+					break;
+				}
 
-                var tableColumn = new VisualElement();
-                tableColumn.style.flexGrow = 1f;
-                tableColumn.style.flexBasis = 0.1f;
+				if (serializedProperty.depth >= initialDepth + 2) // Skip the X Y Z properties that are inside Vectors since we draw the vector field ourself
+					continue;
 
-                if (dataTableAttribute.ShowLabels && IsNotFirstArrayElement(property))
-                {
-                    var propertyLabel = new Label(serializedProperty.displayName);
-                    propertyLabel.style.color = EditorExtension.GLOBAL_COLOR;
+				var tableColumn = new VisualElement();
+				tableColumn.style.flexGrow = 1f;
+				tableColumn.style.flexBasis = 0.1f;
 
-                    tableColumn.Add(propertyLabel);
-                }
+				if (dataTableAttribute.ShowLabels && IsNotFirstArrayElement(property))
+				{
+					var propertyLabel = new Label(serializedProperty.displayName);
 
-                var propertyField = DrawProperty(serializedProperty, new Label());
+					propertyLabel.style.color = EditorExtension.GLOBAL_COLOR;
+					propertyLabel.style.overflow = Overflow.Hidden;
+					propertyLabel.tooltip = serializedProperty.tooltip;
 
-                propertyField.style.flexGrow = 1f;
-                propertyField.style.marginRight = 10f;
+					tableColumn.Add(propertyLabel);
+				}
 
-                if (EditorExtension.GLOBAL_COLOR != EditorExtension.DEFAULT_GLOBAL_COLOR)
-                    ColorUtility.ApplyColor(propertyField, EditorExtension.GLOBAL_COLOR, 100);
+				var propertyField = new PropertyField(serializedProperty, string.Empty);
 
-                tableColumn.Add(propertyField);
-                root.Add(tableColumn);
-            }
+				propertyField.style.flexGrow = 1f;
+				propertyField.style.marginRight = 10f;
 
-            // When there are other attributes on the dataTable field they would recreate the label of the property field so we make sure it will never be there
-            UpdateVisualElement(root, () =>
-            {
-                var labels = root.Query<Label>(className: "unity-base-field__label").ToList();
+				// Add X Y Z labels to Vector fields
+				if (serializedProperty.propertyType is SerializedPropertyType.Vector2 or SerializedPropertyType.Vector3 or SerializedPropertyType.Vector2Int or SerializedPropertyType.Vector3Int)
+				{
+					ExecuteLater(propertyField, () =>
+					{
+						var floatFields = propertyField.Query<FloatField>().ToList();
 
-                foreach (var label in labels)
-                    label.RemoveFromHierarchy();
-            }, 30);
+						for (int i = 0; i < floatFields.Count; i++)
+						{
+							var label = new Label(i == 0 ? "X" : i == 1 ? "Y" : "Z")
+							{
+								style = {
+									alignSelf = Align.Center,
+									marginRight = 3f,
+									color = EditorExtension.GLOBAL_COLOR
+								}
+							};
 
-            return root;
-        }
+							floatFields[i].style.marginRight = 3f;
 
-        private bool IsNotFirstArrayElement(SerializedProperty property)
-        {
-            if (ReflectionUtility.IsPropertyCollection(property))
-            {
-                var splitName = property.displayName.Split(" ");
+							floatFields[i].parent.Add(label);
 
-                return splitName[^1] == "0";
-            }
+							floatFields[i].PlaceInFront(label);
+						}
+					});
+				}
 
-            return true;
-        }
-    }
+				if (EditorExtension.GLOBAL_COLOR != EditorExtension.DEFAULT_GLOBAL_COLOR)
+					ColorUtils.ApplyColor(propertyField, EditorExtension.GLOBAL_COLOR, 100);
+
+				tableColumn.Add(propertyField);
+				root.Add(tableColumn);
+			}
+
+			// When there are other attributes on the dataTable field they would recreate the label of the property field so we make sure it will never be there
+			UpdateVisualElement(root, () =>
+			{
+				var labels = root.Query<Label>(className: "unity-base-field__label").ToList();
+
+				foreach (var label in labels)
+					label.RemoveFromHierarchy();
+			});
+
+			return root;
+		}
+
+		private bool IsNotFirstArrayElement(SerializedProperty property)
+		{
+			if (ReflectionUtility.IsPropertyCollection(property))
+			{
+				var splitName = property.propertyPath.Split(".");
+
+				return splitName[^1] == "data[0]";
+			}
+
+			return true;
+		}
+	}
 }

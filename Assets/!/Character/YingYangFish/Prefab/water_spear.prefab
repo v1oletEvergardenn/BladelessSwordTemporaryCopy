@@ -133,6 +133,19 @@ MonoBehaviour:
   stopLayer:
     serializedVersion: 2
     m_Bits: 3200
+  showPivot: 1
+  pivotOffset: {x: -0.01, y: 0, z: 0}
+  color: {r: 1, g: 0, b: 0, a: 1}
+  hitEffectSettings:
+    rumbleDuration: 0.218
+    frequency_norm: {x: 0.6595174, y: 0.7882037}
+    frequncy_perfect: {x: 1.0214477, y: 1.2747989}
+    freezeTime: 0.1492
+    Time_scale: 0.148
+    repelForce: 148
+    cameraShakeForce: {x: 0.10134049, y: 0.12010725}
+  vfx: {fileID: 0}
+  gameManager: {fileID: 0}
   owner: {fileID: 0}
   followTarget: 0
   target: {fileID: 0}
@@ -141,19 +154,6 @@ MonoBehaviour:
   lifeTimer: 0
   isHostileToPlayer: 0
   isPerfect: 0
-  showPivot: 1
-  pivotOffset: {x: -0.01, y: 0, z: 0}
-  color: {r: 1, g: 0, b: 0, a: 1}
-  rumbleDuration_normal: 0.1
-  rumbleFrequncy_normal: {x: 0.63647956, y: 1.0466838}
-  rumbleDuration_perfect: 0.51
-  rumbleFrequncy_perfect: {x: 0.77287066, y: 1.5}
-  cameraShakeForce: {x: 0, y: 0.2}
-  freezeTimeDuration: 0.3
-  slowTimeScale: 0.1
-  repelForce: 50
-  vfx: {fileID: 0}
-  gameManager: {fileID: 0}
   facingRight: 0
   collisionActive: 0
 --- !u!50 &865071752633607263

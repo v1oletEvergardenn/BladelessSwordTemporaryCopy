@@ -99,10 +99,10 @@ public class InputPlayer : MonoBehaviour
 
         gameManager = GameManager.instance;
         gameManager.playerInput = this;
-        gameManager.player_Idamagable = Health.instance;
+        gameManager.playerhealth = Health.instance;
         gameManager.playerAttack = PlayerAttack.instance;
         gameManager.player_controller = CharacterController2D.instance;
-        gameManager.Player = gameManager.player_Idamagable.gameObject;
+        gameManager.player = gameManager.playerhealth.gameObject;
 
         anim = controller.anim;
 
@@ -329,7 +329,8 @@ public class InputPlayer : MonoBehaviour
     /// </summary>
     private void TestEvent()
     {
-        Time.timeScale = 0.2f;
+        health.Damage(11f);
+        hSAbilitiesManager.ModifyHSPoint(0.5f);
     }
 
     private void OnJump()
@@ -490,9 +491,12 @@ public class InputPlayer : MonoBehaviour
     {
         if (collision.gameObject.layer == 15)//event objects
         {
-            currentEventObject.ShowInteractSign(false);
-            currentEventObject.EndInteraction();
-            currentEventObject = null;
+            if (currentEventObject != null)
+            {
+                currentEventObject.ShowInteractSign(false);
+                currentEventObject.EndInteraction();
+                currentEventObject = null;
+            }
         }
     }
 

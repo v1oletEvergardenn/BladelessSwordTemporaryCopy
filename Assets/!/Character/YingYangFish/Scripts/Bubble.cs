@@ -84,12 +84,12 @@ public class Bubble : IProjectile
         {
             if (collider.TryGetComponent<IDamagable>(out IDamagable dmg))
             {
-                if (dmg.gameObject == gameManager.Player)
+                if (dmg.gameObject == gameManager.player)
                 {
                     if (dmg.gameObject.layer == 14) { continue; }// if is dashing, ignore
-                    vfx.RumblePulse(rumbleFrequncy_normal.x, rumbleFrequncy_normal.y, rumbleDuration_normal);
-                    vfx.SlowTimeForSeconds(freezeTimeDuration, slowTimeScale);
-                    gameManager.player_Idamagable.Repel(repelForce, transform.right.x < 0 ? true : false);
+                    vfx.RumblePulse(hitEffectSettings.frequency_norm, hitEffectSettings.rumbleDuration);
+                    vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
+                    gameManager.playerhealth.Repel(hitEffectSettings.repelForce, transform.right.x < 0 ? true : false);
                 }
                 dmg.Damage(damage, transform, stunDuration, stunValue: stunValue);
             }

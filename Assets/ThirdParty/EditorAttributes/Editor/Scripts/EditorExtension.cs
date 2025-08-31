@@ -1,172 +1,370 @@
-using EditorAttributes.Editor.Utility;
-using System.Collections.Generic;
+using System;
 using System.IO;
-using System.Reflection;
+using System.Linq;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
+using System.Reflection;
 using UnityEngine.UIElements;
+using UnityEditor.UIElements;
+using System.Collections.Generic;
+using EditorAttributes.Editor.Utility;
+using Object = UnityEngine.Object;
 
 namespace EditorAttributes.Editor
 {
-    [CanEditMultipleObjects, CustomEditor(typeof(Object), true)]
-    public class EditorExtension : UnityEditor.Editor
-    {
-        public static readonly Color DEFAULT_GLOBAL_COLOR = new(0.8f, 0.8f, 0.8f, 1.0f);
-        public static Color GLOBAL_COLOR = DEFAULT_GLOBAL_COLOR;
+	[CanEditMultipleObjects, CustomEditor(typeof(Object), true)]
+	public class EditorExtension : UnityEditor.Editor
+	{
+		public static readonly Color DEFAULT_GLOBAL_COLOR = new(0.8f, 0.8f, 0.8f, 1.0f);
+		public static Color GLOBAL_COLOR = DEFAULT_GLOBAL_COLOR;
 
-        private string buttonParamsDataFilePath;
+		private string buttonParamsDataFilePath;
 
-        private Dictionary<MethodInfo, bool> buttonFoldouts = new();
-        private Dictionary<MethodInfo, object[]> buttonParameterValues = new();
+		private Dictionary<MethodInfo, bool> buttonFoldouts = new();
+		private Dictionary<MethodInfo, object[]> buttonParameterValues = new();
 
-        private MethodInfo[] functions;
+		private MethodInfo[] functions;
 
-        private void OnEnable()
-        {
-            functions = target.GetType().GetMethods(ReflectionUtility.BINDING_FLAGS);
+		protected virtual void OnEnable()
+		{
+			functions = target.GetType().GetMethods(ReflectionUtility.BINDING_FLAGS);
 
-            ButtonDrawer.LoadParamsData(functions, target, ref buttonFoldouts, ref buttonParameterValues);
+			ButtonDrawer.LoadParamsData(functions, target, ref buttonFoldouts, ref buttonParameterValues);
 
-            try
-            {
-                buttonParamsDataFilePath = Path.Combine(ButtonDrawer.PARAMS_DATA_LOCATION, $"{target}ParamsData.json");
-            }
-            catch (System.ArgumentException)
-            {
-                return;
-            }
-        }
+			try
+			{
+				buttonParamsDataFilePath = Path.Combine(ButtonDrawer.PARAMS_DATA_LOCATION, ButtonDrawer.GetFileName(target));
+			}
+			catch (ArgumentException)
+			{
+				return;
+			}
+		}
 
-        private void OnDisable()
-        {
-            if (target == null)
-                ButtonDrawer.DeleteParamsData(buttonParamsDataFilePath);
-        }
+		protected virtual void OnDisable()
+		{
+			if (target == null)
+				ButtonDrawer.DeleteParamsData(buttonParamsDataFilePath);
 
-        public override VisualElement CreateInspectorGUI()
-        {
-            // Reset the global color per component GUI so it doesnt leak from other components
-            GLOBAL_COLOR = DEFAULT_GLOBAL_COLOR;
+			EditorHandles.handleProperties.Clear();
+			EditorHandles.boundsHandleList.Clear();
+		}
 
-            var root = DrawDefaultInspector();
-            var buttons = DrawButtons();
+		void OnSceneGUI() => EditorHandles.DrawHandles();
 
-            root.Add(buttons);
+		public override VisualElement CreateInspectorGUI()
+		{
+			// Reset the global color per component GUI so it doesnt leak from other components
+			GLOBAL_COLOR = DEFAULT_GLOBAL_COLOR;
 
-            return root;
-        }
+			var root = new VisualElement();
 
-        private new VisualElement DrawDefaultInspector()
-        {
-            var root = new VisualElement();
+			var nonSerializedMembers = DrawNonSerilizedMembers();
+			var defaultInspector = DrawDefaultInspector();
+			var buttons = DrawButtons();
 
-            using (var property = serializedObject.GetIterator())
-            {
-                if (property.NextVisible(true))
-                {
-                    IColorAttribute prevColor = null;
+			root.Add(defaultInspector);
+			root.Add(nonSerializedMembers);
+			root.Add(buttons);
 
-                    do
-                    {
-                        var propertyField = new PropertyField(property);
+			return root;
+		}
 
-                        if (property.name == "m_Script")
-                            propertyField.SetEnabled(false);
+		protected virtual new VisualElement DrawDefaultInspector()
+		{
+			var root = new VisualElement();
+			var propertyList = new Dictionary<string, PropertyField>();
 
-                        var field = ReflectionUtility.FindField(property.name, target);
-                        var colorAttribute = field?.GetCustomAttribute<GUIColorAttribute>();
+			using (var property = serializedObject.GetIterator())
+			{
+				if (property.NextVisible(true))
+				{
+					IColorAttribute prevColor = null;
 
-                        if (colorAttribute != null)
-                        {
-                            GUIColorDrawer.ColorField(propertyField, colorAttribute);
-                            prevColor = colorAttribute;
-                        }
-                        else if (prevColor != null)
-                        {
-                            GUIColorDrawer.ColorField(propertyField, prevColor);
-                        }
+					do
+					{
+						var propertyField = PropertyDrawerBase.CreatePropertyField(property);
 
-                        root.Add(propertyField);
-                    }
-                    while (property.NextVisible(false));
-                }
-            }
+						if (property.name == "m_Script")
+						{
+							propertyField.SetEnabled(false);
+							root.Add(propertyField);
 
-            return root;
-        }
+							continue;
+						}
 
-        private VisualElement DrawButtons()
-        {
-            var root = new VisualElement();
-            var errorBox = new HelpBox();
+						var field = ReflectionUtility.FindField(property.name, target);
 
-            IColorAttribute prevColor = null;
+						if (field?.GetCustomAttribute<HidePropertyAttribute>() != null)
+						{
+							propertyField.style.display = DisplayStyle.None;
+						}
 
-            foreach (var function in functions)
-            {
-                var buttonAttribute = function.GetCustomAttribute<ButtonAttribute>();
+						var colorAttribute = field?.GetCustomAttribute<GUIColorAttribute>();
 
-                if (buttonAttribute == null)
-                    continue;
+						if (colorAttribute != null)
+						{
+							GUIColorDrawer.ColorField(propertyField, colorAttribute);
+							prevColor = colorAttribute;
+						}
+						else if (prevColor != null)
+						{
+							GUIColorDrawer.ColorField(propertyField, prevColor);
+						}
 
-                var colorAttribute = function?.GetCustomAttribute<GUIColorAttribute>();
+						propertyList.Add(property.name, propertyField);
+					}
+					while (property.NextVisible(false));
+				}
+			}
 
-                if (colorAttribute != null)
-                {
-                    GUIColorDrawer.ColorField(root, colorAttribute);
-                    prevColor = colorAttribute;
-                }
-                else if (prevColor != null)
-                {
-                    GUIColorDrawer.ColorField(root, prevColor);
-                }
+			var orderedProperties = propertyList.OrderBy((property) =>
+			{
+				var field = ReflectionUtility.FindField(property.Key, target);
 
-                var button = ButtonDrawer.DrawButton(function, buttonAttribute, buttonFoldouts, buttonParameterValues, target);
-                var conditionalProperty = ReflectionUtility.GetValidMemberInfo(buttonAttribute.ConditionName, target);
+				var propertyOrderAttribute = field?.GetCustomAttribute<PropertyOrderAttribute>();
 
-                button.RegisterCallback<FocusOutEvent>((callback) => ButtonDrawer.SaveParamsData(functions, target, buttonFoldouts, buttonParameterValues));
+				if (propertyOrderAttribute != null)
+					return propertyOrderAttribute.PropertyOrder;
 
-                if (conditionalProperty != null)
-                {
-                    PropertyDrawerBase.UpdateVisualElement(root, () =>
-                    {
-                        var conditionValue = PropertyDrawerBase.GetConditionValue(conditionalProperty, buttonAttribute, target, errorBox);
+				return 0;
+			});
 
-                        if (buttonAttribute.Negate)
-                            conditionValue = !conditionValue;
+			foreach (var property in orderedProperties)
+				root.Add(property.Value);
 
-                        switch (buttonAttribute.ConditionResult)
-                        {
-                            case ConditionResult.ShowHide:
-                                if (conditionValue)
-                                {
-                                    if (!root.Contains(button))
-                                        root.Add(button);
-                                }
-                                else
-                                {
-                                    PropertyDrawerBase.RemoveElement(root, button);
-                                }
-                                break;
+			return root;
+		}
 
-                            case ConditionResult.EnableDisable:
-                                button.SetEnabled(conditionValue);
-                                break;
-                        }
+		/// <summary>
+		/// Draws all the members marked with the ShowInInspector attribute
+		/// </summary>
+		/// <returns>A visual element containing all non serialized member fields</returns>
+		protected VisualElement DrawNonSerilizedMembers()
+		{
+			var root = new VisualElement();
 
-                        PropertyDrawerBase.DisplayErrorBox(root, errorBox);
-                    });
+			var nonSerializedFields = target.GetType().GetFields(ReflectionUtility.BINDING_FLAGS).Where((field) => field.GetCustomAttribute<ShowInInspectorAttribute>() != null);
 
-                    root.Add(button);
-                }
-                else
-                {
-                    root.Add(button);
-                }
-            }
+			foreach (var nonSerializedField in nonSerializedFields)
+			{
+				if (HasRestrictedAttributes(nonSerializedField, out string errorMessage))
+				{
+					root.Add(new HelpBox(errorMessage, HelpBoxMessageType.Error));
+					continue;
+				}
 
-            return root;
-        }
-    }
+				var field = DrawNonSerializedField(nonSerializedField, nonSerializedField.FieldType, nonSerializedField.GetValue(target));
+
+				root.Add(field);
+			}
+
+			var nonSerializedProperties = target.GetType().GetProperties(ReflectionUtility.BINDING_FLAGS).Where((field) => field.GetCustomAttribute<ShowInInspectorAttribute>() != null);
+
+			foreach (var nonSerializedProperty in nonSerializedProperties)
+			{
+				if (HasRestrictedAttributes(nonSerializedProperty, out string errorMessage))
+				{
+					root.Add(new HelpBox(errorMessage, HelpBoxMessageType.Error));
+					continue;
+				}
+
+				var field = DrawNonSerializedField(nonSerializedProperty, nonSerializedProperty.PropertyType, nonSerializedProperty.GetValue(target));
+
+				root.Add(field);
+			}
+
+			var nonSerializedMethods = target.GetType().GetMethods(ReflectionUtility.BINDING_FLAGS).Where((field) => field.GetCustomAttribute<ShowInInspectorAttribute>() != null);
+
+			foreach (var nonSerializedMethod in nonSerializedMethods)
+			{
+				if (HasRestrictedAttributes(nonSerializedMethod, out string errorMessage))
+				{
+					root.Add(new HelpBox(errorMessage, HelpBoxMessageType.Error));
+					continue;
+				}
+
+				if (nonSerializedMethod.GetParameters().Length > 0 || nonSerializedMethod.ContainsGenericParameters)
+				{
+					root.Add(new HelpBox($"Method <b>{nonSerializedMethod.Name}</b> cannot be drawn because it has parameters or is generic", HelpBoxMessageType.Error));
+					continue;
+				}
+
+				var field = DrawNonSerializedField(nonSerializedMethod, nonSerializedMethod.ReturnType, nonSerializedMethod.Invoke(target, null));
+
+				root.Add(field);
+			}
+
+			return root;
+		}
+
+		private VisualElement DrawNonSerializedField(MemberInfo memberInfo, Type memberType, object memberValue)
+		{
+			var root = new VisualElement();
+
+			var headerAttribute = memberInfo.GetCustomAttribute<HeaderAttribute>();
+
+			var header = new Label()
+			{
+				style = {
+					marginTop = 13,
+					marginLeft = 3,
+					marginRight = -2,
+					unityFontStyleAndWeight = FontStyle.Bold,
+					unityTextAlign = TextAnchor.LowerLeft
+				}
+			};
+
+			header.AddToClassList("unity-header-drawer__label");
+
+			var field = PropertyDrawerBase.CreateFieldForType(memberType, memberInfo.Name, memberValue, AreNonSerializedMemberValuesDifferent(memberInfo, targets));
+
+			field.AddToClassList(BaseField<Void>.alignedFieldUssClassName);
+
+			if (field is Foldout)
+			{
+				field.contentContainer.SetEnabled(false);
+				field.Q<Label>().SetEnabled(false);
+			}
+			else
+			{
+				field.SetEnabled(false);
+			}
+
+			PropertyDrawerBase.BindFieldToMember(memberType, field, memberInfo, target);
+
+			foreach (var spaceAttribute in memberInfo.GetCustomAttributes<SpaceAttribute>())
+			{
+				var space = new VisualElement();
+
+				space.style.height = spaceAttribute.height;
+
+				space.AddToClassList("unity-space-drawer");
+				root.Add(space);
+			}
+
+			if (headerAttribute != null)
+			{
+				header.text = headerAttribute.header;
+				root.Add(header);
+			}
+
+			root.Add(field);
+
+			return root;
+		}
+
+		private bool AreNonSerializedMemberValuesDifferent(MemberInfo memberInfo, Object[] targets)
+		{
+			if (targets == null || targets.Length <= 1)
+				return false;
+
+			object firstValue = ReflectionUtility.GetMemberInfoValue(memberInfo, targets[0]);
+
+			for (int i = 1; i < targets.Length; i++)
+			{
+				object otherValue = ReflectionUtility.GetMemberInfoValue(memberInfo, targets[i]);
+
+				if (!Equals(firstValue, otherValue))
+					return true;
+			}
+
+			return false;
+		}
+
+		private bool HasRestrictedAttributes(MemberInfo memberInfo, out string errorMessage)
+		{
+			if (memberInfo.GetCustomAttribute<HideInInspector>() != null || memberInfo.GetCustomAttribute<HidePropertyAttribute>() != null)
+			{
+				errorMessage = $"You want to show the member <b>{memberInfo.Name}</b> but you mark it with the HideInInspector or HideProperty Attribute, make up your mind bro";
+				return true;
+			}
+
+			if (memberInfo.GetCustomAttribute<SerializeField>() != null || memberInfo.GetCustomAttribute<SerializeReference>() != null)
+			{
+				errorMessage = $"The member <b>{memberInfo.Name}</b> is already serialized, there is no need to use the ShowInInspector Attribute";
+				return true;
+			}
+
+			errorMessage = string.Empty;
+			return false;
+		}
+
+		/// <summary>
+		/// Draws all the buttons from functions using the Button Attribute
+		/// </summary>
+		/// <returns>A visual element containing all drawn buttons</returns>
+		protected VisualElement DrawButtons()
+		{
+			var root = new VisualElement();
+			var errorBox = new HelpBox();
+
+			IColorAttribute prevColor = null;
+
+			foreach (var function in functions)
+			{
+				var buttonAttribute = function.GetCustomAttribute<ButtonAttribute>();
+
+				if (buttonAttribute == null)
+					continue;
+
+				var colorAttribute = function?.GetCustomAttribute<GUIColorAttribute>();
+
+				if (colorAttribute != null)
+				{
+					GUIColorDrawer.ColorField(root, colorAttribute);
+					prevColor = colorAttribute;
+				}
+				else if (prevColor != null)
+				{
+					GUIColorDrawer.ColorField(root, prevColor);
+				}
+
+				var button = ButtonDrawer.DrawButton(function, buttonAttribute, buttonFoldouts, buttonParameterValues, targets);
+				var conditionalProperty = ReflectionUtility.GetValidMemberInfo(buttonAttribute.ConditionName, target);
+
+				button.RegisterCallback<FocusOutEvent>((callback) => ButtonDrawer.SaveParamsData(functions, target, buttonFoldouts, buttonParameterValues));
+
+				if (conditionalProperty != null)
+				{
+					PropertyDrawerBase.UpdateVisualElement(root, () =>
+					{
+						var conditionValue = PropertyDrawerBase.GetConditionValue(conditionalProperty, buttonAttribute, target, errorBox);
+
+						if (buttonAttribute.Negate)
+							conditionValue = !conditionValue;
+
+						switch (buttonAttribute.ConditionResult)
+						{
+							case ConditionResult.ShowHide:
+								if (conditionValue)
+								{
+									if (!root.Contains(button))
+										root.Add(button);
+								}
+								else
+								{
+									PropertyDrawerBase.RemoveElement(root, button);
+								}
+								break;
+
+							case ConditionResult.EnableDisable:
+								button.SetEnabled(conditionValue);
+								break;
+						}
+
+						PropertyDrawerBase.DisplayErrorBox(root, errorBox);
+					});
+
+					root.Add(button);
+				}
+				else
+				{
+					root.Add(button);
+				}
+			}
+
+			return root;
+		}
+	}
 }

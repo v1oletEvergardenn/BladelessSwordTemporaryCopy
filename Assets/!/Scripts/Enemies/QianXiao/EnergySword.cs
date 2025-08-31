@@ -20,21 +20,21 @@ public class EnergySword : IProjectile
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
         if (target != null && collision.gameObject != owner && !collided)
         {
-            if (collision.gameObject == gameManager.Player)
+            if (collision.gameObject == gameManager.player)
             {
                 if (collision.gameObject.layer == 14) { return; }
-                vfx.RumblePulse(rumbleFrequncy_normal.x, rumbleFrequncy_normal.y, rumbleDuration_normal);
+                vfx.RumblePulse(hitEffectSettings.frequency_norm, hitEffectSettings.rumbleDuration);
                 if (isRed)
                 {
-                    if (gameManager.Player.GetComponent<PlayerAttack>().isCounterAttacking && gameManager.Player.GetComponent<CharacterController2D>().FacingRight != facingRight)
+                    if (gameManager.player.GetComponent<PlayerAttack>().isCounterAttacking && gameManager.player.GetComponent<CharacterController2D>().FacingRight != facingRight)
                     {
                         target.Repel(50f, this.transform.right.x < 0 ? true : false);
-                        gameManager.Player.GetComponent<PlayerAttack>().CounterAttack(this, true);
+                        gameManager.player.GetComponent<PlayerAttack>().CounterAttack(this, true);
                     }
                     else
                     {
-                        vfx.RumblePulse(rumbleFrequncy_normal.x, rumbleFrequncy_normal.y, rumbleDuration_normal);
-                        vfx.CameraShake(cameraShakeForce.y);
+                        vfx.RumblePulse(hitEffectSettings.frequency_norm, hitEffectSettings.rumbleDuration);
+                        vfx.CameraShake(hitEffectSettings.cameraShakeForce.y);
                         vfx.SlowTimeForSeconds(0.1f, 0f);
                         vfx.SpawnSlashEffect(GetPivot(), true);
                         target.Damage(damage, transform, stunDuration);

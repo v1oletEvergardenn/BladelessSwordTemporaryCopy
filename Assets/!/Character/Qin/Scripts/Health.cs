@@ -1,3 +1,4 @@
+using Microlight.MicroBar;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,15 +17,13 @@ public class Health : IDamagable
     private PlayerAttack playerAttack;
     private CharacterController2D controller;
     private InputPlayer inputPlayer;
-    public float maxHealth;
-    private float currentHealth;
+    [SerializeField] private float maxHealth;
+    [SerializeField] private float currentHealth;
+    public MicroBar healthBar;
+
     [HideInInspector] public float healthPercentage;
     private DamageFlash _damageFlash;
 
-    public Image Health_segment;
-    public Transform health_parent;
-    public List<Image> segments = new List<Image>();
-    private Color originalColor;
     public Vector3 revivePosition;
 
     public Transform hitEffectPosition;
@@ -48,15 +47,13 @@ public class Health : IDamagable
         _damageFlash = GetComponent<DamageFlash>();
         inputPlayer = GetComponent<InputPlayer>();
         controller = GetComponent<CharacterController2D>();
-        originalColor = Health_segment.color;
-        UpdateHealthSegment();
         revivePosition = transform.position;
+        healthBar.Initialize(maxHealth);
     }
 
     public void IncreaseMaxHealth(int i)
     {
         maxHealth += i;
-        UpdateHealthSegment();
     }
 
     private void Update()
@@ -71,18 +68,6 @@ public class Health : IDamagable
                 anim_bool.Anim_Hit(1);
 
                 if (!isDead) { anim.SetTrigger("stun_after"); }
-            }
-        }
-    }
-
-    private void UpdateHealthSegment()
-    {
-        for (int i = 0; i < maxHealth; i++)
-        {
-            if (i >= segments.Count)
-            {
-                Image _image = Instantiate(Health_segment, health_parent).GetComponent<Image>();
-                segments.Add(_image);
             }
         }
     }
@@ -128,14 +113,12 @@ public class Health : IDamagable
         SoundManager.PlaySound("player_take_damage");
         currentHealth -= damageAmount;
 
+        if (damageAmount >= 10) healthBar.UpdateBar(currentHealth, UpdateAnim.CriticalDamage);
+        else healthBar.UpdateBar(currentHealth);
+
         _damageFlash.OnDamageFlash();
         inputPlayer.DisableFloat();
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        for (int i = 0; i < maxHealth; i++)
-        {
-            if (i < currentHealth) { segments[i].color = originalColor; }
-            else { segments[i].color = new Color(0, 0, 0, 0); }
-        }
         if (stun_duration != 0)
         {
             anim_bool.Anim_Attack(2);
@@ -155,17 +138,17 @@ public class Health : IDamagable
         return 0;
     }
 
-    public int DamageDirectlyWithStun(int damageAmount, float t = 0f)
+    public int DamageDirectlyWithStun(float damageAmount, float t = 0f)
     {
         return Damage(damageAmount, null, t);
     }
 
-    public int Damage(int damageAmount)
+    public int Damage(float damageAmount)
     {
         return Damage(damageAmount, null, 0f);
     }
 
-    public int DamageFromMeleeAttack(Transform attackPos, int damageAmount, float t = 0f)
+    public int DamageFromMeleeAttack(Transform attackPos, float damageAmount, float t = 0f)
     {
         if (this.transform.gameObject.layer == 14) { return 4; }
         if ((attackPos.position.x < transform.position.x && !controller.FacingRight)
@@ -196,11 +179,6 @@ public class Health : IDamagable
         anim_bool.Anim_Attack(1);
         isDead = false;
         GetComponent<Rigidbody2D>().isKinematic = false;
-        for (int i = 0; i < maxHealth; i++)
-        {
-            if (i < currentHealth) { segments[i].color = originalColor; }
-            else { segments[i].color = new Color(0, 0, 0, 0); }
-        }
     }
 
     public void SetRevivePoint(Transform pos)
@@ -240,5 +218,25 @@ public class Health : IDamagable
     public void ForceRepel(float force, bool left)
     {
         GetComponent<Rigidbody2D>().AddForce((left ? Vector3.left : Vector3.right) * force, ForceMode2D.Impulse);
+    }
+
+    public float GetCurrentHealth()
+    { return currentHealth; }
+
+    public float GetMaxHealth()
+    { return maxHealth; }
+
+    public float SetCurrentHealth(float h)
+    {
+        currentHealth = h;
+        healthBar.UpdateBar(currentHealth);
+        return currentHealth;
+    }
+
+    public float SetMaxHealth(float h)
+    {
+        maxHealth = h;
+        healthBar.Initialize(maxHealth);
+        return maxHealth;
     }
 }

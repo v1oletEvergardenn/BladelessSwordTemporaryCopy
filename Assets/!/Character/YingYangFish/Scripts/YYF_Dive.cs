@@ -171,6 +171,5 @@ public class YYF_Dive : IEnemyAction
     public void Sprint()
     {
         return;
-        bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
     }
 }

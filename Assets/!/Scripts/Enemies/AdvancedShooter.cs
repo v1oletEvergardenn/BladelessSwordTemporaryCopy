@@ -32,7 +32,7 @@ public abstract class AdvancedShooter : MonoBehaviour
 
     public virtual void Start()
     {
-        playerIDamagable = GameManager.instance.player_Idamagable;
+        playerIDamagable = GameManager.instance.playerhealth;
         pooler = ObjectPooler.instance;
         anim = GetComponent<Animator>();
         vfx = VFXManager.instance;
@@ -70,7 +70,7 @@ public abstract class AdvancedShooter : MonoBehaviour
         _bullet.rotationSpeed = bulletRotationSpeed;
         if (aimPlayer)
         {
-            _bullet.SetUp(shootPos.eulerAngles, senderOfProjectile, 0, follow_player, GameManager.instance.Player.GetComponent<IDamagable>(), _damage: Damage, _speed: bulletSpeed);
+            _bullet.SetUp(shootPos.eulerAngles, senderOfProjectile, 0, follow_player, GameManager.instance.player.GetComponent<IDamagable>(), _damage: Damage, _speed: bulletSpeed);
         }
         else
         {

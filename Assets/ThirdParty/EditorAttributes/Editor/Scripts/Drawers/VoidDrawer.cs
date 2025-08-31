@@ -6,6 +6,6 @@ namespace EditorAttributes.Editor
     [CustomPropertyDrawer(typeof(Void))]
     public class VoidDrawer : PropertyDrawer
     {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property) => new();
-    }
+		public override VisualElement CreatePropertyGUI(SerializedProperty property) => new();
+	}
 }

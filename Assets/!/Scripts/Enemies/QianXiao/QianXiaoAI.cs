@@ -56,7 +56,7 @@ public class QianXiaoAI : IEnemyController
         base.Start();
         targetPos = nullTargetPos;
         oriGravity = rb.gravityScale;
-        stunBar.fillAmount = (float)currentStun / (float)maxStun;
+        stunBar.UpdateBar(currentStun);
     }
 
     public void Awake()
@@ -75,7 +75,7 @@ public class QianXiaoAI : IEnemyController
         }
         if (deadAnimPlayed) { return; }
         GroundCheck();
-        distanceToPlayer = Vector3.Distance(transform.position, GameManager.instance.Player.transform.position);
+        distanceToPlayer = Vector3.Distance(transform.position, GameManager.instance.player.transform.position);
 
         if (IN_COMBAT)
         {
@@ -155,7 +155,7 @@ public class QianXiaoAI : IEnemyController
         Stun(1);
         flash.OnDamageFlash();
         currentHealth -= damageAmount;
-        healthBar.fillAmount = (float)currentHealth / (float)maxHealth;
+        healthBar.UpdateBar(currentHealth);
         if (!isStage2)
         {
             if (currentHealth <= 0)
@@ -187,7 +187,7 @@ public class QianXiaoAI : IEnemyController
     {
         maxHealth = stage2MaxHealth;
         currentHealth = maxHealth;
-        healthBar.fillAmount = (float)currentHealth / (float)maxHealth;
+        healthBar.UpdateBar(currentHealth);
     }
 
     public void Move()
@@ -245,7 +245,7 @@ public class QianXiaoAI : IEnemyController
     public void Stun(int stunAmount)
     {
         currentStun += stunAmount;
-        stunBar.fillAmount = (float)currentStun / (float)maxStun;
+        stunBar.UpdateBar(currentStun);
         if (currentStun >= maxStun)
         {
             currentStun = 0;

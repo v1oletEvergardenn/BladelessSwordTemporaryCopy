@@ -200,9 +200,23 @@ MonoBehaviour:
   rotationSpeed: 100
   stunDuration: 0.1
   lifeTime: 10
+  stunValue: 1
   stopLayer:
     serializedVersion: 2
     m_Bits: 3200
+  showPivot: 0
+  pivotOffset: {x: 0, y: 0, z: 0}
+  color: {r: 1, g: 0, b: 0, a: 1}
+  hitEffectSettings:
+    rumbleDuration: 0.129
+    frequency_norm: {x: 0.18096516, y: 0.3297587}
+    frequncy_perfect: {x: 0.5308311, y: 0.6756032}
+    freezeTime: 0.0638
+    Time_scale: 0.737
+    repelForce: 10
+    cameraShakeForce: {x: 0.023592494, y: 0.048729107}
+  vfx: {fileID: 0}
+  gameManager: {fileID: 0}
   owner: {fileID: 0}
   followTarget: 0
   target: {fileID: 0}
@@ -211,19 +225,6 @@ MonoBehaviour:
   lifeTimer: 0
   isHostileToPlayer: 0
   isPerfect: 0
-  showPivot: 0
-  pivotOffset: {x: 0, y: 0, z: 0}
-  color: {r: 1, g: 0, b: 0, a: 1}
-  rumbleDuration_normal: 0.1
-  rumbleFrequncy_normal: {x: 0.25, y: 0.4}
-  rumbleDuration_perfect: 0.15
-  rumbleFrequncy_perfect: {x: 0.5, y: 1}
-  cameraShakeForce: {x: 0, y: 0.1}
-  freezeTimeDuration: 0.2
-  slowTimeScale: 0.1
-  repelForce: 20
-  vfx: {fileID: 0}
-  gameManager: {fileID: 0}
   anim_after_hit: after_hit
   death_delay_time_after_hit: 0
   hitEffect: 0

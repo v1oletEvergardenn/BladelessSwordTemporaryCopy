@@ -1,28 +1,28 @@
-using EditorAttributes;
 using UnityEngine;
+using EditorAttributes;
 
 namespace EditorAttributesSamples
 {
-    [HelpURL("https://editorattributesdocs.readthedocs.io/en/latest/Attributes/ButtonAttributes/buttonfield.html")]
-    public class ButtonFieldSample : MonoBehaviour
-    {
-        [Header("ButtonField Attribute:")]
-        [ButtonField(nameof(PrintNumber), buttonHeight: 30f)]
-        [SerializeField] private Void buttonHolder;
+	[HelpURL("https://editorattributesdocs.readthedocs.io/en/latest/Attributes/ButtonAttributes/buttonfield.html")]
+	public class ButtonFieldSample : MonoBehaviour
+	{
+		[Header("ButtonField Attribute:")]
 
-        [SerializeField] private int number;
+		[ButtonField(nameof(PrintNumber), buttonHeight: 30f)]
+		[SerializeField] private Void buttonHolder;
 
-        [HorizontalGroup(true, nameof(buttonHolder01), nameof(buttonHolder02))]
-        [SerializeField] private Void groupHolder;
+		[SerializeField] private int number;
 
-        [ButtonField(nameof(PrintMessage))]
-        [SerializeField, HideInInspector] private Void buttonHolder01;
+		[HorizontalGroup(true, nameof(buttonHolder01), nameof(buttonHolder02))] 
+		[SerializeField] private Void groupHolder;
 
-        [ButtonField(nameof(PrintMessage), "Press Me")]
-        [SerializeField, HideInInspector] private Void buttonHolder02;
+		[ButtonField(nameof(PrintMessage))]
+		[SerializeField, HideInInspector] private Void buttonHolder01;
 
-        private void PrintNumber() => print(number);
+		[ButtonField(nameof(PrintMessage), true, 60, 300, "Hold Me")] 
+		[SerializeField, HideInInspector] private Void buttonHolder02;
 
-        private void PrintMessage() => print("Hello World!");
-    }
+		private void PrintNumber() => print(number);
+		private void PrintMessage() => print("Hello World!");
+	}
 }

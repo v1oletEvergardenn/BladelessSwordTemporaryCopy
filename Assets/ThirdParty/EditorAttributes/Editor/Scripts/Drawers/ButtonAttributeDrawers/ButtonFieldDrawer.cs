@@ -1,36 +1,76 @@
-using EditorAttributes.Editor.Utility;
 using UnityEditor;
 using UnityEngine.UIElements;
+using EditorAttributes.Editor.Utility;
 
 namespace EditorAttributes.Editor
 {
-    [CustomPropertyDrawer(typeof(ButtonFieldAttribute))]
-    public class ButtonFieldDrawer : PropertyDrawerBase
-    {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            var buttonFieldAttribute = attribute as ButtonFieldAttribute;
-            var target = property.serializedObject.targetObject;
+	[CustomPropertyDrawer(typeof(ButtonFieldAttribute))]
+	public class ButtonFieldDrawer : PropertyDrawerBase
+	{
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+			var buttonFieldAttribute = attribute as ButtonFieldAttribute;
 
-            var function = ReflectionUtility.FindFunction(buttonFieldAttribute.FunctionName, target);
-            var functionParameters = function.GetParameters();
+			var path = property.propertyPath.Split('.');
+			object ownerObject = null;
 
-            var root = new VisualElement();
+			if (path.Length == 1)
+			{
+				ownerObject = property.serializedObject.targetObject;
+			}
+			else
+			{
+				// Get the object that the property is a member of
+				var type = ReflectionUtility.GetNestedObjectType(property, out ownerObject);
 
-            if (functionParameters.Length == 0)
-            {
-                var button = new Button(() => function.Invoke(target, null)) { text = string.IsNullOrWhiteSpace(buttonFieldAttribute.ButtonLabel) ? function.Name : buttonFieldAttribute.ButtonLabel };
+				if (type == null)
+					return new HelpBox("Field must be a member of a class", HelpBoxMessageType.Error);
+			}
 
-                button.style.height = buttonFieldAttribute.ButtonHeight;
+			var function = ReflectionUtility.FindFunction(buttonFieldAttribute.FunctionName, ownerObject);
 
-                root.Add(button);
-            }
-            else
-            {
-                root.Add(new HelpBox("Function cannot have parameters", HelpBoxMessageType.Error));
-            }
+			if (function == null)
+				return new HelpBox($"Could not find function <b>{buttonFieldAttribute.FunctionName}</b>. If this function is inherited make sure is marked at protected.", HelpBoxMessageType.Error);
 
-            return root;
-        }
-    }
+			var functionParameters = function.GetParameters();
+			var buttonLabel = string.IsNullOrWhiteSpace(buttonFieldAttribute.ButtonLabel) ? function.Name : buttonFieldAttribute.ButtonLabel;
+
+			var root = new VisualElement();
+
+			if (functionParameters.Length == 0)
+			{
+				if (buttonFieldAttribute.IsRepetable)
+				{
+					var repeatButton = new RepeatButton(() => InvokeFunctionOnAllTargets(property.serializedObject.targetObjects, function.Name), buttonFieldAttribute.PressDelay, buttonFieldAttribute.RepetitionInterval)
+					{
+						text = buttonLabel,
+						tooltip = property.tooltip
+					};
+
+					repeatButton.style.height = buttonFieldAttribute.ButtonHeight;
+					repeatButton.AddToClassList(Button.ussClassName);
+
+					root.Add(repeatButton);
+				}
+				else
+				{
+					var button = new Button(() => InvokeFunctionOnAllTargets(property.serializedObject.targetObjects, function.Name))
+					{
+						text = buttonLabel,
+						tooltip = property.tooltip
+					};
+
+					button.style.height = buttonFieldAttribute.ButtonHeight;
+
+					root.Add(button);
+				}
+			}
+			else
+			{
+				root.Add(new HelpBox("The function cannot have parameters", HelpBoxMessageType.Error));
+			}
+
+			return root;
+		}
+	}
 }
