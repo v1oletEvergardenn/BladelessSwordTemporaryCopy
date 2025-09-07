@@ -34,25 +34,33 @@ public class GeneralProjectile : IProjectile
                 vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
                 gameManager.playerhealth.Repel(hitEffectSettings.repelForce, transform.right.x < 0 ? true : false);
             }
-            if (anim != null) anim.Play(anim_after_hit);
-            vfx.SpawnEffectWithEnum(hitEffect, transform.position, isRed);
-            //shakeManager.CameraShake(gameManager.impulseSource, cameraShakeForce.y);
-            rb.velocity = Vector3.zero;
-            rb.gravityScale = 0;
-            speed = 0f;
-            collided = true;
             target.Damage(damage, transform, stunDuration, stunValue: stunValue);
-            Invoke("Die", death_delay_time_after_hit);
+            Hit();
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)
         {
-            if (anim != null) anim.Play(anim_after_hit);
-            vfx.SpawnEffectWithEnum(hitEffect, transform.position, isRed);
-            rb.velocity = Vector3.zero;
-            rb.gravityScale = 0;
-            speed = 0f;
-            collided = true;
-            Invoke("Die", death_delay_time_after_hit);
+            Hit();
         }
+    }
+
+    public override void HitByHSAttack()
+    {
+        Hit();
+    }
+
+    public override void HitByMeleeAttack()
+    {
+        Hit();
+    }
+
+    public override void Hit()
+    {
+        if (anim != null) anim.Play(anim_after_hit);
+        vfx.SpawnEffectWithEnum(hitEffect, transform.position, isRed);
+        rb.velocity = Vector3.zero;
+        rb.gravityScale = 0;
+        speed = 0f;
+        collided = true;
+        Invoke("Die", death_delay_time_after_hit);
     }
 }

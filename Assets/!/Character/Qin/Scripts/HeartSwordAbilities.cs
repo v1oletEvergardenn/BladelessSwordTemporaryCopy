@@ -45,6 +45,13 @@ public class HeartSwordAbilities : MonoBehaviour
         Lit();
     }
 
+    public void CancelAllAbilities()
+    {
+        if (abilityX != null && abilityX.canBeStopped) abilityX.CancelAction();
+        if (abilityY != null && abilityY.canBeStopped) abilityY.CancelAction();
+        if (abilityB != null && abilityB.canBeStopped) abilityB.CancelAction();
+    }
+
     public void ActivateAbility(IHeartSwordAbility ability)
     {
         ability.ActivateAbility();

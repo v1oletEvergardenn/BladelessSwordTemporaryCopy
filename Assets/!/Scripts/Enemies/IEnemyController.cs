@@ -62,7 +62,7 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public Transform rightBoundary;
     [SerializeField, HideInInspector] public GameObject GFX;
     [SerializeField, HideInInspector] public InternalObjectPooler selfPooler;
-    [HideInInspector] public List<EnemyActionCaller> actionList = new List<EnemyActionCaller>();
+    [HideProperty] public List<EnemyActionCaller> actionList = new List<EnemyActionCaller>();
 
     #endregion BASIC_LOGIC
 
@@ -76,12 +76,12 @@ public abstract class IEnemyController : IDamagable
 
     #region PRIVATE VARIABLES
 
-    [HideInInspector] public bool isActing = false;
-    [HideInInspector] public IEnemyAction initialAction;
-    [HideInInspector] public bool canMove = false;
-    [HideInInspector] public float distanceToPlayer;
-    [HideInInspector] public float currentHealth;
-    [HideInInspector] public bool DEAD = false;
+    [HideProperty] public bool isActing = false;
+    [HideProperty] public IEnemyAction initialAction;
+    [HideProperty] public bool canMove = false;
+    [HideProperty] public float distanceToPlayer;
+    [HideProperty] public float currentHealth;
+    [HideProperty] public bool DEAD = false;
     [HideInInspector] public DamageFlash flash;
     [HideInInspector] public Rigidbody2D rb;
     [HideInInspector] public AnimationCurve outline_flash_anim_curve;

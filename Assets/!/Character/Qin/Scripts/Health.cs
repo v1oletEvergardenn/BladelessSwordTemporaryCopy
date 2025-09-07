@@ -13,10 +13,10 @@ public class Health : IDamagable
     public static Health instance;
     public AnimSetBool anim_bool;
     public Animator anim;
-    public Animator bladeAnim;
     private PlayerAttack playerAttack;
     private CharacterController2D controller;
     private InputPlayer inputPlayer;
+    private HeartSwordAbilities hsManager;
     [SerializeField] private float maxHealth;
     [SerializeField] private float currentHealth;
     public MicroBar healthBar;
@@ -32,7 +32,7 @@ public class Health : IDamagable
     public UnityEvent DEATH;
 
     private float stun_timer;
-    private bool stunned = false;
+    public bool stunned = false;
 
     private void Awake()
     {
@@ -47,6 +47,7 @@ public class Health : IDamagable
         _damageFlash = GetComponent<DamageFlash>();
         inputPlayer = GetComponent<InputPlayer>();
         controller = GetComponent<CharacterController2D>();
+        hsManager = HeartSwordAbilities.instance;
         revivePosition = transform.position;
         healthBar.Initialize(maxHealth);
     }
@@ -189,7 +190,7 @@ public class Health : IDamagable
     public void Stun(float duration, Transform sender)
     {
         playerAttack.EndDefend();
-
+        hsManager.CancelAllAbilities();
         stunned = true;
         stun_timer = duration;
         anim_bool.Anim_Hit(0);

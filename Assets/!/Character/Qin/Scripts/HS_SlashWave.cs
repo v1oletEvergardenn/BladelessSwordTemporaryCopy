@@ -1,3 +1,4 @@
+using EditorAttributes;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -10,18 +11,28 @@ public class HS_SlashWave : IHeartSwordAbility
 
     private bool largeSlash = false;
 
-    public int small_slash_damage = 2;
-    public float small_slash_speed = 200f;
-    public float small_slash_stun = 5f;
+    [TabGroup(nameof(smallSlashSettings), nameof(largeSlashSettings))]
+    [SerializeField] private Void groupHolder;
 
-    public int large_slash_damage = 4;
-    public float large_slash_speed = 40f;
-    public float large_slash_stun = 10f;
+    [VerticalGroup(nameof(small_slash_damage), nameof(small_slash_speed), nameof(small_slash_stun))]
+    [SerializeField, HideInInspector] private Void smallSlashSettings;
+
+    [VerticalGroup(nameof(large_slash_damage), nameof(large_slash_speed), nameof(large_slash_stun))]
+    [SerializeField, HideInInspector] private Void largeSlashSettings;
+
+    [SerializeField, HideProperty, PropertyWidth(200f)] public int small_slash_damage = 2;
+    [SerializeField, HideProperty, PropertyWidth(200f)] public float small_slash_speed = 200f;
+    [SerializeField, HideProperty, PropertyWidth(200f)] public float small_slash_stun = 5f;
+
+    [SerializeField, HideProperty, PropertyWidth(200f)] public int large_slash_damage = 4;
+    [SerializeField, HideProperty, PropertyWidth(200f)] public float large_slash_speed = 40f;
+    [SerializeField, HideProperty, PropertyWidth(200f)] public float large_slash_stun = 10f;
 
     public override bool PerformAbility(bool isLeft)
     {
         if (!CheckEnoughHeartSwordPoints()) return false;
         if (isPerforming) return false;
+        if (health.stunned) return false;
         hSAbilityManager.ModifyHSPoint(-HS_Cost);
         animSet.Anim_Move(0);
         largeSlash = isLeft;

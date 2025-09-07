@@ -535,8 +535,11 @@ public class CharacterController2D : MonoBehaviour
                     anim.Play("attack_fall_" + playerAttack.attackIndex, 0, duration);
                 else if (IsHSAttackRunState(state) || IsHSAttackJumpState(state) || IsHSAttackIdleState(state))
                     anim.Play("HS_attack_fall_" + playerAttack.attackIndex, 0, duration);
-                else if (IsAttackAfterState(state))
+                else if (state.IsName("attack_idle_after") ||
+                state.IsName("attack_jump_after"))
+                {
                     anim.Play("attack_fall_after", 0, duration);
+                }
                 else if (IsStormReadyState(state))
                     anim.Play("storm_ready_fall", 0, duration);
                 else if (IsStormPreState(state))
@@ -617,8 +620,11 @@ public class CharacterController2D : MonoBehaviour
                 anim.Play("HS_attack_idle_" + playerAttack.attackIndex, 0, duration);
             else if (state.IsName("drawback_run"))
                 anim.Play("drawback_idle", 0, duration);
-            else if (IsAttackAfterState(state))
+            else if (state.IsName("attack_jump_after") ||
+            state.IsName("attack_fall_after"))
+            {
                 anim.Play("attack_idle_after", 0, duration);
+            }
             else if (IsStormReadyState(state) && !state.IsName("storm_ready_idle"))
                 anim.Play("storm_ready_idle", 0, duration);
             else if (IsStormPreState(state) && !state.IsName("storm_pre_idle"))
@@ -700,14 +706,10 @@ public class CharacterController2D : MonoBehaviour
             playerAttack.attackIndex = 1;
             return true;
         }
-        if (IsAttackAfterState(state))
+        if (state.IsName("attack_fall_after") ||
+            state.IsName("attack_idle_after"))
         {
             anim.Play("attack_jump_after", 0, duration);
-            return true;
-        }
-        if (IsHSAttackAfterState(state))
-        {
-            anim.Play("HS_attack_jump_after", 0, duration);
             return true;
         }
         if (IsStormReadyState(state))
@@ -763,10 +765,6 @@ public class CharacterController2D : MonoBehaviour
     private bool IsHSAttackRunState(AnimatorStateInfo s) => s.IsName("HS_attack_run_" + playerAttack.attackIndex);
 
     private bool IsHSAttackIdleState(AnimatorStateInfo s) => s.IsName("HS_attack_idle_" + playerAttack.attackIndex);
-
-    private bool IsAttackAfterState(AnimatorStateInfo s) => s.IsName("attack_jump_after") || s.IsName("attack_idle_after");
-
-    private bool IsHSAttackAfterState(AnimatorStateInfo s) => s.IsName("HS_attack_fall_after") || s.IsName("HS_attack_idle_after");
 
     private bool IsStormReadyState(AnimatorStateInfo s) =>
         s.IsName("storm_ready_idle") || s.IsName("storm_ready_jump") ||

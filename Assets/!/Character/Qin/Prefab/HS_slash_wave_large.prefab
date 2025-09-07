@@ -131,6 +131,19 @@ MonoBehaviour:
   stopLayer:
     serializedVersion: 2
     m_Bits: 265344
+  showPivot: 0
+  pivotOffset: {x: 0, y: 0, z: 0}
+  color: {r: 1, g: 0, b: 0, a: 1}
+  hitEffectSettings:
+    rumbleDuration: 0
+    frequency_norm: {x: 0, y: 0}
+    frequncy_perfect: {x: 0, y: 0}
+    freezeTime: 0
+    Time_scale: 0
+    repelForce: 0
+    cameraShakeForce: {x: 0, y: 0}
+  vfx: {fileID: 0}
+  gameManager: {fileID: 0}
   owner: {fileID: 0}
   followTarget: 0
   target: {fileID: 0}
@@ -139,21 +152,13 @@ MonoBehaviour:
   lifeTimer: 0
   isHostileToPlayer: 0
   isPerfect: 0
-  showPivot: 0
-  pivotOffset: {x: 0, y: 0, z: 0}
-  color: {r: 1, g: 0, b: 0, a: 1}
-  rumbleDuration_normal: 0.1
-  rumbleFrequncy_normal: {x: 0.25, y: 0.4}
-  rumbleDuration_perfect: 0.15
-  rumbleFrequncy_perfect: {x: 0.5, y: 1}
-  cameraShakeForce: {x: 0, y: 0.1}
-  freezeTimeDuration: 0.2
-  slowTimeScale: 0.1
-  repelForce: 20
-  vfx: {fileID: 0}
-  gameManager: {fileID: 0}
   anim_after_hit: hit
   death_delay_time_after_hit: 1
+  stopCollider: {fileID: 0}
+  damageCollider: {fileID: 3637875002173077022}
+  showBox: 0
+  boxSize: {x: 0.43, y: 0.73}
+  boxOffset: {x: -0.45, y: 0}
 --- !u!50 &367856373641805229
 Rigidbody2D:
   serializedVersion: 4

@@ -105,10 +105,6 @@ public abstract class IProjectile : MonoBehaviour
         vfx.SpawnHitEffect(false, GetPivot());
     }
 
-    public virtual void HitByMeleeAttack()
-    {
-    }
-
     public void ResetAttributes()
     {
         owner = null;
@@ -167,14 +163,6 @@ public abstract class IProjectile : MonoBehaviour
         return transform.position + transform.right * pivotOffset.x + transform.up * pivotOffset.y;
     }
 
-    public virtual void OnDrawGizmosSelected()
-    {
-        if (!showPivot) return;
-        Gizmos.color = color;
-        Gizmos.DrawLine(this.transform.position, GetPivot());
-        Gizmos.DrawWireSphere(GetPivot(), 0.05f);
-    }
-
     public virtual void Die()
     {
         this.gameObject.SetActive(false);
@@ -182,11 +170,25 @@ public abstract class IProjectile : MonoBehaviour
         ResetAttributes();// Reset position to avoid issues when reusing the object from the pool
     }
 
+    public abstract void HitByHSAttack();
+
+    public abstract void HitByMeleeAttack();
+
+    public abstract void Hit();
+
     public Quaternion CalculateWantedRotation(Vector3 _targetPos)
     {
         float angle = Mathf.Atan2(_targetPos.y - transform.position.y, _targetPos.x - transform.position.x) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
         return targetRotation;
+    }
+
+    public virtual void OnDrawGizmosSelected()
+    {
+        if (!showPivot) return;
+        Gizmos.color = color;
+        Gizmos.DrawLine(this.transform.position, GetPivot());
+        Gizmos.DrawWireSphere(GetPivot(), 0.05f);
     }
 }
 

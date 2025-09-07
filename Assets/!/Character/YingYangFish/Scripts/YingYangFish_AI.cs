@@ -66,15 +66,15 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector] public float swimToCenterSpeed = 2f;
     [SerializeField, HideInInspector, MinMaxSlider(1f, 3f)] public Vector2 minMaxDistanceTocenter;
 
-    [HideInInspector] public float white_distanceToCenter = 0f;
-    [HideInInspector] public float black_distanceToCenter = 0f;
-    [HideInInspector] public Transform movingTarget;
+    [HideProperty] public float white_distanceToCenter = 0f;
+    [HideProperty] public float black_distanceToCenter = 0f;
+    [HideProperty] public Transform movingTarget;
 
-    [HideInInspector] public bool isCloseSwimming;
-    [HideInInspector] public float black_rotateSpeed;
-    [HideInInspector] public float white_rotateSpeed;
-    [HideInInspector] public float black_targetRotateSpeed;
-    [HideInInspector] public float white_targetRotateSpeed;
+    [HideProperty] public bool isCloseSwimming;
+    [HideProperty] public float black_rotateSpeed;
+    [HideProperty] public float white_rotateSpeed;
+    [HideProperty] public float black_targetRotateSpeed;
+    [HideProperty] public float white_targetRotateSpeed;
 
     [SerializeField, HideInInspector] public float far_distance_threshhold = 30f;
     [SerializeField, HideInInspector] public float close_distance_threshhold = 10f;
@@ -118,10 +118,10 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector] public Transform waterSpearPos_white1;
     [SerializeField, HideInInspector] public Transform waterSpearPos_white2;
 
-    [HideInInspector] public bool secondPhase;
-    [HideInInspector] public bool blackPositioned = false;
-    [HideInInspector] public bool whitePositioned = false;
-    [HideInInspector] public bool finishedWaterSpearUltimate = false;
+    [HideProperty] public bool secondPhase;
+    [HideProperty] public bool blackPositioned = false;
+    [HideProperty] public bool whitePositioned = false;
+    [HideProperty] public bool finishedWaterSpearUltimate = false;
     public List<Transform> ultimate_bullets;
 
     #endregion ULTIMATE REFERENCES
@@ -518,6 +518,7 @@ public class YingYangFish_AI : IEnemyController
         Transform fish = isBlack ? blackFish : whiteFish;
         if (origin.localPosition != Vector3.zero)
         {
+            // if fish is above water, dive first
             if (!(isBlack ? isReturnDive_black : isReturnDive_white))
             {
                 if (fish.position.y > waterLevel.position.y)
@@ -526,6 +527,7 @@ public class YingYangFish_AI : IEnemyController
                 }
             }
 
+            //
             if (!(isBlack ? isReturningToCenter_black : isReturningToCenter_white))
             {
                 yield return new WaitUntil(() => !(isBlack ? isReturnDive_black : isReturnDive_white));
@@ -559,9 +561,14 @@ public class YingYangFish_AI : IEnemyController
         TryStopCoroutine(co_sprintBackEqual);
         TryStopCoroutine(co_sprintToAngle);
         TryStopCoroutine(co_singleFishDive);
-        //TryStopCoroutine(co_singleReturnToCenter);
+        TryStopCoroutine(co_singleReturnToCenter);
         TryStopCoroutine(co_singleJumpToPos);
         TryStopCoroutine(co_circling);
+
+        isReturnDive_black = false;
+        isReturnDive_white = false;
+        isReturningToCenter_black = false;
+        isReturningToCenter_white = false;
 
         center.GetComponent<SpriteRenderer>().sortingOrder = 1;
 
@@ -930,32 +937,24 @@ public class YingYangFish_AI : IEnemyController
         }
 
         int index = Random.Range(0, possibleActions.Count);
-        //initialAction = possibleActions[index];
         initialAction = possibleActions[index];
         InsertAction(initialAction, 0);
 
         if (initialAction == waterSpear)
         {
             float i = Random.Range(0, 10);
-            //水凝枪 = 泡泡牢笼 || 条件: 释放水凝枪时30％
             if (i < 3) { AddAction(bubbleTrap); }
-            //水凝枪 = 压缩泡泡光线 || 条件：释放水凝枪时30％。
             else if (i < 6) { AddAction(gatling); } //30%
-            //水凝枪 = 单摆尾 || 条件：释放水凝枪时30%
             else if (i < 9) { AddAction(singleSwing); }//30%
         }
         else if (initialAction == gatling)
         {
             float i = Random.Range(0, 10);
-            //压缩泡泡光线 = 泡泡牢笼 || 条件: 释放压缩泡泡光线时30％
             if (i < 3) { AddAction(bubbleTrap); }
-            //压缩泡泡光线 = 单摆尾 || 条件：释放压缩泡泡光线时30 %
             else if (i < 6) { AddAction(singleSwing); } //30%
         }
         else if (initialAction == dive)
         {
-            //潜水->双摆尾 / 翻腾
-            //条件：当玩家角色气值小于60 % and 玩家角色心剑值小于2。 潜水的目的地设为玩家。
             if (playerEnergy.energyPercentage < 0.6f || HeartSwordAbilities.instance.currentHS_point < 2)
             {
                 movingTarget = player;

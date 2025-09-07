@@ -18,6 +18,7 @@ public class HS_CriticalSlash : IHeartSwordAbility
     {
         if (!CheckEnoughHeartSwordPoints()) return false;
         if (isPerforming) return false;
+        if (health.stunned) return false;
         if (controller.FacingRight == isLeft) { controller.Flip(); }
         hSAbilityManager.ModifyHSPoint(-HS_Cost);
 
@@ -43,6 +44,7 @@ public class HS_CriticalSlash : IHeartSwordAbility
         if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(2.76f);
         else yield return new WaitForSeconds(2.76f);
         hitBox.enabled = true;
+        playerAttack.isCounterAttacking = true;
         while (timer < playerAttack.counterAttackCheckDuration)
         {
             timer += VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;

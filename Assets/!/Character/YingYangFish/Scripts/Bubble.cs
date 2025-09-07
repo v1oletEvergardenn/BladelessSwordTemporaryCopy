@@ -54,11 +54,17 @@ public class Bubble : IProjectile
         }
     }
 
-    public override void FixedUpdate()
+    public override void HitByHSAttack()
     {
+        StartCoroutine(Explode());
     }
 
     public override void HitByMeleeAttack()
+    {
+        StartCoroutine(Explode());
+    }
+
+    public override void Hit()
     {
         StartCoroutine(Explode());
     }

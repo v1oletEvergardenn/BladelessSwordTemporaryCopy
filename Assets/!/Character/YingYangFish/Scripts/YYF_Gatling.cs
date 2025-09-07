@@ -77,6 +77,8 @@ public class YYF_Gatling : IEnemyAction
 
         yield return new WaitForSeconds(0.5f);
 
+        if (bossAI.initialAction == bossAI.waterSpear) yield return new WaitForSeconds(1.5f);
+
         // Initial direction to player
         Quaternion aimDirection = CalculateWantedRotation(playerIDamagable.GetHitPos(), gatlingSpawnPos.position);
         while (elapsed < shootDuration)

@@ -136,17 +136,21 @@ public class InputPlayer : MonoBehaviour
         HandleAbilityInput();
         HandleDefendInput();
         HandleTeleportInput();
+
+        if (Input.GetKeyDown(KeyCode.Minus))
+        {
+            Time.timeScale -= 0.2f;
+        }
+        else if (Input.GetKeyDown(KeyCode.Equals))
+        {
+            Time.timeScale += 0.2f;
+        }
     }
 
     // --- Helper Methods ---
 
     private bool CheckAndHandlePauseOrQTE()
     {
-        // Space key test event
-        if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
-        {
-            TestEvent();
-        }
         if (gameManager.GamePaused) return true;
         if (inputMaster.isQTE) return true;
         return false;
@@ -256,9 +260,11 @@ public class InputPlayer : MonoBehaviour
         bool leftJustPressed = inputMaster._attackLeftAction.WasPressedThisFrame();
 
         if (controller.isFloating) return;
+        if (health.stunned) return;
         //checks if any active heart sword ability is triggered by attack key
         //if does, cancel the attack input and perform the ability instead
-        if (hSAbilitiesManager.currentActivatedAbility != null && hSAbilitiesManager.currentActivatedAbility.isTriggeredByAttackKey)
+        if (hSAbilitiesManager.currentActivatedAbility != null &&
+            hSAbilitiesManager.currentActivatedAbility.isTriggeredByAttackKey)
         {
             bool success = false;
             if (leftJustPressed) { success = hSAbilitiesManager.currentActivatedAbility.PerformAbility(true); }
@@ -327,11 +333,6 @@ public class InputPlayer : MonoBehaviour
     /// <summary>
     /// Test function to trigger an event.
     /// </summary>
-    private void TestEvent()
-    {
-        health.Damage(11f);
-        hSAbilitiesManager.ModifyHSPoint(0.5f);
-    }
 
     private void OnJump()
     {
@@ -462,7 +463,7 @@ public class InputPlayer : MonoBehaviour
             pointerSpriteRenderer.sprite = leftPointer;
             pointer.rotation = transform.rotation;
             pointerSpriteRenderer.size = new Vector2(1.55f, 0.15f);
-            playerAttack.pointerDirection = controller.FacingRight ? Vector3.zero : new Vector3(0, 0, -180);
+            playerAttack.pointerDirection = controller.FacingRight ? Vector3.zero : new Vector3(0, 0, 180);
             playerAttack.isAimingRightStick = false;
         }
     }

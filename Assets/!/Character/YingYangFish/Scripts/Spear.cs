@@ -66,35 +66,45 @@ public class Spear : IProjectile
                     vfx.SpawnHitEffect(false, GetPivot());
                     target.Damage(damage, transform, stunDuration, stunValue: stunValue);
                     target.Repel(150f, this.transform.right.x < 0 ? true : false);
-                    Die();
+                    Hit();
                 }
             }
             else
             {
                 vfx.SpawnHitEffect(false, GetPivot());
                 target.Damage(damage, transform, stunDuration, stunValue: stunValue);
-                Die();
+                Hit();
             }
         }
-        else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0)
+        else if (collision.gameObject != owner &&
+            (stopLayer.value & (1 << collision.gameObject.layer)) > 0)
         {
-            rb.velocity = Vector3.zero;
-            rb.isKinematic = true;
+            Hit();
         }
     }
 
     public override void Die()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public override void HitByHSAttack()
+    {
+        Hit();
+    }
+
+    public override void HitByMeleeAttack()
+    {
+        Hit();
+    }
+
+    public override void Hit()
     {
         GetComponent<SpriteRenderer>().sprite = null;
         GetComponent<Animator>().Play("spear_hit");
         rb.velocity = Vector3.zero;
         rb.isKinematic = true;
         collided = true;
-        Invoke("SetFalseActive", 0.3f);
-    }
-
-    public void SetFalseActive()
-    {
-        gameObject.SetActive(false);
+        Invoke("Die", 0.3f);
     }
 }

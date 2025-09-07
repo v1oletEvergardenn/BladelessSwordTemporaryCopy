@@ -142,4 +142,19 @@ public class LargeEnergySword : IProjectile
             }
         }
     }
+
+    public override void HitByHSAttack()
+    {
+        Die();
+    }
+
+    public override void HitByMeleeAttack()
+    {
+        Die();
+    }
+
+    public override void Hit()
+    {
+        Die();
+    }
 }

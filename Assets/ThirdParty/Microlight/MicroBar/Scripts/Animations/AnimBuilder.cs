@@ -426,6 +426,7 @@ namespace Microlight.MicroBar
                     switch (command.TransformProperty)
                     {
                         case TransformProperties.Position:
+
                             if (animInfo.IsImage)
                             {
                                 tween = animInfo.TargetImage.rectTransform.DOShakePosition(command.Duration, command.FloatValue, command.Frequency, 90f);
@@ -437,6 +438,7 @@ namespace Microlight.MicroBar
                             break;
 
                         case TransformProperties.Rotation:
+
                             if (animInfo.IsImage)
                             {
                                 tween = animInfo.TargetImage.rectTransform.DOShakeRotation(command.Duration, new Vector3(0f, 0f, command.FloatValue), command.Frequency, 90f);
@@ -448,6 +450,7 @@ namespace Microlight.MicroBar
                             break;
 
                         case TransformProperties.Scale:
+
                             if (animInfo.IsImage)
                             {
                                 tween = animInfo.TargetImage.rectTransform.DOShakeScale(command.Duration, command.FloatValue, command.Frequency, 90f);
@@ -460,8 +463,10 @@ namespace Microlight.MicroBar
 
                         case TransformProperties.AnchorPosition:
                             if (!animInfo.IsImage)
-                                break;   // AnchorPosition is not supported for the sprites
-                            tween = animInfo.TargetImage.rectTransform.DOShakeAnchorPos(command.Duration, command.FloatValue, command.Frequency, 90f);
+                                break;
+                            // AnchorPosition is not supported for the sprites
+                            tween = animInfo.TargetImage.rectTransform.DOShakeAnchorPos(command.Duration, command.FloatValue, command.Frequency, 90f)
+                                .OnComplete(() => animInfo.TargetImage.rectTransform.anchoredPosition = Vector2.zero);
                             break;
 
                         default:

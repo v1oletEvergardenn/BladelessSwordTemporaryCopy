@@ -73,4 +73,19 @@ public class EnergySword : IProjectile
         else { vfx.SpawnSlashEffect(GetPivot()); }
         base.Die();
     }
+
+    public override void HitByHSAttack()
+    {
+        Die();
+    }
+
+    public override void HitByMeleeAttack()
+    {
+        Die();
+    }
+
+    public override void Hit()
+    {
+        Die();
+    }
 }

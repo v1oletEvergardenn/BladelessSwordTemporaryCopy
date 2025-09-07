@@ -22,13 +22,11 @@ public class SoundManager : MonoBehaviour
     public static SoundManager instance;
     private Dictionary<string, AudioClip> soundDcitionary;
 
-    public AudioSource soundFX_source;
-    public AudioSource music_source;
-
-    public AudioClip clip_Qianxiao;
-    public AudioClip clip_WaterBoss;
-    public AudioClip clip_Forest;
     // Start is called before the first frame update
+
+    [SerializeField] private int soundFXSourcePoolSize = 15;
+    private AudioSource[] soundFXSources;
+    private int soundFXSourceIndex = 0;
 
     private void Awake()
     {
@@ -43,6 +41,14 @@ public class SoundManager : MonoBehaviour
         {
             soundDcitionary.Add(sound.tag, sound.clip);
         }
+
+        soundFXSources = new AudioSource[soundFXSourcePoolSize];
+        for (int i = 0; i < soundFXSourcePoolSize; i++)
+        {
+            var source = gameObject.AddComponent<AudioSource>();
+            source.playOnAwake = false;
+            soundFXSources[i] = source;
+        }
     }
 
     public static void PlaySound(string tag, float volume = 1)
@@ -51,35 +57,23 @@ public class SoundManager : MonoBehaviour
         {
             return;
         }
-        instance.soundFX_source.PlayOneShot(instance.soundDcitionary[tag], volume);
+        var source = instance.GetNextSoundFXSource();
+        source.PlayOneShot(instance.soundDcitionary[tag], volume);
     }
 
     public static void PlaySound(AudioClip clip, float volume = 1)
     {
-        instance.soundFX_source.PlayOneShot(clip, volume);
+        var source = instance.GetNextSoundFXSource();
+        source.PlayOneShot(clip, volume);
+    }
+
+    private AudioSource GetNextSoundFXSource()
+    {
+        soundFXSourceIndex = (soundFXSourceIndex + 1) % soundFXSources.Length;
+        return soundFXSources[soundFXSourceIndex];
     }
 
     public static void SwitchMusic(int music)
     {
-        if (music == -1)
-        {
-            instance.music_source.Stop();
-            return;
-        }
-        switch ((Music)music)
-        {
-            case Music.QianXiao:
-                instance.music_source.clip = instance.clip_Qianxiao;
-                break;
-
-            case Music.WaterBoss:
-                instance.music_source.clip = instance.clip_WaterBoss;
-                break;
-
-            case Music.Forest:
-                instance.music_source.clip = instance.clip_Forest;
-                break;
-        }
-        instance.music_source.Play();
     }
 }

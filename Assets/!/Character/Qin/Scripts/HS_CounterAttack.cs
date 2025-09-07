@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class HS_CounterAttack : IHeartSwordAbility
 {
-    [SerializeField, HideInInspector, Range(0f, 5f)] public float HS_attack_radius = 2.3f;
+    [SerializeField, Range(0f, 5f)] public float HS_attack_radius = 2.3f;
+    public Transform counterAttackPos;
 
     private float timer = 0f;
 
@@ -24,8 +25,10 @@ public class HS_CounterAttack : IHeartSwordAbility
     {
         if (!playerAttack.canAttack) return false;
         if (controller.isFloating) return false;
+        if (health.stunned) return false;
         if (playerAttack.attackTimer < playerAttack.attackGap) return false;
         if (hSAbilityManager.currentHS_point < HS_Cost) { return false; }
+        if (controller.FacingRight == isLeft) { controller.Flip(); }
 
         hSAbilityManager.ModifyHSPoint(-HS_Cost);
         isPerforming = true;
@@ -133,9 +136,14 @@ public class HS_CounterAttack : IHeartSwordAbility
         playerAttack.canDefend = true;
 
         energy.ChangeEnergy(-energy.attack_energy_consumption);
-
-        projectile.SetUp(playerAttack.pointerDirection, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * playerAttack.basicAttackDamage);
-        projectile.PerfectCounterAttack();
+        //projectile.SetUp(playerAttack.pointerDirection, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * playerAttack.basicAttackDamage);
+        //projectile.PerfectCounterAttack();
+        projectile.HitByHSAttack();
         SoundManager.PlaySound("perfect_attack");
+    }
+
+    public void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawWireSphere(counterAttackPos.position, HS_attack_radius);
     }
 }

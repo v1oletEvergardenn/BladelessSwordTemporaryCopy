@@ -70,10 +70,11 @@ public class PlayerAttack : MonoBehaviour
     [HideInInspector] public float counterAttackCheckTimer = 0f;
     [HideInInspector] public float attackAnimationTime = 0.35f;
 
-    [HideInInspector] public Vector3 pointerDirection;
+    public Vector3 pointerDirection;
     public int attackIndex = 2;
     [HideInInspector] public float combatTimer;
     private float comboTimer;
+    private bool normalAttacking = false;
 
     #endregion Attack Variables
 
@@ -139,9 +140,8 @@ public class PlayerAttack : MonoBehaviour
         if (combatTimer <= 0) { anim.SetBool("isCombat", false); isInCombat = false; combatTimer = 0; }
         if (comboTimer >= 0.67f) { attackIndex = 2; }
 
-        //if (attackTimer > attackGap) { isAttacking = false; }
-        if (counterAttackCheckTimer <= counterAttackCheckDuration) { CheckCounterAttack(); }
-        else { isCounterAttacking = false; }
+        if (counterAttackCheckTimer <= counterAttackCheckDuration) { if (normalAttacking) CheckCounterAttack(); }
+        else { isCounterAttacking = false; normalAttacking = false; }
 
         if (isOnStorm) StormCounterAttack();
     }
@@ -158,7 +158,7 @@ public class PlayerAttack : MonoBehaviour
         if (controller.isFloating) return false;
         if (attackTimer < attackGap) return false;
         if (consumeEnergy) if (!energy.AttackConsume()) { return false; }
-
+        normalAttacking = true;
         InitializeAttack(attackLeft);
 
         // Play the appropriate attack animation
@@ -171,10 +171,10 @@ public class PlayerAttack : MonoBehaviour
     public void InitializeAttack(bool attackLeft)
     {
         isAttackingLeft = attackLeft;
+        counterAttackCheckTimer = 0f;
         isInCombat = true;
         isCounterAttacking = true;
         attackTimer = 0f;
-        counterAttackCheckTimer = 0f;
         attackIndex++;
         if (attackIndex > 2) attackIndex = 1;
         combatTimer = 2f;

@@ -39,9 +39,9 @@ public class YYF_WaterSpear : IEnemyAction
     {
         if (act_routine != null) { StopCoroutine(act_routine); }
 
-        if (spear != null) { spear.SetFalseActive(); }
-        if (smallSpear1 != null) { smallSpear1.SetFalseActive(); }
-        if (smallSpear2 != null) { smallSpear2.SetFalseActive(); }
+        if (spear != null) { spear.Die(); }
+        if (smallSpear1 != null) { smallSpear1.Die(); }
+        if (smallSpear2 != null) { smallSpear2.Die(); }
     }
 
     /// <summary>

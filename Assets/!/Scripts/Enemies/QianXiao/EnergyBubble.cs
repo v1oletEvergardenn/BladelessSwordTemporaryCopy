@@ -46,4 +46,19 @@ public class EnergyBubble : IProjectile
             Invoke("Die", 1f);
         }
     }
+
+    public override void HitByHSAttack()
+    {
+        Die();
+    }
+
+    public override void HitByMeleeAttack()
+    {
+        Die();
+    }
+
+    public override void Hit()
+    {
+        Die();
+    }
 }

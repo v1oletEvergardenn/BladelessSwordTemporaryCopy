@@ -31,21 +31,34 @@ public class Gatling_bubbles : IProjectile
                 vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
                 gameManager.playerhealth.Repel(hitEffectSettings.repelForce, transform.right.x < 0 ? true : false);
             }
-            if (anim != null) anim.Play(anim_after_hit);
-            vfx.SpawnEffectWithEnum(hitEffect, transform.position);
-            Stop();
-            Invoke("Die", death_delay_time_after_hit);
+
+            Hit();
 
             if (collision.gameObject == gameManager.player) YingYangFish_AI.instance.gatling.Hit(this);
             else target.Damage(damage, transform, stunDuration, stunValue: stunValue);
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)
         {
-            if (anim != null) anim.Play(anim_after_hit);
-            vfx.SpawnEffectWithEnum(hitEffect, transform.position);
-            Stop();
-            Invoke("Die", death_delay_time_after_hit);
+            Hit();
         }
+    }
+
+    public override void HitByHSAttack()
+    {
+        Hit();
+    }
+
+    public override void HitByMeleeAttack()
+    {
+        Hit();
+    }
+
+    public override void Hit()
+    {
+        if (anim != null) anim.Play(anim_after_hit);
+        vfx.SpawnEffectWithEnum(hitEffect, transform.position);
+        Stop();
+        Invoke("Die", death_delay_time_after_hit);
     }
 
     public void Stop()

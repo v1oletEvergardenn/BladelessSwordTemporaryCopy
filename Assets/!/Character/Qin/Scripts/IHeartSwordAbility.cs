@@ -3,37 +3,44 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Void = EditorAttributes.Void;
 
 public abstract class IHeartSwordAbility : MonoBehaviour
 {
-    public string abilityName;
-    public string abilityDescription;
-    public Sprite abilityIcon;
-    [Range(0, 10)] public int HS_Cost;
-    public bool isTriggeredByAttackKey = true;
+    [GUIColor(GUIColor.Lime)]
+    [FoldoutGroup("Attributes", nameof(abilityName), nameof(abilityDescription),
+        nameof(abilityIcon), nameof(HS_Cost), nameof(isTriggeredByAttackKey),
+        nameof(canBeStopped), nameof(isActive))]
+    public Void abilityVoid1;
 
-    public MeleeAttack HS_attack_effect = new MeleeAttack(2, 0.5f, 0.05f, new Vector2(1, 1.4f), 0.1f, 20f, 0.1f);
+    [SerializeField, HideProperty] public string abilityName;
+    [SerializeField, HideProperty] public string abilityDescription;
+    [SerializeField, HideProperty] public Sprite abilityIcon;
+    [SerializeField, HideProperty][Range(0, 10)] public int HS_Cost;
+    [SerializeField, HideProperty] public bool isTriggeredByAttackKey = true;
+    [SerializeField, HideProperty] public bool canBeStopped = true;
+    [SerializeField, HideProperty] public bool isActive = false;
+    [GUIColor(144f, 151f, 222f)] public MeleeAttack HS_attack_effect = new MeleeAttack(2, 0.5f, 0.05f, new Vector2(1, 1.4f), 0.1f, 20f, 0.1f);
 
-    [HideInInspector] public bool isPerforming = false;
-    [HideInInspector] public bool isEquipped = false;
-    [HideInInspector] public CharacterController2D controller;
-    [HideInInspector] public VFXManager vfx;
-    [HideInInspector] public GameManager gameManager;
-    [HideInInspector] public Energy energy;
-    [HideInInspector] public Rigidbody2D rb;
-    [HideInInspector] public AnimSetBool animSet;
-    [HideInInspector] public InputPlayer inputPlayer;
-    [HideInInspector] public InputMaster inputMaster;
-    [HideInInspector] public IDamagable health;
-    [HideInInspector] public PlayerAttack playerAttack;
-    [HideInInspector] public InternalObjectPooler selfPooler;
-    [HideInInspector] public HeartSwordAbilities hSAbilityManager;
-    [HideInInspector] public Animator anim;
+    [GUIColor(GUIColor.Default)]
+    [HideProperty] public bool isPerforming = false;
 
-    [HideInInspector] public HashSet<IDamagable> hsHitTargets = new HashSet<IDamagable>();
-    [HideInInspector] public bool hsHitEffectPlayed = false;
-
-    public bool isActive = false;
+    [HideProperty] public bool isEquipped = false;
+    [HideProperty] public CharacterController2D controller;
+    [HideProperty] public VFXManager vfx;
+    [HideProperty] public GameManager gameManager;
+    [HideProperty] public Energy energy;
+    [HideProperty] public Rigidbody2D rb;
+    [HideProperty] public AnimSetBool animSet;
+    [HideProperty] public InputPlayer inputPlayer;
+    [HideProperty] public InputMaster inputMaster;
+    [HideProperty] public Health health;
+    [HideProperty] public PlayerAttack playerAttack;
+    [HideProperty] public InternalObjectPooler selfPooler;
+    [HideProperty] public HeartSwordAbilities hSAbilityManager;
+    [HideProperty] public Animator anim;
+    [HideProperty] public HashSet<IDamagable> hsHitTargets = new HashSet<IDamagable>();
+    [HideProperty] public bool hsHitEffectPlayed = false;
 
     public Coroutine co_ability;
 
@@ -68,11 +75,11 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     public virtual void EquipAbility()
     {
         isEquipped = true;
-        Debug.Log($"{abilityName} equipped.");
     }
 
     public virtual void ActivateAbility()
     {
+        if (health.stunned) return;
         if (!CheckEnoughHeartSwordPoints()) return;
         isActive = true;
         vfx.RumblePulse(0.2f, 0.3f, 0.1f);
@@ -106,6 +113,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
         {
             StopCoroutine(co_ability);
         }
+        EndAction();
     }
 
     public virtual void CheckHSCounterAttack(Collider2D col)
@@ -171,8 +179,9 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     public virtual void HS_counterAttack(IProjectile projectile)
     {
         energy.ChangeEnergy(-energy.attack_energy_consumption);
-        projectile.SetUp(playerAttack.pointerDirection, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * playerAttack.basicAttackDamage);
-        projectile.PerfectCounterAttack();
+        //projectile.SetUp(playerAttack.pointerDirection, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * playerAttack.basicAttackDamage);
+        //projectile.PerfectCounterAttack();
+        projectile.HitByHSAttack();
         SoundManager.PlaySound("perfect_attack");
     }
 }

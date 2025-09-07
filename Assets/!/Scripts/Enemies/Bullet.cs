@@ -48,8 +48,25 @@ public class Bullet : IProjectile
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0)
         {
-            Die();
-            collided = true;
+            Hit();
         }
+    }
+
+    public override void HitByHSAttack()
+    {
+        Die();
+        collided = true;
+    }
+
+    public override void HitByMeleeAttack()
+    {
+        Die();
+        collided = true;
+    }
+
+    public override void Hit()
+    {
+        Die();
+        collided = true;
     }
 }
