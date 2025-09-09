@@ -233,10 +233,10 @@ public class InputPlayer : MonoBehaviour
     private void UpdateMovementInput()
     {
         float x = moveDir.x;
-        if (x < 0 && x > -0.4f) x = -0.4f;
-        if (x > 0 && x < 0.4f) x = 0.4f;
-        if (Mathf.Abs(moveDir.magnitude) < 0.7f) x = 0f;
-        horizontalMove = x;
+        //if (x < 0 && x > -0.4f) x = -0.4f;
+        //if (x > 0 && x < 0.4f) x = 0.4f;
+        //if (Mathf.Abs(moveDir.magnitude) < 0.7f) x = 0f;
+        horizontalMove = (x <= 0 ? -1 : 1);
         if (moveDir.x == 0) horizontalMove = 0;
         if (learnedMovement && !controller.isRunningToTarget)
         {

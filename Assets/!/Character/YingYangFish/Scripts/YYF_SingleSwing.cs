@@ -44,6 +44,7 @@ public class YYF_SingleSwing : IEnemyAction
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         // initialize
+        proceedCall = false;
         bool isBlack = false;
         if (bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = true; }
         bossAI.SetBusy(isBlack);
@@ -55,6 +56,8 @@ public class YYF_SingleSwing : IEnemyAction
 
         // dive
         yield return bossAI.co_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack, bossAI.IsPlayerLeft()));
+        if (bossAI.initialAction == bossAI.waterSpear)
+        { bossAI.waterSpear.OnProceedCall(); }
         if (isBlack) { bossAI.SetBlackTargetRotateSpeed(0); bossAI.black_rotateSpeed = 0; }
         else { bossAI.SetWhiteTargetRotateSpeed(0); bossAI.white_rotateSpeed = 0; }
         Vector3 target = player.transform.position + new Vector3(0, 3, 0);

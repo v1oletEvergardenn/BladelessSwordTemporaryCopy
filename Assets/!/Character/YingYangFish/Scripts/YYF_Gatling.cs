@@ -17,6 +17,7 @@ public class YYF_Gatling : IEnemyAction
 
     public float damageCooldown = 0.2f;
     private float damageTimer = 0f;
+    private float selfDamageTimer = 0f;
 
     public override void Start()
     {
@@ -27,6 +28,7 @@ public class YYF_Gatling : IEnemyAction
     private void Update()
     {
         damageTimer += Time.deltaTime;
+        selfDamageTimer += Time.deltaTime;
     }
 
     public override void CancelAct()
@@ -43,8 +45,8 @@ public class YYF_Gatling : IEnemyAction
 
     public IEnumerator CenterEnd()
     {
-        gatlingPos_black.GetComponent<Animator>().Play("end");
-        gatlingPos_white.GetComponent<Animator>().Play("end");
+        if (gatlingPos_black.gameObject.activeInHierarchy) gatlingPos_black.GetComponent<Animator>().Play("end");
+        if (gatlingPos_white.gameObject.activeInHierarchy) gatlingPos_white.GetComponent<Animator>().Play("end");
         yield return new WaitForSeconds(0.5f);
         gatlingPos_black.gameObject.SetActive(false);
         gatlingPos_white.gameObject.SetActive(false);
@@ -52,6 +54,7 @@ public class YYF_Gatling : IEnemyAction
 
     public override IEnumerator Act_coroutine(float factor = 0)
     {
+        proceedCall = false;
         bool isBlack = false;
         if (!bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = bossAI.CheckCloserFish() == bossAI.blackFish; }
         if (bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = true; }
@@ -74,11 +77,8 @@ public class YYF_Gatling : IEnemyAction
         float elapsed = 0f;
 
         float shootTimer = 0f;
-
+        bool proceeded = false;
         yield return new WaitForSeconds(0.5f);
-
-        if (bossAI.initialAction == bossAI.waterSpear) yield return new WaitForSeconds(1.5f);
-
         // Initial direction to player
         Quaternion aimDirection = CalculateWantedRotation(playerIDamagable.GetHitPos(), gatlingSpawnPos.position);
         while (elapsed < shootDuration)
@@ -99,6 +99,8 @@ public class YYF_Gatling : IEnemyAction
                 shootTimer -= shootInterval;
             }
 
+            if (bossAI.initialAction == bossAI.waterSpear && !proceeded && shootDuration - elapsed <= 1.5f)
+            { bossAI.waterSpear.OnProceedCall(); proceeded = true; }
             yield return null;
         }
 
@@ -165,5 +167,16 @@ public class YYF_Gatling : IEnemyAction
             bubble.stunDuration,
             stunValue: bubble.stunValue);
         if (dealDamage) damageTimer = 0f;
+    }
+
+    public void HitSelf(Gatling_bubbles bubble)
+    {
+        bool dealDamage = selfDamageTimer >= damageCooldown;
+        GameManager.instance.playerhealth.Damage(
+            dealDamage ? bubble.damage : 0,
+            transform,
+            bubble.stunDuration,
+            stunValue: dealDamage ? bubble.stunValue : 0);
+        if (dealDamage) selfDamageTimer = 0f;
     }
 }

@@ -48,6 +48,7 @@ public class YYF_Swing : IEnemyAction
     /// <returns></returns>
     public override IEnumerator Act_coroutine(float factor = 0)
     {
+        proceedCall = false;
         bossAI.SetBlackBusy();
         bossAI.SetWhiteBusy();
         localFactor = factor;

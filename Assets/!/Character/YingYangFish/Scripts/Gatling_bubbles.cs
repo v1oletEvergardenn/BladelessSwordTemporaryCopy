@@ -35,6 +35,7 @@ public class Gatling_bubbles : IProjectile
             Hit();
 
             if (collision.gameObject == gameManager.player) YingYangFish_AI.instance.gatling.Hit(this);
+            else if (collision.gameObject == YingYangFish_AI.instance.gameObject) YingYangFish_AI.instance.gatling.HitSelf(this);
             else target.Damage(damage, transform, stunDuration, stunValue: stunValue);
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)

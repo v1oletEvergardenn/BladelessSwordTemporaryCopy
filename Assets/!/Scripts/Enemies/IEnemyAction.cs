@@ -23,6 +23,7 @@ public abstract class IEnemyAction : MonoBehaviour
     [HideInInspector] public IEnemyController bossController;
     public int actionBreakAmount = 1;
 
+    [HideInInspector] public bool proceedCall = false;
     public Coroutine act_routine;
 
     public virtual void Start()
@@ -39,6 +40,7 @@ public abstract class IEnemyAction : MonoBehaviour
         playerAttack = PlayerAttack.instance;
         playerEnergy = Energy.instance;
         playerController = CharacterController2D.instance;
+        proceedCall = false;
     }
 
     public virtual void Act()
@@ -199,6 +201,15 @@ public abstract class IEnemyAction : MonoBehaviour
 
         int index = UnityEngine.Random.Range(0, items.Length);
         return items[index];
+    }
+
+    /// <summary>
+    /// used to notify that the action can proceed after waiting for an external event or condition.
+    /// </summary>
+    public virtual void OnProceedCall()
+    {
+        proceedCall = true;
+        // Optional override in derived classes
     }
 }
 

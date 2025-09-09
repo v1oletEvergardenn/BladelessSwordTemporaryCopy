@@ -465,6 +465,7 @@ namespace Microlight.MicroBar
                             if (!animInfo.IsImage)
                                 break;
                             // AnchorPosition is not supported for the sprites
+                            animInfo.TargetImage.rectTransform.anchoredPosition = Vector2.zero;
                             tween = animInfo.TargetImage.rectTransform.DOShakeAnchorPos(command.Duration, command.FloatValue, command.Frequency, 90f)
                                 .OnComplete(() => animInfo.TargetImage.rectTransform.anchoredPosition = Vector2.zero);
                             break;

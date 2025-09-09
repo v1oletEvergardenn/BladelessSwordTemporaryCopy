@@ -1,6 +1,7 @@
 using DG.Tweening;
 using EditorAttributes;
 using JetBrains.Annotations;
+using Microlight.MicroBar;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -89,7 +90,8 @@ public class YingYangFish_AI : IEnemyController
 
     [FoldoutGroup("General References", nameof(waterLevel), nameof(endCanvas),
         nameof(EventInteract), nameof(black_particle), nameof(white_particle),
-       nameof(black_tex), nameof(white_tex))]
+       nameof(black_tex), nameof(white_tex), nameof(swimEffect), nameof(fish_origin),
+        nameof(interaction))]
     public Void refenereceGroup;
 
     [SerializeField, HideInInspector] public Transform endCanvas;
@@ -99,6 +101,10 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField, HideInInspector] public GameObject white_particle;
     [SerializeField, HideInInspector] public Sprite black_tex;
     [SerializeField, HideInInspector] public Sprite white_tex;
+    [SerializeField, HideInInspector] public GameObject swimEffect;
+    [SerializeField, HideInInspector] public Transform fish_origin;
+    [SerializeField, HideInInspector] public CameraLimit camLimit;
+    [SerializeField, HideInInspector] public GeneralEventInteraction interaction;
 
     #endregion GENERAL REFERENCES
 
@@ -183,7 +189,7 @@ public class YingYangFish_AI : IEnemyController
         SetWhiteTargetRotateSpeed(idleRotateSpeed);
         black_rotateSpeed = idleRotateSpeed;
         SetBlackTargetRotateSpeed(idleRotateSpeed);
-
+        canTakeDamage = false;
         isCloseSwimming = true;
     }
 
@@ -282,7 +288,7 @@ public class YingYangFish_AI : IEnemyController
 
             blackAnim.Play("sprint");
             float angle = Vector2.Angle(blackFish.right, whiteFish.right);
-            while (angle > 180 || angle < 170)
+            while (angle > 180 || angle < 175)
             {
                 angle = Vector2.Angle(blackFish.right, whiteFish.right); yield return null;
             }
@@ -295,7 +301,7 @@ public class YingYangFish_AI : IEnemyController
             if (black_targetRotateSpeed == sprintRotateSpeed) { SetWhiteTargetRotateSpeed(black_targetRotateSpeed * 2); }
             whiteAnim.Play("sprint");
             float angle = Vector2.Angle(blackFish.right, whiteFish.right);
-            while (angle > 180 || angle < 170)
+            while (angle > 180 || angle < 175)
             {
                 angle = Vector2.Angle(blackFish.right, whiteFish.right); yield return null;
             }
@@ -897,6 +903,7 @@ public class YingYangFish_AI : IEnemyController
     public override void StartAction()
     {
         if (secondPhase || DEAD) { return; }
+        actionList.Clear();
         List<IEnemyAction> possibleActions = new List<IEnemyAction>();
 
         bool isPlayerFar = distanceToPlayer >= far_distance_threshhold;
@@ -937,15 +944,22 @@ public class YingYangFish_AI : IEnemyController
         }
 
         int index = Random.Range(0, possibleActions.Count);
-        initialAction = possibleActions[index];
-        InsertAction(initialAction, 0);
+        initialAction = waterSpear;
 
         if (initialAction == waterSpear)
         {
             float i = Random.Range(0, 10);
             if (i < 3) { AddAction(bubbleTrap); }
-            else if (i < 6) { AddAction(gatling); } //30%
-            else if (i < 9) { AddAction(singleSwing); }//30%
+            else if (i < 6)
+            {
+                AddAction(gatling);
+                InsertAction(waterSpear, 0, 8); return;
+            } //30%
+            else if (i < 9)
+            {
+                AddAction(singleSwing);
+                InsertAction(waterSpear, 0, 9); return;
+            }//30%
         }
         else if (initialAction == gatling)
         {
@@ -967,18 +981,87 @@ public class YingYangFish_AI : IEnemyController
                 AddAction(RandomPick<IEnemyAction>(singleSwing, bubbleTrap, gatling));
             }
         }
+
+        InsertAction(initialAction, 0);
     }
 
     public override IEnumerator IE_Activate()
     {
-        co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
-        yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
+        Vector3 pos = new Vector3(center.position.x, 0, 0);
+        interaction.transform.localPosition = Vector3.zero;
+        float timer = 0f;
+        while (timer <= 2f)
+        {
+            timer += Time.deltaTime;
+            if (timer > 1f)
+            {
+                centerAnim.Play("center_rumbling");
+                VFXManager.instance.Rumble(timer / 7, timer / 7);
+            }
+
+            yield return null;
+        }
+
+        fish_origin.transform.position = new Vector3(pos.x + 5, waterLevel.position.y - 7, 0);
+
+        // prepare to jump out
+
+        whiteOrigin.eulerAngles = Vector3.zero;
+        blackOrigin.eulerAngles = Vector3.zero;
+        StopRotate();
+        whiteAnim.Play("white_dive_1");
+        blackAnim.Play("black_dive_1");
+        blackFish.localPosition = new Vector3(0, 1, 0);
+        whiteFish.localPosition = new Vector3(0, 1, 0);
+
+        whiteFishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.1f);
+        whiteFishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.1f);
+        blackFishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.1f);
+        blackFishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.1f);
+
+        float angle = 210;
+        blackOrigin.Rotate(Dir, angle);
+        whiteOrigin.Rotate(Dir, angle);
+
+        float x = pos.x - 1;
+        fish_origin.DOLocalMove(Vector3.zero, 1f).SetEase(Ease.OutCubic);
+
+        while (fish_origin.position.y < waterLevel.position.y + 4.5f)
+        {
+            if (fish_origin.position.y > waterLevel.position.y + 1)
+            {
+                VFXManager.instance.Rumble(1f, 1f);
+                IN_COMBAT = true;
+                HealthUI.SetActive(true);
+                canTakeDamage = true;
+            }
+            if (fish_origin.position.y > waterLevel.position.y + 2)
+            {
+                center.DOLocalMove(Vector3.zero, 0.3f).SetEase(Ease.Linear);
+                blackAnim.SetBool("dive_end", true);
+                whiteAnim.SetBool("dive_end", true);
+            }
+            yield return null;
+        }
+        VFXManager.instance.StopRumble();
+        yield return new WaitForSeconds(0.5f);
+
+        blackAnim.SetBool("dive_end", false);
+        whiteAnim.SetBool("dive_end", false);
+        SetBlackNotBusy();
+        SetWhiteNotBusy();
+
+        CameraFollow.instance.targets.Add(blackFish);
+        CameraFollow.instance.targets.Add(whiteFish);
+        yield return co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
+        co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
+        yield return new WaitForSeconds(2f);
         StartAction();
     }
 
     public override int Damage(float damageAmount, Transform sender, float stunDuration = 0, bool damageFlash = true, float stunValue = 0)
     {
-        if (DEAD) { return 0; }
+        if (DEAD || !canTakeDamage) { return 0; }
 
         int attackId = sender != null ? sender.GetInstanceID() : 0;
         if (lastAttackId == attackId && Time.time - lastAttackTime < attackCooldown) return 0;
@@ -1036,8 +1119,7 @@ public class YingYangFish_AI : IEnemyController
         if (!secondPhase)
         {
             StartCoroutine(IE_Activate());
-            IN_COMBAT = true;
-            HealthUI.SetActive(true);
+
             EventInteract.SetActive(false);
         }
         else

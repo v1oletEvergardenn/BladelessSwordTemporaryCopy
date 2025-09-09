@@ -173,7 +173,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
         vfx.SpawnHeartSwordHitEffect(damagable.GetHitPos());
 
         //damage
-        damagable.Damage(HS_attack_effect.damage, this.transform, 0, stunValue: 10);
+        damagable.Damage(HS_attack_effect.damage, this.transform, 0, stunValue: HS_attack_effect.stun);
     }
 
     public virtual void HS_counterAttack(IProjectile projectile)

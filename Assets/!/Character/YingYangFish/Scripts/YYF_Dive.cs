@@ -32,6 +32,7 @@ public class YYF_Dive : IEnemyAction
 
     public override IEnumerator Act_coroutine(float factor = 0)
     {
+        proceedCall = false;
         //dive
         bool next1 = false;
         bool ToLeft = true;

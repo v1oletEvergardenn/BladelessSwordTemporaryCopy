@@ -231,6 +231,7 @@ public class VFXManager : MonoBehaviour
         {
             Camera_isShaking = true;
             gameManager.impulseSource.GenerateImpulseWithForce(force);
+
             Camera_isShaking = false;
         }
     }

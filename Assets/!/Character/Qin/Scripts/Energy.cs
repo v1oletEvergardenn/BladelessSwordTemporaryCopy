@@ -10,34 +10,27 @@ public class Energy : MonoBehaviour
     private CharacterController2D controller;
     private InputPlayer playerInput;
 
-    public int maxEnergy;
-    public int currentEnergy;
+    public float maxEnergy;
+    public float currentEnergy;
     public float energyPercentage;
     public MicroBar energyBar;
 
     public Transform failedToDoActionSymbol;
 
-    [Header("RestoreEnergy")] public float restoreCD;
-    public float restoreCDafterConsume;
+    [Header("RestoreEnergy")][Range(0, 5)] public float restore_pre_second;
+    [Range(0, 2)] public float restoreCDafterConsume;
     private float restoreTimer;
     private float restoreTime;
 
-    public int attack_energy_consumption;
-    public int perfect_attack_energy_restore;
+    [Range(0, 10)] public float attack_energy_consumption;
+    [Range(0, 15)] public float perfect_attack_energy_restore;
+    [Range(0, 10)] public float swordTeleport_energy_consumption;
+    [Range(0, 10)] public float dash_energy_consumption;
+    [Range(0, 10)] public float doubleJump_energy_consumption;
 
-    public int swordTeleport_energy_consumption;
-
-    public float floating_consumption_frequency;
-
-    public float defend_consumption_frequency;
-
-    public float storm_consumption_frequency;
-
-    public int dash_energy_consumption;
-
-    private float floating_timer;
-    private float defend_timer;
-    private float storm_timer;
+    [Range(0, 5)] public float float_consume_pre_second;
+    [Range(0, 5)] public float defend_consume_pre_second;
+    [Range(0, 5)] public float storm_consume_pre_second;
 
     private void Awake()
     {
@@ -59,40 +52,24 @@ public class Energy : MonoBehaviour
     {
         restoreTimer += Time.unscaledDeltaTime;
         energyPercentage = (float)currentEnergy / maxEnergy;
-        if (controller.isFloating) { floating_timer += Time.unscaledDeltaTime; }
-        if (playerAttack.isDefending) { defend_timer += Time.unscaledDeltaTime; }
-        if (!playerAttack.isCounterAttacking && playerAttack.anim.GetBool("storm") && !playerAttack.stormReady) { storm_timer += Time.unscaledDeltaTime; }
-        if (floating_timer >= floating_consumption_frequency)
-        {
-            FloatingConsume();
-            floating_timer = 0f;
-        }//floating
-        if (defend_timer >= defend_consumption_frequency)
-        {
-            DefendConsume();
-            defend_timer = 0f;
-        }//defending
-
-        if (storm_timer >= storm_consumption_frequency)
-        {
-            StromConsume();
-            storm_timer = 0;
-        }
+        if (controller.isFloating) { FloatingConsume(); }
+        if (playerAttack.isDefending) { DefendConsume(); }
+        if (!playerAttack.isCounterAttacking &&
+            playerAttack.anim.GetBool("storm") &&
+            !playerAttack.stormReady) { StormConsume(); }
 
         if (restoreTimer >= restoreTime)
         {
-            ChangeEnergy(-1);
-            restoreTime = restoreCD;
-            restoreTimer = 0f;
+            ChangeEnergy(-restore_pre_second * Time.deltaTime);
         }
     }
 
-    public void IncreaseMaxEnergy(int i)
+    public void IncreaseMaxEnergy(float i)
     {
         maxEnergy += i;
     }
 
-    public void ChangeEnergy(int amount)
+    public void ChangeEnergy(float amount)
     {
         currentEnergy -= amount;
         currentEnergy = Mathf.Clamp(currentEnergy, 0, maxEnergy);
@@ -138,6 +115,19 @@ public class Energy : MonoBehaviour
         return false;
     }
 
+    public bool DoubleJumpConsume()
+    {
+        if (doubleJump_energy_consumption <= currentEnergy)
+        {
+            restoreTime = restoreCDafterConsume;
+            restoreTimer = 0f;
+            ChangeEnergy(doubleJump_energy_consumption);
+            return true;
+        }
+        VFXManager.instance.FailedToDoAction();
+        return false;
+    }
+
     public void PerfectCounterAttackRestore()
     {
         ChangeEnergy(-perfect_attack_energy_restore);
@@ -145,22 +135,22 @@ public class Energy : MonoBehaviour
 
     public bool FloatingConsume()
     {
-        if (currentEnergy < 1)
+        if (currentEnergy <= 0)
         {
             playerInput.input_floating = false;
             playerInput.input_floating_timer = 0f;
             VFXManager.instance.FailedToDoAction();
             return false;
         }
-        ChangeEnergy(1);
+        ChangeEnergy(float_consume_pre_second * Time.deltaTime);
         restoreTime = restoreCDafterConsume;
         restoreTimer = 0f;
         return true;
     }
 
-    public bool StromConsume()
+    public bool StormConsume()
     {
-        if (currentEnergy < 1)
+        if (currentEnergy <= 0)
         {
             playerAttack.anim.SetBool("storm", false);
             playerAttack.isOnStorm = false;
@@ -169,7 +159,7 @@ public class Energy : MonoBehaviour
             VFXManager.instance.FailedToDoAction();
             return false;
         }
-        ChangeEnergy(1);
+        ChangeEnergy(storm_consume_pre_second * Time.deltaTime);
         restoreTime = restoreCDafterConsume;
         restoreTimer = 0f;
         return true;
@@ -177,13 +167,13 @@ public class Energy : MonoBehaviour
 
     public bool DefendConsume()
     {
-        if (currentEnergy < 1)
+        if (currentEnergy <= 0)
         {
             playerAttack.EndDefend();
             VFXManager.instance.FailedToDoAction();
             return false;
         }
-        ChangeEnergy(1);
+        ChangeEnergy(defend_consume_pre_second * Time.deltaTime);
         restoreTime = restoreCDafterConsume;
         restoreTimer = 0f;
         return true;

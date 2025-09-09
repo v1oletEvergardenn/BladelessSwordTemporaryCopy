@@ -48,16 +48,19 @@ public class YYF_WaterSpear : IEnemyAction
     /// 1,3,5 = black fish
     /// <para>2,4,6 = white fish</para>
     /// <para>7 = combo from dive, if close to player, add swing</para>
+    /// <para>8 = combo of waterSpear => gatling </para>
+    /// <para>9 = combo of waterSpear => singleSwing </para>
     /// </summary>
     /// <param name="factor"></param>
     /// <returns></returns>
     public override IEnumerator Act_coroutine(float factor = 0)
     {
+        proceedCall = false;
         bool isBlack = false;
         if (!bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = bossAI.CheckCloserFish() == bossAI.blackFish; }
         if (bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = true; }
         bossAI.SetBusy(isBlack);
-        if (factor == 0)
+        if (factor == 0 || factor == 7 || factor == 8 || factor == 9)
         {
             yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
             yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.IESprintStartPoint(isBlack ? "black" : "white"));
@@ -68,7 +71,9 @@ public class YYF_WaterSpear : IEnemyAction
         Spear _spear; Spear _smallSpear1 = null; Spear _smallSpear2 = null;
         bool addition = false;
 
-        if (factor == 0)
+        if (factor == 8 || factor == 9) yield return new WaitUntil(() => proceedCall == true);
+
+        if (factor == 0 || factor == 8 || factor == 9)
         {
             int possiblity = 5;
             if (bossAI.initialAction == bossAI.waterSpear && (playerEnergy.currentEnergy <= 5)) possiblity += 2;
@@ -104,7 +109,7 @@ public class YYF_WaterSpear : IEnemyAction
         _spear = bossAI.selfPooler.SpawnFromPool("water_Spear", waterSpearSpawnPos.position).GetComponent<Spear>();
 
         //set spear
-        if (factor == 0) { spear = _spear; }
+        if (factor == 0 || factor == 8 || factor == 9) { spear = _spear; }
         SetUp(_spear);
 
         //wait for launch
@@ -138,21 +143,17 @@ public class YYF_WaterSpear : IEnemyAction
         {
             if (bossAI.distanceToPlayer <= bossAI.close_distance_threshhold) bossAI.AddAction(bossAI.swing);
         }
-        if (factor == 0)
+        if (factor == 0 || factor == 8 || factor == 9)
         {
             if (bossAI.initialAction == bossAI.waterSpear)
             {
                 if (bossAI.distanceToPlayer <= bossAI.close_distance_threshhold)
                 {
-                    //水凝枪 -> 翻腾/双摆尾
-                    //条件：在释放完水凝枪后，距离小于一定值。
                     if (Possibility(50))
                     {
                         if (Possibility(50)) bossAI.AddAction(bossAI.swing);
                         else bossAI.AddAction(bossAI.splash);
                     }
-                    //水凝枪 -> 潜水 -> 压缩泡泡光线 = 泡泡牢笼/单摆尾。
-                    //条件：在释放完水凝枪后，距离小于一定值时（远离）
                     else
                     {
                         bossAI.movingTarget = bossAI.GetBoundaryFarOfPlayer();
@@ -164,9 +165,6 @@ public class YYF_WaterSpear : IEnemyAction
                     }
                 }
 
-                //水凝枪 -> 潜水 -> 双摆尾 ？双摆尾
-                //条件：在释放完水凝枪后，距离大于一定值时（靠近）
-                //？：成功弹反时有50 %。
                 if (bossAI.distanceToPlayer >= bossAI.far_distance_threshhold)
                 {
                     bossAI.movingTarget = player.transform;

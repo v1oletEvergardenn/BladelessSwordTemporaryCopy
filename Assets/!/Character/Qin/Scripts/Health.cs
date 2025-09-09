@@ -113,18 +113,21 @@ public class Health : IDamagable
         }
         SoundManager.PlaySound("player_take_damage");
         currentHealth -= damageAmount;
-
-        if (damageAmount >= 10) healthBar.UpdateBar(currentHealth, UpdateAnim.CriticalDamage);
-        else healthBar.UpdateBar(currentHealth);
-
-        _damageFlash.OnDamageFlash();
-        inputPlayer.DisableFloat();
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        if (stun_duration != 0)
+        if (damageAmount > 0)
         {
-            anim_bool.Anim_Attack(2);
-            Stun(stun_duration, sender);
+            if (damageAmount >= 10) healthBar.UpdateBar(currentHealth, UpdateAnim.CriticalDamage);
+            else healthBar.UpdateBar(currentHealth);
+
+            _damageFlash.OnDamageFlash();
+            inputPlayer.DisableFloat();
+            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+            if (stun_duration != 0)
+            {
+                anim_bool.Anim_Attack(2);
+                Stun(stun_duration, sender);
+            }
         }
+
         if (currentHealth <= 0)
         {
             anim_bool.Anim_Attack(2);
@@ -133,7 +136,7 @@ public class Health : IDamagable
             GetComponent<Rigidbody2D>().velocity = Vector2.zero;
             GetComponent<Rigidbody2D>().isKinematic = true;
             anim.SetBool("dead", true);
-            if (!stunned) { anim.Play("death"); }
+            anim.Play("death");
             Invoke("OnDeath", 4f);
         }
         return 0;

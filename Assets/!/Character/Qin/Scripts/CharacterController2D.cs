@@ -295,7 +295,7 @@ public class CharacterController2D : MonoBehaviour
     public void DoubleJump(float holdTime)
     {
         if (!canDoubleJump || isGrounded) return;
-
+        if (!energy.DoubleJumpConsume()) return;
         float x = rb.velocity.x;
         float strength = Mathf.Lerp(MinDoubleJumpForceMultiplier, DoubleJumpForceMultiplier, holdTime / DoubleJumpForceTime);
 

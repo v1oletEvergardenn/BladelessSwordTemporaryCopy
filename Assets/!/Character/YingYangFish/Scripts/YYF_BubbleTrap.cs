@@ -9,7 +9,7 @@ public class YYF_BubbleTrap : IEnemyAction
     public float jumpRadius = 5f;
     public float jumpHeight = 3f;
 
-    public int bubbleDamage = 2;
+    public float bubbleDamage = 2;
     public float bubbleSpeed = 5f;
     public float bubbleStunDuration = 0.5f;
     public float bubbleStunValue = 0.5f;
@@ -29,6 +29,7 @@ public class YYF_BubbleTrap : IEnemyAction
 
     public override IEnumerator Act_coroutine(float factor = 0)
     {
+        proceedCall = false;
         bool isBlack = true;
         if (bossAI.isBlackBusy) { isBlack = false; }
         bossAI.SetBusy(isBlack);
