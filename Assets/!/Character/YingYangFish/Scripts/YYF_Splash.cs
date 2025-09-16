@@ -3,14 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class YYF_Splash : IEnemyAction
 {
     private YingYangFish_AI bossAI;
     public float[] shootPositionX;
     public float bulletSpeed = 150f;
-
     public int damage = 2;
     public float gravityScale = 5f;
     public float stunValue = 5f;

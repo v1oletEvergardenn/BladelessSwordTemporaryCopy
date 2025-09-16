@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 10
+  serializedVersion: 9
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -38,12 +38,13 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 13
-  m_BakeOnSceneLoad: 0
+  serializedVersion: 12
+  m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -66,6 +67,9 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
+    m_FinalGather: 0
+    m_FinalGatherFiltering: 1
+    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -119,231 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!21 &90647159
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: water
-  m_Shader: {fileID: -6465566751694194690, guid: 13326eeed13ec4b498f4eb0770b38c60, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _AlphaTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MaskTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _NormalMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _SampleTexture2D_6e24d4388be447eb97d29ddf82a9a802_Texture_1:
-        m_Texture: {fileID: 2800000, guid: 03d9c4cfc0adea348b4dfdaf43005925, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _TexelSize_41cd799c4d5c4671a2abaa82c24c2116_Texture_1:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _TexelSize_e952e8381c61479c99b38609e01c5554_Texture_1:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Texture2DAsset_9e3a7e262db34ddea10b612088dd1860_Out_0:
-        m_Texture: {fileID: 2800000, guid: 7e1aff9652c0dac418d9aa42f5f24dc2, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _alphaTexture:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _belowWaterTex:
-        m_Texture: {fileID: 1008442299}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _colorGradient:
-        m_Texture: {fileID: 363208176}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _distortion_tex:
-        m_Texture: {fileID: 2800000, guid: 63a3a961b343e5341a13f8efb4988815, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _pixelperfectuv_03f5e53fd18b43e19a2becb6e93e2e58_tex_258542073:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _pixelperfectuv_3a2b250062924f3da269ec1b910b2f57_tex_258542073:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _pixelperfectuv_660921aca76b4ccca33840e8e7c6d762_tex_258542073:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _pixelperfectuv_8e2ab4842edb4530b0c5c85605e2f077_tex_258542073:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _pixelperfectuv_b5263cc47d6b4a8d84a602eb760e7a19_tex_258542073:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _pixelperfectuv_b75d5bc4da1347da957eff4013b32203_tex_258542073:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _pixelperfectuv_c5a47b7d4821456281b0ca7cff8a55e1_tex_258542073:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _pixelperfectuv_f8eba3edd3e04eee97fe2c65a8a53d16_tex_258542073:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _reflectionsTexture:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _simTex:
-        m_Texture: {fileID: 1763946962}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _sun_strips:
-        m_Texture: {fileID: 2800000, guid: 02b9ccfabe688644ebd37eb70cbe2341, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _surfaceTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_Lightmaps:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_LightmapsInd:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_ShadowMasks:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _EnableExternalAlpha: 0
-    - _RFalpha: 0
-    - _RForgColor: 0
-    - _belowWaterTexAlpha: 0.829
-    - _belowWaterTexDistortionStrength: 0.785
-    - _color_type: 1
-    - _deep_mlp: 1
-    - _depthFromObstructors: 0
-    - _depthMlp: 0
-    - _distortionFPRH: 0
-    - _distortion_str: 0.1
-    - _edgeIgnoreTransparency: 0
-    - _edgeSize: 0
-    - _enableFalloff: 0
-    - _enable_nor: 0
-    - _enable_obs: 1
-    - _enable_pl: 1
-    - _enable_plat: 1
-    - _enable_ref: 1
-    - _enable_rm: 0
-    - _enable_scrolling: 0
-    - _enable_sim: 0
-    - _enable_td: 0
-    - _enable_topdown: 0
-    - _falloffStart: 0.095
-    - _falloffStrength: 0
-    - _foam_alpha: 0
-    - _foam_density: 0.162
-    - _foam_size: 1.49
-    - _foam_speed: 0.37
-    - _foam_width: 0.179
-    - _lighting: 0
-    - _normStr: 1
-    - _num_of_pixels: 512
-    - _obstruction_alpha: 1
-    - _obstruction_width: 0.15
-    - _pixelArtUV: 0
-    - _pixel_art: 0
-    - _pixel_perfect: 0
-    - _raymarchFalloffEnd: 0
-    - _raymarchFalloffStart: 0
-    - _raymarchSteps: 0
-    - _reflectionY: 0.34939784
-    - _rm_type2: 0
-    - _scrStrength: 0
-    - _strength: 0
-    - _strips_alpha: 0
-    - _strips_density: 16
-    - _strips_scrolling_speed: 0
-    - _strips_size: 0.45
-    - _strips_speed: 0.89
-    - _surfaceAlpha: 1
-    - _surfaceTexAlpha: 0
-    - _useFoamSpeedForST: 0
-    - _usePerspective: 1
-    m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _Flip: {r: 1, g: 1, b: 1, a: 1}
-    - _RFcolor: {r: 0, g: 0, b: 0, a: 0}
-    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
-    - _belowWaterTexUV: {r: -0.00027718543, g: 0.9996372, b: 0.000006612142, a: 0.34939784}
-    - _color: {r: 1, g: 1, b: 1, a: 0.8666667}
-    - _deep_color: {r: 1, g: 1, b: 1, a: 0.8666667}
-    - _deep_minmax: {r: 0, g: 1, b: 0, a: 0}
-    - _deep_minmax_1: {r: 0.56, g: 1, b: 0, a: 0}
-    - _distortion_color: {r: 0.49056602, g: 0.49056602, b: 0.49056602, a: 1}
-    - _distortion_minmax: {r: 0, g: 200, b: 0, a: 0}
-    - _distortion_speed: {r: 0.04, g: 0.01, b: 0, a: 0}
-    - _distortion_strength: {r: 0.15, g: 0.1, b: 0, a: 0}
-    - _distortion_tiling: {r: 1, g: 1, b: 0, a: 0}
-    - _edgeColor: {r: 1, g: 1, b: 1, a: 1}
-    - _foam_color: {r: 1, g: 1, b: 1, a: 0.92156863}
-    - _foam_speed: {r: 0.3, g: 0, b: 0, a: 0}
-    - _m_Color: {r: 0.6415094, g: 0.20879316, b: 0.20879316, a: 0}
-    - _num_of_pixels: {r: 64, g: 64, b: 0, a: 0}
-    - _obs_transform: {r: 0.8, g: 0.8, b: 0.1, a: 0.1}
-    - _obstruction_color: {r: 1, g: 1, b: 1, a: 0}
-    - _perspective: {r: 0.5, g: 2.74, b: 0, a: 0}
-    - _perspective2: {r: 0, g: 0, b: 0, a: 0}
-    - _playerPosition: {r: 0, g: 0, b: -10, a: 0}
-    - _refTexRes: {r: 1920, g: 1620, b: 0, a: 0}
-    - _ref_transform: {r: 1, g: 0.6666666, b: 0, a: 0.16666667}
-    - _reflectionsColor: {r: 1, g: 0.9669811, b: 0.9669811, a: 0.94509804}
-    - _simFoamColor: {r: 1, g: 1, b: 1, a: 0.84313726}
-    - _simMinMaxWavesHeightFoam: {r: 0, g: 1, b: 0, a: 0}
-    - _surfaceTexSpeed: {r: 0, g: 0, b: 0, a: 0}
-    - _surfaceTexTiling: {r: 0, g: 0, b: 0, a: 0}
-    - _surfaceTexUV: {r: 0, g: 0, b: 1, a: 1}
-    - _tiling: {r: 1, g: 1, b: 0, a: 0}
-    - m_Color: {r: 0, g: 0, b: 0, a: 0}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!84 &176555589
 RenderTexture:
   m_ObjectHideFlags: 0
@@ -354,10 +133,12 @@ RenderTexture:
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1920
-  m_Height: 1620
+  serializedVersion: 5
+  m_Width: 1346
+  m_Height: 1263
   m_AntiAliasing: 1
   m_MipCount: -1
   m_DepthStencilFormat: 93
@@ -366,7 +147,6 @@ RenderTexture:
   m_GenerateMips: 1
   m_SRGB: 1
   m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
   m_BindMS: 0
   m_EnableCompatibleFormat: 1
   m_EnableRandomWrite: 0
@@ -381,52 +161,6 @@ RenderTexture:
   m_Dimension: 2
   m_VolumeDepth: 1
   m_ShadowSamplingMode: 2
---- !u!28 &363208176
-Texture2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 3
-  m_Width: 128
-  m_Height: 1
-  m_CompleteImageSize: 512
-  m_MipsStripped: 0
-  m_TextureFormat: 5
-  m_MipCount: 1
-  m_IsReadable: 1
-  m_IsPreProcessed: 0
-  m_IgnoreMipmapLimit: 1
-  m_MipmapLimitGroupName: 
-  m_StreamingMipmaps: 0
-  m_StreamingMipmapsPriority: 0
-  m_VTOnly: 0
-  m_AlphaIsTransparency: 0
-  m_ImageCount: 1
-  m_TextureDimension: 2
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 0
-    m_WrapV: 0
-    m_WrapW: 0
-  m_LightmapFormat: 0
-  m_ColorSpace: 1
-  m_PlatformBlob: 
-  image data: 512
-  _typelessdata: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-  m_StreamData:
-    serializedVersion: 2
-    offset: 0
-    size: 0
-    path: 
 --- !u!1 &456310759
 GameObject:
   m_ObjectHideFlags: 0
@@ -489,11 +223,11 @@ MonoBehaviour:
     follow: {fileID: 1152900971}
     res: 1
     scale: {x: 1.25, y: 1.25}
-    reflectionLayerIdx: 9
+    reflectionLayerIdx: 22
     copyMainBackground: 0
     lastOrtographicSize: 3.515625
-    lastAspectRatio: 1.7777778
-  _run: 1
+    lastAspectRatio: 1.5985749
+  _run: 0
   overrideMainCamera:
     _value: 0
   obstructionObjectsVisible:
@@ -507,8 +241,8 @@ MonoBehaviour:
   uvShader: {fileID: 0}
   jfMaterial: {fileID: 0}
   uvMaterial: {fileID: 0}
-  jfRenderTexture1: {fileID: 490844635}
-  jfRenderTexture2: {fileID: 1992004779}
+  jfRenderTexture1: {fileID: 516493899}
+  jfRenderTexture2: {fileID: 887990033}
   _mainCamera: {fileID: 0}
   genSDF: 0
 --- !u!20 &456310762
@@ -518,7 +252,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 456310759}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
@@ -550,7 +284,7 @@ Camera:
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 4194304
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 1415070968}
   m_TargetDisplay: 0
@@ -600,13 +334,13 @@ MonoBehaviour:
   m_RequiresColorTexture: 0
   m_Version: 2
   m_TaaSettings:
-    m_Quality: 3
-    m_FrameInfluence: 0.1
-    m_JitterScale: 1
-    m_MipBias: 0
-    m_VarianceClampScale: 0.9
-    m_ContrastAdaptiveSharpening: 0
---- !u!84 &490844635
+    quality: 3
+    frameInfluence: 0.1
+    jitterScale: 1
+    mipBias: 0
+    varianceClampScale: 0.9
+    contrastAdaptiveSharpening: 0
+--- !u!84 &516493899
 RenderTexture:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -616,10 +350,12 @@ RenderTexture:
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1200
-  m_Height: 675
+  serializedVersion: 5
+  m_Width: 841
+  m_Height: 526
   m_AntiAliasing: 1
   m_MipCount: -1
   m_DepthStencilFormat: 94
@@ -628,7 +364,6 @@ RenderTexture:
   m_GenerateMips: 1
   m_SRGB: 1
   m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
   m_BindMS: 0
   m_EnableCompatibleFormat: 1
   m_EnableRandomWrite: 1
@@ -726,9 +461,6 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -834,7 +566,7 @@ MonoBehaviour:
     fliterMode: 0
     bitDepth: 0
     layerName: nl
-    layerMask: 2147481839
+    layerMask: 2140142831
     mainCamera: {fileID: 863548387}
     CameraRenderingScene: {fileID: 1152900970}
     holder: {fileID: 863548385}
@@ -844,7 +576,7 @@ MonoBehaviour:
     reflectionLayerIdx: -1
     copyMainBackground: 0
     lastOrtographicSize: 2.8125
-    lastAspectRatio: 1.7777778
+    lastAspectRatio: 1.5985749
   _run: 1
 --- !u!20 &863548387
 Camera:
@@ -885,7 +617,7 @@ Camera:
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2147481839
+    m_Bits: 2140142831
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 1008442299}
   m_TargetDisplay: 0
@@ -935,12 +667,88 @@ MonoBehaviour:
   m_RequiresColorTexture: 0
   m_Version: 2
   m_TaaSettings:
-    m_Quality: 3
-    m_FrameInfluence: 0.1
-    m_JitterScale: 1
+    quality: 3
+    frameInfluence: 0.1
+    jitterScale: 1
+    mipBias: 0
+    varianceClampScale: 0.9
+    contrastAdaptiveSharpening: 0
+--- !u!84 &881784967
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 5
+  m_Width: 1024
+  m_Height: 201
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 46
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
     m_MipBias: 0
-    m_VarianceClampScale: 0.9
-    m_ContrastAdaptiveSharpening: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
+--- !u!84 &887990033
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 5
+  m_Width: 841
+  m_Height: 526
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 4
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 1
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 0
+    m_WrapV: 0
+    m_WrapW: 0
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!84 &939875842
 RenderTexture:
   m_ObjectHideFlags: 0
@@ -951,10 +759,12 @@ RenderTexture:
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1920
-  m_Height: 1620
+  serializedVersion: 5
+  m_Width: 1346
+  m_Height: 1263
   m_AntiAliasing: 1
   m_MipCount: -1
   m_DepthStencilFormat: 93
@@ -963,7 +773,6 @@ RenderTexture:
   m_GenerateMips: 1
   m_SRGB: 1
   m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
   m_BindMS: 0
   m_EnableCompatibleFormat: 1
   m_EnableRandomWrite: 0
@@ -978,6 +787,59 @@ RenderTexture:
   m_Dimension: 2
   m_VolumeDepth: 1
   m_ShadowSamplingMode: 2
+--- !u!21 &990845065
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: box blur
+  m_Shader: {fileID: -6465566751694194690, guid: 954127d931965f8499f2048d08052c2a, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _area: 0.01
+    - _falloffE: 1
+    - _falloffP: 0
+    - _falloffS: 0
+    - _falloffU: 0
+    - _sigmaX: 0.6
+    m_Colors: []
+  m_BuildTextureStacks: []
 --- !u!84 &1008442299
 RenderTexture:
   m_ObjectHideFlags: 0
@@ -988,10 +850,12 @@ RenderTexture:
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1920
-  m_Height: 1080
+  serializedVersion: 5
+  m_Width: 1346
+  m_Height: 842
   m_AntiAliasing: 1
   m_MipCount: -1
   m_DepthStencilFormat: 93
@@ -1000,7 +864,6 @@ RenderTexture:
   m_GenerateMips: 1
   m_SRGB: 1
   m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
   m_BindMS: 0
   m_EnableCompatibleFormat: 1
   m_EnableRandomWrite: 0
@@ -1082,7 +945,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2147482879
+    m_Bits: 2142239999
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -1147,12 +1010,12 @@ MonoBehaviour:
   m_RequiresColorTexture: 0
   m_Version: 2
   m_TaaSettings:
-    m_Quality: 3
-    m_FrameInfluence: 0.1
-    m_JitterScale: 1
-    m_MipBias: 0
-    m_VarianceClampScale: 0.9
-    m_ContrastAdaptiveSharpening: 0
+    quality: 3
+    frameInfluence: 0.1
+    jitterScale: 1
+    mipBias: 0
+    varianceClampScale: 0.9
+    contrastAdaptiveSharpening: 0
 --- !u!114 &1152900973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1234,8 +1097,8 @@ MonoBehaviour:
     reflectionLayerIdx: -1
     copyMainBackground: 0
     lastOrtographicSize: 4.21875
-    lastAspectRatio: 1.1851852
-  _run: 1
+    lastAspectRatio: 1.0657166
+  _run: 0
   startupQF: 1
   pivotDetectionAlphaTreshold: 0
   overrideMainCamera:
@@ -1246,7 +1109,7 @@ MonoBehaviour:
     _value: 1
   defaultReflectionSprflipx:
     _value: 1
-  mainCamera: {fileID: 1152900970}
+  mainCamera: {fileID: 0}
   reflectionCamera: {fileID: 1163453019}
   reflectorMat: {fileID: 2100000, guid: 0ae8ac8d38b65bd408099e116c252bce, type: 2}
   reflectionMat: {fileID: 2100000, guid: 075b92eb3f3ea4948a0553b3da251cc5, type: 2}
@@ -1279,7 +1142,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1163453016}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
@@ -1307,7 +1170,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 4.21875
+  orthographic size: 0
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
@@ -1387,7 +1250,7 @@ MonoBehaviour:
     reflectionLayerIdx: -1
     copyMainBackground: 0
     lastOrtographicSize: 4.21875
-    lastAspectRatio: 1.1851852
+    lastAspectRatio: 1.0657166
   _run: 0
   startupQF: 1
   pivotDetectionAlphaTreshold: 0
@@ -1538,10 +1401,10 @@ MonoBehaviour:
     follow: {fileID: 1152900971}
     res: 1
     scale: {x: 1, y: 1}
-    reflectionLayerIdx: 8
+    reflectionLayerIdx: 20
     copyMainBackground: 0
     lastOrtographicSize: 2.8125
-    lastAspectRatio: 1.7777778
+    lastAspectRatio: 1.5985749
   _run: 0
   startupQF: 1
   pivotDetectionAlphaTreshold: 0
@@ -1618,7 +1481,7 @@ Camera:
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 1048576
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 2043028944}
   m_TargetDisplay: 0
@@ -1668,12 +1531,12 @@ MonoBehaviour:
   m_RequiresColorTexture: 0
   m_Version: 2
   m_TaaSettings:
-    m_Quality: 3
-    m_FrameInfluence: 0.1
-    m_JitterScale: 1
-    m_MipBias: 0
-    m_VarianceClampScale: 0.9
-    m_ContrastAdaptiveSharpening: 0
+    quality: 3
+    frameInfluence: 0.1
+    jitterScale: 1
+    mipBias: 0
+    varianceClampScale: 0.9
+    contrastAdaptiveSharpening: 0
 --- !u!84 &1415070968
 RenderTexture:
   m_ObjectHideFlags: 0
@@ -1684,10 +1547,12 @@ RenderTexture:
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 2400
-  m_Height: 1350
+  serializedVersion: 5
+  m_Width: 1682
+  m_Height: 1052
   m_AntiAliasing: 1
   m_MipCount: -1
   m_DepthStencilFormat: 93
@@ -1696,7 +1561,6 @@ RenderTexture:
   m_GenerateMips: 1
   m_SRGB: 0
   m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
   m_BindMS: 0
   m_EnableCompatibleFormat: 1
   m_EnableRandomWrite: 0
@@ -1711,6 +1575,230 @@ RenderTexture:
   m_Dimension: 2
   m_VolumeDepth: 1
   m_ShadowSamplingMode: 2
+--- !u!21 &1462328274
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: water
+  m_Shader: {fileID: -6465566751694194690, guid: 13326eeed13ec4b498f4eb0770b38c60, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_6e24d4388be447eb97d29ddf82a9a802_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 03d9c4cfc0adea348b4dfdaf43005925, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TexelSize_41cd799c4d5c4671a2abaa82c24c2116_Texture_1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TexelSize_e952e8381c61479c99b38609e01c5554_Texture_1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_9e3a7e262db34ddea10b612088dd1860_Out_0:
+        m_Texture: {fileID: 2800000, guid: 7e1aff9652c0dac418d9aa42f5f24dc2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _alphaTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _belowWaterTex:
+        m_Texture: {fileID: 1008442299}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _colorGradient:
+        m_Texture: {fileID: 1995030087}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _distortion_tex:
+        m_Texture: {fileID: 2800000, guid: 63a3a961b343e5341a13f8efb4988815, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _pixelperfectuv_03f5e53fd18b43e19a2becb6e93e2e58_tex_258542073:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _pixelperfectuv_3a2b250062924f3da269ec1b910b2f57_tex_258542073:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _pixelperfectuv_660921aca76b4ccca33840e8e7c6d762_tex_258542073:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _pixelperfectuv_8e2ab4842edb4530b0c5c85605e2f077_tex_258542073:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _pixelperfectuv_b5263cc47d6b4a8d84a602eb760e7a19_tex_258542073:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _pixelperfectuv_b75d5bc4da1347da957eff4013b32203_tex_258542073:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _pixelperfectuv_c5a47b7d4821456281b0ca7cff8a55e1_tex_258542073:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _pixelperfectuv_f8eba3edd3e04eee97fe2c65a8a53d16_tex_258542073:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _reflectionsTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _simTex:
+        m_Texture: {fileID: 881784967}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _sun_strips:
+        m_Texture: {fileID: 2800000, guid: 02b9ccfabe688644ebd37eb70cbe2341, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _surfaceTex:
+        m_Texture: {fileID: 2800000, guid: 1916ab7346ae1224292d74662bb69d21, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _EnableExternalAlpha: 0
+    - _RFalpha: 0
+    - _RForgColor: 0
+    - _belowWaterTexAlpha: 0.826
+    - _belowWaterTexDistortionStrength: 1
+    - _color_type: 1
+    - _deep_mlp: 1
+    - _depthFromObstructors: 0
+    - _depthMlp: 0
+    - _distortionFPRH: 0
+    - _distortion_str: 0.1
+    - _edgeIgnoreTransparency: 0
+    - _edgeSize: 0
+    - _enableFalloff: 0
+    - _enable_nor: 0
+    - _enable_obs: 0
+    - _enable_pl: 0
+    - _enable_plat: 1
+    - _enable_ref: 0
+    - _enable_rm: 0
+    - _enable_scrolling: 0
+    - _enable_sim: 0
+    - _enable_td: 0
+    - _enable_topdown: 0
+    - _falloffStart: 0.095
+    - _falloffStrength: 0
+    - _foam_alpha: 0
+    - _foam_density: 0
+    - _foam_size: 3.09
+    - _foam_speed: 0.37
+    - _foam_width: 0.179
+    - _lighting: 0
+    - _normStr: 1
+    - _num_of_pixels: 512
+    - _obstruction_alpha: 1
+    - _obstruction_width: 0.15
+    - _pixelArtUV: 0
+    - _pixel_art: 0
+    - _pixel_perfect: 0
+    - _raymarchFalloffEnd: 0
+    - _raymarchFalloffStart: 0
+    - _raymarchSteps: 0
+    - _reflectionY: 1.0603979
+    - _rm_type2: 0
+    - _scrStrength: 0
+    - _strength: 0
+    - _strips_alpha: 0
+    - _strips_density: 16
+    - _strips_scrolling_speed: 0
+    - _strips_size: 2.4
+    - _strips_speed: 3.68
+    - _surfaceAlpha: 1
+    - _surfaceTexAlpha: 0.088
+    - _useFoamSpeedForST: 1
+    - _usePerspective: 1
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Flip: {r: 1, g: 1, b: 1, a: 1}
+    - _RFcolor: {r: 0, g: 0, b: 0, a: 0}
+    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
+    - _belowWaterTexUV: {r: -0.06378796, g: 1.0482185, b: -0.053286787, a: 1.0603979}
+    - _color: {r: 1, g: 1, b: 1, a: 0.8666667}
+    - _deep_color: {r: 1, g: 1, b: 1, a: 0.8666667}
+    - _deep_minmax: {r: 0, g: 1, b: 0, a: 0}
+    - _deep_minmax_1: {r: 0.56, g: 1, b: 0, a: 0}
+    - _distortion_color: {r: 1, g: 0.9858491, b: 0.9858491, a: 1}
+    - _distortion_minmax: {r: 0.26, g: 201.73, b: 0, a: 0}
+    - _distortion_speed: {r: 0, g: 0.28, b: 0, a: 0}
+    - _distortion_strength: {r: 0, g: -0.08, b: 0, a: 0}
+    - _distortion_tiling: {r: 4.38, g: 2.93, b: 0, a: 0}
+    - _edgeColor: {r: 1, g: 1, b: 1, a: 1}
+    - _foam_color: {r: 0.6650944, g: 1, b: 0.9447931, a: 0.36862746}
+    - _foam_speed: {r: 0, g: 2.59, b: 0, a: 0}
+    - _m_Color: {r: 0.6415094, g: 0.20879316, b: 0.20879316, a: 0}
+    - _num_of_pixels: {r: 64, g: 64, b: 0, a: 0}
+    - _obs_transform: {r: 0.8, g: 0.8, b: 0.1, a: 0.1}
+    - _obstruction_color: {r: 1, g: 1, b: 1, a: 0}
+    - _perspective: {r: 0.5, g: 2.74, b: 0, a: 0}
+    - _perspective2: {r: 0, g: 0, b: 0, a: 0}
+    - _playerPosition: {r: 0, g: 0, b: -10, a: 0}
+    - _refTexRes: {r: 1346, g: 1263, b: 0, a: 0}
+    - _ref_transform: {r: 1, g: 0.6666666, b: 0, a: 0.16666667}
+    - _reflectionsColor: {r: 1, g: 0.9669811, b: 0.9669811, a: 0.94509804}
+    - _simFoamColor: {r: 1, g: 1, b: 1, a: 0.84313726}
+    - _simMinMaxWavesHeightFoam: {r: 0, g: 1, b: 0, a: 0}
+    - _surfaceTexSpeed: {r: 0, g: 1, b: 0, a: 0}
+    - _surfaceTexTiling: {r: 8.21, g: 1, b: 0, a: 0}
+    - _surfaceTexUV: {r: 0, g: 0, b: 1, a: 1}
+    - _tiling: {r: 1, g: 1, b: 0, a: 0}
+    - m_Color: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
 --- !u!84 &1589194239
 RenderTexture:
   m_ObjectHideFlags: 0
@@ -1721,8 +1809,10 @@ RenderTexture:
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
+  serializedVersion: 5
   m_Width: 1919
   m_Height: 377
   m_AntiAliasing: 1
@@ -1733,7 +1823,6 @@ RenderTexture:
   m_GenerateMips: 1
   m_SRGB: 1
   m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
   m_BindMS: 0
   m_EnableCompatibleFormat: 1
   m_EnableRandomWrite: 0
@@ -1782,9 +1871,6 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1835,8 +1921,8 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!84 &1763946962
-RenderTexture:
+--- !u!28 &1995030087
+Texture2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1845,70 +1931,44 @@ RenderTexture:
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1024
-  m_Height: 201
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 46
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
+  serializedVersion: 2
+  m_Width: 128
+  m_Height: 1
+  m_CompleteImageSize: 512
+  m_MipsStripped: 0
+  m_TextureFormat: 5
+  m_MipCount: 1
+  m_IsReadable: 1
+  m_IsPreProcessed: 0
+  m_IgnoreMipmapLimit: 0
+  m_MipmapLimitGroupName: 
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_VTOnly: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
   m_TextureSettings:
     serializedVersion: 2
     m_FilterMode: 1
     m_Aniso: 1
     m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
---- !u!84 &1992004779
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1200
-  m_Height: 675
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 4
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 1
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 0
-    m_Aniso: 1
-    m_MipBias: 0
     m_WrapU: 0
     m_WrapV: 0
     m_WrapW: 0
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
+  m_LightmapFormat: 0
+  m_ColorSpace: 1
+  m_PlatformBlob: 
+  image data: 512
+  _typelessdata: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
 --- !u!84 &2043028944
 RenderTexture:
   m_ObjectHideFlags: 0
@@ -1919,10 +1979,12 @@ RenderTexture:
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1920
-  m_Height: 1080
+  serializedVersion: 5
+  m_Width: 1346
+  m_Height: 842
   m_AntiAliasing: 1
   m_MipCount: -1
   m_DepthStencilFormat: 93
@@ -1931,7 +1993,6 @@ RenderTexture:
   m_GenerateMips: 1
   m_SRGB: 1
   m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
   m_BindMS: 0
   m_EnableCompatibleFormat: 1
   m_EnableRandomWrite: 0
@@ -1946,60 +2007,6 @@ RenderTexture:
   m_Dimension: 2
   m_VolumeDepth: 1
   m_ShadowSamplingMode: 2
---- !u!21 &2046560836
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: box blur
-  m_Shader: {fileID: -6465566751694194690, guid: 954127d931965f8499f2048d08052c2a, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex2:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_Lightmaps:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_LightmapsInd:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_ShadowMasks:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _area: 0.01
-    - _falloffE: 1
-    - _falloffP: 0
-    - _falloffS: 0
-    - _falloffU: 0
-    - _sigmaX: 0.6
-    m_Colors: []
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1 &5202825753288957643
 GameObject:
   m_ObjectHideFlags: 0
@@ -2035,13 +2042,10 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 90647159}
+  - {fileID: 1462328274}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2082,8 +2086,8 @@ Transform:
   m_GameObject: {fileID: 5202825753288957643}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0032, y: -1.8298, z: 0}
-  m_LocalScale: {x: 0.6249465, y: 0.122832865, z: 1}
+  m_LocalPosition: {x: -0.07, y: 0.02, z: 0}
+  m_LocalScale: {x: 0.6249465, y: 0.39152977, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2174,9 +2178,9 @@ MonoBehaviour:
   ManagersVisible:
     _value: 1
   enableObstruction:
-    _value: 1
+    _value: 0
   enableReflections:
-    _value: 1
+    _value: 0
   enableSimulation:
     _value: 0
   enableWavesSimulation:
@@ -2205,7 +2209,7 @@ MonoBehaviour:
       enableTopDownReflections:
         _value: 0
       enablePlatformerReflections:
-        _value: 1
+        _value: 0
       enableRaymarchedReflections:
         _value: 0
       mainCamera: {fileID: 0}
@@ -2286,47 +2290,47 @@ MonoBehaviour:
       obstructionAlpha:
         _value: 1
       foamColor:
-        _value: {r: 1, g: 1, b: 1, a: 0.92156863}
+        _value: {r: 0.6650944, g: 1, b: 0.9447931, a: 0.36862746}
       foamSize:
-        _value: 1.49
+        _value: 3.09
       foamSpeed:
-        _value: {x: 0.3, y: 0}
+        _value: {x: 0, y: 2.59}
       foamAlpha:
         _value: 0
       distortionSpeed:
-        _value: {x: 0.04, y: 0.01}
+        _value: {x: 0, y: 0.28}
       distortionStrength:
-        _value: {x: 0.15, y: 0.1}
+        _value: {x: 0, y: -0.08}
       distortionTiling:
-        _value: {x: 1, y: 1}
+        _value: {x: 4.38, y: 2.93}
       distortionMinMax:
-        _value: {x: 0, y: 200}
+        _value: {x: 0.26, y: 201.73}
       distortionColor:
-        _value: {r: 0.49056602, g: 0.49056602, b: 0.49056602, a: 1}
+        _value: {r: 1, g: 0.9858491, b: 0.9858491, a: 1}
       distortionTexture: {fileID: 2800000, guid: 63a3a961b343e5341a13f8efb4988815, type: 3}
       sunStripsTexture: {fileID: 2800000, guid: 02b9ccfabe688644ebd37eb70cbe2341, type: 3}
       stripsSpeed:
-        _value: 0.89
+        _value: 3.68
       stripsScrollingSpeed:
         _value: 0
       stripsSize:
-        _value: 0.45
+        _value: 2.4
       surfaceSprite: {fileID: 0}
-      surfaceTexture: {fileID: 0}
+      surfaceTexture: {fileID: 2800000, guid: 1916ab7346ae1224292d74662bb69d21, type: 3}
       surfaceTiling:
-        _value: {x: 0, y: 0}
+        _value: {x: 8.21, y: 1}
       surfaceSpeed:
-        _value: {x: 0, y: 0}
+        _value: {x: 0, y: 1}
       useFoamSpeed:
-        _value: 0
+        _value: 1
       surfaceAlpha:
-        _value: 0
+        _value: 0.088
       stripsAlpha:
         _value: 0
       stripsDensity:
         _value: 16
       foamDensity:
-        _value: 0.162
+        _value: 0
       perspective:
         _value: {x: 0, y: 0}
       _useLighting:
@@ -2338,9 +2342,9 @@ MonoBehaviour:
       belowWaterUV:
         _value: {x: 0, y: 0, z: 0, w: 0}
       belowWaterDistortionStrength:
-        _value: 0.785
+        _value: 1
       belowWaterAlpha:
-        _value: 0.829
+        _value: 0.826
       colorGradient:
         _value:
           serializedVersion: 2
@@ -2376,7 +2380,7 @@ MonoBehaviour:
         _value: 0
     _simulationSettings:
       resolution:
-        _value: {x: 1024, y: 201}
+        _value: {x: 1024, y: 641}
       waterCmp: {fileID: 7200000, guid: 14821a0cc6771aa45b7163f15854b208, type: 3}
       sr: {fileID: 5202825753288957644}
       obstruction: {fileID: 1415070968}
@@ -2483,8 +2487,8 @@ MonoBehaviour:
       falloffStrength:
         _value: 1
   customWaterMaterial: 0
-  _mat: {fileID: 90647159}
-  _matb: {fileID: 2046560836}
+  _mat: {fileID: 1462328274}
+  _matb: {fileID: 990845065}
   _sr: {fileID: 5202825753288957644}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

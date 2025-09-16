@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 using System;
 using Mobsoft.PixelStyleWaterShader;
 using static UnityEngine.EventSystems.EventTrigger;
+using Void = EditorAttributes.Void;
 
 public class InputPlayer : MonoBehaviour
 {
@@ -30,32 +31,27 @@ public class InputPlayer : MonoBehaviour
 
     #endregion Singleton & References
 
-    #region Movement & Input State
-
-    private float horizontalMove = 0f;
-    [HideInInspector] public bool input_floating = false;
-    [HideInInspector] public float input_floating_timer = 0f;
-    public float HS_cancel_time = 1.2f;
-    [HideInInspector] public float HS_cancel_timer = 0f;
-    [HideInInspector] public float HS_hold_timer = 0f;
-    private Vector2 moveDir;
-
-    #endregion Movement & Input State
-
     #region Pointer & Attack Direction
 
-    [Title("pointerSetting", 15)] public Transform pointer;
-    public float pointerOffset = 1f;
+    [FoldoutGroup("Pointer Variables", nameof(pointer), nameof(pointerOffset),
+        nameof(pointerLength), nameof(lockOnTargetAngle), nameof(leftPointerAutoAiming), nameof(leftPointer),
+        nameof(rightPointer), nameof(rightPointerLayerMask))]
+    [SerializeField] private Void pointerGroupHold;
+
+    [SerializeField, HideProperty] public Transform pointer;
+    [SerializeField, HideProperty] public float pointerOffset = 1f;
+    [SerializeField, HideProperty] public float pointerLength = 15f;
+    [SerializeField, HideProperty] public float lockOnTargetAngle = 10f;
+    [SerializeField, HideProperty] public bool leftPointerAutoAiming = true;
+    [SerializeField, HideProperty] private Sprite leftPointer;
+    [SerializeField, HideProperty] private Sprite rightPointer;
+    [SerializeField, HideProperty] private LayerMask rightPointerLayerMask;
+    [HideProperty] public bool rightPointLeft = false;
+    [HideProperty] public bool leftPointLeft = false;
+
+    [HideProperty] public Vector2 rightAttackDir;
+    [HideProperty] public Vector2 leftAttackDir;
     private SpriteRenderer pointerSpriteRenderer;
-    public float pointerLength = 15f;
-    public float lockOnTargetAngle = 10f;
-    [SerializeField] private Sprite leftPointer;
-    [SerializeField] private Sprite rightPointer;
-    [SerializeField] private LayerMask rightPointerLayerMask;
-    [HideInInspector] public Vector2 rightAttackDir;
-    [HideInInspector] public Vector2 leftAttackDir;
-    public bool rightPointLeft = false;
-    public bool leftPointLeft = false;
 
     #endregion Pointer & Attack Direction
 
@@ -68,17 +64,32 @@ public class InputPlayer : MonoBehaviour
 
     #region Skills & Progression
 
-    [Header("LearnSkills")] public bool learnedMovement = true;
-    public bool learnedJump = true;
-    public bool learnedTeleport = true;
-    public bool learnedDoubleJump = false;
-    public bool learnedAttack = false;
-    public bool learnedBoomerang = false;
-    public bool learnedStorm = false;
-    public bool learnedDefend = false;
-    public bool learnedHeartSword = false;
+    [FoldoutGroup("LearnSkills", nameof(learnedMovement), nameof(learnedJump),
+        nameof(learnedTeleport), nameof(learnedDoubleJump), nameof(learnedAttack),
+        nameof(learnedBoomerang), nameof(learnedStorm), nameof(learnedDefend),
+        nameof(learnedHeartSword))]
+    [SerializeField] private Void learnSkillsGroupHold;
+
+    [SerializeField, HideProperty] public bool learnedMovement = true;
+    [SerializeField, HideProperty] public bool learnedJump = true;
+    [SerializeField, HideProperty] public bool learnedTeleport = true;
+    [SerializeField, HideProperty] public bool learnedDoubleJump = false;
+    [SerializeField, HideProperty] public bool learnedAttack = false;
+    [SerializeField, HideProperty] public bool learnedBoomerang = false;
+    [SerializeField, HideProperty] public bool learnedStorm = false;
+    [SerializeField, HideProperty] public bool learnedDefend = false;
+    [SerializeField, HideProperty] public bool learnedHeartSword = false;
 
     #endregion Skills & Progression
+
+    #region Movement & Input State
+
+    [HideInInspector] public bool input_floating = false;
+    [HideInInspector] public float input_floating_timer = 0f;
+    private float horizontalMove = 0f;
+    private Vector2 moveDir;
+
+    #endregion Movement & Input State
 
     #region Unity Lifecycle
 
@@ -296,18 +307,26 @@ public class InputPlayer : MonoBehaviour
 
     private void HandleAbilityInput()
     {
-        if (!inputMaster._AbilityB.IsPressed() && !inputMaster._AbilityX.IsPressed() && !inputMaster._AbilityY.IsPressed())
-        {
-            hSAbilitiesManager.currentActivatedAbility = null;
-            hSAbilitiesManager.abilityX.isActive = false;
-            hSAbilitiesManager.abilityY.isActive = false;
-            hSAbilitiesManager.abilityB.isActive = false;
-            return;
-        }
+        input(inputMaster._AbilityB, hSAbilitiesManager.abilityB);
+        input(inputMaster._AbilityX, hSAbilitiesManager.abilityX);
+        input(inputMaster._AbilityY, hSAbilitiesManager.abilityY);
 
-        if (inputMaster._AbilityX.WasPressedThisFrame()) { hSAbilitiesManager.ActivateAbility(hSAbilitiesManager.abilityX); return; }
-        if (inputMaster._AbilityY.WasPressedThisFrame()) { hSAbilitiesManager.ActivateAbility(hSAbilitiesManager.abilityY); return; }
-        if (inputMaster._AbilityB.WasPressedThisFrame()) { hSAbilitiesManager.ActivateAbility(hSAbilitiesManager.abilityB); return; }
+        void input(InputAction input, IHeartSwordAbility ability)
+        {
+            if (input.WasPressedThisFrame())
+            {
+                if (ability.toggleToActivate)
+                {
+                    if (ability.isActive) hSAbilitiesManager.Deactivateability(ability);
+                    else hSAbilitiesManager.ActivateAbility(ability);
+                }
+                else hSAbilitiesManager.ActivateAbility(ability);
+            }
+            else if (input.WasReleasedThisFrame())
+            {
+                if (!ability.toggleToActivate) hSAbilitiesManager.Deactivateability(ability);
+            }
+        }
     }
 
     private void HandleDefendInput()
@@ -369,52 +388,26 @@ public class InputPlayer : MonoBehaviour
     /// </summary>
     private void OnAttackDirection()
     {
-        // Update pointer direction flags based on input
         rightPointLeft = rightAttackDir.x <= 0;
-        if (!controller.isRunningToTarget) { leftPointLeft = leftAttackDir.x <= 0; }
+        if (!controller.isRunningToTarget) leftPointLeft = leftAttackDir.x <= 0;
 
-        if (rightAttackDir != Vector2.zero)
+        // Helper for auto-aiming
+        float GetAutoAimAngle(Vector3 pointerPos, Vector3 pointerRight, float pointerLen)
         {
-            // Set pointer sprite and aiming state for right stick
-            pointerSpriteRenderer.sprite = rightPointer;
-            playerAttack.isAimingRightStick = true;
-
-            // Calculate the initial pointer rotation based on right stick input
-            float angle = Vector2.SignedAngle(transform.up, rightAttackDir) + 90;
-            pointer.rotation = Quaternion.Euler(0, 0, angle);
-
-            // Prepare for target snapping
             float tempMinimumAngle = lockOnTargetAngle;
             float closestTargetZ = float.PositiveInfinity;
-            Vector3 pointerPos = pointer.position;
-            Vector3 pointerRight = pointer.right;
-            float pointerLen = pointerLength;
-
-            // Find all potential targets within pointer range and layer mask
             Collider2D[] colliders = Physics2D.OverlapCircleAll(pointerPos, pointerLen, rightPointerLayerMask);
             foreach (Collider2D col in colliders)
             {
-                // Only consider objects that implement IDamagable
-                if (!col.TryGetComponent<IDamagable>(out var damagable))
-                    continue;
-
-                // Calculate direction and distance to the target
+                if (!col.TryGetComponent<IDamagable>(out var damagable)) continue;
                 Vector3 targetPos = damagable.GetHitPos();
                 Vector2 toTarget = (targetPos - pointerPos);
                 float distance = toTarget.magnitude;
                 Vector2 direction = toTarget / distance;
-
-                // Check if the target is within the lock-on angle
                 float _tempAngle = Vector3.Angle(pointerRight, direction);
-                if (_tempAngle > tempMinimumAngle)
-                    continue;
-
-                // Raycast to ensure there are no obstacles between pointer and target
+                if (_tempAngle > tempMinimumAngle) continue;
                 RaycastHit2D hit = Physics2D.Raycast(pointerPos, direction, distance, rightPointerLayerMask);
-                if (hit.collider != null && hit.collider.gameObject != col.gameObject)
-                    continue;
-
-                // If this target is the closest within angle, remember its rotation
+                if (hit.collider != null && hit.collider.gameObject != col.gameObject) continue;
                 float targetZ = GetRotZFromDirection(toTarget);
                 if (_tempAngle < tempMinimumAngle)
                 {
@@ -422,21 +415,32 @@ public class InputPlayer : MonoBehaviour
                     tempMinimumAngle = _tempAngle;
                 }
             }
+            return float.IsPositiveInfinity(closestTargetZ) ? float.NaN : closestTargetZ;
+        }
 
-            // If a valid target was found, snap the pointer to it
-            if (!float.IsPositiveInfinity(closestTargetZ))
-                pointer.eulerAngles = new Vector3(0, 0, closestTargetZ);
+        // Helper for pointer length
+        float GetPointerLength(Vector3 origin, Vector3 direction, float maxLength)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(origin, direction, maxLength, rightPointerLayerMask);
+            if (hit.collider != null && hit.collider.gameObject != this.gameObject)
+                return hit.distance;
+            return maxLength;
+        }
 
-            // --- Pointer length stops at first collider in pointer's direction ---
-            float visualLength = pointerLen;
-            RaycastHit2D pointerHit = Physics2D.Raycast(pointerPos, pointer.right, pointerLen, rightPointerLayerMask);
-            if (pointerHit.collider != null && pointerHit.collider.gameObject != this.gameObject)
-            {
-                visualLength = pointerHit.distance;
-            }
+        if (rightAttackDir != Vector2.zero)
+        {
+            pointerSpriteRenderer.sprite = rightPointer;
+            playerAttack.isAimingRightStick = true;
+            float angle = Vector2.SignedAngle(transform.up, rightAttackDir) + 90;
+            pointer.rotation = Quaternion.Euler(0, 0, angle);
+
+            // Auto-aim for right stick
+            float autoAimAngle = GetAutoAimAngle(pointer.position, pointer.right, pointerLength);
+            if (!float.IsNaN(autoAimAngle))
+                pointer.eulerAngles = new Vector3(0, 0, autoAimAngle);
+
+            float visualLength = GetPointerLength(pointer.position, pointer.right, pointerLength);
             pointerSpriteRenderer.size = new Vector2(visualLength / 2, 0.155f);
-
-            // Update attack direction for use in attack logic
             playerAttack.pointerDirection = new Vector3(0, 0, pointer.rotation.eulerAngles.z);
         }
         else if (leftAttackDir != Vector2.zero)
@@ -446,20 +450,24 @@ public class InputPlayer : MonoBehaviour
             float angle = Vector2.SignedAngle(transform.up, leftAttackDir) + 90;
             pointer.rotation = Quaternion.Euler(0, 0, angle);
 
-            // Pointer length stops at first collider in left stick direction
             float visualLength = 1.55f;
-            RaycastHit2D pointerHit = Physics2D.Raycast(pointer.position, pointer.right, visualLength, rightPointerLayerMask);
-            if (pointerHit.collider != null && pointerHit.collider.gameObject != this.gameObject)
+            if (leftPointerAutoAiming)
             {
-                visualLength = pointerHit.distance;
+                float autoAimAngle = GetAutoAimAngle(pointer.position, pointer.right, pointerLength);
+                if (!float.IsNaN(autoAimAngle))
+                    pointer.eulerAngles = new Vector3(0, 0, autoAimAngle);
+                playerAttack.pointerDirection = new Vector3(0, 0, pointer.rotation.eulerAngles.z);
+            }
+            else
+            {
+                visualLength = GetPointerLength(pointer.position, pointer.right, visualLength);
+                playerAttack.pointerDirection = new Vector3(0, 0, pointer.rotation.eulerAngles.z);
             }
             pointerSpriteRenderer.size = new Vector2(visualLength, 0.155f);
-
-            playerAttack.pointerDirection = new Vector3(0, 0, pointer.rotation.eulerAngles.z);
         }
         else
         {
-            if (!controller.isRunningToTarget) { leftPointLeft = !controller.FacingRight; }
+            if (!controller.isRunningToTarget) leftPointLeft = !controller.FacingRight;
             pointerSpriteRenderer.sprite = leftPointer;
             pointer.rotation = transform.rotation;
             pointerSpriteRenderer.size = new Vector2(1.55f, 0.15f);

@@ -45,7 +45,7 @@ public class Spear : IProjectile
     {
         if (!collisionActive) { return; }
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
-        if (target != null && collision.gameObject != owner && !collided)
+        if (target != null && !IsOwner(target.gameObject) && !collided)
         {
             if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
             if (collision.gameObject == gameManager.player)

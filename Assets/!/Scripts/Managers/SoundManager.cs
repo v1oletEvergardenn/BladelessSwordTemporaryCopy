@@ -37,10 +37,18 @@ public class SoundManager : MonoBehaviour
     {
         soundDcitionary = new Dictionary<string, AudioClip>();
 
-        foreach (SoundType sound in soundList)
+        List<SoundType> allSounds = new List<SoundType>();
+
+        AudioClip[] clips = Resources.LoadAll<AudioClip>("SoundEffects");
+        foreach (AudioClip clip in clips)
         {
-            soundDcitionary.Add(sound.tag, sound.clip);
+            string tag = clip.name;
+            allSounds.Add(new SoundType { tag = tag, clip = clip });
+            if (!soundDcitionary.ContainsKey(tag))
+                soundDcitionary.Add(tag, clip);
         }
+
+        soundList = allSounds.ToArray();
 
         soundFXSources = new AudioSource[soundFXSourcePoolSize];
         for (int i = 0; i < soundFXSourcePoolSize; i++)
@@ -55,6 +63,7 @@ public class SoundManager : MonoBehaviour
     {
         if (!instance.soundDcitionary.ContainsKey(tag))
         {
+            Debug.LogWarning("Sound tag not found: " + tag);
             return;
         }
         var source = instance.GetNextSoundFXSource();

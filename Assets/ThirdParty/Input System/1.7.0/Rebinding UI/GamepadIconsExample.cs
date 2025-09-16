@@ -33,7 +33,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
 
             var icon = default(Sprite);
             if (InputSystem.IsFirstLayoutBasedOnSecond(deviceLayoutName, "Gamepad"))
-                icon = InputMaster.instance.gamePadicons.GetSprite(controlPath);
+                icon = InputMaster.instance.icons.gamePadicons.GetSprite(controlPath);
 
             var textComponent = component.bindingText;
 

@@ -190,6 +190,28 @@ public abstract class IProjectile : MonoBehaviour
         Gizmos.DrawLine(this.transform.position, GetPivot());
         Gizmos.DrawWireSphere(GetPivot(), 0.05f);
     }
+
+    public virtual bool IsOwner(GameObject obj)
+    {
+        if (obj == owner) return true;
+        if (obj.TryGetComponent<SubDamageable>(out SubDamageable idmg)) { if (idmg == null) return false; }
+        if (owner.TryGetComponent<IDamagable>(out IDamagable owner_idmg))
+        {
+            if (owner_idmg != null)
+            {
+                if (owner_idmg.subDamagables.Contains(idmg)) return true;
+            }
+        }
+        if (owner.TryGetComponent<SubDamageable>(out SubDamageable subIdmg))
+        {
+            if (subIdmg != null)
+            {
+                owner_idmg = subIdmg.ParentDamageable;
+                if (owner_idmg != null && owner_idmg.subDamagables.Contains(idmg)) return true;
+            }
+        }
+        return false;
+    }
 }
 
 [System.Serializable]

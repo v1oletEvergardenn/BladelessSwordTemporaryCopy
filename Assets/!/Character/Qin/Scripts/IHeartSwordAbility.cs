@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Void = EditorAttributes.Void;
 
 public abstract class IHeartSwordAbility : MonoBehaviour
@@ -10,7 +11,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     [GUIColor(GUIColor.Lime)]
     [FoldoutGroup("Attributes", nameof(abilityName), nameof(abilityDescription),
         nameof(abilityIcon), nameof(HS_Cost), nameof(isTriggeredByAttackKey),
-        nameof(canBeStopped), nameof(isActive))]
+        nameof(canBeStopped), nameof(isActive), nameof(toggleToActivate))]
     public Void abilityVoid1;
 
     [SerializeField, HideProperty] public string abilityName;
@@ -20,6 +21,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     [SerializeField, HideProperty] public bool isTriggeredByAttackKey = true;
     [SerializeField, HideProperty] public bool canBeStopped = true;
     [SerializeField, HideProperty] public bool isActive = false;
+    [SerializeField, HideProperty] public bool toggleToActivate = false;
     [GUIColor(144f, 151f, 222f)] public MeleeAttack HS_attack_effect = new MeleeAttack(2, 0.5f, 0.05f, new Vector2(1, 1.4f), 0.1f, 20f, 0.1f);
 
     [GUIColor(GUIColor.Default)]
@@ -41,7 +43,6 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     [HideProperty] public Animator anim;
     [HideProperty] public HashSet<IDamagable> hsHitTargets = new HashSet<IDamagable>();
     [HideProperty] public bool hsHitEffectPlayed = false;
-
     public Coroutine co_ability;
 
     public virtual void Start()
@@ -50,6 +51,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
         gameManager = GameManager.instance;
         controller = CharacterController2D.instance;
         inputPlayer = InputPlayer.instance;
+        inputMaster = InputMaster.instance;
         playerAttack = PlayerAttack.instance;
         animSet = AnimSetBool.instance;
         health = Health.instance;
@@ -77,12 +79,18 @@ public abstract class IHeartSwordAbility : MonoBehaviour
         isEquipped = true;
     }
 
-    public virtual void ActivateAbility()
+    public bool CheckAnyPerformingAbility()
     {
-        if (health.stunned) return;
-        if (!CheckEnoughHeartSwordPoints()) return;
+        return hSAbilityManager.CheckAnyPerformingAbility();
+    }
+
+    public virtual bool ActivateAbility()
+    {
+        if (health.stunned) return false;
+        if (!CheckEnoughHeartSwordPoints()) return false;
         isActive = true;
         vfx.RumblePulse(0.2f, 0.3f, 0.1f);
+        return true;
     }
 
     public virtual void DeactivateAbility()
@@ -93,7 +101,6 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     public virtual void UnequipAbility()
     {
         DeactivateAbility();
-        UnequipAbility();
         EndAction();
     }
 
@@ -101,6 +108,14 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     {
         if (HS_Cost <= hSAbilityManager.currentHS_point) return true;
         return false;
+    }
+
+    public InputAction GetInputAction()
+    {
+        if (this == hSAbilityManager.abilityB) { return inputMaster._AbilityB; }
+        else if (this == hSAbilityManager.abilityY) { return inputMaster._AbilityY; }
+        else if (this == hSAbilityManager.abilityX) { return inputMaster._AbilityX; }
+        else { return null; }
     }
 
     public virtual void EndAction()

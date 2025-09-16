@@ -1,26 +1,36 @@
+using Cinemachine;
+using EditorAttributes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
+using System.IO;
 using UnityEngine.InputSystem;
+using static SaveSystem;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
+
     private InputMaster inputManager;
 
-    public static GameManager instance;
-    [HideInInspector] public GameObject player;
-    public AnimationCurve outline_flash_anim_curve;
-    [HideInInspector] public Health playerhealth;
-    [HideInInspector] public PlayerAttack playerAttack;
-    [HideInInspector] public InputPlayer playerInput;
-    public CharacterController2D player_controller;
+    [ButtonField("InitializePlayerSaveData", "initializePlayerData")] public Void holder;
+
+    public GameObject playerPrefab;
+    public GameObject player;
+    [HideProperty] public Health playerhealth;
+    [HideProperty] public PlayerAttack playerAttack;
+    [HideProperty] public Energy playerEnergy;
+    [HideProperty] public InputPlayer playerInput;
+    [HideProperty] public CharacterController2D player_controller;
+    [HideProperty] public HeartSwordAbilities hsManager;
+
     public Material FlashEffectMat;
     [HideInInspector] public CinemachineImpulseSource impulseSource;
+    public AnimationCurve outline_flash_anim_curve;
     public bool isInInformationEvent;
     public bool isInDialog;
     public bool GamePaused = false;
-
     public bool isInPerformingState = false;
 
     public enum PlayerSkillsType
@@ -37,25 +47,78 @@ public class GameManager : MonoBehaviour
         HeartSword
     }
 
-    public List<GameObject> NotTobeDestoryedObjects;
-
     private void Awake()
     {
         if (instance == null) { instance = this; }
         else { Destroy(this.gameObject); }
-        //player_Idamagable = Player.GetComponent<Health>();
-        //playerInput = Player.GetComponent<InputPlayer>();
-        //playerAttack = Player.GetComponent<PlayerAttack>();
-        //player_controller = Player.GetComponent<CharacterController2D>();
     }
 
     private void Start()
     {
         impulseSource = GetComponent<CinemachineImpulseSource>();
-        foreach (GameObject obj in NotTobeDestoryedObjects)
+    }
+
+    public bool LoadAndCreatePlayer()
+    {
+        PlayerSaveData data = SaveSystem._saveData.playerData;
+
+        if (player == null)
         {
-            if (obj != null) DontDestroyOnLoad(obj);
+            if (PlayerSave.instance != null) player = PlayerSave.instance.gameObject;
+            else player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+            DontDestroyOnLoad(player);
         }
+
+        playerhealth = player.GetComponentInChildren<Health>();
+        playerInput = player.GetComponentInChildren<InputPlayer>();
+        playerAttack = player.GetComponentInChildren<PlayerAttack>();
+        player_controller = player.GetComponentInChildren<CharacterController2D>();
+        playerEnergy = player.GetComponentInChildren<Energy>();
+        hsManager = HeartSwordAbilities.instance;
+
+        InitializePlayer();
+        PlayerSave.instance.Load(data);
+        return true;
+    }
+
+    public void InitializePlayer()
+    {
+        playerhealth.transform.position = Vector3.zero;
+        playerhealth.SetMaxHealth(30);
+        playerhealth.SetCurrentHealth(30);
+        playerEnergy.maxEnergy = 16;
+        playerEnergy.currentEnergy = 16;
+        hsManager.SetMaxHSPoint(3);
+        hsManager.SetCurrentHSPoint(3);
+    }
+
+    public void InitializePlayerSaveData()
+    {
+        PlayerSaveData data = new PlayerSaveData();
+        data.currentHealth = 30;
+        data.maxHealth = 30;
+        data.currentEnergy = 16;
+        data.maxEnergy = 16;
+        data.currentHSpoint = 0;
+        data.maxHSpoint = 3;
+        SaveSystem._saveData.playerData = data;
+        File.WriteAllText(SaveFileName(SaveSystem.currentSaveSlot), JsonUtility.ToJson(_saveData, true));
+    }
+
+    /// <summary>
+    /// to be updated
+    /// </summary>
+    public void CreateNewGame(int slot)
+    {
+        //created new Game
+        SaveSystem.currentSaveSlot = slot;
+        if (PlayerSave.instance != null) player = PlayerSave.instance.gameObject;
+        else player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+        DontDestroyOnLoad(player);
+        LevelSaveData levelSaveData = new LevelSaveData();
+        levelSaveData.lastSavedScene = "YingYangFish_Scene";
+        SaveSystem._saveData.levelData = levelSaveData;
+        InitializePlayerSaveData();
     }
 
     private void Update()

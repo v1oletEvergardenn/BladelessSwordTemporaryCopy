@@ -20,7 +20,6 @@ public class HeartSwordAbilities : MonoBehaviour
     public List<HeartSwordUIPoint> HS_points = new List<HeartSwordUIPoint>();
 
     public IHeartSwordAbility abilityX;
-
     public IHeartSwordAbility abilityY;
     public IHeartSwordAbility abilityB;
 
@@ -54,8 +53,28 @@ public class HeartSwordAbilities : MonoBehaviour
 
     public void ActivateAbility(IHeartSwordAbility ability)
     {
-        ability.ActivateAbility();
-        currentActivatedAbility = ability;
+        Deactivateability(abilityB);
+        Deactivateability(abilityY);
+        Deactivateability(abilityX);
+        if (ability.ActivateAbility())
+        {
+            currentActivatedAbility = ability;
+        }
+    }
+
+    public bool CheckAnyPerformingAbility()
+    {
+        if (abilityB.isPerforming || abilityX.isPerforming || abilityY.isPerforming) return true;
+        return false;
+    }
+
+    public void Deactivateability(IHeartSwordAbility ability)
+    {
+        if (currentActivatedAbility == ability)
+        {
+            currentActivatedAbility = null;
+        }
+        ability.DeactivateAbility();
     }
 
     public void ModifyHSPoint(float amount)
@@ -95,6 +114,28 @@ public class HeartSwordAbilities : MonoBehaviour
     }
 
     private Coroutine co_refreshHS_UI;
+
+    public float GetMaxHSpoint()
+    {
+        return maxHS_point;
+    }
+
+    public float GetCurrentHSpoint()
+    {
+        return currentHS_point;
+    }
+
+    public void SetMaxHSPoint(float point)
+    {
+        maxHS_point = point;
+        RefreshHS_UI();
+    }
+
+    public void SetCurrentHSPoint(float point)
+    {
+        currentHS_point = point;
+        RefreshHS_UI();
+    }
 
     public void InitializeHS_UI()
     {

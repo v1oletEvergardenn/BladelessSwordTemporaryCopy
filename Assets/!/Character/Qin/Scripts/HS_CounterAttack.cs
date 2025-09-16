@@ -26,6 +26,7 @@ public class HS_CounterAttack : IHeartSwordAbility
         if (!playerAttack.canAttack) return false;
         if (controller.isFloating) return false;
         if (health.stunned) return false;
+        if (CheckAnyPerformingAbility()) return false;
         if (playerAttack.attackTimer < playerAttack.attackGap) return false;
         if (hSAbilityManager.currentHS_point < HS_Cost) { return false; }
         if (controller.FacingRight == isLeft) { controller.Flip(); }

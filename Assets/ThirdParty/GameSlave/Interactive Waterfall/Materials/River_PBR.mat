@@ -1,0 +1,133 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: River_PBR
+  m_Shader: {fileID: -6465566751694194690, guid: 2e28752affbf7e84ebe1276835ef6bbd,
+    type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _AmbientOcclusion:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Metallic:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: 9f4ea7dbb3614c343abf0d47ada48fbc, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_5c5ce9bfca28465aa27680da4e3790c4_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 38d94a761b250fd48ac85a8fa82dd488, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_6ec089b1422948a7bf9c1d933c813b0b_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 5153f31ee04039943aa4463d1b67677a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_dc1793f548f9478f898c1bcf1ae801ee_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 9a1568052101f2f48ba76e7342adc3f3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Smoothness:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - Global_Radius: -0.5
+    - Metallic: 0.152
+    - NormalStrenght: 0.95
+    - Occlusion: 1
+    - Radius: 1
+    - Smoothness: 0
+    - Speed: -1.5
+    - SphereRadius: 0.25
+    - TestFloat: 1
+    - TopDown_Radius: 0.25
+    - _AmbientOcclusionStrenght: 0
+    - _BottomFoamAmount: 7.64
+    - _DisplacementAmount: 2
+    - _DisplacementScale: 20
+    - _DisplacementSpeed: 0.02
+    - _EdgeFoamFrecuency: 12
+    - _EdgeFoamScale: 0.06
+    - _EdgeFoamSpeed: -1
+    - _Float: 1.86
+    - _FoamAmount: 0.27
+    - _FoamFilling: 38.68
+    - _FoamFlowSpeed: -1.5
+    - _FoamScale: 0.1
+    - _GlowFoam: 0
+    - _GlowFoamStrenght: 1
+    - _MetallicStrenght: 0.079
+    - _NormalMap_VerticalSpeed: -1.5
+    - _NormalStrenght: 1
+    - _QueueControl: 1
+    - _QueueOffset: 0
+    - _RefractionAmount: 0.5
+    - _SmoothnessStrenght: 0.669
+    - _TopFoamPosition: 0.84
+    - _Transparency: 1
+    - _vertexDisplacement: 1
+    - foamPower: 7
+    - foamRadius: 0.83
+    - highlightPosition: 0.84
+    - innerFoamRadius: 0.35
+    - radiusGradient: 0.146
+    - refractionPower: 0.4
+    - watergap: 0
+    m_Colors:
+    - BaseColor: {r: 0, g: 0.11149726, b: 1.6226416, a: 0}
+    - NoiseColor: {r: 0.123474486, g: 2.37969, b: 0.4748344, a: 0}
+    - _Color: {r: 0, g: 0.07667971, b: 1, a: 0}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
+    - _FoamColor: {r: 0.4056604, g: 2, b: 1.3892331, a: 0}
+    - _playerDistance: {r: 0, g: 0, b: 0, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
+--- !u!114 &6695124551748313235
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 9

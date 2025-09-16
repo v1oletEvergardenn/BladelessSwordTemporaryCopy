@@ -70,14 +70,14 @@ public class CharacterController2D : MonoBehaviour
     [SerializeField, HideInInspector, Range(0f, 4f)] private float DoubleJumpForceTime = 1f;
     [SerializeField, HideInInspector, Range(0f, 20f)] private float floatingSpeed;
     [SerializeField, HideInInspector, MinMaxSlider(0, 1, true)] public Vector2 floatingRumblingSpeed;
-    public bool input_floating;
-    [HideInInspector] public float floatingTime = 0f;
-    [HideInInspector] public bool resetRumbleJump = false;
-    public bool isJumping = false;
-    public bool isFloating;
-    [HideInInspector] public bool floatTriggered = false;
-    public bool isFalling = false;
-    [HideInInspector] public bool isRunning = false;
+    [HideProperty] public bool input_floating;
+    [HideProperty] public float floatingTime = 0f;
+    [HideProperty] public bool resetRumbleJump = false;
+    [HideProperty] public bool isJumping = false;
+    [HideProperty] public bool isFloating;
+    [HideProperty] public bool floatTriggered = false;
+    [HideProperty] public bool isFalling = false;
+    [HideProperty] public bool isRunning = false;
     private float _fallSpeedYDampingChangeThreshold;
 
     #endregion Jump & Floating Variables

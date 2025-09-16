@@ -3,7 +3,6 @@ using Mobsoft.PixelStyleWaterShader;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class YYF_SingleSwing : IEnemyAction
 {
@@ -11,7 +10,6 @@ public class YYF_SingleSwing : IEnemyAction
     public bool showRange = true;
     public GameObject swingEffect;
     public GameObject swing_outline;
-
     public float attackTime = 0.5f;
     public float jumpRadius = 5f;
     public float jumpHeight = 3f;

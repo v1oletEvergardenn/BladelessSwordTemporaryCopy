@@ -8,8 +8,10 @@ using static UnityEngine.Rendering.DebugUI;
 public class HS_SlashWave : IHeartSwordAbility
 {
     public float actionDuration = 1.5f;
-
+    private float holdThreshold = 0.4f;
     private bool largeSlash = false;
+    private float holdTimer = 0f;
+    private bool attacked = false;
 
     [TabGroup(nameof(smallSlashSettings), nameof(largeSlashSettings))]
     [SerializeField] private Void groupHolder;
@@ -31,29 +33,55 @@ public class HS_SlashWave : IHeartSwordAbility
     public override bool PerformAbility(bool isLeft)
     {
         if (!CheckEnoughHeartSwordPoints()) return false;
-        if (isPerforming) return false;
+        if (CheckAnyPerformingAbility()) return false;
         if (health.stunned) return false;
         hSAbilityManager.ModifyHSPoint(-HS_Cost);
-        animSet.Anim_Move(0);
-        largeSlash = isLeft;
+        largeSlash = false;
         hsHitEffectPlayed = false;
-        playerAttack.combatTimer = 5f;
-        isPerforming = true;
+        effectPlayed = false;
         hsHitTargets.Clear();
-        co_ability = StartCoroutine(Act());
+        holdTimer = 0f;
+        isPerforming = true;
 
         return true;
     }
 
+    private bool effectPlayed = false;
+
     public void Update()
     {
+        if (!isActive) return;
         if (!isPerforming) return;
-
-        playerAttack.canDefend = false;
+        if ((inputMaster._attackLeftAction.IsPressed()
+            || inputMaster._attackRightAction.IsPressed())
+            && !attacked)
+        {
+            holdTimer += Time.unscaledDeltaTime;
+            if (holdTimer >= holdThreshold)
+            {
+                if (!effectPlayed)
+                {
+                    vfx.SpawnEffectWithEnum(Hit_Effect.slash, health.GetHitPos());
+                    vfx.RumblePulse(0.3f, 0.4f, 0.2f);
+                    effectPlayed = true;
+                }
+                largeSlash = true;
+            }
+        }
+        if ((inputMaster._attackLeftAction.WasReleasedThisFrame()
+            || inputMaster._attackRightAction.WasReleasedThisFrame())
+            && !attacked)
+        {
+            animSet.Anim_Move(0);
+            playerAttack.combatTimer = 5f;
+            attacked = true;
+            co_ability = StartCoroutine(Act());
+        }
     }
 
     public override IEnumerator Act()
     {
+        playerAttack.canDefend = false;
         if (largeSlash)
         {
             Attack();
@@ -113,5 +141,6 @@ public class HS_SlashWave : IHeartSwordAbility
         controller.canSwitchNormalAnim = true;
         isPerforming = false;
         hsHitEffectPlayed = false;
+        attacked = false;
     }
 }

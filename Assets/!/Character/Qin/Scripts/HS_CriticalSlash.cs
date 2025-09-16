@@ -17,7 +17,7 @@ public class HS_CriticalSlash : IHeartSwordAbility
     public override bool PerformAbility(bool isLeft)
     {
         if (!CheckEnoughHeartSwordPoints()) return false;
-        if (isPerforming) return false;
+        if (CheckAnyPerformingAbility()) return false;
         if (health.stunned) return false;
         if (controller.FacingRight == isLeft) { controller.Flip(); }
         hSAbilityManager.ModifyHSPoint(-HS_Cost);

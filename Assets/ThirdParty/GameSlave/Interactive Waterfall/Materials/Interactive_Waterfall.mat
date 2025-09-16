@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4866162617420696045
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 9
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Interactive_Waterfall
+  m_Shader: {fileID: -6465566751694194690, guid: 620d5bd8127564544b93ae1471f6e425,
+    type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _SampleTexture2D_5c5ce9bfca28465aa27680da4e3790c4_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 38d94a761b250fd48ac85a8fa82dd488, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_6ec089b1422948a7bf9c1d933c813b0b_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 5153f31ee04039943aa4463d1b67677a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_dc1793f548f9478f898c1bcf1ae801ee_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 9a1568052101f2f48ba76e7342adc3f3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - Global_Radius: -0.5
+    - Metallic: 0.152
+    - NormalStrenght: 0.95
+    - Occlusion: 1
+    - Radius: 1
+    - Smoothness: 0
+    - SphereRadius: 0.5
+    - TestFloat: 1
+    - TopDown_Radius: 0.5
+    - _BottomEdge: 12.67
+    - _DisplacementScale: 5
+    - _DisplacementSpeed: 0.2
+    - _DisplacementStrenght: 1.5
+    - _EdgeFoam: 0.11
+    - _EdgeFoamFrecuency: 25
+    - _EdgeFoamSpeed: 0.65
+    - _Float: 1.86
+    - _FlowSpeed: 1.5
+    - _FoamAmount: 0.27
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _RefractionStrength: 0.5
+    - _Transparency: 1
+    - _VerticalFoam_Position: 0.63
+    - foamRadius: 0.83
+    - innerFoamRadius: 0.35
+    - radiusGradient: 0
+    - watergap: 0.37
+    m_Colors:
+    - BaseColor: {r: 0, g: 0.15604067, b: 1, a: 0}
+    - NoiseColor: {r: 0.12459107, g: 0.6064397, b: 2.37969, a: 0}
+    - _BaseColor: {r: 0, g: 0.023529291, b: 0.5, a: 0}
+    - _BottomColor: {r: 0, g: 0.25163606, b: 5.3403134, a: 0}
+    - _BottomEdgeColor: {r: 0.4948663, g: 1, b: 0, a: 0}
+    - _FoamColor: {r: 0, g: 0.5, b: 0.27234256, a: 0}
+    - _playerDistance: {r: 0, g: 0, b: 0, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

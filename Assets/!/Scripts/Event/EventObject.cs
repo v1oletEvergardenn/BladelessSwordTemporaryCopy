@@ -22,6 +22,12 @@ public abstract class EventObject : MonoBehaviour
     [ShowField(nameof(HoldRumble)), MinMaxSlider(0, 2f)] public Vector2 rumbleFrequency;
 
     // Start is called before the first frame update
+
+    private void Start()
+    {
+        interactSprite.SetActive(false);
+    }
+
     public virtual void InteractEvent()
     {
         _Event?.Invoke();
@@ -49,6 +55,8 @@ public abstract class EventObject : MonoBehaviour
             if (!HoldToInteract)
             {
                 InteractedRing.fillAmount = 1;
+                InteractEvent();
+                EndInteraction();
             }
             else
             {
@@ -65,10 +73,6 @@ public abstract class EventObject : MonoBehaviour
                     InteractEvent();
                 }
             }
-            else
-            {
-                InteractEvent();
-            }
 
             EndInteraction();
         }
@@ -79,6 +83,6 @@ public abstract class EventObject : MonoBehaviour
         isHolding = false;
         InteractedRing.fillAmount = 0;
         holdingTimer = 0f;
-        VFXManager.instance.StopRumble();
+        if (HoldToInteract) VFXManager.instance.StopRumble();
     }
 }

@@ -16,12 +16,14 @@ public class CameraLimit : MonoBehaviour
     public bool includePlayer = false;
     public float y_limit_low;
     public bool DEBUG = false;
+    public bool collideToTrigger = true;
 
     /// <summary>
     /// once touched the collision, update the camera zoom on Player, change the limit variable to this.
     /// </summary>
     public void UpdateLimit()
     {
+        CameraManager.SwitchPixelPerfectCamera(false);
         CameraFollow camZoom = CameraFollow.instance;
         cam.GetComponent<CameraRegister>().SwitchThisCam();
         camZoom.limitCam = cam;
@@ -40,6 +42,7 @@ public class CameraLimit : MonoBehaviour
     /// </summary>
     public void Deactivate()
     {
+        CameraManager.SwitchPixelPerfectCamera(true);
         CameraFollow.instance.Deactivate();
     }
 
@@ -58,8 +61,10 @@ public class CameraLimit : MonoBehaviour
     {
         if (collision.gameObject.layer == 6 | collision.gameObject.layer == 14)
         {
-            CameraManager.SwitchPixelPerfectCamera(false);
-            UpdateLimit();
+            if (collideToTrigger)
+            {
+                UpdateLimit();
+            }
         }
     }
 
@@ -67,8 +72,10 @@ public class CameraLimit : MonoBehaviour
     {
         if (collision.gameObject.layer == 6 | collision.gameObject.layer == 14)
         {
-            CameraManager.SwitchPixelPerfectCamera(true);
-            Deactivate();
+            if (collideToTrigger)
+            {
+                Deactivate();
+            }
         }
     }
 }

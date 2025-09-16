@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class IDamagable : MonoBehaviour
 {
     [FoldoutGroup("HitPos", nameof(getHitPosition), nameof(color))] public Void hitposVoid1;
-    [SerializeField, HideInInspector] private Vector3 getHitPosition;
+    [SerializeField, HideInInspector] public Vector3 getHitPosition;
     [SerializeField, HideInInspector] public Color color = Color.red;
 
     [HideInInspector] public HashSet<SubDamageable> subDamagables = new HashSet<SubDamageable>();

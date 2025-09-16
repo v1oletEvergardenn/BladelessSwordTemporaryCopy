@@ -1,15 +1,9 @@
 using DG.Tweening;
 using EditorAttributes;
-using JetBrains.Annotations;
-using Microlight.MicroBar;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.UI.Image;
 using Random = UnityEngine.Random;
 using Void = EditorAttributes.Void;
 
@@ -91,7 +85,7 @@ public class YingYangFish_AI : IEnemyController
     [FoldoutGroup("General References", nameof(waterLevel), nameof(endCanvas),
         nameof(EventInteract), nameof(black_particle), nameof(white_particle),
        nameof(black_tex), nameof(white_tex), nameof(swimEffect), nameof(fish_origin),
-        nameof(interaction))]
+        nameof(interaction), nameof(camLimit))]
     public Void refenereceGroup;
 
     [SerializeField, HideInInspector] public Transform endCanvas;
@@ -933,7 +927,7 @@ public class YingYangFish_AI : IEnemyController
 
         if (distanceToPlayer >= waterSpearRange)
         {
-            possibleActions.Add(RandomPick<IEnemyAction>(gatling, waterSpear));
+            possibleActions.Add(Possibility(70) ? waterSpear : gatling);
         }
 
         // if player far
@@ -944,7 +938,7 @@ public class YingYangFish_AI : IEnemyController
         }
 
         int index = Random.Range(0, possibleActions.Count);
-        initialAction = waterSpear;
+        initialAction = possibleActions[index];
 
         if (initialAction == waterSpear)
         {
@@ -989,6 +983,8 @@ public class YingYangFish_AI : IEnemyController
     {
         Vector3 pos = new Vector3(center.position.x, 0, 0);
         interaction.transform.localPosition = Vector3.zero;
+        leftBoundary.gameObject.SetActive(true);
+        rightBoundary.gameObject.SetActive(true);
         float timer = 0f;
         while (timer <= 2f)
         {
@@ -1038,6 +1034,7 @@ public class YingYangFish_AI : IEnemyController
             if (fish_origin.position.y > waterLevel.position.y + 2)
             {
                 center.DOLocalMove(Vector3.zero, 0.3f).SetEase(Ease.Linear);
+                getHitPosition = Vector3.zero;
                 blackAnim.SetBool("dive_end", true);
                 whiteAnim.SetBool("dive_end", true);
             }
@@ -1053,6 +1050,7 @@ public class YingYangFish_AI : IEnemyController
 
         CameraFollow.instance.targets.Add(blackFish);
         CameraFollow.instance.targets.Add(whiteFish);
+
         yield return co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
         co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
         yield return new WaitForSeconds(2f);
@@ -1119,7 +1117,8 @@ public class YingYangFish_AI : IEnemyController
         if (!secondPhase)
         {
             StartCoroutine(IE_Activate());
-
+            camLimit.UpdateLimit();
+            CameraFollow.instance.targets.Add(center);
             EventInteract.SetActive(false);
         }
         else
