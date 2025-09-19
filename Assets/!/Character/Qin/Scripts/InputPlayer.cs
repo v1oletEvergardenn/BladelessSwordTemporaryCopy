@@ -307,9 +307,9 @@ public class InputPlayer : MonoBehaviour
 
     private void HandleAbilityInput()
     {
-        input(inputMaster._AbilityB, hSAbilitiesManager.abilityB);
-        input(inputMaster._AbilityX, hSAbilitiesManager.abilityX);
-        input(inputMaster._AbilityY, hSAbilitiesManager.abilityY);
+        input(inputMaster._AbilityB, hSAbilitiesManager.abilityEast);
+        input(inputMaster._AbilityX, hSAbilitiesManager.abilityWest);
+        input(inputMaster._AbilityY, hSAbilitiesManager.abilityNorth);
 
         void input(InputAction input, IHeartSwordAbility ability)
         {

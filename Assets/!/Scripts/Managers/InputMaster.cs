@@ -356,7 +356,10 @@ public enum InputKeyType
     swordTeleport_key,
     jump_key,
     move_key,
-    aim_key
+    aim_key,
+    AbilityWest_key,
+    AbilityNorth_key,
+    AbilityEast_key
 }
 
 public enum EmotionType

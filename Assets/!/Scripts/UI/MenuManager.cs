@@ -30,11 +30,9 @@ public class MenuManager : MonoBehaviour
     [Header("Pause InGame Canvas")] public GameObject PauseGameCanvas;
     public List<GameObject> Tabs;
     private int currentIndexTab = 0;
-
+    public bool canChangeTab = true;
+    public bool canCloseMenu = true;
     [Header("End Canvas")] public GameObject EndGameCanvas;
-    [Header("TutJumpOut")] public GameObject TutJumpOutCanvas;
-    public GameObject tutJumpOutCTX;
-    public List<Tutorial> jump_tuts = new List<Tutorial>();
 
     private void Awake()
     {
@@ -50,8 +48,6 @@ public class MenuManager : MonoBehaviour
 
         InputMaster.instance._MenuOpenAction.performed += ctx => OpenPauseGameCanvas();
         InputMaster.instance.uiActions.MenuClose.performed += ctx => ClosePauseGameCanvas();
-        InputMaster.instance.uiActions.MenuClose.performed += ctx => CloseTutJumpOut();
-        jump_tuts = tutJumpOutCTX.GetComponentsInChildren<Tutorial>().ToList();
     }
 
     public void OpenPauseGameCanvas()
@@ -60,11 +56,13 @@ public class MenuManager : MonoBehaviour
         currentIndexTab = -1;
         NextTab();
         PauseGameCanvas.SetActive(true);
+        canChangeTab = true;
         InputMaster.instance._playerInput.SwitchCurrentActionMap("UI");
     }
 
     public void ClosePauseGameCanvas()
     {
+        if (!canCloseMenu) return;
         GameManager.instance.UnpauseGame();
         PauseGameCanvas.SetActive(false);
         InputMaster.instance._playerInput.SwitchCurrentActionMap("Gameplay");
@@ -72,12 +70,14 @@ public class MenuManager : MonoBehaviour
 
     public void NextTab()
     {
+        if (!canChangeTab) return;
         currentIndexTab++;
         ShowTab();
     }
 
     public void PreviousTab()
     {
+        if (!canChangeTab) return;
         currentIndexTab--;
         ShowTab();
     }
@@ -108,16 +108,13 @@ public class MenuManager : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(EndGameCanvas.GetComponent<FirstSelectObjectSerializer>().Selected());
     }
 
-    public void TutJumpOut(TutType tutType)
+    public void CanSwitchTab(bool b)
     {
-        TutJumpOutCanvas.SetActive(true);
-        GameManager.instance.PauseGame();
-        jump_tuts[(int)tutType].UpdateInformation();
+        canChangeTab = b;
     }
 
-    public void CloseTutJumpOut()
+    public void CanCloseMenu(bool b)
     {
-        TutJumpOutCanvas.SetActive(false);
-        GameManager.instance.UnpauseGame();
+        canCloseMenu = b;
     }
 }

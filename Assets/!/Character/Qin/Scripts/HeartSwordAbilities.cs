@@ -4,26 +4,56 @@ using Microlight.MicroBar;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Profiling.Memory.Experimental;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Void = EditorAttributes.Void;
+
+public enum AbilitySlot
+{
+    West,
+    North,
+    East
+}
 
 public class HeartSwordAbilities : MonoBehaviour
 {
     public static HeartSwordAbilities instance;
+    [FoldoutGroup("reference", nameof(selfPooler), nameof(rb), nameof(anim))] public Void referenceVoid;
+    [SerializeField, HideProperty] public InternalObjectPooler selfPooler;
+    [SerializeField, HideProperty] public Rigidbody2D rb;
+    [SerializeField, HideProperty] public Animator anim;
 
-    public InternalObjectPooler selfPooler;
-    public Rigidbody2D rb;
-    public Animator anim;
+    [GUIColor(GUIColor.Lime)]
+    [FoldoutGroup("HeartSword Abilities", nameof(maxHS_point),
+         nameof(HS_points), nameof(abilityWest), nameof(abilityEast),
+         nameof(abilityNorth), nameof(currentActivatedAbility))]
+    public Void heartSwordVoid;
 
-    [SerializeField] private float maxHS_point = 3;
+    [SerializeField, HideProperty] private float maxHS_point = 3;
+    [SerializeField, HideProperty] public List<HeartSwordUIPoint> HS_points = new List<HeartSwordUIPoint>();
+    [SerializeField, HideProperty] public IHeartSwordAbility abilityWest;
+    [SerializeField, HideProperty] public IHeartSwordAbility abilityNorth;
+    [SerializeField, HideProperty] public IHeartSwordAbility abilityEast;
+    [SerializeField, HideProperty] public IHeartSwordAbility currentActivatedAbility = null;
     [SerializeField] public float currentHS_point { get; private set; } = 0;
-    public List<HeartSwordUIPoint> HS_points = new List<HeartSwordUIPoint>();
 
-    public IHeartSwordAbility abilityX;
-    public IHeartSwordAbility abilityY;
-    public IHeartSwordAbility abilityB;
+    [GUIColor(144f, 151f, 222f)]
+    [FoldoutGroup("HS_ability swap menu", nameof(Btn_abilityEast), nameof(Btn_abilityNorth),
+        nameof(Btn_abilityWest), nameof(available_abilities), nameof(segments), nameof(SelectHSAbilityUI),
+        nameof(HSAbiltiyUI))]
+    public Void hsAbilitySwapMenuVoid;
 
-    public IHeartSwordAbility currentActivatedAbility = null;
+    [SerializeField, HideProperty] public List<IHeartSwordAbility> available_abilities = new List<IHeartSwordAbility>();
+    [SerializeField, HideProperty] public List<Ability_UI_segment> segments;
+    [SerializeField, HideProperty] public GameObject SelectHSAbilityUI;
+    [SerializeField, HideProperty] public GameObject HSAbiltiyUI;
+    [SerializeField, HideProperty] public Btn_HSAbility Btn_abilityWest;
+    [SerializeField, HideProperty] public Btn_HSAbility Btn_abilityNorth;
+    [SerializeField, HideProperty] public Btn_HSAbility Btn_abilityEast;
+
+    private AbilitySlot slot;
 
     public void Awake()
     {
@@ -32,9 +62,10 @@ public class HeartSwordAbilities : MonoBehaviour
 
     private void Start()
     {
-        if (abilityX != null) abilityX.EquipAbility();
-        if (abilityY != null) abilityY.EquipAbility();
-        if (abilityB != null) abilityB.EquipAbility();
+        if (abilityWest != null) abilityWest.EquipAbility();
+        if (abilityNorth != null) abilityNorth.EquipAbility();
+        if (abilityEast != null) abilityEast.EquipAbility();
+        SelectHSAbilityUI.SetActive(false);
         InitializeHS_UI();
     }
 
@@ -44,18 +75,73 @@ public class HeartSwordAbilities : MonoBehaviour
         Lit();
     }
 
+    public void SelectSlotBeforeSwitchAbility(Btn_HSAbility btnSlot)
+    {
+        slot = btnSlot.abilitySlot;
+    }
+
+    public void OpenSelectAbilityMenu()
+    {
+        // iterate through available abilities
+        for (int i = 0; i < segments.Count; i++)
+        {
+            segments[i].equipped = false;
+            segments[i].ability = null;
+            if (i < available_abilities.Count)
+            {
+                segments[i].ability = available_abilities[i];
+                if (segments[i].ability == abilityWest ||
+                     segments[i].ability == abilityNorth ||
+                      segments[i].ability == abilityEast)
+                {
+                    segments[i].equipped = true;
+                }
+            }
+        }
+
+        HSAbiltiyUI.SetActive(false);
+        SelectHSAbilityUI.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(segments[0].gameObject);
+        // open select ability menu
+    }
+
+    public void ChangeAbility(IHeartSwordAbility newAbility)
+    {
+        switch (slot)
+        {
+            case AbilitySlot.West:
+                abilityWest = newAbility;
+                abilityWest.EquipAbility();
+                break;
+
+            case AbilitySlot.North:
+                abilityNorth = newAbility;
+                abilityNorth.EquipAbility();
+                break;
+
+            case AbilitySlot.East:
+                abilityEast = newAbility;
+                abilityEast.EquipAbility();
+                break;
+        }
+
+        SelectHSAbilityUI.SetActive(false);
+        HSAbiltiyUI.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(Btn_abilityNorth.gameObject);
+    }
+
     public void CancelAllAbilities()
     {
-        if (abilityX != null && abilityX.canBeStopped) abilityX.CancelAction();
-        if (abilityY != null && abilityY.canBeStopped) abilityY.CancelAction();
-        if (abilityB != null && abilityB.canBeStopped) abilityB.CancelAction();
+        if (abilityWest != null && abilityWest.canBeStopped) abilityWest.CancelAction();
+        if (abilityNorth != null && abilityNorth.canBeStopped) abilityNorth.CancelAction();
+        if (abilityEast != null && abilityEast.canBeStopped) abilityEast.CancelAction();
     }
 
     public void ActivateAbility(IHeartSwordAbility ability)
     {
-        Deactivateability(abilityB);
-        Deactivateability(abilityY);
-        Deactivateability(abilityX);
+        Deactivateability(abilityEast);
+        Deactivateability(abilityNorth);
+        Deactivateability(abilityWest);
         if (ability.ActivateAbility())
         {
             currentActivatedAbility = ability;
@@ -64,7 +150,7 @@ public class HeartSwordAbilities : MonoBehaviour
 
     public bool CheckAnyPerformingAbility()
     {
-        if (abilityB.isPerforming || abilityX.isPerforming || abilityY.isPerforming) return true;
+        if (abilityEast.isPerforming || abilityWest.isPerforming || abilityNorth.isPerforming) return true;
         return false;
     }
 

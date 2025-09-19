@@ -9,14 +9,12 @@ using Void = EditorAttributes.Void;
 public abstract class IHeartSwordAbility : MonoBehaviour
 {
     [GUIColor(GUIColor.Lime)]
-    [FoldoutGroup("Attributes", nameof(abilityName), nameof(abilityDescription),
-        nameof(abilityIcon), nameof(HS_Cost), nameof(isTriggeredByAttackKey),
+    [FoldoutGroup("Attributes", nameof(abilityAttributes),
+        nameof(HS_Cost), nameof(isTriggeredByAttackKey),
         nameof(canBeStopped), nameof(isActive), nameof(toggleToActivate))]
     public Void abilityVoid1;
 
-    [SerializeField, HideProperty] public string abilityName;
-    [SerializeField, HideProperty] public string abilityDescription;
-    [SerializeField, HideProperty] public Sprite abilityIcon;
+    [SerializeField, HideProperty] public SO_HeartSwordAttribute abilityAttributes;
     [SerializeField, HideProperty][Range(0, 10)] public int HS_Cost;
     [SerializeField, HideProperty] public bool isTriggeredByAttackKey = true;
     [SerializeField, HideProperty] public bool canBeStopped = true;
@@ -112,9 +110,9 @@ public abstract class IHeartSwordAbility : MonoBehaviour
 
     public InputAction GetInputAction()
     {
-        if (this == hSAbilityManager.abilityB) { return inputMaster._AbilityB; }
-        else if (this == hSAbilityManager.abilityY) { return inputMaster._AbilityY; }
-        else if (this == hSAbilityManager.abilityX) { return inputMaster._AbilityX; }
+        if (this == hSAbilityManager.abilityEast) { return inputMaster._AbilityB; }
+        else if (this == hSAbilityManager.abilityNorth) { return inputMaster._AbilityY; }
+        else if (this == hSAbilityManager.abilityWest) { return inputMaster._AbilityX; }
         else { return null; }
     }
 

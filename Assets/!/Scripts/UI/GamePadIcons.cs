@@ -72,6 +72,9 @@ public class GamePadIcons : ScriptableObject
                 case InputKeyType.jump_key: return buttonSouth;
                 case InputKeyType.move_key: return leftStick;
                 case InputKeyType.aim_key: return rightStick;
+                case InputKeyType.AbilityWest_key: return buttonWest;
+                case InputKeyType.AbilityNorth_key: return buttonNorth;
+                case InputKeyType.AbilityEast_key: return buttonEast;
                 default: return null;
             }
         }
