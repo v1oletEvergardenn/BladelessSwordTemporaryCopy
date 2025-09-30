@@ -82,7 +82,20 @@ public class InputMaster : MonoBehaviour
         gameplayActions = input.Gameplay;
         uiActions = input.UI;
         gameplayActions.Enable();
-        uiActions.Disable();
+        uiActions.Enable();
+        _playerInput.SwitchCurrentActionMap("GamePlay");
+        //uiActions.Disable();
+    }
+
+    public void SwitchToUIAction()
+    {
+        InputMaster.instance._playerInput.SwitchCurrentActionMap("UI");
+        InputPlayer.instance.moveDir = Vector2.zero;
+    }
+
+    public void SwitchToGameplayAction()
+    {
+        InputMaster.instance._playerInput.SwitchCurrentActionMap("Gameplay");
     }
 
     private void Start()

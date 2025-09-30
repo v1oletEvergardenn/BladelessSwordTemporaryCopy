@@ -29,17 +29,20 @@ public class Btn_HSAbility : MonoBehaviour
         switch (abilitySlot)
         {
             case AbilitySlot.West:
-                ability = hsManager.abilityWest;
+                if (hsManager.abilityWest != null) ability = hsManager.abilityWest;
+                else { ability = null; }
                 inputKeyType = InputKeyType.AbilityWest_key;
                 break;
 
             case AbilitySlot.North:
-                ability = hsManager.abilityNorth;
+                if (hsManager.abilityNorth != null) ability = hsManager.abilityNorth;
+                else { ability = null; }
                 inputKeyType = InputKeyType.AbilityNorth_key;
                 break;
 
             case AbilitySlot.East:
-                ability = hsManager.abilityEast;
+                if (hsManager.abilityEast != null) ability = hsManager.abilityEast;
+                else { ability = null; }
                 inputKeyType = InputKeyType.AbilityEast_key;
                 break;
         }
@@ -54,7 +57,7 @@ public class Btn_HSAbility : MonoBehaviour
 
     public void SelectAbility()
     {
-        HeartSwordAbilities.instance.SelectSlotBeforeSwitchAbility(this);
-        HeartSwordAbilities.instance.OpenSelectAbilityMenu();
+        HSAbilitySwapMenu.instance.SelectSlotBeforeSwitchAbility(this);
+        HSAbilitySwapMenu.instance.OpenSelectAbilityMenu();
     }
 }

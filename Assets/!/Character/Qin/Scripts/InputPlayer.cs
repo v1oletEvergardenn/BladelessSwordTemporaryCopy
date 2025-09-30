@@ -87,7 +87,7 @@ public class InputPlayer : MonoBehaviour
     [HideInInspector] public bool input_floating = false;
     [HideInInspector] public float input_floating_timer = 0f;
     private float horizontalMove = 0f;
-    private Vector2 moveDir;
+    [HideInInspector] public Vector2 moveDir;
 
     #endregion Movement & Input State
 
@@ -112,6 +112,8 @@ public class InputPlayer : MonoBehaviour
         gameManager.playerInput = this;
         gameManager.playerhealth = Health.instance;
         gameManager.playerAttack = PlayerAttack.instance;
+        gameManager.playerEnergy = Energy.instance;
+        gameManager.hsManager = HeartSwordAbilities.instance;
         gameManager.player_controller = CharacterController2D.instance;
         gameManager.player = gameManager.playerhealth.gameObject;
 

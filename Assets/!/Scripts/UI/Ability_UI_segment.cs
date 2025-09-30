@@ -10,6 +10,7 @@ public class Ability_UI_segment : MonoBehaviour
     public TextMeshProUGUI chineseText;
     public Image icon;
     public Image panel;
+    public Image input;
     public Color equipedColor;
     public Color unequipedColor;
     public bool equipped = false;
@@ -27,10 +28,17 @@ public class Ability_UI_segment : MonoBehaviour
             if (equipped)
             {
                 panel.color = equipedColor;
+                input.color = new Color(1, 1, 1, 1);
+                input.sprite = HeartSwordAbilities.instance.GetInputSpriteOnAbility(ability);
+            }
+            else
+            {
+                input.color = new Color(1, 1, 1, 0);
             }
         }
         else
         {
+            input.color = new Color(1, 1, 1, 0);
             chineseText.text = "";
             icon.sprite = null;
         }
@@ -58,6 +66,6 @@ public class Ability_UI_segment : MonoBehaviour
             yield return null;
         }
         panel.color = endColor; // Ensure final color is set
-        HeartSwordAbilities.instance.ChangeAbility(ability);
+        HSAbilitySwapMenu.instance.ChangeAbility(ability);
     }
 }

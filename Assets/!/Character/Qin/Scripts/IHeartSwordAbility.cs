@@ -2,6 +2,7 @@ using EditorAttributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Void = EditorAttributes.Void;
@@ -9,15 +10,17 @@ using Void = EditorAttributes.Void;
 public abstract class IHeartSwordAbility : MonoBehaviour
 {
     [GUIColor(GUIColor.Lime)]
-    [FoldoutGroup("Attributes", nameof(abilityAttributes),
+    [FoldoutGroup("Attributes", nameof(abilityAttributes), nameof(equippedBranch),
         nameof(HS_Cost), nameof(isTriggeredByAttackKey),
-        nameof(canBeStopped), nameof(isActive), nameof(toggleToActivate))]
+        nameof(canBeStopped), nameof(learned), nameof(isActive), nameof(toggleToActivate))]
     public Void abilityVoid1;
 
     [SerializeField, HideProperty] public SO_HeartSwordAttribute abilityAttributes;
+    [SerializeField, HideProperty] public IHeartSwordAbilityBranch equippedBranch;
     [SerializeField, HideProperty][Range(0, 10)] public int HS_Cost;
     [SerializeField, HideProperty] public bool isTriggeredByAttackKey = true;
     [SerializeField, HideProperty] public bool canBeStopped = true;
+    [SerializeField, HideProperty] public bool learned = false;
     [SerializeField, HideProperty] public bool isActive = false;
     [SerializeField, HideProperty] public bool toggleToActivate = false;
     [GUIColor(144f, 151f, 222f)] public MeleeAttack HS_attack_effect = new MeleeAttack(2, 0.5f, 0.05f, new Vector2(1, 1.4f), 0.1f, 20f, 0.1f);
@@ -40,6 +43,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     [HideProperty] public HeartSwordAbilities hSAbilityManager;
     [HideProperty] public Animator anim;
     [HideProperty] public HashSet<IDamagable> hsHitTargets = new HashSet<IDamagable>();
+    [HideProperty] public List<IHeartSwordAbilityBranch> branches = new List<IHeartSwordAbilityBranch>();
     [HideProperty] public bool hsHitEffectPlayed = false;
     public Coroutine co_ability;
 
@@ -58,6 +62,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
         selfPooler = hSAbilityManager.selfPooler;
         rb = hSAbilityManager.rb;
         anim = hSAbilityManager.anim;
+        branches = GetComponents<IHeartSwordAbilityBranch>().ToList<IHeartSwordAbilityBranch>();
     }
 
     public virtual bool PerformAbility(bool isLeft)
@@ -70,6 +75,18 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     public virtual IEnumerator Act()
     {
         yield return null;
+    }
+
+    public virtual void ChangeBranch(IHeartSwordAbilityBranch branch)
+    {
+        abilityAttributes = branch.abilityAttributes;
+        HS_Cost = branch.HS_Cost;
+        isTriggeredByAttackKey = branch.isTriggeredByAttackKey;
+        canBeStopped = branch.canBeStopped;
+        learned = branch.learned;
+        toggleToActivate = branch.toggleToActivate;
+        HS_attack_effect = branch.HS_attack_effect;
+        equippedBranch = branch;
     }
 
     public virtual void EquipAbility()

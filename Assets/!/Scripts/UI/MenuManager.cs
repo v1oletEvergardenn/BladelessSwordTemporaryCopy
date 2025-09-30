@@ -32,6 +32,10 @@ public class MenuManager : MonoBehaviour
     private int currentIndexTab = 0;
     public bool canChangeTab = true;
     public bool canCloseMenu = true;
+
+    [Header("Save Point Canvas")] public GameObject SavePointCanvas;
+    public GameObject SavePointMenu;
+    public GameObject HSAbilitySwapMenu;
     [Header("End Canvas")] public GameObject EndGameCanvas;
 
     private void Awake()
@@ -42,12 +46,25 @@ public class MenuManager : MonoBehaviour
     private void Start()
     {
         PauseGameCanvas.SetActive(false);
-
+        SavePointCanvas.SetActive(false);
         InputMaster.instance.uiActions.FlipPage_LB.performed += ctx => PreviousTab();
         InputMaster.instance.uiActions.FlipPage_RB.performed += ctx => NextTab();
 
         InputMaster.instance._MenuOpenAction.performed += ctx => OpenPauseGameCanvas();
-        InputMaster.instance.uiActions.MenuClose.performed += ctx => ClosePauseGameCanvas();
+        InputMaster.instance.uiActions.MenuClose.performed += ctx => CloseMenu();
+    }
+
+    public void CloseMenu()
+    {
+        print(1);
+        if (PauseGameCanvas.activeInHierarchy)
+        {
+            ClosePauseGameCanvas();
+        }
+        else if (SavePointCanvas.activeInHierarchy)
+        {
+            CloseSavePointCanvas();
+        }
     }
 
     public void OpenPauseGameCanvas()
@@ -57,7 +74,7 @@ public class MenuManager : MonoBehaviour
         NextTab();
         PauseGameCanvas.SetActive(true);
         canChangeTab = true;
-        InputMaster.instance._playerInput.SwitchCurrentActionMap("UI");
+        InputMaster.instance.SwitchToUIAction();
     }
 
     public void ClosePauseGameCanvas()
@@ -65,7 +82,22 @@ public class MenuManager : MonoBehaviour
         if (!canCloseMenu) return;
         GameManager.instance.UnpauseGame();
         PauseGameCanvas.SetActive(false);
-        InputMaster.instance._playerInput.SwitchCurrentActionMap("Gameplay");
+        InputMaster.instance.SwitchToGameplayAction();
+    }
+
+    public void OpenSavePointCanvas()
+    {
+        SavePointCanvas.SetActive(true);
+        SavePointMenu.SetActive(true);
+        HSAbilitySwapMenu.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(SavePointMenu.GetComponent<FirstSelectObjectSerializer>().Selected());
+        InputMaster.instance.SwitchToUIAction();
+    }
+
+    public void CloseSavePointCanvas()
+    {
+        SavePointCanvas.SetActive(false);
+        InputMaster.instance.SwitchToGameplayAction();
     }
 
     public void NextTab()

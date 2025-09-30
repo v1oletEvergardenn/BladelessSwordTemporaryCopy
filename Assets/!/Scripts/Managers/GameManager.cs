@@ -121,10 +121,6 @@ public class GameManager : MonoBehaviour
         InitializePlayerSaveData();
     }
 
-    private void Update()
-    {
-    }
-
     public void LearnSkills(PlayerSkillsType skill)
     {
         if (skill == PlayerSkillsType.Movement)
@@ -170,7 +166,6 @@ public class GameManager : MonoBehaviour
         GamePaused = true;
         Time.timeScale = 0f;
         InputMaster.instance.gameplayActions.Disable();
-        InputMaster.instance.uiActions.Enable();
         PlayerAttack.instance.anim.SetBool("isRunning", false);
     }
 
@@ -179,6 +174,5 @@ public class GameManager : MonoBehaviour
         GamePaused = false;
         Time.timeScale = 1f;
         InputMaster.instance.gameplayActions.Enable();
-        InputMaster.instance.uiActions.Disable();
     }
 }

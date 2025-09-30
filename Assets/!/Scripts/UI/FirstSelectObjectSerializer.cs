@@ -26,7 +26,7 @@ public class FirstSelectObjectSerializer : MonoBehaviour
         return FirstSelectObject;
     }
 
-    public void SetFristObject()
+    public void SetFirstObject()
     {
         EventSystem.current.SetSelectedGameObject(FirstSelectObject);
     }

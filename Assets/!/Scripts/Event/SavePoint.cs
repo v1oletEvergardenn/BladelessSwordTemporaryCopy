@@ -6,9 +6,10 @@ public class SavePoint : EventObject
 {
     public override void InteractEvent()
     {
+        MenuManager.instance.OpenSavePointCanvas();
         _Event?.Invoke();
         //save game
-        SaveSystem.Save();
+        //SaveSystem.Save();
         //show saved UI
         //rumble
         VFXManager.instance.RumblePulse(0.3f, 0.5f, 0.2f);
