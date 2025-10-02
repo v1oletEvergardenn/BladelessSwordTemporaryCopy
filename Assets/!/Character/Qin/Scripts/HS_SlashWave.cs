@@ -30,7 +30,7 @@ public class HS_SlashWave : IHeartSwordAbility
     [SerializeField, HideProperty, PropertyWidth(200f)] public float large_slash_speed = 40f;
     [SerializeField, HideProperty, PropertyWidth(200f)] public float large_slash_stun = 10f;
 
-    public override bool PerformAbility(bool isLeft)
+    public override bool OriginalAbilityPerformance(bool isLeft)
     {
         if (!CheckEnoughHeartSwordPoints()) return false;
         if (CheckAnyPerformingAbility()) return false;

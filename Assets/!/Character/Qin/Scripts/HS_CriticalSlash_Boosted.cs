@@ -1,37 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 using static UnityEngine.Rendering.DebugUI;
 
-public class HS_CriticalSlash : IHeartSwordAbility
+public class HS_CriticalSlash_Boosted : IHeartSwordAbilityBranch
 {
-    public float actionDuration = 1.5f;
-    public Collider2D hitBox;
+    private HS_CriticalSlash criticalSlash;
 
-    public override void Start()
-    {
-        base.Start();
-        hitBox.enabled = false;
-    }
-
-    public override bool OriginalAbilityPerformance(bool isLeft)
+    public override bool BranchAbilityPerformance(bool isLeft)
     {
         if (!CheckEnoughHeartSwordPoints()) return false;
         if (CheckAnyPerformingAbility()) return false;
         if (health.stunned) return false;
         if (controller.FacingRight == isLeft) { controller.Flip(); }
         hSAbilityManager.ModifyHSPoint(-HS_Cost);
-
-        print("performing original ability");
-
+        print("performing branch ability");
         inputPlayer.DisableAllActions();
         animSet.Anim_Hit(0);
         controller.canSwitchNormalAnim = false;
         hsHitEffectPlayed = false;
         playerAttack.combatTimer = 5f;
-        isPerforming = true;
+        parentAbility.isPerforming = true;
         hsHitTargets.Clear();
-        co_ability = StartCoroutine(Act());
+        parentAbility.co_ability = StartCoroutine(Act());
 
         return true;
     }
@@ -45,26 +37,30 @@ public class HS_CriticalSlash : IHeartSwordAbility
         anim.Play("HS_critical_slash");
         if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(2.76f);
         else yield return new WaitForSeconds(2.76f);
-        hitBox.enabled = true;
+        criticalSlash.hitBox.enabled = true;
         playerAttack.isCounterAttacking = true;
         while (timer < playerAttack.counterAttackCheckDuration)
         {
             timer += VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
-            CheckHSCounterAttack(hitBox);
+            CheckHSCounterAttack(criticalSlash.hitBox);
             yield return null;
         }
-        if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(actionDuration - 2.76f - playerAttack.counterAttackCheckDuration);
-        else yield return new WaitForSeconds(actionDuration - 2.76f - playerAttack.counterAttackCheckDuration);
+        if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(criticalSlash.actionDuration - 2.76f - playerAttack.counterAttackCheckDuration);
+        else yield return new WaitForSeconds(criticalSlash.actionDuration - 2.76f - playerAttack.counterAttackCheckDuration);
 
-        EndAction();
+        criticalSlash.EndAction();
         animSet.Anim_Hit(1);
     }
 
-    public override void EndAction()
+    // Start is called before the first frame update
+    public override void Start()
     {
-        controller.canSwitchNormalAnim = true;
-        isPerforming = false;
-        hitBox.enabled = true;
-        hsHitEffectPlayed = false;
+        base.Start();
+        criticalSlash = GetComponent<HS_CriticalSlash>();
+    }
+
+    // Update is called once per frame
+    private void Update()
+    {
     }
 }

@@ -21,7 +21,7 @@ public class HS_CounterAttack : IHeartSwordAbility
         if (!isActive) return;
     }
 
-    public override bool PerformAbility(bool isLeft)
+    public override bool OriginalAbilityPerformance(bool isLeft)
     {
         if (!playerAttack.canAttack) return false;
         if (controller.isFloating) return false;

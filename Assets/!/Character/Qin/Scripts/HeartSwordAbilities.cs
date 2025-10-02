@@ -67,7 +67,7 @@ public class HeartSwordAbilities : MonoBehaviour
     private void Update()
     {
         currentHS_point = Mathf.Clamp(currentHS_point, 0, maxHS_point);
-        Lit();
+        UILitEffect();
     }
 
     public Sprite GetInputSpriteOnAbility(IHeartSwordAbility ability)
@@ -85,6 +85,38 @@ public class HeartSwordAbilities : MonoBehaviour
             return InputMaster.instance.icons.gamePadicons.GetSprite(InputKeyType.AbilityEast_key);
         }
         else return null;
+    }
+
+    public void UnequipAbility(IHeartSwordAbility ability)
+    {
+        if (ability == abilityWest) abilityWest = null;
+        if (ability == abilityEast) abilityEast = null;
+        if (ability == abilityNorth) abilityNorth = null;
+        ability.UnequipAbility();
+    }
+
+    public void EquipAbility(IHeartSwordAbility ability, AbilitySlot slot, bool unequipOldAbility)
+    {
+        switch (slot)
+        {
+            case AbilitySlot.West:
+                if (unequipOldAbility && abilityWest != null) abilityWest.UnequipAbility();
+                abilityWest = ability;
+                ability.EquipAbility();
+                break;
+
+            case AbilitySlot.North:
+                if (unequipOldAbility && abilityNorth != null) abilityNorth.UnequipAbility();
+                abilityNorth = ability;
+                ability.EquipAbility();
+                break;
+
+            case AbilitySlot.East:
+                if (unequipOldAbility && abilityEast != null) abilityEast.UnequipAbility();
+                abilityEast = ability;
+                ability.EquipAbility();
+                break;
+        }
     }
 
     public void CancelAllAbilities()
@@ -107,12 +139,15 @@ public class HeartSwordAbilities : MonoBehaviour
 
     public bool CheckAnyPerformingAbility()
     {
-        if (abilityEast.isPerforming || abilityWest.isPerforming || abilityNorth.isPerforming) return true;
+        if (abilityEast != null && abilityEast.isPerforming) return true;
+        if (abilityWest != null && abilityWest.isPerforming) return true;
+        if (abilityNorth != null && abilityNorth.isPerforming) return true;
         return false;
     }
 
     public void Deactivateability(IHeartSwordAbility ability)
     {
+        if (ability == null) return;
         if (currentActivatedAbility == ability)
         {
             currentActivatedAbility = null;
@@ -130,7 +165,7 @@ public class HeartSwordAbilities : MonoBehaviour
     private float alpha = 0;
     private bool isIncreasing = true;
 
-    public void Lit()
+    public void UILitEffect()
     {
         if (isIncreasing == true)
         {

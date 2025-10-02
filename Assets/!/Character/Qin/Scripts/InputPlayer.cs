@@ -280,8 +280,8 @@ public class InputPlayer : MonoBehaviour
             hSAbilitiesManager.currentActivatedAbility.isTriggeredByAttackKey)
         {
             bool success = false;
-            if (leftJustPressed) { success = hSAbilitiesManager.currentActivatedAbility.PerformAbility(true); }
-            else if (rightJustPressed) { success = hSAbilitiesManager.currentActivatedAbility.PerformAbility(false); }
+            if (leftJustPressed) { success = hSAbilitiesManager.currentActivatedAbility.CheckPerformAbility(true); }
+            else if (rightJustPressed) { success = hSAbilitiesManager.currentActivatedAbility.CheckPerformAbility(false); }
             if (success) return;
         }
 
@@ -315,6 +315,7 @@ public class InputPlayer : MonoBehaviour
 
         void input(InputAction input, IHeartSwordAbility ability)
         {
+            if (ability == null) return;
             if (input.WasPressedThisFrame())
             {
                 if (ability.toggleToActivate)

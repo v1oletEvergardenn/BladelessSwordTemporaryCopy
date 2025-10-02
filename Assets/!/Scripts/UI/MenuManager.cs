@@ -27,6 +27,7 @@ public enum TutType
 public class MenuManager : MonoBehaviour
 {
     public static MenuManager instance;
+
     [Header("Pause InGame Canvas")] public GameObject PauseGameCanvas;
     public List<GameObject> Tabs;
     private int currentIndexTab = 0;
@@ -56,7 +57,6 @@ public class MenuManager : MonoBehaviour
 
     public void CloseMenu()
     {
-        print(1);
         if (PauseGameCanvas.activeInHierarchy)
         {
             ClosePauseGameCanvas();
