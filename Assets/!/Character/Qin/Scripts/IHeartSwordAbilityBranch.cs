@@ -4,24 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[System.Serializable]
 public abstract class IHeartSwordAbilityBranch : MonoBehaviour
 {
-    [GUIColor(GUIColor.Lime)]
-    [FoldoutGroup("Attributes", nameof(abilityAttributes),
-       nameof(HS_Cost), nameof(isTriggeredByAttackKey),
-       nameof(canBeStopped), nameof(learned), nameof(isActive), nameof(toggleToActivate))]
-    public Void abilityVoid1;
+    public SO_HeartSwordAttribute abilityAttribute;
+    public bool learned = false;
 
-    [SerializeField, HideProperty] public SO_HeartSwordAttribute abilityAttributes;
-    [SerializeField, HideProperty][Range(0, 10)] public int HS_Cost;
-    [SerializeField, HideProperty] public bool isTriggeredByAttackKey = true;
-    [SerializeField, HideProperty] public bool canBeStopped = true;
-    [SerializeField, HideProperty] public bool learned = false;
-    [SerializeField, HideProperty] public bool isActive = false;
-    [SerializeField, HideProperty] public bool toggleToActivate = false;
-    [GUIColor(144f, 151f, 222f)] public MeleeAttack HS_attack_effect = new MeleeAttack(2, 0.5f, 0.05f, new Vector2(1, 1.4f), 0.1f, 20f, 0.1f);
     [HideProperty] public IHeartSwordAbility parentAbility;
-
     [HideProperty] public CharacterController2D controller;
     [HideProperty] public VFXManager vfx;
     [HideProperty] public GameManager gameManager;
@@ -70,15 +59,15 @@ public abstract class IHeartSwordAbilityBranch : MonoBehaviour
 
     public bool CheckEnoughHeartSwordPoints()
     {
-        if (HS_Cost <= hSAbilityManager.currentHS_point) return true;
+        if (abilityAttribute.HS_Cost <= hSAbilityManager.currentHS_point) return true;
         return false;
     }
 
     public InputAction GetInputAction()
     {
-        if (this == hSAbilityManager.abilityEast) { return inputMaster._AbilityB; }
-        else if (this == hSAbilityManager.abilityNorth) { return inputMaster._AbilityY; }
-        else if (this == hSAbilityManager.abilityWest) { return inputMaster._AbilityX; }
+        if (this == hSAbilityManager.GetEastAbility()) { return inputMaster._AbilityB; }
+        else if (this == hSAbilityManager.GetNorthAbility()) { return inputMaster._AbilityY; }
+        else if (this == hSAbilityManager.GetWestAbility()) { return inputMaster._AbilityX; }
         else { return null; }
     }
 
@@ -126,20 +115,20 @@ public abstract class IHeartSwordAbilityBranch : MonoBehaviour
         if (damagable is SubDamageable sub) { parentDamagble = sub.ParentDamageable; }
         hsHitTargets.Add(parentDamagble);
         foreach (IDamagable i in parentDamagble.subDamagables) { hsHitTargets.Add(i); }
-
+        MeleeAttack attackEffect = abilityAttribute.HS_attack_effect;
         //effect
         if (!hsHitEffectPlayed)
         {
-            vfx.MeleeAttackEffect(HS_attack_effect,
+            vfx.MeleeAttackEffect(attackEffect,
             damagable,
             damagable.GetHitPos().x < health.GetHitPos().x ? true : false);
             hsHitEffectPlayed = true;
         }
-        else damagable.Repel(HS_attack_effect.repel, damagable.GetHitPos().x < health.GetHitPos().x ? true : false);
+        else damagable.Repel(attackEffect.repel, damagable.GetHitPos().x < health.GetHitPos().x ? true : false);
         vfx.SpawnHeartSwordHitEffect(damagable.GetHitPos());
 
         //damage
-        damagable.Damage(HS_attack_effect.damage, this.transform, 0, stunValue: HS_attack_effect.stun);
+        damagable.Damage(attackEffect.damage, this.transform, 0, stunValue: attackEffect.stun);
     }
 
     public virtual void HS_counterAttack(IProjectile projectile)

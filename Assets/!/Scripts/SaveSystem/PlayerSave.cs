@@ -22,6 +22,32 @@ public struct LevelSaveData
     public string lastSavedScene;
 }
 
+[System.Serializable]
+public struct HeartSwordSaveData
+{
+    //equipped heartsword index west, east, north
+
+    public int westAbilityIndex;
+    public int eastAbilityIndex;
+    public int northAbilityIndex;
+    public List<HSAblitySaveData> hsAbilities;
+}
+
+[System.Serializable]
+public struct HSAblitySaveData
+{
+    public int branchIndex;
+    public bool learned;
+    public bool toggleToActivate;
+    public List<HSAblityBranchSaveData> branches;
+}
+
+[System.Serializable]
+public struct HSAblityBranchSaveData
+{
+    public bool learned;
+}
+
 public class PlayerSave : MonoBehaviour
 {
     public static PlayerSave instance;
@@ -60,5 +86,15 @@ public class PlayerSave : MonoBehaviour
     public void Save(ref LevelSaveData data)
     {
         data.lastSavedScene = SceneManager.GetActiveScene().name;
+    }
+
+    public void Save(ref HeartSwordSaveData data)
+    {
+        HeartSwordAbilities.instance.Save(ref data);
+    }
+
+    public void Load(HeartSwordSaveData data)
+    {
+        HeartSwordAbilities.instance.Load(data);
     }
 }

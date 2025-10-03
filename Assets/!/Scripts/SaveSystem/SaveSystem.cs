@@ -23,6 +23,13 @@ public class SaveSystem
         File.WriteAllText(SaveFileName(currentSaveSlot), JsonUtility.ToJson(_saveData, true));
     }
 
+    public static void AutoSave()
+    {
+        HandleSaveData();
+        _saveData.autoSaveSlot = currentSaveSlot;
+        File.WriteAllText(SaveFileName(-1), JsonUtility.ToJson(_saveData, true));
+    }
+
     public static void Save(int slot)
     {
         HandleSaveData();
@@ -31,8 +38,11 @@ public class SaveSystem
 
     public static void HandleSaveData()
     {
+        _saveData.newGameCreated = true;
         PlayerSave.instance.Save(ref _saveData.playerData);
         PlayerSave.instance.Save(ref _saveData.levelData);
+        PlayerSave.instance.Save(ref _saveData.heartSwordData);
+        Debug.Log("saving at slot" + currentSaveSlot);
     }
 
     public static void Load(int slot)
@@ -47,9 +57,19 @@ public class SaveSystem
         else
         {
             string saveContent = File.ReadAllText(SaveFileName(slot));
-            currentSaveSlot = slot;
+
             _saveData = JsonUtility.FromJson<SaveData>(saveContent);
-            HandleLoadData();
+            if (!_saveData.newGameCreated)
+            {
+                Debug.LogWarning($"creating new game at slot{slot}");
+                GameManager.instance.CreateNewGame(slot);
+            }
+            else
+            {
+                if (slot == -1) currentSaveSlot = _saveData.autoSaveSlot;
+                else currentSaveSlot = slot;
+                HandleLoadData();
+            }
         }
     }
 
@@ -65,5 +85,8 @@ public struct SaveData
 {
     public PlayerSaveData playerData;
     public LevelSaveData levelData;
+    public HeartSwordSaveData heartSwordData;
+    public int autoSaveSlot;
+    public bool newGameCreated;
     // Add other game data here as needed
 }

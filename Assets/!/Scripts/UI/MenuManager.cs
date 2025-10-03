@@ -1,10 +1,12 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using static ControllerInput;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using static ControllerInput;
 
 public enum TutType
 {
@@ -38,6 +40,11 @@ public class MenuManager : MonoBehaviour
     public GameObject SavePointMenu;
     public GameObject HSAbilitySwapMenu;
     [Header("End Canvas")] public GameObject EndGameCanvas;
+
+    [Header("Transition")] public GameObject FadeCanvas;
+    public Image fadeOutImage;
+    [Range(0.1f, 10f)] public float _fadeOutTime = 1f;
+    [Range(0.1f, 10f)] public float _fadeInTime = 1f;
 
     private void Awake()
     {
@@ -75,6 +82,37 @@ public class MenuManager : MonoBehaviour
         PauseGameCanvas.SetActive(true);
         canChangeTab = true;
         InputMaster.instance.SwitchToUIAction();
+    }
+
+    /// <summary>
+    /// fades the screen in or out.
+    /// </summary>
+    /// <param name="fadeIn">true is transparent, false is fully alpha</param>
+    /// <returns></returns>
+    public static IEnumerator Fade(bool fadeIn)
+    {
+        if (instance == null || instance.fadeOutImage == null)
+            yield break;
+
+        // Stop any existing tweens on the image to avoid overlap
+        instance.fadeOutImage.DOKill();
+
+        // Ensure the canvas is active
+        if (instance.FadeCanvas != null)
+            instance.FadeCanvas.SetActive(true);
+
+        Color color = instance.fadeOutImage.color;
+        color.a = fadeIn ? 0f : 1f;
+        instance.fadeOutImage.color = color;
+
+        // Determine target alpha and duration
+        float targetAlpha = fadeIn ? 1f : 0f;
+        float duration = fadeIn ? instance._fadeInTime : instance._fadeOutTime;
+
+        // Tween the alpha
+        instance.fadeOutImage.DOFade(targetAlpha, duration)
+            .SetEase(Ease.OutCubic);
+        yield return new WaitForSeconds(duration);
     }
 
     public void ClosePauseGameCanvas()
@@ -148,5 +186,10 @@ public class MenuManager : MonoBehaviour
     public void CanCloseMenu(bool b)
     {
         canCloseMenu = b;
+    }
+
+    public void Save()
+    {
+        SaveSystem.Save();
     }
 }

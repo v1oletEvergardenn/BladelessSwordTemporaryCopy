@@ -58,21 +58,27 @@ public class HSAbilitySwapMenu : MonoBehaviour
     {
         HeartSwordAbilities hs = HeartSwordAbilities.instance;
         abilityToSegment.Clear();
-        // iterate through available abilities
+
+        // Gather all learned abilities
+        List<IHeartSwordAbility> learnedAbilities = hs.GetLearnedAbilities();
+        // Assign learned abilities to segments in order, do not skip segment indices
         for (int i = 0; i < segments.Count; i++)
         {
-            segments[i].ability = null;
-
-            if (i < hs.allAbilities.Count)
+            if (i < learnedAbilities.Count)
             {
-                segments[i].ability = hs.allAbilities[i];
+                segments[i].ability = learnedAbilities[i];
                 abilityToSegment[segments[i].ability] = segments[i];
             }
+            else
+            {
+                segments[i].ability = null;
+            }
         }
+
+        // open select ability menu
         HSAbiltiyUI.SetActive(false);
         SelectHSAbilityUI.SetActive(true);
         EventSystem.current.SetSelectedGameObject(segments[0].gameObject);
-        // open select ability menu
     }
 
     public void ReturnToHSAbilityMenu()
@@ -84,9 +90,9 @@ public class HSAbilitySwapMenu : MonoBehaviour
 
     public void UpdateSegmentUIInfo(Ability_UI_segment segment)
     {
-        txt_chineseName.text = segment.ability != null ? segment.ability.abilityAttributes.chineseName : "";
-        txt_name.text = segment.ability != null ? segment.ability.abilityAttributes.name : "";
-        txt_description.text = segment.ability != null ? segment.ability.abilityAttributes.description : "";
+        txt_chineseName.text = segment.ability != null ? segment.ability.GetCurrentAttribute().chineseName : "";
+        txt_name.text = segment.ability != null ? segment.ability.GetCurrentAttribute().name : "";
+        txt_description.text = segment.ability != null ? segment.ability.GetCurrentAttribute().description : "";
         //img_showImage.sprite = segment.ability != null ? segment.ability.abilityAttributes.icon : null;
     }
 
@@ -108,16 +114,16 @@ public class HSAbilitySwapMenu : MonoBehaviour
 
         // Find which slot (if any) currently has newAbility equipped
         AbilitySlot? equippedSlot = null;
-        if (hsManager.abilityWest == newAbility) equippedSlot = AbilitySlot.West;
-        else if (hsManager.abilityNorth == newAbility) equippedSlot = AbilitySlot.North;
-        else if (hsManager.abilityEast == newAbility) equippedSlot = AbilitySlot.East;
+        if (hsManager.GetWestAbility() == newAbility) equippedSlot = AbilitySlot.West;
+        else if (hsManager.GetNorthAbility() == newAbility) equippedSlot = AbilitySlot.North;
+        else if (hsManager.GetEastAbility() == newAbility) equippedSlot = AbilitySlot.East;
 
         // Get the current ability in the selected slot
         switch (slot)
         {
-            case AbilitySlot.West: oldAbility = hsManager.abilityWest; break;
-            case AbilitySlot.North: oldAbility = hsManager.abilityNorth; break;
-            case AbilitySlot.East: oldAbility = hsManager.abilityEast; break;
+            case AbilitySlot.West: oldAbility = hsManager.GetWestAbility(); break;
+            case AbilitySlot.North: oldAbility = hsManager.GetNorthAbility(); break;
+            case AbilitySlot.East: oldAbility = hsManager.GetEastAbility(); break;
         }
 
         // Case 1: newAbility is already equipped in the selected slot, unequip it

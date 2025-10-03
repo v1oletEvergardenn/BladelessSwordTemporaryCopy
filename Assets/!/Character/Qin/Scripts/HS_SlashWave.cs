@@ -35,7 +35,7 @@ public class HS_SlashWave : IHeartSwordAbility
         if (!CheckEnoughHeartSwordPoints()) return false;
         if (CheckAnyPerformingAbility()) return false;
         if (health.stunned) return false;
-        hSAbilityManager.ModifyHSPoint(-HS_Cost);
+        hSAbilityManager.ModifyHSPoint(-GetCurrentAttribute().HS_Cost);
         largeSlash = false;
         hsHitEffectPlayed = false;
         effectPlayed = false;
@@ -138,7 +138,7 @@ public class HS_SlashWave : IHeartSwordAbility
 
     public override void EndAction()
     {
-        controller.canSwitchNormalAnim = true;
+        if (controller != null) controller.canSwitchNormalAnim = true;
         isPerforming = false;
         hsHitEffectPlayed = false;
         attacked = false;

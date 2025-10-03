@@ -15,7 +15,7 @@ public class Ability_UI_segment : MonoBehaviour, IPointerEnterHandler, ISelectHa
     [SerializeField] private Color equipedColor;
     [SerializeField] private Color unequipedColor;
     public IHeartSwordAbility ability;
-    private List<IHeartSwordAbilityBranch> availableBranch = new List<IHeartSwordAbilityBranch>();
+    private List<IHeartSwordAbilityBranch> learnedBranches = new List<IHeartSwordAbilityBranch>();
 
     public void OnEnable()
     {
@@ -31,14 +31,13 @@ public class Ability_UI_segment : MonoBehaviour, IPointerEnterHandler, ISelectHa
     {
         if (EventSystem.current.currentSelectedGameObject != gameObject) return;
         if (ability == null) return;
-        int branchCount = availableBranch.Count;
+        int branchCount = learnedBranches.Count;
         if (branchCount == 0) return;
 
-        // Find current index, -1 means "none branch" (no branch equipped)
-        int currentIndex = -1;
-        if (ability.equippedBranch != null)
-            currentIndex = availableBranch.IndexOf(ability.equippedBranch);
+        print("1");
 
+        // Find current index, -1 means "none branch" (no branch equipped)
+        int currentIndex = ability.GetBranchIndex();
         float nav = InputMaster.instance.uiActions.Navigate.ReadValue<Vector2>().y;
         int nextIndex = currentIndex;
 
@@ -71,21 +70,21 @@ public class Ability_UI_segment : MonoBehaviour, IPointerEnterHandler, ISelectHa
         if (nextIndex == -1)
             ability.ChangeBranch(null);
         else
-            ability.ChangeBranch(availableBranch[nextIndex]);
+            ability.ChangeBranch(learnedBranches[nextIndex]);
         UpdateUI();
     }
 
     public void UpdateUI()
     {
         panel.color = unequipedColor;
-        availableBranch.Clear();
+        learnedBranches.Clear();
         if (ability != null)
         {
-            chineseText.text = ability.abilityAttributes.chineseName;
-            icon.sprite = ability.abilityAttributes.icon;
-            availableBranch = ability.GetAvailableBranches();
+            chineseText.text = ability.GetCurrentAttribute().chineseName;
+            icon.sprite = ability.GetCurrentAttribute().icon;
+            learnedBranches = ability.GetLearnedBranches();
             HSAbilitySwapMenu.instance.UpdateSegmentUIInfo(this);
-            if (ability.isEquipped)
+            if (ability.IsEquipped())
             {
                 panel.color = equipedColor;
                 input.color = new Color(1, 1, 1, 1);

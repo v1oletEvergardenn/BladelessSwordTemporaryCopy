@@ -49,7 +49,11 @@ public class InputMaster : MonoBehaviour
     {
         if (instance == null) { instance = this; }
         else { Destroy(this.gameObject); }
-        NewInput();
+
+        input = new ControllerInput();
+        input.Enable();
+        gameplayActions = input.Gameplay;
+        uiActions = input.UI;
 
         _playerInput = GetComponent<PlayerInput>();
 
@@ -69,22 +73,6 @@ public class InputMaster : MonoBehaviour
 
         qteInteractedKey_image.fillAmount = 0;
         qteKey.SetActive(false);
-    }
-
-    public void NewInput()
-    {
-        if (input != null)
-        {
-            input.Disable();
-        }
-        input = new ControllerInput();
-        input.Enable();
-        gameplayActions = input.Gameplay;
-        uiActions = input.UI;
-        gameplayActions.Enable();
-        uiActions.Enable();
-        _playerInput.SwitchCurrentActionMap("GamePlay");
-        //uiActions.Disable();
     }
 
     public void SwitchToUIAction()

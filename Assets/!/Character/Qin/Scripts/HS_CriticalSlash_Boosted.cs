@@ -14,7 +14,7 @@ public class HS_CriticalSlash_Boosted : IHeartSwordAbilityBranch
         if (CheckAnyPerformingAbility()) return false;
         if (health.stunned) return false;
         if (controller.FacingRight == isLeft) { controller.Flip(); }
-        hSAbilityManager.ModifyHSPoint(-HS_Cost);
+        hSAbilityManager.ModifyHSPoint(-abilityAttribute.HS_Cost);
         print("performing branch ability");
         inputPlayer.DisableAllActions();
         animSet.Anim_Hit(0);

@@ -28,10 +28,10 @@ public class HeartSwordAbilities : MonoBehaviour
     [HideProperty] public List<IHeartSwordAbility> allAbilities = new List<IHeartSwordAbility>();
     [SerializeField, HideProperty] private float maxHS_point = 3;
     [SerializeField, HideProperty] public List<HeartSwordUIPoint> HS_points = new List<HeartSwordUIPoint>();
-    [SerializeField, HideProperty] public IHeartSwordAbility abilityWest;
-    [SerializeField, HideProperty] public IHeartSwordAbility abilityNorth;
-    [SerializeField, HideProperty] public IHeartSwordAbility abilityEast;
-    [SerializeField, HideProperty] public IHeartSwordAbility currentActivatedAbility = null;
+    [SerializeField, HideProperty] private int abilityWest = -1;
+    [SerializeField, HideProperty] private int abilityNorth = -1;
+    [SerializeField, HideProperty] private int abilityEast = -1;
+    [SerializeField, HideProperty] private int currentActivatedAbility = -1;
     [SerializeField] public float currentHS_point { get; private set; } = 0;
 
     public void Awake()
@@ -58,9 +58,9 @@ public class HeartSwordAbilities : MonoBehaviour
 
     private void Start()
     {
-        if (abilityWest != null) abilityWest.EquipAbility();
-        if (abilityNorth != null) abilityNorth.EquipAbility();
-        if (abilityEast != null) abilityEast.EquipAbility();
+        //if (GetWestAbility() != null) GetWestAbility().EquipAbility();
+        //if (GetNorthAbility() != null) GetNorthAbility().EquipAbility();
+        //if (GetEastAbility() != null) GetEastAbility().EquipAbility();
         InitializeHS_UI();
     }
 
@@ -72,27 +72,66 @@ public class HeartSwordAbilities : MonoBehaviour
 
     public Sprite GetInputSpriteOnAbility(IHeartSwordAbility ability)
     {
-        if (ability == abilityWest)
+        if (ability == GetWestAbility())
         {
             return InputMaster.instance.icons.gamePadicons.GetSprite(InputKeyType.AbilityWest_key);
         }
-        else if (ability == abilityNorth)
+        else if (ability == GetNorthAbility())
         {
             return InputMaster.instance.icons.gamePadicons.GetSprite(InputKeyType.AbilityNorth_key);
         }
-        else if (ability == abilityEast)
+        else if (ability == GetEastAbility())
         {
             return InputMaster.instance.icons.gamePadicons.GetSprite(InputKeyType.AbilityEast_key);
         }
         else return null;
     }
 
+    public List<IHeartSwordAbility> GetLearnedAbilities()
+    {
+        List<IHeartSwordAbility> learnedAbilities = new List<IHeartSwordAbility>();
+        foreach (var ability in allAbilities)
+        {
+            if (ability.learned) learnedAbilities.Add(ability);
+        }
+        return learnedAbilities;
+    }
+
+    public IHeartSwordAbility GetWestAbility()
+    {
+        if (abilityWest == -1) return null;
+        else return (abilityWest >= 0 && abilityWest < allAbilities.Count) ? allAbilities[abilityWest] : null;
+    }
+
+    public IHeartSwordAbility GetNorthAbility()
+    {
+        if (abilityNorth == -1) return null;
+        else return (abilityNorth >= 0 && abilityNorth < allAbilities.Count) ? allAbilities[abilityNorth] : null;
+    }
+
+    public IHeartSwordAbility GetEastAbility()
+    {
+        if (abilityEast == -1) return null;
+        else return (abilityEast >= 0 && abilityEast < allAbilities.Count) ? allAbilities[abilityEast] : null;
+    }
+
+    public IHeartSwordAbility GetCurrentActivatedAbility()
+    {
+        if (currentActivatedAbility == -1) return null;
+        else return (currentActivatedAbility >= 0 && currentActivatedAbility < allAbilities.Count) ? allAbilities[currentActivatedAbility] : null;
+    }
+
     public void UnequipAbility(IHeartSwordAbility ability)
     {
-        if (ability == abilityWest) abilityWest = null;
-        if (ability == abilityEast) abilityEast = null;
-        if (ability == abilityNorth) abilityNorth = null;
+        if (ability == GetWestAbility()) abilityWest = -1;
+        if (ability == GetEastAbility()) abilityEast = -1;
+        if (ability == GetNorthAbility()) abilityNorth = -1;
         ability.UnequipAbility();
+    }
+
+    public int GetAbilityIndex(IHeartSwordAbility ability)
+    {
+        return allAbilities.IndexOf(ability);
     }
 
     public void EquipAbility(IHeartSwordAbility ability, AbilitySlot slot, bool unequipOldAbility)
@@ -100,57 +139,57 @@ public class HeartSwordAbilities : MonoBehaviour
         switch (slot)
         {
             case AbilitySlot.West:
-                if (unequipOldAbility && abilityWest != null) abilityWest.UnequipAbility();
-                abilityWest = ability;
-                ability.EquipAbility();
+                if (unequipOldAbility && GetWestAbility() != null) GetWestAbility().UnequipAbility();
+                abilityWest = GetAbilityIndex(ability);
+                if (ability != null) ability.EquipAbility();
                 break;
 
             case AbilitySlot.North:
-                if (unequipOldAbility && abilityNorth != null) abilityNorth.UnequipAbility();
-                abilityNorth = ability;
-                ability.EquipAbility();
+                if (unequipOldAbility && GetNorthAbility() != null) GetNorthAbility().UnequipAbility();
+                abilityNorth = GetAbilityIndex(ability);
+                if (ability != null) ability.EquipAbility();
                 break;
 
             case AbilitySlot.East:
-                if (unequipOldAbility && abilityEast != null) abilityEast.UnequipAbility();
-                abilityEast = ability;
-                ability.EquipAbility();
+                if (unequipOldAbility && GetEastAbility() != null) GetEastAbility().UnequipAbility();
+                abilityEast = GetAbilityIndex(ability);
+                if (ability != null) ability.EquipAbility();
                 break;
         }
     }
 
     public void CancelAllAbilities()
     {
-        if (abilityWest != null && abilityWest.canBeStopped) abilityWest.CancelAction();
-        if (abilityNorth != null && abilityNorth.canBeStopped) abilityNorth.CancelAction();
-        if (abilityEast != null && abilityEast.canBeStopped) abilityEast.CancelAction();
+        if (GetWestAbility() != null && GetWestAbility().GetCurrentAttribute().canBeStopped) GetWestAbility().CancelAction();
+        if (GetNorthAbility() != null && GetNorthAbility().GetCurrentAttribute().canBeStopped) GetNorthAbility().CancelAction();
+        if (GetEastAbility() != null && GetEastAbility().GetCurrentAttribute().canBeStopped) GetEastAbility().CancelAction();
     }
 
     public void ActivateAbility(IHeartSwordAbility ability)
     {
-        Deactivateability(abilityEast);
-        Deactivateability(abilityNorth);
-        Deactivateability(abilityWest);
+        Deactivateability(GetEastAbility());
+        Deactivateability(GetNorthAbility());
+        Deactivateability(GetWestAbility());
         if (ability.ActivateAbility())
         {
-            currentActivatedAbility = ability;
+            currentActivatedAbility = GetAbilityIndex(ability);
         }
     }
 
     public bool CheckAnyPerformingAbility()
     {
-        if (abilityEast != null && abilityEast.isPerforming) return true;
-        if (abilityWest != null && abilityWest.isPerforming) return true;
-        if (abilityNorth != null && abilityNorth.isPerforming) return true;
+        if (GetEastAbility() != null && GetEastAbility().isPerforming) return true;
+        if (GetWestAbility() != null && GetWestAbility().isPerforming) return true;
+        if (GetNorthAbility() != null && GetNorthAbility().isPerforming) return true;
         return false;
     }
 
     public void Deactivateability(IHeartSwordAbility ability)
     {
         if (ability == null) return;
-        if (currentActivatedAbility == ability)
+        if (currentActivatedAbility == GetAbilityIndex(ability))
         {
-            currentActivatedAbility = null;
+            currentActivatedAbility = -1;
         }
         ability.DeactivateAbility();
     }
@@ -287,6 +326,53 @@ public class HeartSwordAbilities : MonoBehaviour
         {
             point.border.gameObject.SetActive(true);
             point.lit.gameObject.SetActive(false);
+        }
+    }
+
+    public void Save(ref HeartSwordSaveData data)
+    {
+        data.westAbilityIndex = abilityWest;
+        data.eastAbilityIndex = abilityEast;
+        data.northAbilityIndex = abilityNorth;
+        data.hsAbilities = new List<HSAblitySaveData>();
+        foreach (var ability in allAbilities)
+        {
+            HSAblitySaveData abilityData = new HSAblitySaveData
+            {
+                branchIndex = ability.GetBranchIndex(),
+                learned = ability.learned,
+                toggleToActivate = ability.toggleToActivate,
+                branches = new List<HSAblityBranchSaveData>()
+            };
+            foreach (var branch in ability.GetBranches())
+            {
+                HSAblityBranchSaveData branchData = new HSAblityBranchSaveData
+                {
+                    learned = branch.learned
+                };
+                abilityData.branches.Add(branchData);
+            }
+            data.hsAbilities.Add(abilityData);
+        }
+    }
+
+    public void Load(HeartSwordSaveData data)
+    {
+        abilityEast = data.eastAbilityIndex;
+        EquipAbility(GetEastAbility(), AbilitySlot.East, true);
+        abilityNorth = data.northAbilityIndex;
+        EquipAbility(GetNorthAbility(), AbilitySlot.North, true);
+        abilityWest = data.westAbilityIndex;
+        EquipAbility(GetWestAbility(), AbilitySlot.West, true);
+        for (int i = 0; i < allAbilities.Count; i++)
+        {
+            allAbilities[i].ChangeBranch(data.hsAbilities[i].branchIndex);
+            allAbilities[i].learned = data.hsAbilities[i].learned;
+            allAbilities[i].toggleToActivate = data.hsAbilities[i].toggleToActivate;
+            for (int j = 0; j < allAbilities[i].GetBranches().Count; j++)
+            {
+                allAbilities[i].GetBranches()[j].learned = data.hsAbilities[i].branches[j].learned;
+            }
         }
     }
 }

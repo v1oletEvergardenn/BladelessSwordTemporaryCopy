@@ -28,10 +28,10 @@ public class HS_CounterAttack : IHeartSwordAbility
         if (health.stunned) return false;
         if (CheckAnyPerformingAbility()) return false;
         if (playerAttack.attackTimer < playerAttack.attackGap) return false;
-        if (hSAbilityManager.currentHS_point < HS_Cost) { return false; }
+        if (hSAbilityManager.currentHS_point < GetCurrentAttribute().HS_Cost) { return false; }
         if (controller.FacingRight == isLeft) { controller.Flip(); }
 
-        hSAbilityManager.ModifyHSPoint(-HS_Cost);
+        hSAbilityManager.ModifyHSPoint(-GetCurrentAttribute().HS_Cost);
         isPerforming = true;
         playerAttack.InitializeAttack(isLeft);
         hsHitEffectPlayed = false;
@@ -114,19 +114,19 @@ public class HS_CounterAttack : IHeartSwordAbility
         if (damagable is SubDamageable sub) { parentDamagble = sub.ParentDamageable; }
         hsHitTargets.Add(parentDamagble);
         foreach (IDamagable i in parentDamagble.subDamagables) { hsHitTargets.Add(i); }
-
+        MeleeAttack attackEffect = GetCurrentAttribute().HS_attack_effect;
         if (!hsHitEffectPlayed)
         {
-            vfx.MeleeAttackEffect(HS_attack_effect,
+            vfx.MeleeAttackEffect(attackEffect,
             damagable,
             damagable.GetHitPos().x < health.GetHitPos().x ? true : false);
             hsHitEffectPlayed = true;
         }
-        else damagable.Repel(HS_attack_effect.repel, damagable.GetHitPos().x < health.GetHitPos().x ? true : false);
+        else damagable.Repel(attackEffect.repel, damagable.GetHitPos().x < health.GetHitPos().x ? true : false);
 
         vfx.SpawnHeartSwordHitEffect(damagable.GetHitPos());
 
-        damagable.Damage(HS_attack_effect.damage, this.transform, 0, stunValue: HS_attack_effect.stun);
+        damagable.Damage(attackEffect.damage, this.transform, 0, stunValue: attackEffect.stun);
         playerAttack.canDefend = true;
     }
 

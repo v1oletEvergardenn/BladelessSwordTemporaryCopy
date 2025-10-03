@@ -271,17 +271,18 @@ public class InputPlayer : MonoBehaviour
         bool rightPressed = inputMaster._attackRightAction.IsPressed();
         bool rightJustPressed = inputMaster._attackRightAction.WasPressedThisFrame();
         bool leftJustPressed = inputMaster._attackLeftAction.WasPressedThisFrame();
+        IHeartSwordAbility currentAbility = hSAbilitiesManager.GetCurrentActivatedAbility();
 
         if (controller.isFloating) return;
         if (health.stunned) return;
         //checks if any active heart sword ability is triggered by attack key
         //if does, cancel the attack input and perform the ability instead
-        if (hSAbilitiesManager.currentActivatedAbility != null &&
-            hSAbilitiesManager.currentActivatedAbility.isTriggeredByAttackKey)
+        if (currentAbility != null &&
+            currentAbility.GetCurrentAttribute().isTriggeredByAttackKey)
         {
             bool success = false;
-            if (leftJustPressed) { success = hSAbilitiesManager.currentActivatedAbility.CheckPerformAbility(true); }
-            else if (rightJustPressed) { success = hSAbilitiesManager.currentActivatedAbility.CheckPerformAbility(false); }
+            if (leftJustPressed) { success = currentAbility.CheckPerformAbility(true); }
+            else if (rightJustPressed) { success = currentAbility.CheckPerformAbility(false); }
             if (success) return;
         }
 
@@ -309,9 +310,9 @@ public class InputPlayer : MonoBehaviour
 
     private void HandleAbilityInput()
     {
-        input(inputMaster._AbilityB, hSAbilitiesManager.abilityEast);
-        input(inputMaster._AbilityX, hSAbilitiesManager.abilityWest);
-        input(inputMaster._AbilityY, hSAbilitiesManager.abilityNorth);
+        input(inputMaster._AbilityB, hSAbilitiesManager.GetEastAbility());
+        input(inputMaster._AbilityX, hSAbilitiesManager.GetWestAbility());
+        input(inputMaster._AbilityY, hSAbilitiesManager.GetNorthAbility());
 
         void input(InputAction input, IHeartSwordAbility ability)
         {

@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     private InputMaster inputManager;
 
     [ButtonField("InitializePlayerSaveData", "initializePlayerData")] public Void holder;
-
+    [ButtonField("AutoSaveGame", "AutoSaveGame")] public Void holder2;
     public GameObject playerPrefab;
     public GameObject player;
     [HideProperty] public Health playerhealth;
@@ -75,9 +75,9 @@ public class GameManager : MonoBehaviour
         player_controller = player.GetComponentInChildren<CharacterController2D>();
         playerEnergy = player.GetComponentInChildren<Energy>();
         hsManager = HeartSwordAbilities.instance;
-
         InitializePlayer();
         PlayerSave.instance.Load(data);
+        PlayerSave.instance.Load(SaveSystem._saveData.heartSwordData);
         return true;
     }
 
@@ -115,10 +115,14 @@ public class GameManager : MonoBehaviour
         if (PlayerSave.instance != null) player = PlayerSave.instance.gameObject;
         else player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
         DontDestroyOnLoad(player);
-        LevelSaveData levelSaveData = new LevelSaveData();
-        levelSaveData.lastSavedScene = "YingYangFish_Scene";
-        SaveSystem._saveData.levelData = levelSaveData;
+        SceneManager.LoadScene("YingYangFish_Scene");
         InitializePlayerSaveData();
+    }
+
+    public void AutoSaveGame()
+    {
+        print("autosaved game");
+        SaveSystem.AutoSave();
     }
 
     public void LearnSkills(PlayerSkillsType skill)

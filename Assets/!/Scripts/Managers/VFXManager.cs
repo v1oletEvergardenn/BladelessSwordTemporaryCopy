@@ -53,15 +53,6 @@ public class VFXManager : MonoBehaviour
 
     #endregion Time
 
-    #region FadeTranstions
-
-    public GameObject FadeCanvas;
-    public Image fadeOutImage;
-    [Range(0.1f, 10f)] public float _fadeOutTime = 1f;
-    [Range(0.1f, 10f)] public float _fadeInTime = 1f;
-
-    #endregion FadeTranstions
-
     #region Unity Lifecycle
 
     private void Awake()
@@ -145,7 +136,10 @@ public class VFXManager : MonoBehaviour
     /// </summary>
     public void StopRumble()
     {
-        Gamepad.current.SetMotorSpeeds(0, 0);
+        if (Gamepad.current != null)
+        {
+            Gamepad.current.SetMotorSpeeds(0, 0);
+        }
     }
 
     /// <summary>
@@ -310,33 +304,6 @@ public class VFXManager : MonoBehaviour
         // Optionally disable the effect when finished decreasing
         if (!start)
             breakEffect.enabled = false;
-    }
-
-    /// <summary>
-    /// fades the screen in or out.
-    /// </summary>
-    /// <param name="fadeIn">true is transparent, false is fully alpha</param>
-    /// <returns></returns>
-    public static IEnumerator Fade(bool fadeIn)
-    {
-        if (instance == null || instance.fadeOutImage == null)
-            yield break;
-
-        // Stop any existing tweens on the image to avoid overlap
-        instance.fadeOutImage.DOKill();
-
-        // Ensure the canvas is active
-        if (instance.FadeCanvas != null)
-            instance.FadeCanvas.SetActive(true);
-
-        // Determine target alpha and duration
-        float targetAlpha = fadeIn ? 0f : 1f;
-        float duration = fadeIn ? instance._fadeInTime : instance._fadeOutTime;
-
-        // Tween the alpha
-        instance.fadeOutImage.DOFade(targetAlpha, duration)
-            .SetEase(Ease.OutCubic);
-        yield return new WaitForSeconds(duration);
     }
 
     #endregion Camera Effects

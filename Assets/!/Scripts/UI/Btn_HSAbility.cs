@@ -29,19 +29,19 @@ public class Btn_HSAbility : MonoBehaviour
         switch (abilitySlot)
         {
             case AbilitySlot.West:
-                if (hsManager.abilityWest != null) ability = hsManager.abilityWest;
+                if (hsManager.GetWestAbility() != null) ability = hsManager.GetWestAbility();
                 else { ability = null; }
                 inputKeyType = InputKeyType.AbilityWest_key;
                 break;
 
             case AbilitySlot.North:
-                if (hsManager.abilityNorth != null) ability = hsManager.abilityNorth;
+                if (hsManager.GetNorthAbility() != null) ability = hsManager.GetNorthAbility();
                 else { ability = null; }
                 inputKeyType = InputKeyType.AbilityNorth_key;
                 break;
 
             case AbilitySlot.East:
-                if (hsManager.abilityEast != null) ability = hsManager.abilityEast;
+                if (hsManager.GetEastAbility() != null) ability = hsManager.GetEastAbility();
                 else { ability = null; }
                 inputKeyType = InputKeyType.AbilityEast_key;
                 break;

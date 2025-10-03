@@ -20,7 +20,7 @@ public class HS_CriticalSlash : IHeartSwordAbility
         if (CheckAnyPerformingAbility()) return false;
         if (health.stunned) return false;
         if (controller.FacingRight == isLeft) { controller.Flip(); }
-        hSAbilityManager.ModifyHSPoint(-HS_Cost);
+        hSAbilityManager.ModifyHSPoint(-GetCurrentAttribute().HS_Cost);
 
         print("performing original ability");
 
@@ -62,7 +62,7 @@ public class HS_CriticalSlash : IHeartSwordAbility
 
     public override void EndAction()
     {
-        controller.canSwitchNormalAnim = true;
+        if (controller != null) controller.canSwitchNormalAnim = true;
         isPerforming = false;
         hitBox.enabled = true;
         hsHitEffectPlayed = false;

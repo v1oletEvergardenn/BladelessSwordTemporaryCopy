@@ -3,11 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public class UIEvents : MonoBehaviour
 {
     [GUIColor(GUIColor.Lime)][Title("OnEnable Event", 15)] public Void onenableVoid;
 
+    public bool setSelectedObjectOnEnable = false;
+    public GameObject selectedObjectOnEnable;
     public UnityEvent onenableEvent;
 
     [GUIColor(144f, 151f, 222f)][Title("OnDisable Event", 15)] public Void disableVoid;
@@ -27,6 +30,7 @@ public class UIEvents : MonoBehaviour
     public void OnEnable()
     {
         onenableEvent?.Invoke();
+        if (setSelectedObjectOnEnable) SetSelectObject(selectedObjectOnEnable);
     }
 
     public void OnDisable()
@@ -42,5 +46,10 @@ public class UIEvents : MonoBehaviour
             this.gameObject.SetActive(false);
             menuToGoBack.SetActive(true);
         }
+    }
+
+    public void SetSelectObject(GameObject obj)
+    {
+        EventSystem.current.SetSelectedGameObject(obj);
     }
 }
