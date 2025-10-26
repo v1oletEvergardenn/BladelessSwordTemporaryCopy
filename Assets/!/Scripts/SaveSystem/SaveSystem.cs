@@ -76,7 +76,7 @@ public class SaveSystem
     private static void HandleLoadData()
     {
         SceneManager.LoadScene(_saveData.levelData.lastSavedScene);
-        GameManager.instance.LoadAndCreatePlayer();
+        GameManager.instance.LoadPlayer();
     }
 }
 

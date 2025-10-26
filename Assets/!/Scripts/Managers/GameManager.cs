@@ -10,6 +10,8 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public bool NOTSTARTATMAINMENU = false;
+
     public static GameManager instance;
 
     private InputMaster inputManager;
@@ -51,6 +53,24 @@ public class GameManager : MonoBehaviour
     {
         if (instance == null) { instance = this; }
         else { Destroy(this.gameObject); }
+        CheckIfStartFromMainMenu();
+    }
+
+    /// <summary>
+    /// Ensures the game starts from the main menu by resetting the current save slot and initializing the player
+    /// reference if necessary.
+    /// </summary>
+    /// <remarks>If the active scene is not the "MainMenu", the current save slot is reset to -1. If a player
+    /// instance exists, it creates a reference to the existing player; otherwise, it creates a new player instance. No
+    /// action is taken if the active scene is "MainMenu".</remarks>
+    public void CheckIfStartFromMainMenu()
+    {
+        if (SceneManager.GetActiveScene().name != "MainMenu")
+        {
+            SaveSystem.currentSaveSlot = -1;
+            if (CharacterController2D.instance != null) CreatePlayerReference(CharacterController2D.instance.gameObject);
+            else CreateNewPlayer();
+        }
     }
 
     private void Start()
@@ -58,10 +78,23 @@ public class GameManager : MonoBehaviour
         impulseSource = GetComponent<CinemachineImpulseSource>();
     }
 
-    public bool LoadAndCreatePlayer()
+    public bool LoadPlayer()
     {
         PlayerSaveData data = SaveSystem._saveData.playerData;
+        CreateNewPlayer();
+        PlayerSave.instance.Load(data);
+        PlayerSave.instance.Load(SaveSystem._saveData.heartSwordData);
+        return true;
+    }
 
+    /// <summary>
+    /// Creates a new player instance if one does not already exist.
+    /// </summary>
+    /// <remarks>If a saved player instance is available, it will be used; otherwise, a new player instance
+    /// is instantiated using the specified prefab. The player object is marked as persistent  across scene loads. This
+    /// method also initializes the player and establishes necessary references.</remarks>
+    public void CreateNewPlayer()
+    {
         if (player == null)
         {
             if (PlayerSave.instance != null) player = PlayerSave.instance.gameObject;
@@ -69,16 +102,20 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(player);
         }
 
-        playerhealth = player.GetComponentInChildren<Health>();
-        playerInput = player.GetComponentInChildren<InputPlayer>();
-        playerAttack = player.GetComponentInChildren<PlayerAttack>();
-        player_controller = player.GetComponentInChildren<CharacterController2D>();
-        playerEnergy = player.GetComponentInChildren<Energy>();
-        hsManager = HeartSwordAbilities.instance;
+        CreatePlayerReference(player);
         InitializePlayer();
-        PlayerSave.instance.Load(data);
-        PlayerSave.instance.Load(SaveSystem._saveData.heartSwordData);
-        return true;
+    }
+
+    public void CreatePlayerReference(GameObject _player)
+    {
+        if (_player == null) return;
+        player = _player;
+        playerhealth = _player.GetComponentInChildren<Health>();
+        playerInput = _player.GetComponentInChildren<InputPlayer>();
+        playerAttack = _player.GetComponentInChildren<PlayerAttack>();
+        player_controller = _player.GetComponentInChildren<CharacterController2D>();
+        playerEnergy = _player.GetComponentInChildren<Energy>();
+        hsManager = _player.GetComponentInChildren<HeartSwordAbilities>();
     }
 
     public void InitializePlayer()
@@ -92,19 +129,6 @@ public class GameManager : MonoBehaviour
         hsManager.SetCurrentHSPoint(3);
     }
 
-    public void InitializePlayerSaveData()
-    {
-        PlayerSaveData data = new PlayerSaveData();
-        data.currentHealth = 30;
-        data.maxHealth = 30;
-        data.currentEnergy = 16;
-        data.maxEnergy = 16;
-        data.currentHSpoint = 0;
-        data.maxHSpoint = 3;
-        SaveSystem._saveData.playerData = data;
-        File.WriteAllText(SaveFileName(SaveSystem.currentSaveSlot), JsonUtility.ToJson(_saveData, true));
-    }
-
     /// <summary>
     /// to be updated
     /// </summary>
@@ -112,11 +136,8 @@ public class GameManager : MonoBehaviour
     {
         //created new Game
         SaveSystem.currentSaveSlot = slot;
-        if (PlayerSave.instance != null) player = PlayerSave.instance.gameObject;
-        else player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
-        DontDestroyOnLoad(player);
+        CreateNewPlayer();
         SceneManager.LoadScene("YingYangFish_Scene");
-        InitializePlayerSaveData();
     }
 
     public void AutoSaveGame()

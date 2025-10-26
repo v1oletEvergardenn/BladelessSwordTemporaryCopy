@@ -55,7 +55,7 @@ public class PlayerAttack : MonoBehaviour
 
     [FoldoutGroup("Attack Variables", nameof(basicAttackDamage), nameof(CounterAttackRadius), nameof(jumpCounterAttackRadius),
         nameof(jumpAttackPoint), nameof(counterAttackPoint), nameof(counterAttackCheckDuration),
-        nameof(perfectCounterAttackCheckDuration), nameof(attackGap))]
+        nameof(perfectCounterAttackCheckDuration), nameof(attackGap), nameof(commonHitEffect))]
     [SerializeField] private Void attackGroupHold;
 
     [SerializeField, HideInInspector] public int basicAttackDamage = 1;
@@ -66,6 +66,7 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField, HideInInspector, Range(0f, 0.3f)] public float counterAttackCheckDuration;
     [SerializeField, HideInInspector, Range(0f, 0.2f)] public float perfectCounterAttackCheckDuration;
     [SerializeField, HideInInspector, Range(0f, 1f)] public float attackGap; //CD of attack
+    [SerializeField, HideInInspector] public ProjectileHitEffectSettings commonHitEffect;
     [HideInInspector] public float attackTimer = 0f;//CD timer of attack
     [HideInInspector] public float counterAttackCheckTimer = 0f;
     [HideInInspector] public float attackAnimationTime = 0.35f;
@@ -179,6 +180,7 @@ public class PlayerAttack : MonoBehaviour
         if (attackIndex > 2) attackIndex = 1;
         combatTimer = 2f;
         comboTimer = 0f;
+        hitIdamagables.Clear();
     }
 
     private string GetAttackAnimName()
@@ -193,9 +195,11 @@ public class PlayerAttack : MonoBehaviour
         return $"attack_idle_{indexStr}";
     }
 
+    private List<IDamagable> hitIdamagables = new List<IDamagable>();
+
     public void CheckCounterAttack()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(counterAttackPoint.position, CounterAttackRadius + 10);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(counterAttackPoint.position, CounterAttackRadius + 2);
         float counterRadius = CounterAttackRadius + counterAttackPoint.localPosition.x;
         // Gather projectiles and damagables, and find closest of each
         foreach (Collider2D collider in colliders)
@@ -207,11 +211,28 @@ public class PlayerAttack : MonoBehaviour
                 if (proj.isHostileToPlayer && !proj.collided)
                 {
                     if (!IsInCounterDirection(proj.GetPivot())) continue;
-                    float dist = Vector2.Distance(proj.GetPivot(), health.GetHitPos());
+                    float dist = Vector2.Distance(proj.GetPivot(), counterAttackPoint.position);
                     if (dist <= counterRadius)// if normal attack
                     {
                         if (counterAttackCheckTimer <= perfectCounterAttackCheckDuration) CounterAttack(proj, true);
                         if (counterAttackCheckTimer <= counterAttackCheckDuration) CounterAttack(proj, false);
+                    }
+                }
+            }
+
+            if (collider.TryGetComponent<IDamagable>(out IDamagable dmg))
+            {
+                if (!hitIdamagables.Contains(dmg))
+                {
+                    if (dmg.canBeHitWithoutHSAttack)
+                    {
+                        float distance = Vector2.Distance(dmg.GetHitPos(), health.GetHitPos());
+                        if (distance <= counterRadius)
+                        {
+                            dmg.Damage(basicAttackDamage, this.transform, 0.1f, true, 0);
+                            hitIdamagables.Add(dmg);
+                            CommonHitEffect(dmg);
+                        }
                     }
                 }
             }
@@ -258,6 +279,16 @@ public class PlayerAttack : MonoBehaviour
         isCounterAttacking = false;
         canDefend = true;
         attackTimer = 3f;
+    }
+
+    public void CommonHitEffect(IDamagable dmg)
+    {
+        if (dmg.resetAttackCDOnHit) attackTimer = attackGap + 0.5f;
+        if (!dmg.consumeEnergyOnHit) energy.PerfectCounterAttackRestore();
+        vfx.RumblePulse(commonHitEffect.frequncy_perfect.x, commonHitEffect.frequncy_perfect.y, commonHitEffect.rumbleDuration);
+        vfx.CameraShake(commonHitEffect.cameraShakeForce.y);
+        vfx.SpawnHitEffect(true, dmg.GetHitPos());
+        SoundManager.PlaySound("perfect_attack");
     }
 
     public void EndAttack()

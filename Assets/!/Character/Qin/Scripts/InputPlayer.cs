@@ -489,18 +489,30 @@ public class InputPlayer : MonoBehaviour
 
     #endregion Pointer & Attack Direction Logic
 
-    #region Trigger & EventObject Handling
+    #region Trigger
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        CollisionWithEventObject(collision);
+    }
+
+    public void CollisionWithEventObject(Collider2D collision)
+    {
         if (collision.gameObject.layer == 15)//event objects
         {
-            currentEventObject = collision.GetComponent<EventObject>();
-            currentEventObject.ShowInteractSign(true);
+            if (collision.TryGetComponent<EventObject>(out EventObject obj))
+            {
+                obj.ShowInteractSign(true);
+            }
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
+    {
+        ExitWithEventObject(collision);
+    }
+
+    private void ExitWithEventObject(Collider2D collision)
     {
         if (collision.gameObject.layer == 15)//event objects
         {
@@ -513,7 +525,7 @@ public class InputPlayer : MonoBehaviour
         }
     }
 
-    #endregion Trigger & EventObject Handling
+    #endregion Trigger
 
     #region Utility
 

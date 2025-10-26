@@ -7,7 +7,9 @@ public abstract class IDamagable : MonoBehaviour
     [FoldoutGroup("HitPos", nameof(getHitPosition), nameof(color))] public Void hitposVoid1;
     [SerializeField, HideInInspector] public Vector3 getHitPosition;
     [SerializeField, HideInInspector] public Color color = Color.red;
-
+    public bool canBeHitWithoutHSAttack = false;
+    public bool resetAttackCDOnHit = false;
+    public bool consumeEnergyOnHit = true;
     [HideInInspector] public HashSet<SubDamageable> subDamagables = new HashSet<SubDamageable>();
 
     public virtual int Damage(float damageAmount, Transform sender = null, float stunDuration = 0f, bool damageFlash = true, float stunValue = 0)

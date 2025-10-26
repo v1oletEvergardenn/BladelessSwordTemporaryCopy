@@ -72,7 +72,7 @@ public class PlayerSave : MonoBehaviour
     public void Load(PlayerSaveData data)
     {
         GameManager manager = GameManager.instance;
-        if (manager.player == null) { manager.LoadAndCreatePlayer(); return; }
+        if (manager.player == null) { manager.LoadPlayer(); return; }
 
         manager.playerhealth.transform.position = data.pos;
         manager.playerhealth.SetMaxHealth(data.maxHealth);
