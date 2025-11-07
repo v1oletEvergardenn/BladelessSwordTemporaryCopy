@@ -2,13 +2,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using DG.Tweening;
+using UnityEngine.InputSystem;
 
 public class SavingMenu : MonoBehaviour
 {
     public GameObject SavingUI;
     public List<Button> slotButtons = new List<Button>();
-    public Button AutoSaveSlot;
+    public Button autoSaveSlot;
+
+    public Material slotsMat;
+    public float initialYPos = 175f;
+    public float moveAmount = 255f;
+    protected Tween moveUPTween;
+    protected Tween moveDOWNTween;
+
+    public InputActionReference _navigateReference;
+    protected Selectable _lastSelected;
 
     // Start is called before the first frame update
     private void Start()
@@ -16,18 +28,138 @@ public class SavingMenu : MonoBehaviour
         SavingUI.SetActive(false);
     }
 
-    // Update is called once per frame
-    private void Update()
+    public void Awake()
     {
+        InitializeSlots();
+    }
+
+    public void InitializeSlots()
+    {
+        // Initialize each slot button
+        foreach (var btn in slotButtons)
+        {
+            AddSelectionListeners(btn);
+            Material newMat = new Material(slotsMat);
+        }
+        AddSelectionListeners(autoSaveSlot);
+        Material mat = new Material(slotsMat);
+    }
+
+    public void OnEnable()
+    {
+        _navigateReference.action.performed += OnNavigate;
+        foreach (var btn in slotButtons)
+        {
+            btn.GetComponent<RectTransform>().anchoredPosition =
+                new Vector3(btn.GetComponent<RectTransform>().anchoredPosition.x,
+                initialYPos);
+        }
+        autoSaveSlot.GetComponent<RectTransform>().anchoredPosition =
+            new Vector3(autoSaveSlot.GetComponent<RectTransform>().anchoredPosition.x,
+            initialYPos);
+    }
+
+    public void OnDisable()
+    {
+        _navigateReference.action.performed -= OnNavigate;
+        moveUPTween?.Kill(true);
+        moveDOWNTween?.Kill(true);
+    }
+
+    public void AddSelectionListeners(Selectable selectable)
+    {
+        EventTrigger trigger = selectable.gameObject.GetComponent<EventTrigger>();
+        if (trigger == null)
+        {
+            trigger = selectable.gameObject.AddComponent<EventTrigger>();
+        }
+
+        // select event
+        EventTrigger.Entry selectEntry = new EventTrigger.Entry
+        {
+            eventID = EventTriggerType.Select
+        };
+        selectEntry.callback.AddListener(OnSelect);
+        trigger.triggers.Add(selectEntry);
+
+        // deselect event
+        EventTrigger.Entry deselectEntry = new EventTrigger.Entry
+        {
+            eventID = EventTriggerType.Deselect
+        };
+        deselectEntry.callback.AddListener(OnDeselect);
+
+        trigger.triggers.Add(deselectEntry);
+
+        //pointerenter event
+        EventTrigger.Entry pointerEnter = new EventTrigger.Entry
+        {
+            eventID = EventTriggerType.PointerEnter
+        };
+        pointerEnter.callback.AddListener(OnPointerEnter);
+        trigger.triggers.Add(pointerEnter);
+        //pointerexit event
+        EventTrigger.Entry pointerExit = new EventTrigger.Entry
+        {
+            eventID = EventTriggerType.PointerExit
+        };
+        pointerExit.callback.AddListener(OnPointerExit);
+        trigger.triggers.Add(pointerExit);
+    }
+
+    public void OnSelect(BaseEventData eventData)
+    {
+        _lastSelected = eventData.selectedObject.GetComponent<Selectable>();
+        // Handle select event
+        moveUPTween = eventData.selectedObject.GetComponent<RectTransform>().DOAnchorPosY(initialYPos + moveAmount, 0.2f);
+    }
+
+    public void OnDeselect(BaseEventData eventData)
+    {
+        // Handle deselect event
+        moveDOWNTween = eventData.selectedObject.GetComponent<RectTransform>().DOAnchorPosY(initialYPos, 0.2f);
+    }
+
+    public void OnPointerEnter(BaseEventData eventData)
+    {
+        PointerEventData pointerEventData = eventData as PointerEventData;
+        if (pointerEventData != null)
+        {
+            Selectable sel = pointerEventData.pointerEnter.GetComponentInParent<Selectable>();
+            if (sel == null)
+            {
+                sel = pointerEventData.pointerEnter.GetComponentInChildren<Selectable>();
+            }
+            pointerEventData.selectedObject = sel.gameObject;
+        }
+    }
+
+    public void OnPointerExit(BaseEventData eventData)
+    {
+        PointerEventData pointerEventData = eventData as PointerEventData;
+        if (pointerEventData != null)
+        {
+            pointerEventData.selectedObject = null;
+        }
+    }
+
+    public void OnNavigate(InputAction.CallbackContext context)
+    {
+        if (EventSystem.current.currentSelectedGameObject == null && _lastSelected != null)
+        {
+            EventSystem.current.SetSelectedGameObject(_lastSelected.gameObject);
+        }
     }
 
     public void StartNewGameMenu()
     {
+        MoveSlots(false);
         UpdateSlotsTexts();
         // Enable all slot buttons
         foreach (var btn in slotButtons)
             btn.interactable = true;
-
+        autoSaveSlot.gameObject.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(slotButtons[0].gameObject);
         // Check each slot for existing save file
         for (int i = 0; i < slotButtons.Count; i++)
         {
@@ -63,9 +195,10 @@ public class SavingMenu : MonoBehaviour
     {
         if (System.IO.File.Exists(SaveSystem.SaveFileName(-1)))
         {
-            AutoSaveSlot.gameObject.SetActive(true);
-            AutoSaveSlot.onClick.RemoveAllListeners();
-            AutoSaveSlot.onClick.AddListener(() =>
+            autoSaveSlot.gameObject.SetActive(true);
+            EventSystem.current.SetSelectedGameObject(autoSaveSlot.gameObject);
+            autoSaveSlot.onClick.RemoveAllListeners();
+            autoSaveSlot.onClick.AddListener(() =>
             {
                 WarningSystem.ShowWarning("Load the auto save?",
                 () =>
@@ -73,8 +206,14 @@ public class SavingMenu : MonoBehaviour
                     StartCoroutine(LoadGame(-1)); // Assuming -1 indicates auto-save
                 });
             });
+            MoveSlots(true);
         }
-        else { AutoSaveSlot.gameObject.SetActive(false); }
+        else
+        {
+            autoSaveSlot.gameObject.SetActive(false);
+            EventSystem.current.SetSelectedGameObject(slotButtons[0].gameObject);
+            MoveSlots(false);
+        }
 
         UpdateSlotsTexts();
         // Disable buttons for slots without a save file
@@ -97,6 +236,22 @@ public class SavingMenu : MonoBehaviour
                     });
                 });
             }
+        }
+    }
+
+    private bool isRight = true;
+
+    private void MoveSlots(bool right)
+    {
+        if (right != isRight)
+        {
+            foreach (var btn in slotButtons)
+            {
+                RectTransform rt = btn.GetComponent<RectTransform>();
+                float targetX = right ? rt.anchoredPosition.x + 104f : rt.anchoredPosition.x - 104f;
+                rt.anchoredPosition = new Vector2(targetX, rt.anchoredPosition.y);
+            }
+            isRight = right;
         }
     }
 

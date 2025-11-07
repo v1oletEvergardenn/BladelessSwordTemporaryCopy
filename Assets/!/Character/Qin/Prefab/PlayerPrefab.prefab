@@ -1865,6 +1865,14 @@ MonoBehaviour:
   counterAttackCheckDuration: 0.177
   perfectCounterAttackCheckDuration: 0.04
   attackGap: 0.36
+  commonHitEffect:
+    rumbleDuration: 0
+    frequency_norm: {x: 0, y: 0}
+    frequncy_perfect: {x: 0, y: 0}
+    freezeTime: 0
+    Time_scale: 0
+    repelForce: 0
+    cameraShakeForce: {x: 0, y: 0}
   attackTimer: 0
   counterAttackCheckTimer: 0
   attackAnimationTime: 0.35
@@ -1923,6 +1931,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   getHitPosition: {x: 0, y: 1.38, z: 0}
   color: {r: 1, g: 0, b: 0, a: 1}
+  canBeHitWithoutHSAttack: 0
+  resetAttackCDOnHit: 0
+  consumeEnergyOnHit: 1
   anim_bool: {fileID: 1670082175976385656}
   anim: {fileID: 5610019840959657370}
   maxHealth: 30
