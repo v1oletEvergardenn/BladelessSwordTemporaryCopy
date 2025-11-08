@@ -33,9 +33,6 @@ public class Ability_UI_segment : MonoBehaviour, IPointerEnterHandler, ISelectHa
         if (ability == null) return;
         int branchCount = learnedBranches.Count;
         if (branchCount == 0) return;
-
-        print("1");
-
         // Find current index, -1 means "none branch" (no branch equipped)
         int currentIndex = ability.GetBranchIndex();
         float nav = InputMaster.instance.uiActions.Navigate.ReadValue<Vector2>().y;

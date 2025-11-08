@@ -14,6 +14,7 @@ Material:
   m_ValidKeywords:
   - USE_DISTORTION
   - USE_GLOSS
+  - USE_SATURATION
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -51,7 +52,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _ChromaticAmount: 1
+    - _ChromaticAmount: 0.01
     - _ColorMask: 15
     - _DistortionEdgePx: 256
     - _DistortionInnerPx: 0
@@ -61,7 +62,7 @@ Material:
     - _GlobalBlurPercent: 0.9
     - _GlossIntensity: 0.681
     - _GlossWidth: 0.01
-    - _Saturation: 0.87
+    - _Saturation: 1
     - _Stencil: 0
     - _StencilComp: 8
     - _StencilOp: 0

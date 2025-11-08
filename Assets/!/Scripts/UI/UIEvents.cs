@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 public class UIEvents : MonoBehaviour
 {
@@ -22,24 +23,27 @@ public class UIEvents : MonoBehaviour
     public UnityEvent backToLastPageEvent;
     public GameObject menuToGoBack;
 
-    private void Update()
-    {
-        if (InputMaster.instance.uiActions.Cancel.WasPressedThisFrame()) { BackToLastPage(); }
-    }
-
     public void OnEnable()
     {
         onenableEvent?.Invoke();
         if (setSelectedObjectOnEnable) SetSelectObject(selectedObjectOnEnable);
+        //if (menuToGoBack != null) InputMaster.instance.uiActions.Cancel.performed += BackToLastPage;
     }
 
     public void OnDisable()
     {
+        //if (menuToGoBack != null) InputMaster.instance.uiActions.Cancel.performed -= BackToLastPage;
         disableEvent?.Invoke();
+    }
+
+    public void Update()
+    {
+        if (InputMaster.instance._playerInput.actions["Cancel"].WasPressedThisFrame()) { BackToLastPage(); }
     }
 
     public void BackToLastPage()
     {
+        if (WarningSystem.IsWarningActive) return;
         backToLastPageEvent?.Invoke();
         if (menuToGoBack != null)
         {

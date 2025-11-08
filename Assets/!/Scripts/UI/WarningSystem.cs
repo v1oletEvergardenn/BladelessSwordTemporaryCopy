@@ -7,6 +7,8 @@ using UnityEngine.EventSystems; // Remove if not using TextMeshPro
 public class WarningSystem : MonoBehaviour
 {
     public static WarningSystem instance;
+    private static bool _isWarningActive = false;
+    public static bool IsWarningActive => _isWarningActive;
 
     [Header("UI References")]
     public GameObject warningPanel;
@@ -27,6 +29,12 @@ public class WarningSystem : MonoBehaviour
         HideWarning();
     }
 
+    private void Start()
+    {
+        //InputMaster.instance.warningWindowActions.Cancel.performed += ctx => Cancel();
+        //InputMaster.instance.warningWindowActions.Confirm.performed += ctx => Confirm();
+    }
+
     /// <summary>
     /// Show a warning popup with message and actions.
     /// </summary>
@@ -35,6 +43,9 @@ public class WarningSystem : MonoBehaviour
     /// <param name="onCancel">Optional action to run on cancel</param>
     public static void ShowWarning(string message, Action onConfirm, Action onCancel = null)
     {
+        _isWarningActive = true;
+        InputMaster.instance.SwitchToWarningAction();
+
         instance.lastSelectedObj = EventSystem.current.currentSelectedGameObject;
         EventSystem.current.SetSelectedGameObject(instance.confirmButton.gameObject);
         instance.warningPanel.SetActive(true);
@@ -52,6 +63,7 @@ public class WarningSystem : MonoBehaviour
     private void Confirm()
     {
         var action = onConfirm;
+        InputMaster.instance.SwitchToUIAction();
         HideWarning();
         action?.Invoke();
     }
@@ -59,12 +71,14 @@ public class WarningSystem : MonoBehaviour
     private void Cancel()
     {
         var action = onCancel;
+        InputMaster.instance.SwitchToUIAction();
         HideWarning();
         action?.Invoke();
     }
 
     private void HideWarning()
     {
+        _isWarningActive = false;
         if (lastSelectedObj != null) EventSystem.current.SetSelectedGameObject(lastSelectedObj);
         warningPanel.SetActive(false);
         messageText.text = "";

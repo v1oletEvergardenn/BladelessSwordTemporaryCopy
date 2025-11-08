@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
             else player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
             DontDestroyOnLoad(player);
         }
-
+        InputMaster.instance.SwitchToGameplayAction();
         CreatePlayerReference(player);
         InitializePlayer();
     }
@@ -138,6 +138,7 @@ public class GameManager : MonoBehaviour
         SaveSystem.currentSaveSlot = slot;
         CreateNewPlayer();
         SceneManager.LoadScene("YingYangFish_Scene");
+        InputMaster.instance.SwitchToGameplayAction();
     }
 
     public void AutoSaveGame()

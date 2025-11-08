@@ -15,6 +15,7 @@ public class InputMaster : MonoBehaviour
     public ControllerInput input;
     public ControllerInput.GameplayActions gameplayActions;
     public ControllerInput.UIActions uiActions;
+    public ControllerInput.WarningWindowActions warningWindowActions;
 
     public GamePadIcons icons;
 
@@ -51,9 +52,10 @@ public class InputMaster : MonoBehaviour
         else { Destroy(this.gameObject); }
 
         input = new ControllerInput();
-        input.Enable();
+
         gameplayActions = input.Gameplay;
         uiActions = input.UI;
+        warningWindowActions = input.WarningWindow;
 
         _playerInput = GetComponent<PlayerInput>();
 
@@ -71,6 +73,7 @@ public class InputMaster : MonoBehaviour
         _AbilityB = _playerInput.actions["AbilityB"];
         _AbilityY = _playerInput.actions["AbilityY"];
 
+        _playerInput.SwitchCurrentActionMap("UI");
         qteInteractedKey_image.fillAmount = 0;
         qteKey.SetActive(false);
     }
@@ -78,12 +81,49 @@ public class InputMaster : MonoBehaviour
     public void SwitchToUIAction()
     {
         InputMaster.instance._playerInput.SwitchCurrentActionMap("UI");
-        InputPlayer.instance.moveDir = Vector2.zero;
+        if (InputPlayer.instance != null)
+        {
+            InputPlayer.instance.moveDir = Vector2.zero;
+        }
     }
 
     public void SwitchToGameplayAction()
     {
         InputMaster.instance._playerInput.SwitchCurrentActionMap("Gameplay");
+    }
+
+    public void SwitchToWarningAction()
+    {
+        InputMaster.instance._playerInput.SwitchCurrentActionMap("WarningWindow");
+    }
+
+    private void Update()
+    {
+    }
+
+    private void LogActionCallbacks(InputAction action)
+    {
+        if (action == null) return;
+        var field = typeof(InputAction).GetField("m_Performed", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (field != null)
+        {
+            var del = field.GetValue(action) as Delegate;
+            if (del != null)
+            {
+                foreach (var d in del.GetInvocationList())
+                {
+                    Debug.Log($"Callback: {d.Method.DeclaringType}.{d.Method.Name}");
+                }
+            }
+            else
+            {
+                Debug.Log("No callbacks attached.");
+            }
+        }
+        else
+        {
+            Debug.Log("Could not find delegate field.");
+        }
     }
 
     private void Start()

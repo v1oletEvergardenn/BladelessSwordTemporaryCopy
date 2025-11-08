@@ -928,6 +928,54 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""WarningWindow"",
+            ""id"": ""5050d047-8c3e-4198-8888-95c0df946e57"",
+            ""actions"": [
+                {
+                    ""name"": ""Confirm"",
+                    ""type"": ""Button"",
+                    ""id"": ""1cdaea0b-900a-4c2c-bcf1-5ca4f8a5a4e7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Cancel"",
+                    ""type"": ""Button"",
+                    ""id"": ""88345843-6f44-4947-8b24-e815345f4292"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""a28f92f1-c976-4c7c-85d0-ee92e42b5d8c"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Confirm"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1ffb0cd0-b2a4-433e-afc3-17e27414b8cb"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Cancel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -964,6 +1012,10 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         m_UI_FlipPageRight = m_UI.FindAction("FlipPageRight", throwIfNotFound: true);
         m_UI_FlipPage_LB = m_UI.FindAction("FlipPage_LB", throwIfNotFound: true);
         m_UI_FlipPage_RB = m_UI.FindAction("FlipPage_RB", throwIfNotFound: true);
+        // WarningWindow
+        m_WarningWindow = asset.FindActionMap("WarningWindow", throwIfNotFound: true);
+        m_WarningWindow_Confirm = m_WarningWindow.FindAction("Confirm", throwIfNotFound: true);
+        m_WarningWindow_Cancel = m_WarningWindow.FindAction("Cancel", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1321,6 +1373,60 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         }
     }
     public UIActions @UI => new UIActions(this);
+
+    // WarningWindow
+    private readonly InputActionMap m_WarningWindow;
+    private List<IWarningWindowActions> m_WarningWindowActionsCallbackInterfaces = new List<IWarningWindowActions>();
+    private readonly InputAction m_WarningWindow_Confirm;
+    private readonly InputAction m_WarningWindow_Cancel;
+    public struct WarningWindowActions
+    {
+        private @ControllerInput m_Wrapper;
+        public WarningWindowActions(@ControllerInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Confirm => m_Wrapper.m_WarningWindow_Confirm;
+        public InputAction @Cancel => m_Wrapper.m_WarningWindow_Cancel;
+        public InputActionMap Get() { return m_Wrapper.m_WarningWindow; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(WarningWindowActions set) { return set.Get(); }
+        public void AddCallbacks(IWarningWindowActions instance)
+        {
+            if (instance == null || m_Wrapper.m_WarningWindowActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_WarningWindowActionsCallbackInterfaces.Add(instance);
+            @Confirm.started += instance.OnConfirm;
+            @Confirm.performed += instance.OnConfirm;
+            @Confirm.canceled += instance.OnConfirm;
+            @Cancel.started += instance.OnCancel;
+            @Cancel.performed += instance.OnCancel;
+            @Cancel.canceled += instance.OnCancel;
+        }
+
+        private void UnregisterCallbacks(IWarningWindowActions instance)
+        {
+            @Confirm.started -= instance.OnConfirm;
+            @Confirm.performed -= instance.OnConfirm;
+            @Confirm.canceled -= instance.OnConfirm;
+            @Cancel.started -= instance.OnCancel;
+            @Cancel.performed -= instance.OnCancel;
+            @Cancel.canceled -= instance.OnCancel;
+        }
+
+        public void RemoveCallbacks(IWarningWindowActions instance)
+        {
+            if (m_Wrapper.m_WarningWindowActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IWarningWindowActions instance)
+        {
+            foreach (var item in m_Wrapper.m_WarningWindowActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_WarningWindowActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public WarningWindowActions @WarningWindow => new WarningWindowActions(this);
     public interface IGameplayActions
     {
         void OnMove(InputAction.CallbackContext context);
@@ -1354,5 +1460,10 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         void OnFlipPageRight(InputAction.CallbackContext context);
         void OnFlipPage_LB(InputAction.CallbackContext context);
         void OnFlipPage_RB(InputAction.CallbackContext context);
+    }
+    public interface IWarningWindowActions
+    {
+        void OnConfirm(InputAction.CallbackContext context);
+        void OnCancel(InputAction.CallbackContext context);
     }
 }

@@ -61,7 +61,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 18
+  m_SortingOrder: 1000
   m_TargetDisplay: 0
 --- !u!114 &2238799389937301209
 MonoBehaviour:
@@ -75,12 +75,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1980, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.553
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -3844,6 +3844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1489f7a5fe2f61940af94a6c14b88e6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NOTSTARTATMAINMENU: 0
   playerPrefab: {fileID: 4724049110690754538, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
   player: {fileID: 0}
   playerhealth: {fileID: 0}
@@ -4514,6 +4515,14 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 1a0eba7d-f3b9-4695-967c-0af2075b20cd
     m_ActionName: Gameplay/AbilityB[/XInputControllerWindows/buttonEast]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 1cdaea0b-900a-4c2c-bcf1-5ca4f8a5a4e7
+    m_ActionName: WarningWindow/Confirm[/XInputControllerWindows/buttonSouth]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 88345843-6f44-4947-8b24-e815345f4292
+    m_ActionName: WarningWindow/Cancel[/XInputControllerWindows/buttonEast]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Gameplay
