@@ -161,7 +161,8 @@ public class PlayerAttack : MonoBehaviour
         if (consumeEnergy) if (!energy.AttackConsume()) { return false; }
         normalAttacking = true;
         InitializeAttack(attackLeft);
-
+        if (attackLeft) { QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.leftCounterAttack); }
+        else { QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.rightCounterAttack); }
         // Play the appropriate attack animation
         anim.Play(GetAttackAnimName());
         anim.SetBool("isCombat", true);
@@ -333,6 +334,7 @@ public class PlayerAttack : MonoBehaviour
         if (canDefend && !controller.isFloating)
         {
             if (!energy.DefendConsume()) { return; }
+            if (!isDefending) { QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.defend); }
             isDefending = true;
             animSet.Anim_Defend(0);
             anim.Play("defend");

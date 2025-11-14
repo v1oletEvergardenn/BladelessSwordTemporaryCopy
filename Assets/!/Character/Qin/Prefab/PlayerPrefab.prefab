@@ -1945,19 +1945,7 @@ MonoBehaviour:
   isDead: 0
   DEATH:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: EndCanvas
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
   stunned: 0
 --- !u!114 &2543618377839832168
 MonoBehaviour:
@@ -2510,8 +2498,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commonAttribute: {fileID: 11400000, guid: 8ed998852960ace4587a29aa97ea295c, type: 2}
+  type: 6
+  questActionID: hs_attack
   branches: []
-  learned: 0
+  learned: 1
   isActive: 0
   isPerforming: 0
   hsHitEffectPlayed: 0
@@ -3601,13 +3591,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f31b1976c4d9fdc44ae07c0b9f2ed061, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  allAbilities_ref:
+  - {fileID: 4369938591803654828}
+  - {fileID: 6292435455098606858}
+  - {fileID: 7692349019359649549}
   selfPooler: {fileID: 6909178917796394598}
   rb: {fileID: 8484378856517362717}
   anim: {fileID: 5610019840959657370}
-  allAbilities_ref:
-  - {fileID: 6292435455098606858}
-  - {fileID: 4369938591803654828}
-  - {fileID: 7692349019359649549}
   allAbilities:
   - {fileID: 0}
   - {fileID: 0}
@@ -3620,9 +3610,9 @@ MonoBehaviour:
   - {fileID: 7700881654836060864}
   - {fileID: 9055875050913893345}
   - {fileID: 1388019030509448985}
-  abilityWest: -1
-  abilityNorth: -1
-  abilityEast: -1
+  abilityWest: 0
+  abilityNorth: 2
+  abilityEast: 1
   currentActivatedAbility: -1
 --- !u!1 &6292435455098606858
 GameObject:
@@ -3672,6 +3662,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commonAttribute: {fileID: 11400000, guid: 645b4d8a2c674644983d036e199d5cf9, type: 2}
+  type: 6
+  questActionID: hs_slash
   branches:
   - {fileID: 1689395142328155218}
   - {fileID: 4402944448691048704}
@@ -4940,6 +4932,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commonAttribute: {fileID: 11400000, guid: 9b6def557c93f8f4c87ff35d47f826f6, type: 2}
+  type: 6
+  questActionID: hs_wave
   branches: []
   learned: 1
   isActive: 0

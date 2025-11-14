@@ -4,7 +4,6 @@ using Microlight.MicroBar;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Profiling.Memory.Experimental;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -12,12 +11,12 @@ using Void = EditorAttributes.Void;
 
 public class HeartSwordAbilities : MonoBehaviour
 {
+    public List<GameObject> allAbilities_ref = new List<GameObject>();
     public static HeartSwordAbilities instance;
-    [FoldoutGroup("reference", nameof(allAbilities_ref), nameof(selfPooler), nameof(rb), nameof(anim))] public Void referenceVoid;
+    [FoldoutGroup("reference", nameof(selfPooler), nameof(rb), nameof(anim))] public Void referenceVoid;
     [SerializeField, HideProperty] public InternalObjectPooler selfPooler;
     [SerializeField, HideProperty] public Rigidbody2D rb;
     [SerializeField, HideProperty] public Animator anim;
-    [SerializeField, HideProperty] public List<GameObject> allAbilities_ref = new List<GameObject>();
 
     [GUIColor(GUIColor.Lime)]
     [FoldoutGroup("HeartSword Abilities", nameof(maxHS_point),
@@ -58,9 +57,9 @@ public class HeartSwordAbilities : MonoBehaviour
 
     private void Start()
     {
-        //if (GetWestAbility() != null) GetWestAbility().EquipAbility();
-        //if (GetNorthAbility() != null) GetNorthAbility().EquipAbility();
-        //if (GetEastAbility() != null) GetEastAbility().EquipAbility();
+        if (GetWestAbility() != null) GetWestAbility().EquipAbility();
+        if (GetNorthAbility() != null) GetNorthAbility().EquipAbility();
+        if (GetEastAbility() != null) GetEastAbility().EquipAbility();
         InitializeHS_UI();
     }
 

@@ -44,7 +44,7 @@ public class WarningSystem : MonoBehaviour
     public static void ShowWarning(string message, Action onConfirm, Action onCancel = null)
     {
         _isWarningActive = true;
-        InputMaster.instance.SwitchToWarningAction();
+        InputMaster.SwitchToWarningAction();
 
         instance.lastSelectedObj = EventSystem.current.currentSelectedGameObject;
         EventSystem.current.SetSelectedGameObject(instance.confirmButton.gameObject);
@@ -63,7 +63,7 @@ public class WarningSystem : MonoBehaviour
     private void Confirm()
     {
         var action = onConfirm;
-        InputMaster.instance.SwitchToUIAction();
+        InputMaster.SwitchToUIAction();
         HideWarning();
         action?.Invoke();
     }
@@ -71,7 +71,7 @@ public class WarningSystem : MonoBehaviour
     private void Cancel()
     {
         var action = onCancel;
-        InputMaster.instance.SwitchToUIAction();
+        InputMaster.SwitchToUIAction();
         HideWarning();
         action?.Invoke();
     }

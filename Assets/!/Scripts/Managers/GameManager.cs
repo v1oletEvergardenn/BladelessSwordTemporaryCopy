@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         if (instance == null) { instance = this; }
-        else { Destroy(this.gameObject); }
+        else { if (NOTSTARTATMAINMENU) Destroy(this.gameObject); }
         CheckIfStartFromMainMenu();
     }
 
@@ -65,7 +65,8 @@ public class GameManager : MonoBehaviour
     /// action is taken if the active scene is "MainMenu".</remarks>
     public void CheckIfStartFromMainMenu()
     {
-        if (SceneManager.GetActiveScene().name != "MainMenu")
+        if (SceneManager.GetActiveScene().name != "MainMenu" &&
+            SceneManager.GetActiveScene().name != "PreLoad")
         {
             SaveSystem.currentSaveSlot = -1;
             if (CharacterController2D.instance != null) CreatePlayerReference(CharacterController2D.instance.gameObject);
@@ -76,6 +77,9 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         impulseSource = GetComponent<CinemachineImpulseSource>();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        InputSystem.DisableDevice(Mouse.current);
     }
 
     public bool LoadPlayer()
@@ -101,7 +105,7 @@ public class GameManager : MonoBehaviour
             else player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
             DontDestroyOnLoad(player);
         }
-        InputMaster.instance.SwitchToGameplayAction();
+        InputMaster.SwitchToGameplayAction();
         CreatePlayerReference(player);
         InitializePlayer();
     }
@@ -121,12 +125,12 @@ public class GameManager : MonoBehaviour
     public void InitializePlayer()
     {
         playerhealth.transform.position = Vector3.zero;
-        playerhealth.SetMaxHealth(30);
-        playerhealth.SetCurrentHealth(30);
+        playerhealth.SetMaxHealth(50);
+        playerhealth.SetCurrentHealth(50);
         playerEnergy.maxEnergy = 16;
         playerEnergy.currentEnergy = 16;
-        hsManager.SetMaxHSPoint(3);
-        hsManager.SetCurrentHSPoint(3);
+        hsManager.SetMaxHSPoint(6);
+        hsManager.SetCurrentHSPoint(6);
     }
 
     /// <summary>
@@ -138,7 +142,7 @@ public class GameManager : MonoBehaviour
         SaveSystem.currentSaveSlot = slot;
         CreateNewPlayer();
         SceneManager.LoadScene("YingYangFish_Scene");
-        InputMaster.instance.SwitchToGameplayAction();
+        InputMaster.SwitchToGameplayAction();
     }
 
     public void AutoSaveGame()
@@ -191,7 +195,7 @@ public class GameManager : MonoBehaviour
     {
         GamePaused = true;
         Time.timeScale = 0f;
-        InputMaster.instance.gameplayActions.Disable();
+        InputMaster.SwitchToUIAction();
         PlayerAttack.instance.anim.SetBool("isRunning", false);
     }
 
@@ -199,6 +203,11 @@ public class GameManager : MonoBehaviour
     {
         GamePaused = false;
         Time.timeScale = 1f;
-        InputMaster.instance.gameplayActions.Enable();
+        InputMaster.SwitchToGameplayAction();
+    }
+
+    public void RestorePlayerHeartSword()
+    {
+        hsManager.SetCurrentHSPoint(hsManager.GetMaxHSpoint());
     }
 }

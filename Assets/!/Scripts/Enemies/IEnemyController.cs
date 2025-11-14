@@ -64,6 +64,7 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public GameObject GFX;
     [SerializeField, HideInInspector] public InternalObjectPooler selfPooler;
     [HideProperty] public List<EnemyActionCaller> actionList = new List<EnemyActionCaller>();
+    [HideProperty] public IEnemyAction lastAction;
 
     #endregion BASIC_LOGIC
 

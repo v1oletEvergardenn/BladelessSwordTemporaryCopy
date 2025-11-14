@@ -3,6 +3,8 @@ using UnityEditor;
 using UnityEditor.AnimatedValues;
 using UnityEngine;
 
+#if UNITY_EDITOR
+
 namespace Water2D
 {
     [InitializeOnLoad]
@@ -620,3 +622,5 @@ namespace Water2D
         #endregion OnInspectorGUI
     }
 }
+
+#endif

@@ -59,42 +59,53 @@ public class InputMaster : MonoBehaviour
 
         _playerInput = GetComponent<PlayerInput>();
 
-        _moveAction = _playerInput.actions["Move"];
-        _attackDirectionAction = _playerInput.actions["AttackDirection"];
-        _jumpAction = _playerInput.actions["Jump"];
-        _teleportAction = _playerInput.actions["Teleport"];
-        _attackLeftAction = _playerInput.actions["AttackLeft"];
-        _attackRightAction = _playerInput.actions["AttackRight"];
-        _defendAction = _playerInput.actions["Defend"];
-        _EventKeyAction = _playerInput.actions["EventKey"];
-        _EventFlipPageAction = _playerInput.actions["Event_flip_page"];
-        _MenuOpenAction = _playerInput.actions["MenuOpen"];
-        _AbilityX = _playerInput.actions["AbilityX"];
-        _AbilityB = _playerInput.actions["AbilityB"];
-        _AbilityY = _playerInput.actions["AbilityY"];
+        _moveAction = gameplayActions.Move;
+        _attackDirectionAction = gameplayActions.AttackDirection;
+        _jumpAction = gameplayActions.Jump;
+        _teleportAction = gameplayActions.Teleport;
+        _attackLeftAction = gameplayActions.AttackLeft;
+        _attackRightAction = gameplayActions.AttackRight;
+        _defendAction = gameplayActions.Defend;
+        _EventKeyAction = gameplayActions.EventKey;
+        _EventFlipPageAction = gameplayActions.Event_flip_page;
+        _MenuOpenAction = gameplayActions.MenuOpen;
+        _AbilityX = gameplayActions.AbilityX;
+        _AbilityB = gameplayActions.AbilityB;
+        _AbilityY = gameplayActions.AbilityY;
 
-        _playerInput.SwitchCurrentActionMap("UI");
         qteInteractedKey_image.fillAmount = 0;
         qteKey.SetActive(false);
     }
 
-    public void SwitchToUIAction()
+    public static void SwitchToUIAction()
     {
-        InputMaster.instance._playerInput.SwitchCurrentActionMap("UI");
+        InputMaster.instance.uiActions.Enable();
+        InputMaster.instance.gameplayActions.Disable();
+        InputMaster.instance.warningWindowActions.Disable();
         if (InputPlayer.instance != null)
         {
             InputPlayer.instance.moveDir = Vector2.zero;
         }
     }
 
-    public void SwitchToGameplayAction()
+    public static void SwitchToGameplayAction()
     {
-        InputMaster.instance._playerInput.SwitchCurrentActionMap("Gameplay");
+        InputMaster.instance.uiActions.Disable();
+        InputMaster.instance.gameplayActions.Enable();
+        InputMaster.instance.warningWindowActions.Disable();
     }
 
-    public void SwitchToWarningAction()
+    public static void SwitchToWarningAction()
     {
-        InputMaster.instance._playerInput.SwitchCurrentActionMap("WarningWindow");
+        InputMaster.instance.uiActions.Disable();
+        InputMaster.instance.gameplayActions.Disable();
+        InputMaster.instance.warningWindowActions.Enable();
+    }
+
+    private void Start()
+    {
+        gameManager = GameManager.instance;
+        SwitchToUIAction();
     }
 
     private void Update()
@@ -103,32 +114,13 @@ public class InputMaster : MonoBehaviour
 
     private void LogActionCallbacks(InputAction action)
     {
-        if (action == null) return;
-        var field = typeof(InputAction).GetField("m_Performed", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        if (field != null)
+        if (action == null)
         {
-            var del = field.GetValue(action) as Delegate;
-            if (del != null)
-            {
-                foreach (var d in del.GetInvocationList())
-                {
-                    Debug.Log($"Callback: {d.Method.DeclaringType}.{d.Method.Name}");
-                }
-            }
-            else
-            {
-                Debug.Log("No callbacks attached.");
-            }
+            Debug.Log("Action is null.");
+            return;
         }
-        else
-        {
-            Debug.Log("Could not find delegate field.");
-        }
-    }
 
-    private void Start()
-    {
-        gameManager = GameManager.instance;
+        Debug.Log($"Action '{action.name}' is enabled: {action.enabled}, phase: {action.phase}");
     }
 
     /// <summary>

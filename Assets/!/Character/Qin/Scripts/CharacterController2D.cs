@@ -155,6 +155,8 @@ public class CharacterController2D : MonoBehaviour
 
     #region Basic Movement
 
+    private bool hasTriggeredMoveAction = false;
+
     public void Move(float move)
     {
         if (!canMove)
@@ -168,6 +170,7 @@ public class CharacterController2D : MonoBehaviour
                 Mathf.Infinity,
                 VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime
             );
+            hasTriggeredMoveAction = false; // Reset when movement is not allowed
             return;
         }
 
@@ -177,6 +180,20 @@ public class CharacterController2D : MonoBehaviour
         float speed = runSpeed;
         bool moving = move != 0;
         SetRunningState(moving);
+
+        // Only trigger OnAction once per movement session
+        if (moving)
+        {
+            if (!hasTriggeredMoveAction)
+            {
+                QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.Move);
+                hasTriggeredMoveAction = true;
+            }
+        }
+        else
+        {
+            hasTriggeredMoveAction = false; // Reset when player stops moving
+        }
 
         if (!isGrounded && m_AirControl)
         {
@@ -281,7 +298,7 @@ public class CharacterController2D : MonoBehaviour
         float x = rb.velocity.x;
         rb.velocity = new Vector2(x, m_JumpForce);
         isJumping = true;
-
+        QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.Jump);
         var state = anim.GetCurrentAnimatorStateInfo(0);
         float duration = state.normalizedTime;
 
@@ -305,7 +322,7 @@ public class CharacterController2D : MonoBehaviour
         isFloating = false;
         isFalling = false;
         isJumping = true;
-
+        QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.SwordJump);
         PlayAnimClipInCombat("sword_jump_after", "sword_jump_after_combat");
         bool hit = playerAttack.JumpAttack();
         if (hit)
@@ -366,6 +383,7 @@ public class CharacterController2D : MonoBehaviour
         if (teleportTimer <= teleportCD || !energy.TeleportConsume()) return;
         teleportTimer = 0f;
         teleported = false;
+        QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.swordTeleport);
         co_teleport = StartCoroutine(TeleportCoroutine(FacingRight));
     }
 

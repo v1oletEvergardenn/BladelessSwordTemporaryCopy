@@ -905,19 +905,19 @@ public class YingYangFish_AI : IEnemyController
         float waterSpearRange = 10f;
         //water spear --- if player qi less than certain amount or player distance is further than a certain amount
         int energy_Threshhold = 5;
-        if (playerEnergy.currentEnergy <= energy_Threshhold) possibleActions.Add(waterSpear);
+        if (playerEnergy.currentEnergy <= energy_Threshhold) if (lastAction != waterSpear) possibleActions.Add(waterSpear);
 
         //splash --- if player is moving towards here for 3 seconds;
         int playerDistanceDeltaThreshhold = -20;
-        if (playerDistanceDelta <= playerDistanceDeltaThreshhold) possibleActions.Add(splash);
+        if (playerDistanceDelta <= playerDistanceDeltaThreshhold) if (lastAction != splash) possibleActions.Add(splash);
 
         // if player close
         if (isPlayerClose)
         {
             float i = Random.Range(0, 10);
-            if (i < 3) { possibleActions.Add(swing); } //30%
-            else if (i < 6) { possibleActions.Add(splash); } //30%
-            else
+            if (i < 3 && lastAction != swing) { possibleActions.Add(swing); } //30%
+            else if (i < 6 && lastAction != splash) { possibleActions.Add(splash); } //30%
+            else if (lastAction != dive)
             {
                 possibleActions.Add(dive);
                 movingTarget = GetFarTargetOutOfTwo(player, GetBoundaryFarOfPlayer());
@@ -927,18 +927,27 @@ public class YingYangFish_AI : IEnemyController
 
         if (distanceToPlayer >= waterSpearRange)
         {
-            possibleActions.Add(Possibility(70) ? waterSpear : gatling);
+            IEnemyAction action = Possibility(70) ? waterSpear : gatling;
+            if (lastAction != action) possibleActions.Add(action);
         }
 
         // if player far
-        if (isPlayerFar)
+        if (isPlayerFar && lastAction != dive)
         {
             possibleActions.Add(dive);
             movingTarget = player;// get near to player since too far
         }
 
-        int index = Random.Range(0, possibleActions.Count);
-        initialAction = possibleActions[index];
+        initialAction = null;
+        if (possibleActions.Count > 0)
+        {
+            int index = Random.Range(0, possibleActions.Count);
+            initialAction = possibleActions[index];
+        }
+        else
+        {
+            StartAction(); return;
+        }
 
         if (initialAction == waterSpear)
         {
@@ -975,8 +984,11 @@ public class YingYangFish_AI : IEnemyController
                 AddAction(RandomPick<IEnemyAction>(singleSwing, bubbleTrap, gatling));
             }
         }
-
-        InsertAction(initialAction, 0);
+        if (initialAction != null)
+        {
+            InsertAction(initialAction, 0);
+            lastAction = initialAction;
+        }
     }
 
     public override IEnumerator IE_Activate()
@@ -1117,8 +1129,9 @@ public class YingYangFish_AI : IEnemyController
         if (!secondPhase)
         {
             StartCoroutine(IE_Activate());
-            camLimit.UpdateLimit();
+
             CameraFollow.instance.targets.Add(center);
+            camLimit.UpdateLimit();
             EventInteract.SetActive(false);
         }
         else

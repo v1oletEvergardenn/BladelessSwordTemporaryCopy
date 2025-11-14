@@ -17,6 +17,8 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     #region Inspector Fields & Attributes
 
     public SO_HeartSwordAttribute commonAttribute;
+    [HideInInspector] public ObjectiveType type = ObjectiveType.HeartSword;
+    [ObjectiveIDDropdown] public string questActionID;
     [SerializeField] protected List<IHeartSwordAbilityBranch> branches;
     public bool learned = false;
     public bool isActive = false;

@@ -1,3 +1,4 @@
+using EditorAttributes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,8 @@ using UnityEngine.Events;
 [RequireComponent(typeof(DamageFlash))]
 public class ShooterOnHIt : IDamagable
 {
+    public QuestObjID objectiveID;
+
     private SpriteRenderer spriteRenderer;
     private DamageFlash flash;
     public float maxHealth;
@@ -33,6 +36,7 @@ public class ShooterOnHIt : IDamagable
         currentHealth -= damageAmount;
         if (currentHealth <= 0)
         {
+            QuestManager.OnAction(objectiveID);
             Die?.Invoke();
             if (canRevive)
             {

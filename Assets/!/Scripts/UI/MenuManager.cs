@@ -46,6 +46,12 @@ public class MenuManager : MonoBehaviour
     [Range(0.1f, 10f)] public float _fadeOutTime = 1f;
     [Range(0.1f, 10f)] public float _fadeInTime = 1f;
 
+    [Header("Quest")] public Transform questHolder;
+    public Transform border;
+    public GameObject questUIPrefab;
+    public GameObject objectiveUIPrefab;
+    [HideInInspector] public List<UI_Objective> ui_objs = new List<UI_Objective>();
+
     private void Awake()
     {
         if (instance == null) { instance = this; }
@@ -60,6 +66,8 @@ public class MenuManager : MonoBehaviour
 
         InputMaster.instance._MenuOpenAction.performed += ctx => OpenPauseGameCanvas();
         InputMaster.instance.uiActions.MenuClose.performed += ctx => CloseMenu();
+
+        UpdateQuestUI();
     }
 
     public void CloseMenu()
@@ -74,6 +82,39 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    public void UpdateQuestUI()
+    {
+        foreach (Transform child in questHolder)
+        {
+            Destroy(child.gameObject);
+        }
+        if (QuestManager.GetActiveQuests().Count() > 0)
+        {
+            border.gameObject.SetActive(true);
+            foreach (var quest in QuestManager.GetActiveQuests())
+            {
+                UI_Quest quests = Instantiate(questUIPrefab, questHolder).GetComponent<UI_Quest>();
+                quests.name = quest.quest.name;
+                quests.UpdateUI(quest);
+
+                // Only show active objectives (current layer)
+                foreach (var objective in quest.ActiveObjectives)
+                {
+                    UI_Objective obj = Instantiate(objectiveUIPrefab, questHolder).GetComponent<UI_Objective>();
+                    ui_objs.Add(obj);
+                    obj.linkedObjective = objective;
+                    obj.UpdateUI();
+                }
+            }
+            questHolder.GetComponent<ContentSizeFitter>().enabled = true;
+            questHolder.GetComponent<ContentSizeFitter>().enabled = false;
+        }
+        else
+        {
+            border.gameObject.SetActive(false);
+        }
+    }
+
     public void OpenPauseGameCanvas()
     {
         GameManager.instance.PauseGame();
@@ -81,38 +122,7 @@ public class MenuManager : MonoBehaviour
         NextTab();
         PauseGameCanvas.SetActive(true);
         canChangeTab = true;
-        InputMaster.instance.SwitchToUIAction();
-    }
-
-    /// <summary>
-    /// fades the screen in or out.
-    /// </summary>
-    /// <param name="fadeIn">true is transparent, false is fully alpha</param>
-    /// <returns></returns>
-    public static IEnumerator Fade(bool fadeIn)
-    {
-        if (instance == null || instance.fadeOutImage == null)
-            yield break;
-
-        // Stop any existing tweens on the image to avoid overlap
-        instance.fadeOutImage.DOKill();
-
-        // Ensure the canvas is active
-        if (instance.FadeCanvas != null)
-            instance.FadeCanvas.SetActive(true);
-
-        Color color = instance.fadeOutImage.color;
-        color.a = fadeIn ? 0f : 1f;
-        instance.fadeOutImage.color = color;
-
-        // Determine target alpha and duration
-        float targetAlpha = fadeIn ? 1f : 0f;
-        float duration = fadeIn ? instance._fadeInTime : instance._fadeOutTime;
-
-        // Tween the alpha
-        instance.fadeOutImage.DOFade(targetAlpha, duration)
-            .SetEase(Ease.OutCubic);
-        yield return new WaitForSeconds(duration);
+        InputMaster.SwitchToUIAction();
     }
 
     public void ClosePauseGameCanvas()
@@ -120,7 +130,7 @@ public class MenuManager : MonoBehaviour
         if (!canCloseMenu) return;
         GameManager.instance.UnpauseGame();
         PauseGameCanvas.SetActive(false);
-        InputMaster.instance.SwitchToGameplayAction();
+        InputMaster.SwitchToGameplayAction();
     }
 
     public void OpenSavePointCanvas()
@@ -129,13 +139,13 @@ public class MenuManager : MonoBehaviour
         SavePointMenu.SetActive(true);
         HSAbilitySwapMenu.SetActive(false);
         EventSystem.current.SetSelectedGameObject(SavePointMenu.GetComponent<FirstSelectObjectSerializer>().Selected());
-        InputMaster.instance.SwitchToUIAction();
+        InputMaster.SwitchToUIAction();
     }
 
     public void CloseSavePointCanvas()
     {
         SavePointCanvas.SetActive(false);
-        InputMaster.instance.SwitchToGameplayAction();
+        InputMaster.SwitchToGameplayAction();
     }
 
     public void NextTab()
@@ -191,5 +201,36 @@ public class MenuManager : MonoBehaviour
     public void Save()
     {
         SaveSystem.Save();
+    }
+
+    /// <summary>
+    /// fades the screen in or out.
+    /// </summary>
+    /// <param name="fadeIn">true is transparent, false is fully alpha</param>
+    /// <returns></returns>
+    public static IEnumerator Fade(bool fadeIn)
+    {
+        if (instance == null || instance.fadeOutImage == null)
+            yield break;
+
+        // Stop any existing tweens on the image to avoid overlap
+        instance.fadeOutImage.DOKill();
+
+        // Ensure the canvas is active
+        if (instance.FadeCanvas != null)
+            instance.FadeCanvas.SetActive(true);
+
+        Color color = instance.fadeOutImage.color;
+        color.a = fadeIn ? 0f : 1f;
+        instance.fadeOutImage.color = color;
+
+        // Determine target alpha and duration
+        float targetAlpha = fadeIn ? 1f : 0f;
+        float duration = fadeIn ? instance._fadeInTime : instance._fadeOutTime;
+
+        // Tween the alpha
+        instance.fadeOutImage.DOFade(targetAlpha, duration)
+            .SetEase(Ease.OutCubic);
+        yield return new WaitForSeconds(duration);
     }
 }

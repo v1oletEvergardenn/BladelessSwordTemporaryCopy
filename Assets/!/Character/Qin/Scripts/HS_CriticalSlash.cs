@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
 
+[System.Serializable]
 public class HS_CriticalSlash : IHeartSwordAbility
 {
     public float actionDuration = 1.5f;

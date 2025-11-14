@@ -1,5 +1,3 @@
-#if UNITY_EDITOR
-#endif
 using UnityEngine;
 
 namespace Water2D
@@ -18,7 +16,9 @@ namespace Water2D
         [HideInInspector][SerializeField] private static ReflectionsSystem _reflectionsManagerTopDown;
         [HideInInspector][SerializeField] private static ReflectionsSystem _reflectionsManagerRayMarch;
 
-        [HideInInspector][SerializeField] public ObstructorManager obstructorManager
+        [HideInInspector]
+        [SerializeField]
+        public ObstructorManager obstructorManager
         {
             get
             {
@@ -37,8 +37,12 @@ namespace Water2D
             }
             set { }
         }
-        [HideInInspector][SerializeField] SurfaceRenderingManager _surfaceRenderer;
-        [HideInInspector][SerializeField] public SurfaceRenderingManager surfaceRenderer
+
+        [HideInInspector][SerializeField] private SurfaceRenderingManager _surfaceRenderer;
+
+        [HideInInspector]
+        [SerializeField]
+        public SurfaceRenderingManager surfaceRenderer
         {
             get
             {
@@ -57,14 +61,16 @@ namespace Water2D
             }
             set { }
         }
-        [HideInInspector][SerializeField] public ReflectionsSystem reflectionsManagerPlatformer
+
+        [HideInInspector]
+        [SerializeField]
+        public ReflectionsSystem reflectionsManagerPlatformer
         {
             get
             {
                 if (_reflectionsManagerPlatformer == null)
                 {
                     foreach (var system in FindObjectsOfType<ReflectionsSystem>(true)) if (system.name == "ReflectionsManagerPL") _reflectionsManagerPlatformer = system;
-
                 }
                 if (_reflectionsManagerPlatformer == null)
                 {
@@ -91,7 +97,6 @@ namespace Water2D
                 }
                 if (_reflectionsManagerRayMarch == null)
                 {
-
                     _reflectionsManagerRayMarch = new GameObject("ReflectionsManagerRM").AddComponent<ReflectionsSystem>();
                     OnReflectionsChanged();
                 }
@@ -103,7 +108,9 @@ namespace Water2D
             set { _reflectionsManagerRayMarch = value; }
         }
 
-        [HideInInspector][SerializeField] public ReflectionsSystem reflectionsManagerTopDown
+        [HideInInspector]
+        [SerializeField]
+        public ReflectionsSystem reflectionsManagerTopDown
         {
             get
             {
@@ -152,6 +159,7 @@ namespace Water2D
 
         //child for shader double pass
         [HideInInspector][SerializeField] private GameObject _childPP;
+
         public GameObject childPP
         {
             get
@@ -164,7 +172,6 @@ namespace Water2D
                 _childPP = value;
             }
         }
-
 
         [SerializeField][HideInInspector] public WaterCryo<bool> ManagersVisible = new WaterCryo<bool>(false);
         [HideInInspector][SerializeField] public WaterCryo<bool> enableObstruction = new WaterCryo<bool>(true);
@@ -180,22 +187,28 @@ namespace Water2D
         [HideInInspector][SerializeField] public ModernWater2DSettings settings = new ModernWater2DSettings();
         [HideInInspector][SerializeField] public bool customWaterMaterial;
 
-        [HideInInspector][SerializeField] Material _mat;
-        [HideInInspector][SerializeField] public Material mat
+        [HideInInspector][SerializeField] private Material _mat;
+
+        [HideInInspector]
+        [SerializeField]
+        public Material mat
         {
             set { _mat = value; }
             get { if (_mat == null) _mat = new Material(Shader.Find("ModernWater2D/waterg")); return _mat; }
         }
 
-        [HideInInspector][SerializeField] Material _matb;
-        [HideInInspector][SerializeField] public Material matb
+        [HideInInspector][SerializeField] private Material _matb;
+
+        [HideInInspector]
+        [SerializeField]
+        public Material matb
         {
             set { _matb = value; }
             get { if (_matb == null) OnBlurMaterialChanged(); return _matb; }
         }
 
-
         [HideInInspector][SerializeField] private static Transform _managersParent;
+
         public static Transform managersParent
         {
             get
@@ -224,7 +237,6 @@ namespace Water2D
 
         private void OnEnable()
         {
-
             //record current resolution
             resolution = new Vector2(Screen.width, Screen.height);
 
@@ -236,7 +248,7 @@ namespace Water2D
             sr.sharedMaterial.SetTexture("_simTex", (Texture2D)Resources.Load("Sprites/placeholders/blackTex"));
             sr.sharedMaterial.SetTexture("_wavesHeight", (Texture2D)Resources.Load("Sprites/placeholders/whiteTex"));
 
-            //setup layer 
+            //setup layer
             SetLayers();
 
             //setup cryo class callbacks and water managers
@@ -248,12 +260,11 @@ namespace Water2D
 
             //setup blur
             OnBlurMaterialChanged();
-          OnWavesSimulationChanged();
-
+            OnWavesSimulationChanged();
         }
 
         //sets the water layer for water
-        void SetLayers()
+        private void SetLayers()
         {
 #if UNITY_EDITOR
             if (!WaterLayers.LayerExists(srLayer)) WaterLayers.CreateLayer(srLayer);
@@ -264,14 +275,13 @@ namespace Water2D
             CreateDestroyPostProcessingCamera();
         }
 
-        void CreateDestroyPostProcessingCamera()
+        private void CreateDestroyPostProcessingCamera()
         {
             if (settings._blurSettings.useBlur.value && _childPP == null) CreateChildPP();
             else if (!settings._blurSettings.useBlur.value && _childPP != null) DestroyImmediate(_childPP);
         }
 
-
-        void CreateChildPP()
+        private void CreateChildPP()
         {
             _childPP = new GameObject(name + " post processing");
             SpriteRenderer sr = _childPP.AddComponent<SpriteRenderer>();
@@ -305,21 +315,18 @@ namespace Water2D
             t.localScale = Vector3.one;
         }
 
-
-
         private Camera GetCameraRenderingScreen()
         {
             if (overrideMainCamera.value && cameraOverride != null) return cameraOverride;
             else return Camera.main;
         }
 
-        //includes or excludes the water layer in mainCamera 
-        void SetCameraLayers()
+        //includes or excludes the water layer in mainCamera
+        private void SetCameraLayers()
         {
             //include normal and post processing layer
             Camera.main.cullingMask |= (1 << Obstructor.GetLayerIdx(srLayer));
             Camera.main.cullingMask |= (1 << Obstructor.GetLayerIdx(sr2Layer));
-
         }
 
         public void SetWaterSim(ref WaterSimulation _waterSimulation)
@@ -335,14 +342,12 @@ namespace Water2D
             }
         }
 
-
         private void Start()
         {
             if (Application.isPlaying) sr.sharedMaterial.SetTexture("_simTex", waterSimulation.GetRT());
         }
 
-
-        void SetupManagers()
+        private void SetupManagers()
         {
             ObstructorManager.instance = obstructorManager;
 
@@ -357,12 +362,11 @@ namespace Water2D
 
         private void OnResolutionChanged()
         {
-
         }
 
-        Vector2 resolution;
+        private Vector2 resolution;
 
-        bool CheckForResolutionChanged()
+        private bool CheckForResolutionChanged()
         {
             if (resolution.x != Screen.width || resolution.y != Screen.height)
             {
@@ -372,7 +376,7 @@ namespace Water2D
             return false;
         }
 
-        void SimulationSetup()
+        private void SimulationSetup()
         {
             settings._simulationSettings.sr = _sr;
             settings._simulationSettings.obstruction = ObstructorManager.instance.layerRenderer.LayerTexture();
@@ -380,7 +384,7 @@ namespace Water2D
             sr.sharedMaterial.SetTexture("_simTex", waterSimulation.GetRT());
         }
 
-        void CameraSetup()
+        private void CameraSetup()
         {
             Camera cam = GetCameraRenderingScreen();
             sr.sharedMaterial.SetMatrix("_projectionMatrix", cam.projectionMatrix);
@@ -388,10 +392,9 @@ namespace Water2D
             sr.sharedMaterial.SetVector("_camRect", new Vector4(cam.rect.x, cam.rect.y, cam.rect.width, cam.rect.height));
             sr.sharedMaterial.SetVector("_camSize", new Vector2(cam.pixelWidth, cam.pixelHeight));
             sr.sharedMaterial.SetVector("_obs_transform", !cam.orthographic ? new Vector4(1f, 1f, 0f, 0f) : new Vector4((1f / obstructorManager.sizeMLP.x), (1f / obstructorManager.sizeMLP.y), (1f - (1f / obstructorManager.sizeMLP.x)) / 2, (1f - (1f / obstructorManager.sizeMLP.y)) / 2));
-
         }
 
-        void SetCallbacks()
+        private void SetCallbacks()
         {
             enableObstruction.onValueChanged = OnWaterChanged;
             overrideMainCamera.onValueChanged = OnCameraSettingsChanged;
@@ -407,6 +410,7 @@ namespace Water2D
             settings._waterSettings.onValueChanged(OnWaterChanged);
             settings._blurSettings.onValueChanged(OnBlurChanged);
         }
+
         public void OnCameraSettingsChanged()
         {
             bool changeFlag = false;
@@ -434,7 +438,7 @@ namespace Water2D
             }
         }
 
-        void OnOSimulationChanged()
+        private void OnOSimulationChanged()
         {
             SetWaterSim(ref _waterSimulation);
             if (!enableSimulation.value) return;
@@ -445,27 +449,26 @@ namespace Water2D
             sr.sharedMaterial.SetTexture("_simTex", waterSimulation.GetRT());
         }
 
-        void SetupWaveSimulation() 
+        private void SetupWaveSimulation()
         {
             wavesSimulation.SetSettings(gameObject, sr, settings._wavesSettings);
             wavesSimulation.Setup();
         }
 
-        void OnWavesSimulationChanged()
+        private void OnWavesSimulationChanged()
         {
-            
             sr.sharedMaterial.SetColor("_edgeColor", settings._wavesSettings.edgeColor.value);
             sr.sharedMaterial.SetFloat("_edgeSize", settings._wavesSettings.edgeColoringSize.value);
             sr.sharedMaterial.SetFloat("_edgeIgnoreTransparency", settings._wavesSettings.edgeIgnoreTransparency.value ? 1f : 0f);
         }
 
-        void OnObstructionChanged()
+        private void OnObstructionChanged()
         {
             if (!enableObstruction.value) return;
             obstructorManager.UpdateSettings(settings._obstructorSettings);
         }
 
-        void OnInspectorSettingsChanged() 
+        private void OnInspectorSettingsChanged()
         {
             managersParent.gameObject.hideFlags = (ManagersVisible.value ? HideFlags.None : HideFlags.HideInHierarchy);
         }
@@ -476,13 +479,15 @@ namespace Water2D
             switch (settings._blurSettings.blurType)
             {
                 case BlurSettings.BlurType.box:
-                    matb = new Material(Shader.Find("hidden/box"));  
+                    matb = new Material(Shader.Find("hidden/box"));
                     matb.name = "box blur";
                     break;
+
                 case BlurSettings.BlurType.gaussian:
                     matb = new Material(Shader.Find("hidden/gaussian"));
                     matb.name = "gaussian blur";
                     break;
+
                 case BlurSettings.BlurType.bokeh:
                     matb = new Material(Shader.Find("hidden/bokeh"));
                     matb.name = "bokeh blur";
@@ -490,19 +495,19 @@ namespace Water2D
             }
             SetMaterials();
             OnBlurChanged();
-            
+
             //don't work on all urp versions
             //if(settings._blurSettings.blurType == BlurSettings.BlurType.gaussian || settings._blurSettings.blurType == BlurSettings.BlurType.box) SetupTwoPass();
         }
 
-        void SetMaterials() 
+        private void SetMaterials()
         {
             if (!settings._blurSettings.useBlur.value) return;
             SpriteRenderer sr = childPP.GetComponent<SpriteRenderer>();
             sr.sharedMaterial = matb;
         }
 
-        void OnBlurChanged()
+        private void OnBlurChanged()
         {
             CreateDestroyPostProcessingCamera();
             SetLayers();
@@ -517,11 +522,13 @@ namespace Water2D
                     sr.sharedMaterial.SetInt("_area", settings._blurSettings.boxSamplingRange.value);
                     sr.sharedMaterial.SetFloat("_sigmaX", settings._blurSettings.boxStrength.value);
                     break;
+
                 case BlurSettings.BlurType.gaussian:
                     sr.sharedMaterial.SetTexture("_MainTex2", _childPPLayerRenderer.LayerTexture());
                     sr.sharedMaterial.SetInt("_area", settings._blurSettings.gaussianSamplingRange.value);
                     sr.sharedMaterial.SetFloat("_sigmaX", settings._blurSettings.gaussianStrengthX.value);
                     break;
+
                 case BlurSettings.BlurType.bokeh:
                     sr.sharedMaterial.SetTexture("_MainTex2", _childPPLayerRenderer.LayerTexture());
                     sr.sharedMaterial.SetFloat("_area", settings._blurSettings.bokehArea.value);
@@ -538,14 +545,13 @@ namespace Water2D
             sr.sharedMaterial.SetInt("_falloffU", settings._blurSettings.useFalloff.value ? 1 : 0);
         }
 
-
-        void OnWaterChanged()
+        private void OnWaterChanged()
         {
             //set material
-      
+
             sr.sharedMaterial = mat;
             //enable or disable cameras
-            
+
             reflectionsManagerTopDown.run = enableReflections.value && settings._reflectionsSettings.enableTopDownReflections.value;
             reflectionsManagerPlatformer.run = enableReflections.value && settings._reflectionsSettings.enablePlatformerReflections.value;
             reflectionsManagerRayMarch.run = enableReflections.value && settings._reflectionsSettings.enableRaymarchedReflections.value;
@@ -560,9 +566,9 @@ namespace Water2D
             sr.sharedMaterial.SetInt("_dwaves", enableWavesSimulation.value ? 1 : 0);
 
             sr.sharedMaterial.SetInt("_color_type", (int)settings._waterSettings.coloringType);
-   
+
             sr.sharedMaterial.SetFloat("_depthMlp", settings._waterSettings.depthMlp.value);
-            sr.sharedMaterial.SetTexture("_colorGradient", Create(settings._waterSettings.colorGradient.value,128));
+            sr.sharedMaterial.SetTexture("_colorGradient", Create(settings._waterSettings.colorGradient.value, 128));
 
             sr.sharedMaterial.SetColor("_color", settings._waterSettings.color.value);
             sr.sharedMaterial.SetFloat("_surfaceAlpha", settings._waterSettings.baseAlpha.value);
@@ -586,15 +592,13 @@ namespace Water2D
             sr.sharedMaterial.SetFloat("_foam_density", settings._waterSettings.foamDensity.value);
             sr.sharedMaterial.SetFloat("_foam_alpha", settings._waterSettings.foamAlpha.value);
 
-
-
             if (settings._waterSettings.enableBelowWater.value) sr.sharedMaterial.SetTexture("_belowWaterTex", surfaceRenderer.layerRenderer.LayerTexture());
             else
             {
                 sr.sharedMaterial.SetTexture("_belowWaterTex", null);
             }
             sr.sharedMaterial.SetFloat("_belowWaterTexDistortionStrength", settings._waterSettings.belowWaterDistortionStrength.value);
-            sr.sharedMaterial.SetFloat("_belowWaterTexAlpha", settings._waterSettings.enableBelowWater.value? settings._waterSettings.belowWaterAlpha.value : 0f);
+            sr.sharedMaterial.SetFloat("_belowWaterTexAlpha", settings._waterSettings.enableBelowWater.value ? settings._waterSettings.belowWaterAlpha.value : 0f);
 
             sr.sharedMaterial.SetVector("_distortion_speed", settings._waterSettings.distortionSpeed.value);
             sr.sharedMaterial.SetVector("_distortion_strength", settings._waterSettings.distortionStrength.value);
@@ -608,7 +612,7 @@ namespace Water2D
             sr.sharedMaterial.SetVector("_surfaceTexTiling", settings._waterSettings.surfaceTiling.value);
             sr.sharedMaterial.SetVector("_surfaceTexSpeed", settings._waterSettings.surfaceSpeed.value);
             sr.sharedMaterial.SetFloat("_useFoamSpeedForST", settings._waterSettings.useFoamSpeed.value ? 1.0f : 0.0f);
-            sr.sharedMaterial.SetVector("_surfaceTexUV", new Vector4(0f,0f,1f,1f));
+            sr.sharedMaterial.SetVector("_surfaceTexUV", new Vector4(0f, 0f, 1f, 1f));
 
             sr.sharedMaterial.SetTexture("_sun_strips", settings._waterSettings.sunStripsTexture);
             sr.sharedMaterial.SetFloat("_strips_speed", settings._waterSettings.stripsSpeed.value);
@@ -619,7 +623,7 @@ namespace Water2D
             sr.sharedMaterial.SetFloat("_strips_density", settings._waterSettings.stripsDensity.value);
         }
 
-        void OnReflectionsChanged()
+        private void OnReflectionsChanged()
         {
             if (!enableReflections.value) return;
 
@@ -628,9 +632,9 @@ namespace Water2D
             sr.sharedMaterial.SetInt("_enable_rm", settings._reflectionsSettings.enableRaymarchedReflections.value ? 1 : 0);
             sr.sharedMaterial.SetInt("_distortionFPRH", settings._reflectionsSettings.DistortionFPRH.value ? 1 : 0);
 
-            reflectionsManagerTopDown.UpdateSettings(settings._reflectionsSettings,true);
-            reflectionsManagerPlatformer.UpdateSettings(settings._reflectionsSettings,false);
-            reflectionsManagerRayMarch.UpdateSettings(settings._reflectionsSettings,false);
+            reflectionsManagerTopDown.UpdateSettings(settings._reflectionsSettings, true);
+            reflectionsManagerPlatformer.UpdateSettings(settings._reflectionsSettings, false);
+            reflectionsManagerRayMarch.UpdateSettings(settings._reflectionsSettings, false);
 
             sr.sharedMaterial.SetInt("_usePerspective", settings._reflectionsSettings.usePerspective.value ? 1 : 0);
             sr.sharedMaterial.SetVector("_perspective", settings._reflectionsSettings.waterPerspective.value);
@@ -646,20 +650,21 @@ namespace Water2D
             if (settings._reflectionsSettings.playerPosition != null) sr.sharedMaterial.SetVector("_playerPosition", settings._reflectionsSettings.playerPosition.position);
 
             sr.sharedMaterial.SetFloat("_raymarchSteps", settings._reflectionsSettings.enableRaymarchedReflections.value ? settings._reflectionsSettings.raymarchSteps.value : 0);
-            sr.sharedMaterial.SetInt("_rm_type2", settings._reflectionsSettings.type2.value ? 1:0);
+            sr.sharedMaterial.SetInt("_rm_type2", settings._reflectionsSettings.type2.value ? 1 : 0);
             sr.sharedMaterial.SetFloat("_raymarchFalloffStart", settings._reflectionsSettings.raymarchFalloffStart.value);
             sr.sharedMaterial.SetFloat("_raymarchFalloffEnd", settings._reflectionsSettings.raymarchFalloffEnd.value);
             var t = Shader.GetGlobalTexture(WaterShaderIdsREF.reflectionsTexture3);
-            if(t!=null) sr.sharedMaterial.SetVector("_refTexRes", new Vector2(t.width,t.height) );
+            if (t != null) sr.sharedMaterial.SetVector("_refTexRes", new Vector2(t.width, t.height));
         }
 
         private void Awake()
         {
             if (enableWavesSimulation.value) wavesSimulation.Start();
         }
+
         private void Update()
         {
-            if(settings._reflectionsSettings.playerPosition != null) sr.sharedMaterial.SetVector("_playerPosition", settings._reflectionsSettings.playerPosition.position);
+            if (settings._reflectionsSettings.playerPosition != null) sr.sharedMaterial.SetVector("_playerPosition", settings._reflectionsSettings.playerPosition.position);
             CameraSetup();
             SurfaceSetup();
             BelowWaterSetup();
@@ -668,19 +673,18 @@ namespace Water2D
             if (CheckForResolutionChanged()) OnResolutionChanged();
         }
 
-        private void ReflectionsUpdate() 
+        private void ReflectionsUpdate()
         {
             Camera cam = GetCameraRenderingScreen();
             float waterUVY = settings._reflectionsSettings.customReflectionStart.value ? settings._reflectionsSettings.mirrorY.value : 1f;
             float waterUVYToWorldPos = (sr.bounds.max.y - sr.bounds.min.y) * waterUVY + sr.bounds.min.y;
             float camYMax = cam.ViewportToWorldPoint(new Vector3(1, 1)).y;
             float camYMin = cam.ViewportToWorldPoint(new Vector3(0, 0)).y;
-            sr.sharedMaterial.SetFloat("_reflectionY", (waterUVYToWorldPos-camYMin)/ Mathf.Abs(camYMax- camYMin));
+            sr.sharedMaterial.SetFloat("_reflectionY", (waterUVYToWorldPos - camYMin) / Mathf.Abs(camYMax - camYMin));
             sr.sharedMaterial.SetVector("_ref_transform", !cam.orthographic ? new Vector4(1f, 1f, 0f, 0f) : new Vector4(1f, 0.6666666f, 0f, 0.166666665f));
-
         }
 
-        private void SurfaceSetup() 
+        private void SurfaceSetup()
         {
             if (settings._waterSettings.surfaceSprite != null)
             {
@@ -696,8 +700,8 @@ namespace Water2D
                 float xp1 = settings._waterSettings.surfaceSprite.bounds.max.x;
                 float yp1 = settings._waterSettings.surfaceSprite.bounds.max.y;
 
-                Vector4 uvs = new Vector4((x0 - xp0) / Mathf.Abs(xp1 - xp0), (x1 - xp0) / Mathf.Abs(xp1-xp0), (y0 - yp0) / Mathf.Abs(yp1 - yp0), (y1 - yp0) / Mathf.Abs(yp1 - yp0));
-                sr.sharedMaterial.SetVector("_surfaceTexUV", uvs );
+                Vector4 uvs = new Vector4((x0 - xp0) / Mathf.Abs(xp1 - xp0), (x1 - xp0) / Mathf.Abs(xp1 - xp0), (y0 - yp0) / Mathf.Abs(yp1 - yp0), (y1 - yp0) / Mathf.Abs(yp1 - yp0));
+                sr.sharedMaterial.SetVector("_surfaceTexUV", uvs);
             }
         }
 
@@ -724,7 +728,6 @@ namespace Water2D
             }
         }
 
-
         private void FixedUpdate()
         {
             if (enableSimulation.value)
@@ -733,14 +736,13 @@ namespace Water2D
             }
             if (enableWavesSimulation.value)
             {
-                wavesSimulation.Update(sr.bounds.size.y/2f/transform.lossyScale.y);
+                wavesSimulation.Update(sr.bounds.size.y / 2f / transform.lossyScale.y);
             }
         }
 
         private void OnDrawGizmos()
         {
-            
-            if(waterSimulation!=null) waterSimulation.OnGizmos();
+            if (waterSimulation != null) waterSimulation.OnGizmos();
 
             //draw reflection plane if platformer reflections are on
             if (!settings._reflectionsSettings.enablePlatformerReflections.value) return;
@@ -771,18 +773,15 @@ namespace Water2D
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if(enableWavesSimulation.value)
+            if (enableWavesSimulation.value)
             {
                 var p = collision.transform.position.x;
-                float s = (transform.position.x - (sr.bounds.size.x*0.5f));
-                float e = (transform.position.x + (sr.bounds.size.x*0.5f));
-                float t = (p - s)/(e-s);
+                float s = (transform.position.x - (sr.bounds.size.x * 0.5f));
+                float e = (transform.position.x + (sr.bounds.size.x * 0.5f));
+                float t = (p - s) / (e - s);
 
-                wavesSimulation.Collision(collision,Mathf.Lerp(0f,1f,t));
+                wavesSimulation.Collision(collision, Mathf.Lerp(0f, 1f, t));
             }
         }
-
     }
 }
-
-

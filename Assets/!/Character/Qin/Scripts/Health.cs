@@ -174,6 +174,7 @@ public class Health : IDamagable
     public void OnDeath()
     {
         DEATH?.Invoke();
+        MenuManager.instance.EndCanvas();
     }
 
     public void Revive()

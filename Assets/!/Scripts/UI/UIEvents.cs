@@ -38,7 +38,7 @@ public class UIEvents : MonoBehaviour
 
     public void Update()
     {
-        if (InputMaster.instance._playerInput.actions["Cancel"].WasPressedThisFrame()) { BackToLastPage(); }
+        if (InputMaster.instance.uiActions.Cancel.WasPressedThisFrame()) { BackToLastPage(); }
     }
 
     public void BackToLastPage()
