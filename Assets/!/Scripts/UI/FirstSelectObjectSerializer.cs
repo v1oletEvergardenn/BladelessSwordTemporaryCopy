@@ -11,6 +11,7 @@ public class FirstSelectObjectSerializer : MonoBehaviour
     public GameObject FirstSelectObject;
     public UnityEvent OnSelected;
     public UnityEvent OnDisSelected;
+    public bool setFirstObjectOnEnable = false;
 
     private void Start()
     {
@@ -34,5 +35,13 @@ public class FirstSelectObjectSerializer : MonoBehaviour
     public void DisSelected()
     {
         OnDisSelected?.Invoke();
+    }
+
+    private void OnEnable()
+    {
+        if (setFirstObjectOnEnable)
+        {
+            SetFirstObject();
+        }
     }
 }

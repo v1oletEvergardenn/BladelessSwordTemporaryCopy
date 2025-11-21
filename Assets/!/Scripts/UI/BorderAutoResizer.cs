@@ -11,6 +11,7 @@ public class BorderAutoResizer : MonoBehaviour
     [Tooltip("Maximum height for the border. Set to 0 for unlimited.")]
     public float maxHeight = 0f;
 
+    public bool enforceChildrenTopAnchors = true;
     private RectTransform borderRect;
 
     private void Awake()
@@ -63,6 +64,7 @@ public class BorderAutoResizer : MonoBehaviour
     private void EnforceChildrenTopAnchors()
     {
         if (borderRect == null) return;
+        if (!enforceChildrenTopAnchors) return;
         foreach (RectTransform child in GetAllDescendants(borderRect))
         {
             child.pivot = new Vector2(child.pivot.x, 1f);
