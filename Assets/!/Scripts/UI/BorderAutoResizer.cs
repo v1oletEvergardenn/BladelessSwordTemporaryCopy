@@ -11,7 +11,7 @@ public class BorderAutoResizer : MonoBehaviour
     [Tooltip("Maximum height for the border. Set to 0 for unlimited.")]
     public float maxHeight = 0f;
 
-    public bool enforceChildrenTopAnchors = true;
+    public bool enforceChildrenTopAnchors = false;
     private RectTransform borderRect;
 
     private void Awake()

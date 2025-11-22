@@ -5,9 +5,13 @@ using UnityEngine;
 using UnityEngine.Events;
 using EditorAttributes;
 using UnityEngine.InputSystem;
+
 using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.InputSystem.XR;
 using DG.Tweening;
+using System;
+
+using Void = EditorAttributes.Void;
 
 [SelectionBase]
 public class CharacterController2D : MonoBehaviour
@@ -387,7 +391,7 @@ public class CharacterController2D : MonoBehaviour
         co_teleport = StartCoroutine(TeleportCoroutine(FacingRight));
     }
 
-    public IEnumerator RunToPosition(Vector3 target)
+    public IEnumerator RunToPositionCoroutine(Vector3 target, Action callBack = null)
     {
         bool originalEnabled = InputMaster.instance._defendAction.enabled;
         InputMaster.instance._defendAction.Disable();
@@ -398,6 +402,13 @@ public class CharacterController2D : MonoBehaviour
         yield return new WaitUntil(() => !isRunningToTarget);
         if (originalEnabled)
             InputMaster.instance._defendAction.Enable();
+        yield return null;
+        callBack?.Invoke();
+    }
+
+    public void RunToPosition(Vector3 target, Action callBack)
+    {
+        StartCoroutine(RunToPositionCoroutine(target, callBack));
     }
 
     public void DesignatedPositionTeleport(Vector3 pos)

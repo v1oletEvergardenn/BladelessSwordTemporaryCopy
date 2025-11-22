@@ -30,6 +30,6 @@ public class CameraRegister : MonoBehaviour
 
     public void SwitchToNormalCam()
     {
-        CameraManager.instance.SwtichToNormalCam();
+        CameraManager.instance.SwitchToNormalCam();
     }
 }

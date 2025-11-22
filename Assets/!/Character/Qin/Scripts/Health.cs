@@ -20,6 +20,7 @@ public class Health : IDamagable
     [SerializeField] private float maxHealth;
     [SerializeField] private float currentHealth;
     public MicroBar healthBar;
+    public GameObject characterUI;
 
     [HideInInspector] public float healthPercentage;
     private DamageFlash _damageFlash;
@@ -175,6 +176,11 @@ public class Health : IDamagable
     {
         DEATH?.Invoke();
         MenuManager.instance.EndCanvas();
+    }
+
+    public void SetCharacterUI(bool active)
+    {
+        characterUI.SetActive(active);
     }
 
     public void Revive()

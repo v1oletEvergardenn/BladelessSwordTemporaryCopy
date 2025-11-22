@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &65943158
 RectTransform:
   m_ObjectHideFlags: 0
@@ -463,11 +463,11 @@ MonoBehaviour:
   targetMaterials:
   - {fileID: 2100000, guid: 3a1c5c1ba9fe3e047b2f7fce22c6b414, type: 2}
   downsample: 1
-  targetRT: {fileID: 0}
+  targetRT: {fileID: 498191835}
   blurDownsample: 16
   blurIterations: 2
   blurOffset: 0.41
-  blurRT: {fileID: 0}
+  blurRT: {fileID: 622073825}
 --- !u!1 &201277136
 GameObject:
   m_ObjectHideFlags: 0
@@ -1123,6 +1123,44 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 451435636}
   m_CullTransparentMesh: 1
+--- !u!84 &498191835
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ExternalTexRT (URP)
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 5
+  m_Width: 617
+  m_Height: 347
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 0
+  m_ColorFormat: 4
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 1
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1001 &527741142
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1478,6 +1516,44 @@ RectTransform:
   m_AnchoredPosition: {x: 773.1, y: -254.8}
   m_SizeDelta: {x: 515.8, y: 92.3}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!84 &622073825
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ExternalTexBlurRT (Camera)
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 5
+  m_Width: 38
+  m_Height: 21
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 0
+  m_ColorFormat: 4
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 1
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &651234023
 GameObject:
   m_ObjectHideFlags: 0
@@ -3694,7 +3770,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6396210384107816896, guid: 5169ba3ac14536b41972324dc231d013, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 73.56
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6848939919694832233, guid: 5169ba3ac14536b41972324dc231d013, type: 3}
       propertyPath: m_Enabled
@@ -3702,11 +3778,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6976168742260184594, guid: 5169ba3ac14536b41972324dc231d013, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6976168742260184594, guid: 5169ba3ac14536b41972324dc231d013, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6976168742260184594, guid: 5169ba3ac14536b41972324dc231d013, type: 3}
       propertyPath: m_SizeDelta.x
@@ -3714,7 +3790,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6976168742260184594, guid: 5169ba3ac14536b41972324dc231d013, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 63.56
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6976168742260184594, guid: 5169ba3ac14536b41972324dc231d013, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -3730,7 +3806,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8281998472531194189, guid: 5169ba3ac14536b41972324dc231d013, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 115.06
+      value: 51.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

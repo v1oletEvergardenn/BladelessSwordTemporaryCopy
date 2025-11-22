@@ -25,7 +25,13 @@ public class Store : MonoBehaviour
     // Call this to display store UI and available items
     public void OpenStore()
     {
-        MenuManager.instance.OpenStoreCanvas(this);
+        InputMaster.SwitchToUIAction();
+        CharacterController2D.instance.RunToPosition(transform.position + new Vector3(1, 0, 0),
+            () =>
+            {
+                CharacterController2D.instance.FaceTarget(transform);
+                MenuManager.instance.OpenStoreCanvas(this);
+            });
     }
 
     // Call this when the player selects an item to buy
@@ -39,7 +45,6 @@ public class Store : MonoBehaviour
 
         if (IsSoldOut(itemIndex))
         {
-            Debug.Log("Item is sold out.");
             // TODO: Show sold out UI feedback
             return false;
         }

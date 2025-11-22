@@ -10,7 +10,7 @@ public class CameraManager : MonoBehaviour
 {
     private static List<CinemachineVirtualCamera> cameras = new List<CinemachineVirtualCamera>();
 
-    public static CinemachineVirtualCamera activeCamera = null;
+    public CinemachineVirtualCamera activeCamera = null;
     public CinemachineVirtualCamera playerNormalCam;
     public static CinemachineVirtualCamera beforeActiveCam = null;
 
@@ -88,7 +88,7 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    public void SwtichToNormalCam()
+    public void SwitchToNormalCam()
     {
         if (mainCam == null) { return; }
         mainCam.GetComponent<PixelPerfectCamera>().enabled = true;
@@ -104,14 +104,14 @@ public class CameraManager : MonoBehaviour
 
     public static bool IsActiveCamera(CinemachineVirtualCamera camera)
     {
-        return camera == activeCamera;
+        return camera == instance.activeCamera;
     }
 
     public static void SwitchCamera(CinemachineVirtualCamera newCam)
     {
         newCam.Priority = 10;
-        if (beforeActiveCam != activeCamera) { beforeActiveCam = activeCamera; }
-        activeCamera = newCam;
+        if (beforeActiveCam != instance.activeCamera) { beforeActiveCam = instance.activeCamera; }
+        instance.activeCamera = newCam;
 
         foreach (CinemachineVirtualCamera cam in cameras)
         {
@@ -131,8 +131,8 @@ public class CameraManager : MonoBehaviour
     public static void SwitchBounceQTECamera(CinemachineVirtualCamera newCam)
     {
         newCam.Priority = 10;
-        beforeActiveCam = activeCamera;
-        activeCamera = newCam;
+        beforeActiveCam = instance.activeCamera;
+        instance.activeCamera = newCam;
 
         foreach (CinemachineVirtualCamera cam in cameras)
         {
@@ -188,5 +188,10 @@ public class CameraManager : MonoBehaviour
         }
 
         isLerpingYDaming = false;
+    }
+
+    public bool isPlayerNormalCamera()
+    {
+        return activeCamera == playerNormalCam;
     }
 }

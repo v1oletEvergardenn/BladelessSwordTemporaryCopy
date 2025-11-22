@@ -636,7 +636,7 @@ public class YingYangFish_AI : IEnemyController
         GameManager.instance.isInPerformingState = true;
 
         //event: player run to the left
-        yield return StartCoroutine(playerController.RunToPosition(transform.position - new Vector3(2, 0, 0)));
+        yield return StartCoroutine(playerController.RunToPositionCoroutine(transform.position - new Vector3(2, 0, 0)));
         playerController.FaceTarget(this.transform);
         yield return new WaitForSeconds(0.5f);
 
@@ -729,7 +729,7 @@ public class YingYangFish_AI : IEnemyController
         yield return new WaitForSeconds(5f);
 
         //player run to position
-        yield return StartCoroutine(playerController.RunToPosition(transform.position - new Vector3(14f, 0, 0)));
+        yield return StartCoroutine(playerController.RunToPositionCoroutine(transform.position - new Vector3(14f, 0, 0)));
 
         //sword teleport jump qte
         playerController.rb.velocity = Vector3.zero;

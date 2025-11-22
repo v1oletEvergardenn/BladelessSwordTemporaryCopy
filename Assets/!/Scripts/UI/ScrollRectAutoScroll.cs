@@ -91,7 +91,7 @@ public class ScrollRectAutoScroll : MonoBehaviour, IPointerEnterHandler, IPointe
 
 #nullable disable
 
-    private void ScrollToSelected(bool quickScroll)
+    public void ScrollToSelected(bool quickScroll)
     {
         int selectedIndex = -1;
         Selectable selectedElement = EventSystem.current.currentSelectedGameObject ? EventSystem.current.currentSelectedGameObject.GetComponent<Selectable>() : null;
@@ -113,7 +113,6 @@ public class ScrollRectAutoScroll : MonoBehaviour, IPointerEnterHandler, IPointe
                 m_NextScrollPosition = new Vector2(0, 1 - (selectedIndex / ((float)m_Selectables.Count - 1)));
             }
         }
-        print(m_ScrollRect.normalizedPosition);
         if (selectedElement == null)
         {
             m_ScrollRect.verticalNormalizedPosition = 1f;

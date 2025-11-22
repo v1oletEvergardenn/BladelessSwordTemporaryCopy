@@ -34,7 +34,15 @@ public class TradeItemBtn : MonoBehaviour
         // Update UI
         itemNameText.text = itemData.itemName;
         itemPriceText.text = itemData.price.ToString();
-        itemRemainingText.text = soldOut ? "Sold Out" : $"x{remaining}";
+        if (remaining == -1)
+        {
+            itemRemainingText.text = "Unlimited";
+        }
+        else
+        {
+            itemRemainingText.text = soldOut ? "Sold Out" : $"{remaining} remaining";
+        }
+
         itemIcon.sprite = itemData.icon;
 
         if (soldOut)
@@ -57,6 +65,14 @@ public class TradeItemBtn : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        originalPosUpdated = false;
+    }
+
+    private bool originalPosUpdated = false;
+    private Vector2 originalPos;
+
     /// <summary>
     /// Called when the buy button is clicked.
     /// </summary>
@@ -67,7 +83,20 @@ public class TradeItemBtn : MonoBehaviour
         if (success)
         {
             // Update UI after purchase
-            MenuManager.instance.UpdateStoreUI(store);
+            MenuManager.instance.UpdateStoreUI();
+            var rect = GetComponent<RectTransform>();
+            rect.DOComplete(); // Stop any previous tweens
+            if (!originalPosUpdated) originalPos = rect.anchoredPosition; originalPosUpdated = true;
+
+            // Move down then up
+            rect.DOAnchorPos(originalPos + new Vector2(0f, -40f), 0.1f)
+                  .SetEase(Ease.InSine)
+                  .OnComplete(() =>
+                  {
+                      rect.DOAnchorPos(originalPos, 0.1f)
+                          .SetEase(Ease.OutSine);
+                  });
+            VFXManager.instance.RumblePulse(0.1f, 0.2f, 0.1f);
         }
         else
         {
@@ -82,6 +111,8 @@ public class TradeItemBtn : MonoBehaviour
                         rect.DOShakeAnchorPos(0.1f, new Vector2(20f, 0f), 10, 20, false, true);
                     });
             }
+
+            VFXManager.instance.RumblePulse(0.2f, 0.3f, 0.1f);
         }
     }
 }

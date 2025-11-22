@@ -8,15 +8,17 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Void = EditorAttributes.Void;
+using Cinemachine;
 
 public class HeartSwordAbilities : MonoBehaviour
 {
     public List<GameObject> allAbilities_ref = new List<GameObject>();
     public static HeartSwordAbilities instance;
-    [FoldoutGroup("reference", nameof(selfPooler), nameof(rb), nameof(anim))] public Void referenceVoid;
+    [FoldoutGroup("reference", nameof(selfPooler), nameof(rb), nameof(anim), nameof(hsUpgradeCam))] public Void referenceVoid;
     [SerializeField, HideProperty] public InternalObjectPooler selfPooler;
     [SerializeField, HideProperty] public Rigidbody2D rb;
     [SerializeField, HideProperty] public Animator anim;
+    [SerializeField, HideProperty] public CameraRegister hsUpgradeCam;
 
     [GUIColor(GUIColor.Lime)]
     [FoldoutGroup("HeartSword Abilities", nameof(maxHS_point),
@@ -373,5 +375,10 @@ public class HeartSwordAbilities : MonoBehaviour
                 allAbilities[i].GetBranches()[j].learned = data.hsAbilities[i].branches[j].learned;
             }
         }
+    }
+
+    public void SwitchToHSUpgradeCamera()
+    {
+        hsUpgradeCam.SwitchThisCam();
     }
 }

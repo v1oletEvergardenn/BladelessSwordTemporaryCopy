@@ -130,7 +130,7 @@ public class CameraFollow : MonoBehaviour
 
     public void Deactivate()
     {
-        CameraManager.instance.SwtichToNormalCam();
+        CameraManager.instance.SwitchToNormalCam();
         //currentLimit = maxLimit;
         activate = false;
         useOffset = true;
