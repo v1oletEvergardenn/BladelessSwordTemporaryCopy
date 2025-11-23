@@ -71,6 +71,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField, HideProperty] public GameObject HSAbilitySwapMenu;
     [SerializeField, HideProperty] public GameObject HSAbilityUpgradeMenu;
     [SerializeField, HideProperty] public Transform hsUpgrade_rotator;
+    private List<HSAbilityUpgradeUI> hsUpgradeUIs = new List<HSAbilityUpgradeUI>();
 
     [FoldoutGroup("EndCanvas",
         nameof(EndGameCanvas))]
@@ -160,6 +161,14 @@ public class MenuManager : MonoBehaviour
         {
             PauseMenuTabs.Add(child.gameObject);
         }
+
+        hsUpgradeUIs.Clear();
+        foreach (Transform t in hsUpgrade_rotator.GetComponentsInChildren<Transform>(true))
+        {
+            var ui = t.GetComponent<HSAbilityUpgradeUI>();
+            if (ui != null)
+                hsUpgradeUIs.Add(ui);
+        }
     }
 
     #endregion Unity Methods
@@ -172,6 +181,8 @@ public class MenuManager : MonoBehaviour
         if (PauseGameCanvas.activeInHierarchy)
         {
             ClosePauseGameCanvas();
+            currentIndexTab = -1;
+            NextTab();
         }
         else if (HSAbilityUpgradeMenu.activeInHierarchy)
         {
@@ -180,13 +191,15 @@ public class MenuManager : MonoBehaviour
         else if (StoreCanvas.activeInHierarchy)
         {
             CloseStoreCanvas();
+            currentIndexTab = -1;
+            NextTab();
         }
         else if (SavePointCanvas.activeInHierarchy)
         {
             CloseSavePointCanvas();
+            currentIndexTab = -1;
+            NextTab();
         }
-        currentIndexTab = -1;
-        NextTab();
         canChangeTab = true;
     }
 
@@ -232,6 +245,8 @@ public class MenuManager : MonoBehaviour
     /// </summary>
     public void OpenSavePointCanvas()
     {
+        currentIndexTab = -1;
+        NextTab();
         SavePointCanvas.SetActive(true);
         SavePointMenu.SetActive(true);
         HSAbilitySwapMenu.SetActive(false);
@@ -257,6 +272,10 @@ public class MenuManager : MonoBehaviour
         InputMaster.SwitchToUIAction();
 
         HSAbilityUpgradeMenu.SetActive(true);
+        foreach (var ui in hsUpgradeUIs)
+        {
+            ui.ShowOrHide(true);
+        }
     }
 
     public void CloseHSUpgradeMenu()
@@ -266,12 +285,19 @@ public class MenuManager : MonoBehaviour
 
     public IEnumerator CloseHSUpgardeMenuCoroutine()
     {
-        HSAbilityUpgradeMenu.SetActive(false);
+        foreach (var ui in hsUpgradeUIs)
+        {
+            ui.ShowOrHide(false);
+        }
         CameraManager.instance.SwitchToNormalCam();
+        yield return new WaitForSeconds(0.7f);
+        HSAbilityUpgradeMenu.SetActive(false);
         Health.instance.SetCharacterUI(true);
         SavePointCanvas.SetActive(false);
-        yield return new WaitForSeconds(1.2f);
+        yield return new WaitForSeconds(0.3f);
         InputMaster.SwitchToGameplayAction();
+        currentIndexTab = -1;
+        NextTab();
     }
 
     #endregion SavePointMenu
@@ -451,7 +477,7 @@ public class MenuManager : MonoBehaviour
             new Vector3(0, 0, targetAngle),
             0.3f,
             RotateMode.Fast
-        ).SetEase(Ease.InSine);
+        ).SetEase(Ease.OutSine);
 
         previousHSUpgradeTabIndex = currentIndexTab;
     }

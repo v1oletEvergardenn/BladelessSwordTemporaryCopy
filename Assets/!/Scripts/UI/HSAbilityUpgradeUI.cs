@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using EditorAttributes;
+using TMPro;
 
 [ExecuteAlways]
 public class HSAbilityUpgradeUI : MonoBehaviour
@@ -14,9 +15,10 @@ public class HSAbilityUpgradeUI : MonoBehaviour
     public Image p3;
     public Image branch1;
     public Image branch2;
-
+    public TextMeshProUGUI abilityName;
     public List<GameObject> connectionLines = new List<GameObject>();
     private bool linesCreated = false;
+    public Sprite lineSprite;
 
     // Start is called before the first frame update
     private void Start()
@@ -34,6 +36,130 @@ public class HSAbilityUpgradeUI : MonoBehaviour
             {
                 UpdateConnectLines();
             }
+        }
+    }
+
+    public void ShowOrHide(bool show)
+    {
+        if (show)
+        {
+            StartCoroutine(ShowCoroutine());
+        }
+        else
+        {
+            StartCoroutine(HideCoroutine());
+        }
+    }
+
+    private void OnEnable()
+    {
+        List<Image> images = new List<Image> { origin, p1, p2, p3, branch1, branch2 };
+        foreach (var lineObj in connectionLines)
+        {
+            if (lineObj != null)
+            {
+                var img = lineObj.GetComponent<Image>();
+                img.fillAmount = 0f;
+                Color _c = img.color;
+                _c.a = 1f;
+                img.color = _c;
+            }
+        }
+        foreach (var img in images)
+        {
+            if (img != null)
+            {
+                Color col = img.color;
+                col.a = 0f;
+                img.color = col;
+            }
+        }
+        Color c = abilityName.color;
+        c.a = 0f;
+        abilityName.color = c;
+    }
+
+    public IEnumerator ShowCoroutine()
+    {
+        // Gather all images
+        List<Image> images = new List<Image> { origin, p1, p2, p3, branch1, branch2 };
+        yield return new WaitForSeconds(0.8f);
+
+        for (int i = 0; i < images.Count; i++)
+        {
+            StartCoroutine(FadeUI(0.5f, images[i], true));
+        }
+        yield return new WaitForSeconds(0.3f);
+        yield return StartCoroutine(ConnectLinesUICoroutine(connectionLines[0].GetComponent<Image>()));
+        yield return StartCoroutine(ConnectLinesUICoroutine(connectionLines[1].GetComponent<Image>()));
+        yield return StartCoroutine(ConnectLinesUICoroutine(connectionLines[2].GetComponent<Image>()));
+        StartCoroutine(ConnectLinesUICoroutine(connectionLines[3].GetComponent<Image>()));
+        yield return StartCoroutine(ConnectLinesUICoroutine(connectionLines[4].GetComponent<Image>()));
+
+        yield return StartCoroutine(FadeUI(0.2f, abilityName, true));
+    }
+
+    public IEnumerator HideCoroutine()
+    {
+        StartCoroutine(FadeUI(0.3f, abilityName, false));
+        List<Image> images = new List<Image> { origin, p1, p2, p3, branch1, branch2 };
+        for (int i = 0; i < images.Count; i++)
+        {
+            StartCoroutine(FadeUI(0.3f, images[i], false));
+        }
+
+        foreach (var lineObj in connectionLines)
+        {
+            StartCoroutine(FadeUI(0.3f, lineObj.GetComponent<Image>(), false));
+        }
+
+        yield return new WaitForSeconds(0.3f);
+    }
+
+    public IEnumerator ConnectLinesUICoroutine(Image line)
+    {
+        float elapsed = 0f;
+        float duration = 0.1f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            line.fillAmount = Mathf.Lerp(0, 1f, t);
+            yield return null;
+        }
+    }
+
+    public IEnumerator FadeUI(float duration, Image image, bool fadeIn)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            Color c = image.color;
+            if (fadeIn) c.a = Mathf.Lerp(0, 1f, t);
+            else c.a = Mathf.Lerp(1f, 0, t);
+            image.color = c;
+
+            yield return null;
+        }
+    }
+
+    public IEnumerator FadeUI(float duration, TextMeshProUGUI text, bool fadeIn)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            Color c = text.color;
+            if (fadeIn) c.a = Mathf.Lerp(0, 1f, t);
+            else c.a = Mathf.Lerp(1f, 0, t);
+            text.color = c;
+
+            yield return null;
         }
     }
 
@@ -97,6 +223,9 @@ public class HSAbilityUpgradeUI : MonoBehaviour
         connectionLines.Add(lineObj);
 
         Image lineImage = lineObj.AddComponent<Image>();
+        lineImage.sprite = lineSprite;
+        lineImage.type = Image.Type.Filled;
+        lineImage.fillMethod = Image.FillMethod.Vertical;
         lineImage.color = Color.white;
 
         RectTransform fromRect = from.rectTransform;

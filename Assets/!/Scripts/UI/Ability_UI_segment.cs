@@ -14,7 +14,6 @@ public class Ability_UI_segment : MonoBehaviour, IPointerEnterHandler, ISelectHa
     [SerializeField] private Color equipedColor;
     [SerializeField] private Color unequipedColor;
     public IHeartSwordAbility ability;
-    private List<IHeartSwordAbilityBranch> learnedBranches = new List<IHeartSwordAbilityBranch>();
 
     public void OnEnable()
     {
@@ -30,7 +29,8 @@ public class Ability_UI_segment : MonoBehaviour, IPointerEnterHandler, ISelectHa
     {
         if (EventSystem.current.currentSelectedGameObject != gameObject) return;
         if (ability == null) return;
-        int branchCount = learnedBranches.Count;
+        //learned branchCount
+        int branchCount = 2;
         if (branchCount == 0) return;
         // Find current index, -1 means "none branch" (no branch equipped)
         int currentIndex = ability.GetBranchIndex();
@@ -63,22 +63,22 @@ public class Ability_UI_segment : MonoBehaviour, IPointerEnterHandler, ISelectHa
         }
 
         // Equip the branch or set to none
-        if (nextIndex == -1)
-            ability.ChangeBranch(null);
-        else
-            ability.ChangeBranch(learnedBranches[nextIndex]);
+        //if (nextIndex == -1)
+        //    ability.ChangeBranch(null);
+        //else
+        //    ability.ChangeBranch(learnedBranches[nextIndex]);
         UpdateUI();
     }
 
     public void UpdateUI()
     {
         panel.color = unequipedColor;
-        learnedBranches.Clear();
+        //learnedBranches.Clear();
         if (ability != null)
         {
             chineseText.text = ability.GetCurrentAttribute().chineseName;
             icon.sprite = ability.GetCurrentAttribute().icon;
-            learnedBranches = ability.GetLearnedBranches();
+            //learnedBranches = ability.GetLearnedBranches();
             HSAbilitySwapMenu.instance.UpdateSegmentUIInfo(this);
             if (ability.IsEquipped())
             {

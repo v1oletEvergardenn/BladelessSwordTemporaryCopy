@@ -10,9 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eaaaba554fcc1fb47932eb2fdfedec44, type: 3}
-  m_Name: HS_attribute_CriticalSlash_boosted
+  m_Name: HS_attribute_CriticalSlash_branch2
   m_EditorClassIdentifier: 
-  attributeName: critical slash powered
-  chineseName: "\u4F1A\u5FC3\u65A9 \u65391"
-  description: very good
+  attributeName: critical slash
+  chineseName: "\u4F1A\u5FC3\u65A9"
+  description: 'high damage
+
+'
   icon: {fileID: 0}
+  HS_Cost: 0
+  isTriggeredByAttackKey: 1
+  canBeStopped: 1
+  HS_attack_effect:
+    damage: 15
+    stun: 20
+    freezeTime: 0.1
+    repel: 20
+    rumble: {x: 1.5504203, y: 2.1680675}
+    rumbleDuration: 0.15
+    cameraShake: 0.2

@@ -9,11 +9,17 @@ public class HS_CriticalSlash : IHeartSwordAbility
     public float actionDuration = 1.5f;
     public Collider2D hitBox;
 
+    #region Unity Lifecycle
+
     public override void Start()
     {
         base.Start();
         hitBox.enabled = false;
     }
+
+    #endregion Unity Lifecycle
+
+    #region Original Ability Performance
 
     public override bool OriginalAbilityPerformance(bool isLeft)
     {
@@ -32,12 +38,12 @@ public class HS_CriticalSlash : IHeartSwordAbility
         playerAttack.combatTimer = 5f;
         isPerforming = true;
         hsHitTargets.Clear();
-        co_ability = StartCoroutine(Act());
+        co_ability = StartCoroutine(OriginalAct());
 
         return true;
     }
 
-    public override IEnumerator Act()
+    public override IEnumerator OriginalAct()
     {
         float timer = 0f;
 
@@ -61,6 +67,54 @@ public class HS_CriticalSlash : IHeartSwordAbility
         animSet.Anim_Hit(1);
     }
 
+    #endregion Original Ability Performance
+
+    #region Branch Ability Performance
+
+    public override bool FirstBranchAbilityPerformance(bool isLeft)
+    {
+        if (!playerAttack.canAttack) return false;
+        if (controller.isFloating) return false;
+        if (health.stunned) return false;
+        if (CheckAnyPerformingAbility()) return false;
+        if (playerAttack.attackTimer < playerAttack.attackGap) return false;
+        if (hSAbilityManager.currentHS_point < GetCurrentAttribute().HS_Cost) { return false; }
+        if (controller.FacingRight == isLeft) { controller.Flip(); }
+
+        CancelAction();
+        co_ability = StartCoroutine(FirstBranchAct());
+        return true;
+    }
+
+    public override bool SecondBranchAbilityPerformance(bool isLeft)
+    {
+        if (!playerAttack.canAttack) return false;
+        if (controller.isFloating) return false;
+        if (health.stunned) return false;
+        if (CheckAnyPerformingAbility()) return false;
+        if (playerAttack.attackTimer < playerAttack.attackGap) return false;
+        if (hSAbilityManager.currentHS_point < GetCurrentAttribute().HS_Cost) { return false; }
+        if (controller.FacingRight == isLeft) { controller.Flip(); }
+
+        CancelAction();
+        co_ability = StartCoroutine(SecondBranchAct());
+        return true;
+    }
+
+    public override IEnumerator FirstBranchAct()
+    {
+        yield return StartCoroutine(OriginalAct());
+    }
+
+    public override IEnumerator SecondBranchAct()
+    {
+        yield return StartCoroutine(OriginalAct());
+    }
+
+    #endregion Branch Ability Performance
+
+    #region Utility Methods
+
     public override void EndAction()
     {
         if (controller != null) controller.canSwitchNormalAnim = true;
@@ -68,4 +122,6 @@ public class HS_CriticalSlash : IHeartSwordAbility
         hitBox.enabled = true;
         hsHitEffectPlayed = false;
     }
+
+    #endregion Utility Methods
 }

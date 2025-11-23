@@ -17,12 +17,17 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     #region Inspector Fields & Attributes
 
     public SO_HeartSwordAttribute commonAttribute;
+    public SO_HeartSwordAttribute branch1Attribute;
+    public SO_HeartSwordAttribute branch2Attribute;
     [HideInInspector] public ObjectiveType type = ObjectiveType.HeartSword;
     [ObjectiveIDDropdown] public string questActionID;
-    [SerializeField] protected List<IHeartSwordAbilityBranch> branches;
+
     public bool learned = false;
     public bool isActive = false;
-    protected int branchIndex = -1;
+
+    protected bool unlockedBranch1 = false;
+    protected bool unlockedBranch2 = false;
+    protected int branchIndex = 0;
 
     [Space(20)] public Void spaceholder;
     protected SO_HeartSwordAttribute abilityAttribute;
@@ -69,17 +74,9 @@ public abstract class IHeartSwordAbility : MonoBehaviour
         selfPooler = hSAbilityManager.selfPooler;
         rb = hSAbilityManager.rb;
         anim = hSAbilityManager.anim;
-        branches = GetComponents<IHeartSwordAbilityBranch>().ToList<IHeartSwordAbilityBranch>();
     }
 
     #region Ability Performance
-
-    /// <summary>
-    /// Executes the original ability logic. Must be implemented by derived classes.
-    /// </summary>
-    /// <param name="isLeft">Direction or context for the ability (true = left, false = right).</param>
-    /// <returns>True if performed successfully, otherwise false.</returns>
-    public abstract bool OriginalAbilityPerformance(bool isLeft);
 
     /// <summary>
     /// Checks and performs the ability, using the equipped branch if available.
@@ -88,16 +85,39 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     /// <returns>True if performed successfully, otherwise false.</returns>
     public virtual bool CheckPerformAbility(bool isLeft)
     {
-        if (CheckBranchIndexValidate())
-            return branches[branchIndex].BranchAbilityPerformance(isLeft);
+        if (branchIndex == 1)
+        {
+            return FirstBranchAbilityPerformance(isLeft);
+        }
+        else if (branchIndex == 2)
+        {
+            return SecondBranchAbilityPerformance(isLeft);
+        }
         else
+        {
             return OriginalAbilityPerformance(isLeft);
+        }
     }
+
+    /// <summary>
+    /// Executes the original ability logic. Must be implemented by derived classes.
+    /// </summary>
+    /// <param name="isLeft">Direction or context for the ability (true = left, false = right).</param>
+    /// <returns>True if performed successfully, otherwise false.</returns>
+    public abstract bool OriginalAbilityPerformance(bool isLeft);
+
+    public abstract bool FirstBranchAbilityPerformance(bool isLeft);
+
+    public abstract bool SecondBranchAbilityPerformance(bool isLeft);
 
     /// <summary>
     /// Coroutine for the ability's main action. Must be implemented by derived classes.
     /// </summary>
-    public abstract IEnumerator Act();
+    public abstract IEnumerator OriginalAct();
+
+    public abstract IEnumerator FirstBranchAct();
+
+    public abstract IEnumerator SecondBranchAct();
 
     #endregion Ability Performance
 
@@ -105,70 +125,35 @@ public abstract class IHeartSwordAbility : MonoBehaviour
 
     public int GetBranchIndex() => branchIndex;
 
-    public List<IHeartSwordAbilityBranch> GetBranches() => branches;
-
-    public List<IHeartSwordAbilityBranch> GetLearnedBranches() => branches.Where(b => b.learned).ToList();
-
     /// <summary>
     /// Changes the currently equipped ability branch and updates attributes.
     /// </summary>
     /// <param name="branch">The branch to equip.</param>
-    public void ChangeBranch(IHeartSwordAbilityBranch branch)
+    ///
+    public void ChangeBranch(int branchIndex)
     {
-        if (branch == null) { SetNoneBranch(); return; }
-        SetAttribute(branch);
-        branchIndex = branches.IndexOf(branch);
-    }
-
-    public void ChangeBranch(int index)
-    {
-        if (index < 0 || index >= branches.Count) { SetNoneBranch(); return; }
-        SetAttribute(branches[index]);
-        branchIndex = index;
+        if (branchIndex == 1) { SetAttribute(branch2Attribute); this.branchIndex = branchIndex; return; }
+        else if (branchIndex == 2) { SetAttribute(branch1Attribute); this.branchIndex = branchIndex; return; }
+        else { SetNoneBranch(); this.branchIndex = 0; return; }
     }
 
     public void SetNoneBranch()
-    {
-        branchIndex = -1;
-        SetAttribute(commonAttribute);
-    }
+    { branchIndex = 0; SetAttribute(commonAttribute); }
 
     public void SetAttribute(SO_HeartSwordAttribute attribute) => abilityAttribute = attribute;
 
-    public void SetAttribute(IHeartSwordAbilityBranch branch) => SetAttribute(branch.abilityAttribute);
-
-    public IHeartSwordAbilityBranch GetCurrentBranch()
-    { return (CheckBranchIndexValidate()) ? branches[branchIndex] : null; }
-
-    public SO_HeartSwordAttribute GetCurrentAttribute()
-    {
-        if (branchIndex == -1) { return commonAttribute; }
-        return (CheckBranchIndexValidate()) ? branches[branchIndex].abilityAttribute : null;
-    }
-
-    public bool CheckBranchIndexValidate()
-    {
-        if (branchIndex >= 0 && branchIndex < branches.Count) return true;
-        else
-        {
-            branchIndex = -1;
-            return false;
-        }
-    }
+    public SO_HeartSwordAttribute GetCurrentAttribute() => abilityAttribute;
 
     #endregion Branch Management
 
     #region Equip/Unequip & Activation
 
+    public bool IsEquipped() => isEquipped;
+
     /// <summary>
     /// Marks this ability as equipped.
     /// </summary>
-    public virtual void EquipAbility()
-    {
-        isEquipped = true;
-    }
-
-    public bool IsEquipped() => isEquipped;
+    public virtual void EquipAbility() => isEquipped = true;
 
     /// <summary>
     /// Deactivates and ends the ability action.

@@ -9,6 +9,8 @@ public class HS_CounterAttack : IHeartSwordAbility
 
     private float timer = 0f;
 
+    #region Unity Lifecycle
+
     public override void Start()
     {
         base.Start();
@@ -20,6 +22,15 @@ public class HS_CounterAttack : IHeartSwordAbility
         if (!isEquipped) return;
         if (!isActive) return;
     }
+
+    public void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawWireSphere(counterAttackPos.position, HS_attack_radius);
+    }
+
+    #endregion Unity Lifecycle
+
+    #region Original Ability Performance
 
     public override bool OriginalAbilityPerformance(bool isLeft)
     {
@@ -40,7 +51,7 @@ public class HS_CounterAttack : IHeartSwordAbility
         anim.Play(GetAttackAnimName());
 
         CancelAction();
-        co_ability = StartCoroutine(Act());
+        co_ability = StartCoroutine(OriginalAct());
         return true;
 
         string GetAttackAnimName()
@@ -56,7 +67,7 @@ public class HS_CounterAttack : IHeartSwordAbility
         }
     }
 
-    public override IEnumerator Act()
+    public override IEnumerator OriginalAct()
     {
         timer = 0f;
         playerAttack.isCounterAttacking = true;
@@ -70,6 +81,54 @@ public class HS_CounterAttack : IHeartSwordAbility
         }
         isPerforming = false;
     }
+
+    #endregion Original Ability Performance
+
+    #region Branch Ability Performance
+
+    public override bool FirstBranchAbilityPerformance(bool isLeft)
+    {
+        if (!playerAttack.canAttack) return false;
+        if (controller.isFloating) return false;
+        if (health.stunned) return false;
+        if (CheckAnyPerformingAbility()) return false;
+        if (playerAttack.attackTimer < playerAttack.attackGap) return false;
+        if (hSAbilityManager.currentHS_point < GetCurrentAttribute().HS_Cost) { return false; }
+        if (controller.FacingRight == isLeft) { controller.Flip(); }
+
+        CancelAction();
+        co_ability = StartCoroutine(FirstBranchAct());
+        return true;
+    }
+
+    public override bool SecondBranchAbilityPerformance(bool isLeft)
+    {
+        if (!playerAttack.canAttack) return false;
+        if (controller.isFloating) return false;
+        if (health.stunned) return false;
+        if (CheckAnyPerformingAbility()) return false;
+        if (playerAttack.attackTimer < playerAttack.attackGap) return false;
+        if (hSAbilityManager.currentHS_point < GetCurrentAttribute().HS_Cost) { return false; }
+        if (controller.FacingRight == isLeft) { controller.Flip(); }
+
+        CancelAction();
+        co_ability = StartCoroutine(SecondBranchAct());
+        return true;
+    }
+
+    public override IEnumerator FirstBranchAct()
+    {
+        yield return StartCoroutine(OriginalAct());
+    }
+
+    public override IEnumerator SecondBranchAct()
+    {
+        yield return StartCoroutine(OriginalAct());
+    }
+
+    #endregion Branch Ability Performance
+
+    #region Utility Methods
 
     public override void CheckHSCounterAttack(Collider2D col)
     {
@@ -143,8 +202,5 @@ public class HS_CounterAttack : IHeartSwordAbility
         SoundManager.PlaySound("perfect_attack");
     }
 
-    public void OnDrawGizmosSelected()
-    {
-        Gizmos.DrawWireSphere(counterAttackPos.position, HS_attack_radius);
-    }
+    #endregion Utility Methods
 }

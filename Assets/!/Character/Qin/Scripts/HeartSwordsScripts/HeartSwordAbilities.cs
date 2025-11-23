@@ -345,14 +345,14 @@ public class HeartSwordAbilities : MonoBehaviour
                 toggleToActivate = ability.toggleToActivate,
                 branches = new List<HSAblityBranchSaveData>()
             };
-            foreach (var branch in ability.GetBranches())
-            {
-                HSAblityBranchSaveData branchData = new HSAblityBranchSaveData
-                {
-                    learned = branch.learned
-                };
-                abilityData.branches.Add(branchData);
-            }
+            //foreach (var branch in ability.GetBranches())
+            //{
+            //    HSAblityBranchSaveData branchData = new HSAblityBranchSaveData
+            //    {
+            //        learned = branch.learned
+            //    };
+            //    abilityData.branches.Add(branchData);
+            //}
             data.hsAbilities.Add(abilityData);
         }
     }
@@ -367,13 +367,13 @@ public class HeartSwordAbilities : MonoBehaviour
         EquipAbility(GetWestAbility(), AbilitySlot.West, true);
         for (int i = 0; i < allAbilities.Count; i++)
         {
-            allAbilities[i].ChangeBranch(data.hsAbilities[i].branchIndex);
+            //allAbilities[i].ChangeBranch(data.hsAbilities[i].branchIndex);
             allAbilities[i].learned = data.hsAbilities[i].learned;
             allAbilities[i].toggleToActivate = data.hsAbilities[i].toggleToActivate;
-            for (int j = 0; j < allAbilities[i].GetBranches().Count; j++)
-            {
-                allAbilities[i].GetBranches()[j].learned = data.hsAbilities[i].branches[j].learned;
-            }
+            //for (int j = 0; j < allAbilities[i].GetBranches().Count; j++)
+            //{
+            //allAbilities[i].GetBranches()[j].learned = data.hsAbilities[i].branches[j].learned;
+            //}
         }
     }
 

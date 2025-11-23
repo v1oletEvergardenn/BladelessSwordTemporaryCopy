@@ -7,6 +7,8 @@ using static UnityEngine.Rendering.DebugUI;
 
 public class HS_SlashWave : IHeartSwordAbility
 {
+    #region Fields and Properties
+
     public float actionDuration = 1.5f;
     private float holdThreshold = 0.4f;
     private bool largeSlash = false;
@@ -30,23 +32,13 @@ public class HS_SlashWave : IHeartSwordAbility
     [SerializeField, HideProperty, PropertyWidth(200f)] public float large_slash_speed = 40f;
     [SerializeField, HideProperty, PropertyWidth(200f)] public float large_slash_stun = 10f;
 
-    public override bool OriginalAbilityPerformance(bool isLeft)
-    {
-        if (!CheckEnoughHeartSwordPoints()) return false;
-        if (CheckAnyPerformingAbility()) return false;
-        if (health.stunned) return false;
-        hSAbilityManager.ModifyHSPoint(-GetCurrentAttribute().HS_Cost);
-        largeSlash = false;
-        hsHitEffectPlayed = false;
-        effectPlayed = false;
-        hsHitTargets.Clear();
-        holdTimer = 0f;
-        isPerforming = true;
-
-        return true;
-    }
-
     private bool effectPlayed = false;
+
+    #endregion Fields and Properties
+
+    #region Unity Lifecycle
+
+    // If you have a Start method, place it here
 
     public void Update()
     {
@@ -75,11 +67,31 @@ public class HS_SlashWave : IHeartSwordAbility
             animSet.Anim_Move(0);
             playerAttack.combatTimer = 5f;
             attacked = true;
-            co_ability = StartCoroutine(Act());
+            co_ability = StartCoroutine(OriginalAct());
         }
     }
 
-    public override IEnumerator Act()
+    #endregion Unity Lifecycle
+
+    #region Original Ability Performance
+
+    public override bool OriginalAbilityPerformance(bool isLeft)
+    {
+        if (!CheckEnoughHeartSwordPoints()) return false;
+        if (CheckAnyPerformingAbility()) return false;
+        if (health.stunned) return false;
+        hSAbilityManager.ModifyHSPoint(-GetCurrentAttribute().HS_Cost);
+        largeSlash = false;
+        hsHitEffectPlayed = false;
+        effectPlayed = false;
+        hsHitTargets.Clear();
+        holdTimer = 0f;
+        isPerforming = true;
+
+        return true;
+    }
+
+    public override IEnumerator OriginalAct()
     {
         playerAttack.canDefend = false;
         if (largeSlash)
@@ -117,6 +129,54 @@ public class HS_SlashWave : IHeartSwordAbility
         animSet.Anim_Move(1);
     }
 
+    #endregion Original Ability Performance
+
+    #region Branch Ability Performance
+
+    public override bool FirstBranchAbilityPerformance(bool isLeft)
+    {
+        if (!playerAttack.canAttack) return false;
+        if (controller.isFloating) return false;
+        if (health.stunned) return false;
+        if (CheckAnyPerformingAbility()) return false;
+        if (playerAttack.attackTimer < playerAttack.attackGap) return false;
+        if (hSAbilityManager.currentHS_point < GetCurrentAttribute().HS_Cost) { return false; }
+        if (controller.FacingRight == isLeft) { controller.Flip(); }
+
+        CancelAction();
+        co_ability = StartCoroutine(FirstBranchAct());
+        return true;
+    }
+
+    public override bool SecondBranchAbilityPerformance(bool isLeft)
+    {
+        if (!playerAttack.canAttack) return false;
+        if (controller.isFloating) return false;
+        if (health.stunned) return false;
+        if (CheckAnyPerformingAbility()) return false;
+        if (playerAttack.attackTimer < playerAttack.attackGap) return false;
+        if (hSAbilityManager.currentHS_point < GetCurrentAttribute().HS_Cost) { return false; }
+        if (controller.FacingRight == isLeft) { controller.Flip(); }
+
+        CancelAction();
+        co_ability = StartCoroutine(SecondBranchAct());
+        return true;
+    }
+
+    public override IEnumerator FirstBranchAct()
+    {
+        yield return StartCoroutine(OriginalAct());
+    }
+
+    public override IEnumerator SecondBranchAct()
+    {
+        yield return StartCoroutine(OriginalAct());
+    }
+
+    #endregion Branch Ability Performance
+
+    #region Utility Methods
+
     public void Attack()
     {
         playerAttack.canAttack = true;
@@ -143,4 +203,6 @@ public class HS_SlashWave : IHeartSwordAbility
         hsHitEffectPlayed = false;
         attacked = false;
     }
+
+    #endregion Utility Methods
 }

@@ -2535,7 +2535,6 @@ MonoBehaviour:
   commonAttribute: {fileID: 11400000, guid: 8ed998852960ace4587a29aa97ea295c, type: 2}
   type: 6
   questActionID: hs_attack
-  branches: []
   learned: 1
   isActive: 0
   isPerforming: 0
@@ -2982,6 +2981,7 @@ GameObject:
   - component: {fileID: 3093208506432532171}
   - component: {fileID: 4865009588095001295}
   - component: {fileID: 517247827063866096}
+  - component: {fileID: 8661855450591640159}
   m_Layer: 0
   m_Name: HSAbilityUpgradeCam
   m_TagString: Untagged
@@ -3080,6 +3080,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMainCam: 0
+--- !u!114 &8661855450591640159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5496811779052072511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee71021279e3ed7479c5d677748f4e23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 1977391573695511326}
+  offset: {x: 0, y: 20, z: -10}
 --- !u!1 &5637699945292759113
 GameObject:
   m_ObjectHideFlags: 0
@@ -3769,8 +3783,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7376058001455921948}
   - component: {fileID: 6137630411403767933}
-  - component: {fileID: 1689395142328155218}
-  - component: {fileID: 4402944448691048704}
   m_Layer: 0
   m_Name: HS_CriticalSlash
   m_TagString: Untagged
@@ -3809,9 +3821,6 @@ MonoBehaviour:
   commonAttribute: {fileID: 11400000, guid: 645b4d8a2c674644983d036e199d5cf9, type: 2}
   type: 6
   questActionID: hs_slash
-  branches:
-  - {fileID: 1689395142328155218}
-  - {fileID: 4402944448691048704}
   learned: 1
   isActive: 0
   isPerforming: 0
@@ -3832,64 +3841,6 @@ MonoBehaviour:
   anim: {fileID: 0}
   actionDuration: 3.1
   hitBox: {fileID: 6066468803475954402}
---- !u!114 &1689395142328155218
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6292435455098606858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a536fbc353c1a743a48b7c648b92f4c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  abilityAttribute: {fileID: 11400000, guid: 5e2747d306814a04abe82b6208687a1b, type: 2}
-  learned: 1
-  parentAbility: {fileID: 0}
-  controller: {fileID: 0}
-  vfx: {fileID: 0}
-  gameManager: {fileID: 0}
-  energy: {fileID: 0}
-  rb: {fileID: 0}
-  animSet: {fileID: 0}
-  inputPlayer: {fileID: 0}
-  inputMaster: {fileID: 0}
-  health: {fileID: 0}
-  playerAttack: {fileID: 0}
-  selfPooler: {fileID: 0}
-  hSAbilityManager: {fileID: 0}
-  anim: {fileID: 0}
-  hsHitEffectPlayed: 0
---- !u!114 &4402944448691048704
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6292435455098606858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a536fbc353c1a743a48b7c648b92f4c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  abilityAttribute: {fileID: 11400000, guid: 5e2747d306814a04abe82b6208687a1b, type: 2}
-  learned: 1
-  parentAbility: {fileID: 0}
-  controller: {fileID: 0}
-  vfx: {fileID: 0}
-  gameManager: {fileID: 0}
-  energy: {fileID: 0}
-  rb: {fileID: 0}
-  animSet: {fileID: 0}
-  inputPlayer: {fileID: 0}
-  inputMaster: {fileID: 0}
-  health: {fileID: 0}
-  playerAttack: {fileID: 0}
-  selfPooler: {fileID: 0}
-  hSAbilityManager: {fileID: 0}
-  anim: {fileID: 0}
-  hsHitEffectPlayed: 0
 --- !u!1 &6615324774052230768
 GameObject:
   m_ObjectHideFlags: 0
@@ -5167,7 +5118,6 @@ MonoBehaviour:
   commonAttribute: {fileID: 11400000, guid: 9b6def557c93f8f4c87ff35d47f826f6, type: 2}
   type: 6
   questActionID: hs_wave
-  branches: []
   learned: 1
   isActive: 0
   isPerforming: 0
