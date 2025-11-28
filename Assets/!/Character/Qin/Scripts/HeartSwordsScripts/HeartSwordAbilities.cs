@@ -12,7 +12,6 @@ using Cinemachine;
 
 public class HeartSwordAbilities : MonoBehaviour
 {
-    public List<GameObject> allAbilities_ref = new List<GameObject>();
     public static HeartSwordAbilities instance;
     [FoldoutGroup("reference", nameof(selfPooler), nameof(rb), nameof(anim), nameof(hsUpgradeCam))] public Void referenceVoid;
     [SerializeField, HideProperty] public InternalObjectPooler selfPooler;
@@ -20,19 +19,26 @@ public class HeartSwordAbilities : MonoBehaviour
     [SerializeField, HideProperty] public Animator anim;
     [SerializeField, HideProperty] public CameraRegister hsUpgradeCam;
 
+    [FoldoutGroup("HeartSword References", nameof(hs_CriticalSlash), nameof(hs_CounterAttack), nameof(hs_SlashWave))]
+    public Void heartSwordReferencesVoid;
+
+    [SerializeField, HideProperty] public HS_CriticalSlash hs_CriticalSlash;
+    [SerializeField, HideProperty] public HS_CounterAttack hs_CounterAttack;
+    [SerializeField, HideProperty] public HS_SlashWave hs_SlashWave;
+    [HideProperty] public List<IHeartSwordAbility> allAbilities = new List<IHeartSwordAbility>();
+
     [GUIColor(GUIColor.Lime)]
     [FoldoutGroup("HeartSword Abilities", nameof(maxHS_point),
          nameof(HS_points), nameof(abilityWest), nameof(abilityEast),
          nameof(abilityNorth), nameof(currentActivatedAbility))]
     public Void heartSwordVoid;
 
-    [HideProperty] public List<IHeartSwordAbility> allAbilities = new List<IHeartSwordAbility>();
     [SerializeField, HideProperty] private float maxHS_point = 3;
     [SerializeField, HideProperty] public List<HeartSwordUIPoint> HS_points = new List<HeartSwordUIPoint>();
-    [SerializeField, HideProperty] private int abilityWest = -1;
-    [SerializeField, HideProperty] private int abilityNorth = -1;
-    [SerializeField, HideProperty] private int abilityEast = -1;
-    [SerializeField, HideProperty] private int currentActivatedAbility = -1;
+    [SerializeField, HideProperty] private HSEnum abilityWest;
+    [SerializeField, HideProperty] private HSEnum abilityNorth;
+    [SerializeField, HideProperty] private HSEnum abilityEast;
+    [SerializeField, HideProperty] private HSEnum currentActivatedAbility;
     [SerializeField] public float currentHS_point { get; private set; } = 0;
 
     public void Awake()
@@ -44,17 +50,9 @@ public class HeartSwordAbilities : MonoBehaviour
     private void InitializeAbilityList()
     {
         allAbilities.Clear();
-        foreach (var reference in allAbilities_ref)
-        {
-            if (reference != null)
-            {
-                var ability = reference.GetComponentInChildren<IHeartSwordAbility>();
-                if (ability != null)
-                {
-                    allAbilities.Add(ability);
-                }
-            }
-        }
+        allAbilities.Add(hs_CounterAttack);
+        allAbilities.Add(hs_CriticalSlash);
+        allAbilities.Add(hs_SlashWave);
     }
 
     private void Start()
@@ -88,51 +86,30 @@ public class HeartSwordAbilities : MonoBehaviour
         else return null;
     }
 
-    public List<IHeartSwordAbility> GetLearnedAbilities()
+    public List<IHeartSwordAbility> GetUnlockedAbilities()
     {
-        List<IHeartSwordAbility> learnedAbilities = new List<IHeartSwordAbility>();
+        List<IHeartSwordAbility> unlockedAbilities = new List<IHeartSwordAbility>();
         foreach (var ability in allAbilities)
         {
-            if (ability.learned) learnedAbilities.Add(ability);
+            if (ability.IsUnlocked()) unlockedAbilities.Add(ability);
         }
-        return learnedAbilities;
+        return unlockedAbilities;
     }
 
-    public IHeartSwordAbility GetWestAbility()
-    {
-        if (abilityWest == -1) return null;
-        else return (abilityWest >= 0 && abilityWest < allAbilities.Count) ? allAbilities[abilityWest] : null;
-    }
+    public IHeartSwordAbility GetWestAbility() => GetAbilityByEnum(abilityWest);
 
-    public IHeartSwordAbility GetNorthAbility()
-    {
-        if (abilityNorth == -1) return null;
-        else return (abilityNorth >= 0 && abilityNorth < allAbilities.Count) ? allAbilities[abilityNorth] : null;
-    }
+    public IHeartSwordAbility GetNorthAbility() => GetAbilityByEnum(abilityNorth);
 
-    public IHeartSwordAbility GetEastAbility()
-    {
-        if (abilityEast == -1) return null;
-        else return (abilityEast >= 0 && abilityEast < allAbilities.Count) ? allAbilities[abilityEast] : null;
-    }
+    public IHeartSwordAbility GetEastAbility() => GetAbilityByEnum(abilityEast);
 
-    public IHeartSwordAbility GetCurrentActivatedAbility()
-    {
-        if (currentActivatedAbility == -1) return null;
-        else return (currentActivatedAbility >= 0 && currentActivatedAbility < allAbilities.Count) ? allAbilities[currentActivatedAbility] : null;
-    }
+    public IHeartSwordAbility GetCurrentActivatedAbility() => GetAbilityByEnum(currentActivatedAbility);
 
     public void UnequipAbility(IHeartSwordAbility ability)
     {
-        if (ability == GetWestAbility()) abilityWest = -1;
-        if (ability == GetEastAbility()) abilityEast = -1;
-        if (ability == GetNorthAbility()) abilityNorth = -1;
+        if (ability == GetWestAbility()) abilityWest = HSEnum.None;
+        if (ability == GetEastAbility()) abilityEast = HSEnum.None;
+        if (ability == GetNorthAbility()) abilityNorth = HSEnum.None;
         ability.UnequipAbility();
-    }
-
-    public int GetAbilityIndex(IHeartSwordAbility ability)
-    {
-        return allAbilities.IndexOf(ability);
     }
 
     public void EquipAbility(IHeartSwordAbility ability, AbilitySlot slot, bool unequipOldAbility)
@@ -190,7 +167,7 @@ public class HeartSwordAbilities : MonoBehaviour
         if (ability == null) return;
         if (currentActivatedAbility == GetAbilityIndex(ability))
         {
-            currentActivatedAbility = -1;
+            currentActivatedAbility = HSEnum.None;
         }
         ability.DeactivateAbility();
     }
@@ -341,18 +318,10 @@ public class HeartSwordAbilities : MonoBehaviour
             HSAblitySaveData abilityData = new HSAblitySaveData
             {
                 branchIndex = ability.GetBranchIndex(),
-                learned = ability.learned,
+                unlocked = ability.IsUnlocked(),
                 toggleToActivate = ability.toggleToActivate,
                 branches = new List<HSAblityBranchSaveData>()
             };
-            //foreach (var branch in ability.GetBranches())
-            //{
-            //    HSAblityBranchSaveData branchData = new HSAblityBranchSaveData
-            //    {
-            //        learned = branch.learned
-            //    };
-            //    abilityData.branches.Add(branchData);
-            //}
             data.hsAbilities.Add(abilityData);
         }
     }
@@ -368,7 +337,7 @@ public class HeartSwordAbilities : MonoBehaviour
         for (int i = 0; i < allAbilities.Count; i++)
         {
             //allAbilities[i].ChangeBranch(data.hsAbilities[i].branchIndex);
-            allAbilities[i].learned = data.hsAbilities[i].learned;
+            allAbilities[i].SetLockedStates(data.hsAbilities[i].unlocked);
             allAbilities[i].toggleToActivate = data.hsAbilities[i].toggleToActivate;
             //for (int j = 0; j < allAbilities[i].GetBranches().Count; j++)
             //{
@@ -381,4 +350,39 @@ public class HeartSwordAbilities : MonoBehaviour
     {
         hsUpgradeCam.SwitchThisCam();
     }
+
+    public IHeartSwordAbility GetAbilityByEnum(HSEnum abilityEnum)
+    {
+        switch (abilityEnum)
+        {
+            case HSEnum.HSCounterAttack:
+                return hs_CounterAttack;
+
+            case HSEnum.CriticalSlash:
+                return hs_CriticalSlash;
+
+            case HSEnum.SlashWave:
+                return hs_SlashWave;
+
+            case HSEnum.None:
+            default:
+                return null;
+        }
+    }
+
+    public HSEnum GetAbilityIndex(IHeartSwordAbility ability)
+    {
+        if (ability == hs_CounterAttack) return HSEnum.HSCounterAttack;
+        if (ability == hs_CriticalSlash) return HSEnum.CriticalSlash;
+        if (ability == hs_SlashWave) return HSEnum.SlashWave;
+        return HSEnum.None;
+    }
+}
+
+public enum HSEnum
+{
+    None,
+    HSCounterAttack,
+    CriticalSlash,
+    SlashWave,
 }

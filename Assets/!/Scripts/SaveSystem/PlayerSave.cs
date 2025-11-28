@@ -27,9 +27,9 @@ public struct HeartSwordSaveData
 {
     //equipped heartsword index west, east, north
 
-    public int westAbilityIndex;
-    public int eastAbilityIndex;
-    public int northAbilityIndex;
+    public HSEnum westAbilityIndex;
+    public HSEnum eastAbilityIndex;
+    public HSEnum northAbilityIndex;
     public List<HSAblitySaveData> hsAbilities;
 }
 
@@ -37,7 +37,7 @@ public struct HeartSwordSaveData
 public struct HSAblitySaveData
 {
     public int branchIndex;
-    public bool learned;
+    public bool unlocked;
     public bool toggleToActivate;
     public List<HSAblityBranchSaveData> branches;
 }
@@ -45,7 +45,7 @@ public struct HSAblitySaveData
 [System.Serializable]
 public struct HSAblityBranchSaveData
 {
-    public bool learned;
+    public bool unlocked;
 }
 
 public class PlayerSave : MonoBehaviour

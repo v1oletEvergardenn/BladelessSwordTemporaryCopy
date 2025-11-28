@@ -22,12 +22,13 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     [HideInInspector] public ObjectiveType type = ObjectiveType.HeartSword;
     [ObjectiveIDDropdown] public string questActionID;
 
-    public bool learned = false;
+    protected bool unlocked = false;
     public bool isActive = false;
 
     protected bool unlockedBranch1 = false;
     protected bool unlockedBranch2 = false;
     protected int branchIndex = 0;
+    protected int upgradedLevel = 0;
 
     [Space(20)] public Void spaceholder;
     protected SO_HeartSwordAttribute abilityAttribute;
@@ -125,6 +126,18 @@ public abstract class IHeartSwordAbility : MonoBehaviour
 
     public int GetBranchIndex() => branchIndex;
 
+    public bool IsBranch1Unlocked() => unlockedBranch1;
+
+    public bool IsBranch2Unlocked() => unlockedBranch2;
+
+    public int GetUpgradedLevel() => upgradedLevel;
+
+    public bool IsUnlocked() => unlocked;
+
+    public void SetLockedStates(bool unlocked) => this.unlocked = unlocked;
+
+    public void Unlock() => unlocked = true;
+
     /// <summary>
     /// Changes the currently equipped ability branch and updates attributes.
     /// </summary>
@@ -218,6 +231,23 @@ public abstract class IHeartSwordAbility : MonoBehaviour
         else if (this == hSAbilityManager.GetNorthAbility()) return inputMaster._AbilityY;
         else if (this == hSAbilityManager.GetWestAbility()) return inputMaster._AbilityX;
         else return null;
+    }
+
+    public bool Upgrade(int index)
+    {
+        if (!unlocked) return false;
+        if (upgradedLevel + 1 != index) return false;
+        upgradedLevel++;
+        return true;
+    }
+
+    public bool UnlockBranch(bool firstBranch)
+    {
+        if (!unlocked) return false;
+        if (upgradedLevel < 3) return false;
+        if (firstBranch) unlockedBranch1 = true;
+        else unlockedBranch2 = true;
+        return true;
     }
 
     #endregion Ability State & Utility

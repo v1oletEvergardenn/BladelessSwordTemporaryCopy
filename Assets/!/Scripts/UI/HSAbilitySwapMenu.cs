@@ -60,7 +60,7 @@ public class HSAbilitySwapMenu : MonoBehaviour
         abilityToSegment.Clear();
 
         // Gather all learned abilities
-        List<IHeartSwordAbility> learnedAbilities = hs.GetLearnedAbilities();
+        List<IHeartSwordAbility> learnedAbilities = hs.GetUnlockedAbilities();
         // Assign learned abilities to segments in order, do not skip segment indices
         for (int i = 0; i < segments.Count; i++)
         {

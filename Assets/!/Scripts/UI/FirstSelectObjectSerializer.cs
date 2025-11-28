@@ -30,6 +30,7 @@ public class FirstSelectObjectSerializer : MonoBehaviour
     public void SetFirstObject()
     {
         EventSystem.current.SetSelectedGameObject(FirstSelectObject);
+        print("selected" + FirstSelectObject.name);
     }
 
     public void DisSelected()

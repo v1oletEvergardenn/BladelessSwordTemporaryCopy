@@ -37,6 +37,12 @@ public class MenuManager : MonoBehaviour
     private void Awake()
     {
         if (instance == null) { instance = this; }
+        PauseGameCanvas.SetActive(false);
+        SavePointCanvas.SetActive(false);
+        SavePointMenu.SetActive(false);
+        HSAbilitySwapMenu.SetActive(false);
+        HSAbilityUpgradeMenu.SetActive(false);
+        StoreCanvas.SetActive(false);
     }
 
     #endregion Singleton
@@ -63,6 +69,8 @@ public class MenuManager : MonoBehaviour
         nameof(SavePointMenu),
         nameof(HSAbilitySwapMenu),
         nameof(HSAbilityUpgradeMenu),
+        nameof(backgroundImage1),
+        nameof(backgroundImage2),
         nameof(hsUpgrade_rotator))]
     public Void SaveGameVoidHolder;
 
@@ -70,6 +78,8 @@ public class MenuManager : MonoBehaviour
     [SerializeField, HideProperty] public GameObject SavePointMenu;
     [SerializeField, HideProperty] public GameObject HSAbilitySwapMenu;
     [SerializeField, HideProperty] public GameObject HSAbilityUpgradeMenu;
+    [SerializeField, HideProperty] public Image backgroundImage1;
+    [SerializeField, HideProperty] public Image backgroundImage2;
     [SerializeField, HideProperty] public Transform hsUpgrade_rotator;
     private List<HSAbilityUpgradeUI> hsUpgradeUIs = new List<HSAbilityUpgradeUI>();
 
@@ -137,9 +147,6 @@ public class MenuManager : MonoBehaviour
     private void Start()
     {
         // Initialize menu states
-        PauseGameCanvas.SetActive(false);
-        SavePointCanvas.SetActive(false);
-        StoreCanvas.SetActive(false);
 
         // Register input events for tab navigation and menu open/close
         InputMaster.instance.uiActions.FlipPage_LB.performed += ctx => PreviousTab();
@@ -272,6 +279,13 @@ public class MenuManager : MonoBehaviour
         InputMaster.SwitchToUIAction();
 
         HSAbilityUpgradeMenu.SetActive(true);
+
+        backgroundImage1.color = new Color(backgroundImage1.color.r, backgroundImage1.color.g, backgroundImage1.color.b, 0f);
+        backgroundImage1.DOFade(1f, 1f).SetEase(Ease.OutCubic);
+
+        backgroundImage2.color = new Color(backgroundImage2.color.r, backgroundImage2.color.g, backgroundImage2.color.b, 0f);
+        backgroundImage2.DOFade(1f, 1f).SetEase(Ease.OutCubic);
+
         foreach (var ui in hsUpgradeUIs)
         {
             ui.ShowOrHide(true);
@@ -280,15 +294,21 @@ public class MenuManager : MonoBehaviour
 
     public void CloseHSUpgradeMenu()
     {
-        StartCoroutine(CloseHSUpgardeMenuCoroutine());
+        StartCoroutine(CloseHSUpgradeMenuCoroutine());
     }
 
-    public IEnumerator CloseHSUpgardeMenuCoroutine()
+    public IEnumerator CloseHSUpgradeMenuCoroutine()
     {
         foreach (var ui in hsUpgradeUIs)
         {
             ui.ShowOrHide(false);
         }
+        backgroundImage1.color = new Color(backgroundImage1.color.r, backgroundImage1.color.g, backgroundImage1.color.b, 1f);
+        backgroundImage1.DOFade(0f, 1f).SetEase(Ease.OutCubic);
+
+        backgroundImage2.color = new Color(backgroundImage2.color.r, backgroundImage2.color.g, backgroundImage2.color.b, 1f);
+        backgroundImage2.DOFade(0f, 1f).SetEase(Ease.OutCubic);
+
         CameraManager.instance.SwitchToNormalCam();
         yield return new WaitForSeconds(0.7f);
         HSAbilityUpgradeMenu.SetActive(false);
