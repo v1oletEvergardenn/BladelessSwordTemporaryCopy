@@ -1,4 +1,8 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [System.Serializable]
 public struct StoreItem
@@ -35,55 +39,82 @@ public class Store : MonoBehaviour
     }
 
     // Call this when the player selects an item to buy
-    public bool BuyItem(int itemIndex)
+    public void BuyItem(int itemIndex, TradeItemBtn btn)
     {
         if (itemIndex < 0 || itemIndex >= itemsForSale.Length)
         {
             Debug.LogWarning("Invalid item index.");
-            return false;
+            return;
         }
-
-        if (IsSoldOut(itemIndex))
-        {
-            // TODO: Show sold out UI feedback
-            return false;
-        }
-
         TradeItemSO item = itemsForSale[itemIndex].item;
-        bool success = CurrencyManager.instance.TryBuyItem(item);
-
-        if (success)
+        if (IsSoldOut(itemIndex) || !CurrencyManager.instance.hasEnoughCurrency(item.price))
         {
-            // Only decrement if not infinite
-            if (remainingQuantities[itemIndex] != -1)
+            btn.Fail();
+            Debug.LogWarning("Not enough currency or item sold out.");
+            return;
+        }
+        WarningSystem.ShowWarning($"Are you sure you want to buy {itemsForSale[itemIndex].item.name}?",
+            () => CurrencyManager.instance.TryBuyItem(item, btn, this));
+    }
+
+    private int FindNextAvailableItem(int itemIndex)
+    {
+        // Collect all active item indices
+        List<int> activeIndices = new List<int>();
+        for (int i = 0; i < MenuManager.instance.tradeItemPool.Count; i++)
+        {
+            if (MenuManager.instance.tradeItemPool[i].activeInHierarchy)
             {
-                remainingQuantities[itemIndex]--;
-                if (remainingQuantities[itemIndex] <= 0)
-                {
-                    remainingQuantities[itemIndex] = 0;
-                    // TODO: Update store UI to reflect sold out state
-                    Debug.Log($"Player bought {item.itemName}. Now sold out.");
-                }
-                else
-                {
-                    // TODO: Update store UI to reflect new quantity
-                    Debug.Log($"Player bought {item.itemName}. {remainingQuantities[itemIndex]} left.");
-                }
+                activeIndices.Add(i);
+            }
+        }
+
+        if (activeIndices.Count == 0)
+            return -1; // No active items
+
+        // Find the position of itemIndex in the active list
+        int pos = activeIndices.IndexOf(itemIndex);
+
+        if (pos == -1)
+            return activeIndices[0]; // If itemIndex is not active, return first active
+
+        // If itemIndex is the last active, return previous active
+        if (pos == activeIndices.Count - 1)
+            return activeIndices[Math.Max(0, pos - 1)];
+
+        // Otherwise, return next active
+        return activeIndices[pos + 1];
+    }
+
+    public bool SellItem(int itemIndex)
+    {
+        TradeItemSO item = itemsForSale[itemIndex].item;
+
+        // Only decrement if not infinite
+        if (remainingQuantities[itemIndex] != -1)
+        {
+            remainingQuantities[itemIndex]--;
+            if (remainingQuantities[itemIndex] <= 0)
+            {
+                remainingQuantities[itemIndex] = 0;
+                // TODO: Update store UI to reflect sold out state
+                Debug.Log($"Player bought {item.itemName}. Now sold out.");
+
+                EventSystem.current.SetSelectedGameObject(MenuManager.instance.tradeItemPool[FindNextAvailableItem(itemIndex)]);
             }
             else
             {
-                // Infinite stock, no decrement
-                // TODO: Update store UI if needed
-                Debug.Log($"Player bought {item.itemName}. (Infinite stock)");
+                // TODO: Update store UI to reflect new quantity
+                Debug.Log($"Player bought {item.itemName}. {remainingQuantities[itemIndex]} left.");
             }
-            return true;
         }
         else
         {
-            // TODO: Show not enough currency UI feedback
-            Debug.Log("Purchase failed.");
-            return false;
+            // Infinite stock, no decrement
+            // TODO: Update store UI if needed
+            Debug.Log($"Player bought {item.itemName}. (Infinite stock)");
         }
+        return true;
     }
 
     // Optional: Call this to close the store UI

@@ -23,6 +23,7 @@ public class CameraLimit : MonoBehaviour
     /// </summary>
     public void UpdateLimit()
     {
+        print("updateLimit");
         CameraManager.SwitchPixelPerfectCamera(false);
         CameraFollow camZoom = CameraFollow.instance;
         cam.GetComponent<CameraRegister>().SwitchThisCam();

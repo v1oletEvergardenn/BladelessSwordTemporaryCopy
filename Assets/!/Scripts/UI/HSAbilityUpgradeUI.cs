@@ -81,10 +81,11 @@ public class HSAbilityUpgradeUI : UIChildNavigate
         }
     }
 
-    private void OnEnable()
+    public override void OnEnable()
     {
         if (!Application.isPlaying) hsManager = FindAnyObjectByType<HeartSwordAbilities>();
-        else hsManager = HeartSwordAbilities.instance;
+        else hsManager = HeartSwordAbilities.instance; base.OnEnable();
+        if (hsManager == null) return;
         ability = hsManager.GetAbilityByEnum(abilityEnum);
         if (!Application.isPlaying) return;
 
@@ -408,7 +409,10 @@ public class HSAbilityUpgradeUI : UIChildNavigate
 
     public void SetColor(Material mat, Color color)
     {
-        mat.SetColor("_Color", color);
+        if (mat != null && mat.shader != null && mat.shader.name == "UI/UIGlow")
+        {
+            mat.SetColor("_Color", color);
+        }
     }
 
     public void SetAlpha(Material mat, float alpha)

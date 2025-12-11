@@ -39,10 +39,15 @@ public class CurrencyManager : MonoBehaviour
         return false;
     }
 
+    public bool hasEnoughCurrency(int amount)
+    {
+        return currency >= amount;
+    }
+
     /// <summary>
     /// Attempts to buy an item. Returns true if successful.
     /// </summary>
-    public bool TryBuyItem(TradeItemSO item)
+    public bool TryBuyItem(TradeItemSO item, TradeItemBtn btn, Store store)
     {
         if (item == null) return false;
         if (SpendCurrency(item.price))
@@ -50,6 +55,8 @@ public class CurrencyManager : MonoBehaviour
             // TODO: Grant the item to the player (e.g., add to inventory)
             Debug.Log($"Purchased {item.itemName} for {item.price} currency.");
             // TODO: Update inventory UI here
+            store.SellItem(btn.itemIndex);
+            btn.Success();
             return true;
         }
         else

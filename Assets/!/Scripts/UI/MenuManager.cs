@@ -123,7 +123,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField, HideProperty] public TextMeshProUGUI itemDetail_description;
     [SerializeField, HideProperty] public Image itemDetail_icon;
     private List<GameObject> StoreMenuTabs = new List<GameObject>();
-    private List<GameObject> tradeItemPool = new List<GameObject>();
+    [HideInInspector] public List<GameObject> tradeItemPool = new List<GameObject>();
     private TradeItemType tradeItemType;
     [HideInInspector] public Store currentStore;
 
@@ -373,6 +373,12 @@ public class MenuManager : MonoBehaviour
             GameObject itemObj = tradeItemPool[i];
 
             if (i >= itemCount)
+            {
+                itemObj.SetActive(false);
+                continue;
+            }
+
+            if (currentStore.remainingQuantities[i] <= 0)
             {
                 itemObj.SetActive(false);
                 continue;

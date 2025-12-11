@@ -78,41 +78,42 @@ public class TradeItemBtn : MonoBehaviour
     /// </summary>
     public void OnClick_BuyItem()
     {
-        bool success = store.BuyItem(itemIndex);
-        if (soldOut) success = false;
-        if (success)
+        store.BuyItem(itemIndex, this);
+    }
+
+    public void Success()
+    {
+        // Update UI after purchase
+        MenuManager.instance.UpdateStoreUI();
+        var rect = GetComponent<RectTransform>();
+        rect.DOComplete(); // Stop any previous tweens
+        if (!originalPosUpdated) originalPos = rect.anchoredPosition; originalPosUpdated = true;
+
+        // Move down then up
+        rect.DOAnchorPos(originalPos + new Vector2(0f, -40f), 0.1f)
+              .SetEase(Ease.InSine)
+              .OnComplete(() =>
+              {
+                  rect.DOAnchorPos(originalPos, 0.1f)
+                      .SetEase(Ease.OutSine);
+              });
+        VFXManager.instance.RumblePulse(0.1f, 0.2f, 0.1f);
+    }
+
+    public void Fail()
+    {
+        // Shake the button horizontally if purchase fails
+        var rect = GetComponent<RectTransform>();
+        if (rect != null)
         {
-            // Update UI after purchase
-            MenuManager.instance.UpdateStoreUI();
-            var rect = GetComponent<RectTransform>();
             rect.DOComplete(); // Stop any previous tweens
-            if (!originalPosUpdated) originalPos = rect.anchoredPosition; originalPosUpdated = true;
-
-            // Move down then up
-            rect.DOAnchorPos(originalPos + new Vector2(0f, -40f), 0.1f)
-                  .SetEase(Ease.InSine)
-                  .OnComplete(() =>
-                  {
-                      rect.DOAnchorPos(originalPos, 0.1f)
-                          .SetEase(Ease.OutSine);
-                  });
-            VFXManager.instance.RumblePulse(0.1f, 0.2f, 0.1f);
+            rect.DOShakeAnchorPos(0.1f, new Vector2(40f, 0f), 10, 20, false, true)
+                .OnComplete(() =>
+                {
+                    rect.DOShakeAnchorPos(0.1f, new Vector2(20f, 0f), 10, 20, false, true);
+                });
         }
-        else
-        {
-            // Shake the button horizontally if purchase fails
-            var rect = GetComponent<RectTransform>();
-            if (rect != null)
-            {
-                rect.DOComplete(); // Stop any previous tweens
-                rect.DOShakeAnchorPos(0.1f, new Vector2(40f, 0f), 10, 20, false, true)
-                    .OnComplete(() =>
-                    {
-                        rect.DOShakeAnchorPos(0.1f, new Vector2(20f, 0f), 10, 20, false, true);
-                    });
-            }
 
-            VFXManager.instance.RumblePulse(0.2f, 0.3f, 0.1f);
-        }
+        VFXManager.instance.RumblePulse(0.2f, 0.3f, 0.1f);
     }
 }

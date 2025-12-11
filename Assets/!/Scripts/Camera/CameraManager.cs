@@ -28,10 +28,23 @@ public class CameraManager : MonoBehaviour
     [HideInInspector] public float _normYPanAmount;
 
     [Header("PixelPerfectCameraSetting")]
-    [HideInInspector] public Camera mainCam;
+    public Camera mainCam;
 
     public bool askForSwitchPixelPerfectCamera = false;
-    private List<float> pixelCameraOrthographicSizes = new List<float> { 1.534091f, 1.6875f, 1.875f, 2.109375f, 2.410714f, 2.8125f, 3.375f, 4.21875f, 5.625f, 8.4375f, 16.875f };
+
+    private List<float> pixelCameraOrthographicSizes = new List<float> {
+        1.534091f,
+        1.6875f,
+        1.875f,
+        2.109375f,
+        2.410714f,
+        2.8125f,
+        3.375f,
+        4.21875f,
+        5.625f,
+        8.4375f,
+        16.875f };
+
     public Vector2 desiredOrthographicSizeThreshold = Vector2.one;
 
     private bool desiredPixelPerfectCamState = true;
@@ -40,14 +53,10 @@ public class CameraManager : MonoBehaviour
     {
         if (instance == null) { instance = this; }
         else { Destroy(this.gameObject); }
-        mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
     }
 
     private void Update()
     {
-        if (mainCam == null) { mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>(); }
-        if (mainCam == null) { return; }
-
         if (mainCam.TryGetComponent<PixelPerfectCamera>(out PixelPerfectCamera cam))
         {
             if (cam.enabled != desiredPixelPerfectCamState)
@@ -57,15 +66,31 @@ public class CameraManager : MonoBehaviour
                     mainCam.GetComponent<PixelPerfectCamera>().enabled = desiredPixelPerfectCamState;
                 }
             }
+            //Debug.Log($"OrthoSize: {mainCam.orthographicSize}, PixelRatio: {mainCam.GetComponent<PixelPerfectCamera>().pixelRatio}");
         }
+    }
+
+    private List<float> PixelCameraOrthoSizes()
+    {
+        pixelCameraOrthographicSizes.Clear();
+        int steps = 10;
+        int screenHeight = Screen.height;
+
+        for (int n = 1; n <= steps; n++)
+        {
+            float orthoSize = (float)screenHeight / (2f * mainCam.GetComponent<PixelPerfectCamera>().assetsPPU * n);
+            pixelCameraOrthographicSizes.Add(orthoSize);
+        }
+
+        pixelCameraOrthographicSizes.Reverse(); // Largest at last index
+        return pixelCameraOrthographicSizes;
     }
 
     public static void SwitchPixelPerfectCamera(bool ask)
     {
-        if (instance.mainCam == null) { return; }
         instance.desiredPixelPerfectCamState = ask;
         float currentOrthoSize = instance.mainCam.orthographicSize;
-        List<float> tempOrthoList = instance.pixelCameraOrthographicSizes;
+        List<float> tempOrthoList = instance.PixelCameraOrthoSizes();
 
         if (currentOrthoSize <= tempOrthoList[0])//if smaller than the first one
         {
@@ -90,7 +115,6 @@ public class CameraManager : MonoBehaviour
 
     public void SwitchToNormalCam()
     {
-        if (mainCam == null) { return; }
         mainCam.GetComponent<PixelPerfectCamera>().enabled = true;
         if (playerNormalCam == null)
         {
