@@ -8,7 +8,7 @@ using Void = EditorAttributes.Void;
 [ExecuteAlways]
 public class ParallaxManager : MonoBehaviour
 {
-    public Camera cam;
+    private Camera cam;
 
     [ButtonField(nameof(RecreateAllLayerCopies), "Clear & Recreate All Layer Copies")] public Void holder;
 
@@ -69,6 +69,7 @@ public class ParallaxManager : MonoBehaviour
 
     public void Start()
     {
+        cam = Camera.main;
         UpdateLayerCopies();
         foreach (layer i in layers)
         {

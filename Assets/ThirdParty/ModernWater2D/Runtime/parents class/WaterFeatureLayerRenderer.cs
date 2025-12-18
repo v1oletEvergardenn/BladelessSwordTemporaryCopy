@@ -1,12 +1,13 @@
 ﻿#if UNITY_EDITOR
 #endif
+
 using System;
 using UnityEngine;
 
 namespace Water2D
 {
     /// <summary>
-    /// This class is used for water feature managers 
+    /// This class is used for water feature managers
     /// Invidual water sources can connect to the manager and set the "run" variable to true
     /// Even If only one water source requires this manager to run, this manager will run
     /// </summary>
@@ -16,7 +17,8 @@ namespace Water2D
     public abstract class WaterFeatureLayerRenderer : MonoBehaviour
     {
         [HideInInspector][SerializeField] protected LayerRenderer _layerRenderer;
-        [HideInInspector][SerializeField] bool _run;
+        [HideInInspector][SerializeField] private bool _run;
+
         [HideInInspector]
         [SerializeField]
         public bool run
@@ -30,6 +32,7 @@ namespace Water2D
                 _run = value;
             }
         }
+
         private int runTrue = 0;
         private int runFalse = 0;
 
@@ -48,5 +51,4 @@ namespace Water2D
             _layerRenderer.run = run;
         }
     }
-
 }

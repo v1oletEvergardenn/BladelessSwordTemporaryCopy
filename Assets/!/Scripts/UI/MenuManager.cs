@@ -81,7 +81,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField, HideProperty] public Image backgroundImage1;
     [SerializeField, HideProperty] public Image backgroundImage2;
     [SerializeField, HideProperty] public Transform hsUpgrade_rotator;
-    private List<HSAbilityUpgradeUI> hsUpgradeUIs = new List<HSAbilityUpgradeUI>();
+    public List<HSAbilityUpgradeUI> hsUpgradeUIs = new List<HSAbilityUpgradeUI>();
 
     [FoldoutGroup("EndCanvas",
         nameof(EndGameCanvas))]
@@ -148,11 +148,12 @@ public class MenuManager : MonoBehaviour
     {
         // Initialize menu states
 
-        // Register input events for tab navigation and menu open/close
         InputMaster.instance.uiActions.FlipPage_LB.performed += ctx => PreviousTab();
         InputMaster.instance.uiActions.FlipPage_RB.performed += ctx => NextTab();
         InputMaster.instance._MenuOpenAction.performed += ctx => OpenPauseGameCanvas();
         InputMaster.instance.uiActions.MenuClose.performed += ctx => CloseMenu();
+        InputMaster.instance.uiActions.Cancel.performed += ctx => BackToLastMenu();
+        // Register input events for tab navigation and menu open/close
 
         UpdateQuestUI();
         TradeItemPoolGenerate();
@@ -169,13 +170,13 @@ public class MenuManager : MonoBehaviour
             PauseMenuTabs.Add(child.gameObject);
         }
 
-        hsUpgradeUIs.Clear();
-        foreach (Transform t in hsUpgrade_rotator.GetComponentsInChildren<Transform>(true))
-        {
-            var ui = t.GetComponent<HSAbilityUpgradeUI>();
-            if (ui != null)
-                hsUpgradeUIs.Add(ui);
-        }
+        //hsUpgradeUIs.Clear();
+        //foreach (Transform t in hsUpgrade_rotator.GetComponentsInChildren<Transform>(true))
+        //{
+        //    var ui = t.GetComponent<HSAbilityUpgradeUI>();
+        //    if (ui != null)
+        //        hsUpgradeUIs.Add(ui);
+        //}
     }
 
     #endregion Unity Methods
@@ -193,7 +194,7 @@ public class MenuManager : MonoBehaviour
         }
         else if (HSAbilityUpgradeMenu.activeInHierarchy)
         {
-            CloseHSUpgradeMenu();
+            CloseHSUpgradeMenu(false);
         }
         else if (StoreCanvas.activeInHierarchy)
         {
@@ -208,6 +209,12 @@ public class MenuManager : MonoBehaviour
             NextTab();
         }
         canChangeTab = true;
+    }
+
+    public void BackToLastMenu()
+    {
+        print("backed to last menu");
+        EventSystem.current.currentSelectedGameObject?.GetComponent<IBackToLastMenu>()?.GoBack();
     }
 
     /// <summary>
@@ -292,12 +299,12 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    public void CloseHSUpgradeMenu()
+    public void CloseHSUpgradeMenu(bool openSavePointMenu)
     {
-        StartCoroutine(CloseHSUpgradeMenuCoroutine());
+        StartCoroutine(CloseHSUpgradeMenuCoroutine(openSavePointMenu));
     }
 
-    public IEnumerator CloseHSUpgradeMenuCoroutine()
+    public IEnumerator CloseHSUpgradeMenuCoroutine(bool openSavePointMenu)
     {
         foreach (var ui in hsUpgradeUIs)
         {
@@ -312,12 +319,19 @@ public class MenuManager : MonoBehaviour
         CameraManager.instance.SwitchToNormalCam();
         yield return new WaitForSeconds(0.7f);
         HSAbilityUpgradeMenu.SetActive(false);
+        if (openSavePointMenu)
+        {
+            OpenSavePointCanvas();
+        }
+        else
+        {
+            SavePointCanvas.SetActive(false);
+            yield return new WaitForSeconds(0.3f);
+            InputMaster.SwitchToGameplayAction();
+        }
         Health.instance.SetCharacterUI(true);
-        SavePointCanvas.SetActive(false);
-        yield return new WaitForSeconds(0.3f);
-        InputMaster.SwitchToGameplayAction();
-        currentIndexTab = -1;
-        NextTab();
+        currentIndexTab = 0;
+        hsUpgrade_rotator.localRotation = Quaternion.Euler(0, 0, 0);
     }
 
     #endregion SavePointMenu
@@ -506,6 +520,10 @@ public class MenuManager : MonoBehaviour
         ).SetEase(Ease.OutSine);
 
         previousHSUpgradeTabIndex = currentIndexTab;
+
+        EventSystem.current.SetSelectedGameObject(
+            hsUpgradeUIs[currentIndexTab * 2].gameObject
+        );
     }
 
     /// <summary>

@@ -24,7 +24,11 @@ public abstract class IDamagable : MonoBehaviour
 
     public virtual void Repel(float force, bool left)
     {
-        GetComponent<Rigidbody2D>().AddForce((left ? Vector3.left : Vector3.right) * force, ForceMode2D.Impulse);
+        TryGetComponent<Rigidbody2D>(out var rb);
+        if (rb != null)
+        {
+            rb.AddForce((left ? Vector3.left : Vector3.right) * force, ForceMode2D.Impulse);
+        }
     }
 
     private void OnDrawGizmosSelected()

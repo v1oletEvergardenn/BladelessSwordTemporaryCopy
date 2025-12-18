@@ -387,6 +387,7 @@ namespace Water2D
         private void CameraSetup()
         {
             Camera cam = GetCameraRenderingScreen();
+            if (cam == null) return;
             sr.sharedMaterial.SetMatrix("_projectionMatrix", cam.projectionMatrix);
             sr.sharedMaterial.SetMatrix("_worldToCamMatrix", cam.worldToCameraMatrix);
             sr.sharedMaterial.SetVector("_camRect", new Vector4(cam.rect.x, cam.rect.y, cam.rect.width, cam.rect.height));
@@ -417,14 +418,14 @@ namespace Water2D
             if (overrideMainCamera.value == false)
             {
                 settings._obstructorSettings.mainCamera = Camera.main;
-                settings._reflectionsSettings.mainCamera = Camera.main;
+                //settings._reflectionsSettings.mainCamera = Camera.main;
                 settings._simulationSettings.mainCam = Camera.main;
                 changeFlag = true;
             }
             else if (cameraOverride != null)
             {
                 settings._obstructorSettings.mainCamera = cameraOverride;
-                settings._reflectionsSettings.mainCamera = cameraOverride;
+                //settings._reflectionsSettings.mainCamera = cameraOverride;
                 settings._simulationSettings.mainCam = cameraOverride;
                 changeFlag = true;
             }
@@ -742,6 +743,7 @@ namespace Water2D
 
         private void OnDrawGizmos()
         {
+            if (Camera.main == null) return;
             if (waterSimulation != null) waterSimulation.OnGizmos();
 
             //draw reflection plane if platformer reflections are on

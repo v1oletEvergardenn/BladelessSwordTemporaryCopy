@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-
 namespace Water2D
 {
-    
     [Serializable]
     public class ReflectionsSettings
     {
@@ -84,5 +82,4 @@ namespace Water2D
             customReflectionStart.onValueChanged = onReflectionsChanged;
         }
     }
-
 }

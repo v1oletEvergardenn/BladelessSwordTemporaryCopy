@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 #if UNITY_EDITOR
+
 using UnityEditor;
+
 #endif
+
 using UnityEngine;
 
 namespace Water2D
@@ -12,13 +16,15 @@ namespace Water2D
     public class ReflectionsSystem : WaterFeatureLayerRenderer
     {
         #region Singleton
+
         [SerializeField][HideInInspector] public static ReflectionsSystem instanceTopDown;
         [SerializeField][HideInInspector] public static ReflectionsSystem instanceRayMarch;
         [SerializeField][HideInInspector] public static ReflectionsSystem instancePlatformer;
 
         public ReflectionsSystem(bool topdown) => this.topdown = topdown;
 
-        [SerializeField][HideInInspector] bool startupQF = false;
+        [SerializeField][HideInInspector] private bool startupQF = false;
+
         private void Awake()
         {
             Singleton();
@@ -26,25 +32,23 @@ namespace Water2D
             SetCallbacks();
         }
 
-        void Singleton()
+        private void Singleton()
         {
             if (!startupQF) { startupQF = true; return; }
 
             if (raymarch)
             {
-
                 if (instanceRayMarch == null) { instanceRayMarch = this; }
                 else if (this == instanceRayMarch) return;
                 else DestroyImmediate(gameObject);
             }
             else if (topdown)
             {
-
                 if (instanceTopDown == null) { instanceTopDown = this; }
                 else if (this == instanceTopDown) return;
                 else DestroyImmediate(gameObject);
             }
-            else 
+            else
             {
                 if (instancePlatformer == null) { instancePlatformer = this; }
                 else if (this == instancePlatformer) return;
@@ -52,38 +56,36 @@ namespace Water2D
             }
         }
 
-        public static ReflectionsSystem GetInstanceTopDown() 
+        public static ReflectionsSystem GetInstanceTopDown()
         {
             return instanceTopDown;
         }
 
         public static ReflectionsSystem GetInstancePlatformer()
         {
-
             return instancePlatformer;
         }
-
 
         public static ReflectionsSystem GetInstanceRayMarch()
         {
             return instanceRayMarch;
         }
 
-        #endregion
+        #endregion Singleton
 
         #region Variables
 
         [HideInInspector] public int pivotDetectionAlphaTreshold = 122;
 
-        [HideInInspector] [SerializeField] public WaterCryo<bool> overrideMainCamera = new WaterCryo<bool>(false);
-        [HideInInspector] [SerializeField] public WaterCryo<bool> reflectionObjectsVisible = new WaterCryo<bool>(false);
-        [HideInInspector] [SerializeField] public WaterCryo<bool> cameraVisible = new WaterCryo<bool>(false);
-        [HideInInspector] [SerializeField] public WaterCryo<bool> defaultReflectionSprflipx = new WaterCryo<bool>(false);
-        [HideInInspector] [SerializeField] public Camera mainCamera;
-        [HideInInspector] [SerializeField] public Camera reflectionCamera;
-        [HideInInspector] [SerializeField] public Material reflectorMat;
-        [HideInInspector] [SerializeField] public Material reflectionMat;
-        [HideInInspector] [SerializeField] public WaterCryo<float> textureResolution = new WaterCryo<float>(1);
+        [HideInInspector][SerializeField] public WaterCryo<bool> overrideMainCamera = new WaterCryo<bool>(false);
+        [HideInInspector][SerializeField] public WaterCryo<bool> reflectionObjectsVisible = new WaterCryo<bool>(false);
+        [HideInInspector][SerializeField] public WaterCryo<bool> cameraVisible = new WaterCryo<bool>(false);
+        [HideInInspector][SerializeField] public WaterCryo<bool> defaultReflectionSprflipx = new WaterCryo<bool>(false);
+        [HideInInspector][SerializeField] public Camera mainCamera;
+        [HideInInspector][SerializeField] public Camera reflectionCamera;
+        [HideInInspector][SerializeField] public Material reflectorMat;
+        [HideInInspector][SerializeField] public Material reflectionMat;
+        [HideInInspector][SerializeField] public WaterCryo<float> textureResolution = new WaterCryo<float>(1);
         [HideInInspector][SerializeField] public int layers;
 
         public const string rlayer = "Reflections";
@@ -95,29 +97,31 @@ namespace Water2D
 
         [HideInInspector] public int reflectionLayerIdx;
 
-        LayerRenderer layerRenderer 
+        private LayerRenderer layerRenderer
         {
-            get 
+            get
             {
-                if (_layerRenderer == null) 
-                { 
+                if (_layerRenderer == null)
+                {
                     _layerRenderer = new LayerRenderer();
-                    if(mainCamera == null) mainCamera = Camera.main;
-                    if(textureResolution==null) textureResolution = new WaterCryo<float>(1);
-                    if (topdown)_layerRenderer.Setup(mainCamera, transform, rlayer, Vector2.one, textureResolution.value);
-                    else _layerRenderer.Setup(mainCamera, transform, layers, new Vector2(1f,1.5f), textureResolution.value);
+                    if (mainCamera == null) mainCamera = Camera.main;
+                    if (textureResolution == null) textureResolution = new WaterCryo<float>(1);
+                    if (topdown) _layerRenderer.Setup(mainCamera, transform, rlayer, Vector2.one, textureResolution.value);
+                    else _layerRenderer.Setup(mainCamera, transform, layers, new Vector2(1f, 1.5f), textureResolution.value);
                 }
-                return _layerRenderer; 
+                return _layerRenderer;
             }
-            set { _layerRenderer = value; } 
+            set { _layerRenderer = value; }
         }
-        
 
-        [SerializeField] [HideInInspector] ReflectionSettings _reflectionsSettings;
-        [SerializeField] [HideInInspector] public ReflectionSettings reflectionsSettings
+        [SerializeField][HideInInspector] private ReflectionSettings _reflectionsSettings;
+
+        [SerializeField]
+        [HideInInspector]
+        public ReflectionSettings reflectionsSettings
         {
-            get { if(_reflectionsSettings == null) _reflectionsSettings = new ReflectionSettings(); return _reflectionsSettings; }
-            set { _reflectionsSettings = value; }   
+            get { if (_reflectionsSettings == null) _reflectionsSettings = new ReflectionSettings(); return _reflectionsSettings; }
+            set { _reflectionsSettings = value; }
         }
 
         #endregion Variables
@@ -125,24 +129,25 @@ namespace Water2D
         #region Dictionaries
 
         // caster transform and reflector object
-        [SerializeField] Dictionary<Transform, ReflectionSO> _reflectors = new Dictionary<Transform, ReflectionSO>();
-        Dictionary<Transform, ReflectionSO> reflectors
+        [SerializeField] private Dictionary<Transform, ReflectionSO> _reflectors = new Dictionary<Transform, ReflectionSO>();
+
+        private Dictionary<Transform, ReflectionSO> reflectors
         {
             get { if (_reflectors == null) _reflectors = new Dictionary<Transform, ReflectionSO>(); return _reflectors; }
             set { _reflectors = value; }
         }
 
-      
+        [SerializeField] private Dictionary<Texture2D, Vector2> _pivots = new Dictionary<Texture2D, Vector2>();
 
-        [SerializeField] Dictionary<Texture2D, Vector2> _pivots = new Dictionary<Texture2D, Vector2>();
-        Dictionary<Texture2D, Vector2> pivots
+        private Dictionary<Texture2D, Vector2> pivots
         {
             get { if (_pivots == null) _pivots = new Dictionary<Texture2D, Vector2>(); return _pivots; }
             set { _pivots = value; }
         }
 
-        [SerializeField] Dictionary<Sprite, Vector2> _pivotsSH = new Dictionary<Sprite, Vector2>();
-        Dictionary<Sprite, Vector2> pivotsSH
+        [SerializeField] private Dictionary<Sprite, Vector2> _pivotsSH = new Dictionary<Sprite, Vector2>();
+
+        private Dictionary<Sprite, Vector2> pivotsSH
         {
             get { if (_pivotsSH == null) _pivotsSH = new Dictionary<Sprite, Vector2>(); return _pivotsSH; }
             set { _pivotsSH = value; }
@@ -176,12 +181,11 @@ namespace Water2D
             }
         }
 
-        public void UpdateAllReflectors() 
+        public void UpdateAllReflectors()
         {
             UpdateReflectionsPhysics();
             UpdateReflectionsShader();
         }
-
 
         public void ReflectionObjectsVisible(bool visible)
         {
@@ -201,7 +205,7 @@ namespace Water2D
             this.reflectionsSettings.alpha.value = reflectionsSettings.alpha.value;
             this.reflectionsSettings.tilt.value = reflectionsSettings.tilt.value;
             this.reflectionsSettings.y.value = reflectionsSettings.mirrorY.value;
-            if (cameraVisible != null )
+            if (cameraVisible != null)
             {
                 cameraVisible.value = reflectionsSettings.cameraVisible.value;
                 defaultReflectionSprflipx.value = reflectionsSettings.defaultReflectionSprflipx.value;
@@ -210,7 +214,7 @@ namespace Water2D
                 overrideMainCamera.value = reflectionsSettings.overrideMainCamera.value;
                 textureResolution.value = reflectionsSettings.textureResolution.value;
             }
-                //create layers bitmask
+            //create layers bitmask
             layers = 0;
             if (!topdown && !raymarch)
             {
@@ -219,7 +223,7 @@ namespace Water2D
                     layers |= (1 << bit);
                 }
             }
-            else if(raymarch)
+            else if (raymarch)
             {
                 foreach (int bit in reflectionsSettings.raymarchlayers)
                 {
@@ -228,8 +232,7 @@ namespace Water2D
             }
         }
 
-
-        void SetCallbacks()
+        private void SetCallbacks()
         {
             if (overrideMainCamera == null) return;
             overrideMainCamera.onValueChanged = OnSettingsChanged;
@@ -255,8 +258,7 @@ namespace Water2D
             UpdateReflections();
         }
 
-
-        #endregion
+        #endregion Common
 
         #region Enable&Disable
 
@@ -266,10 +268,9 @@ namespace Water2D
 #if UNITY_EDITOR
             EditorApplication.update += Update;
 #endif
-           
-     
+
             if (topdown) _layerRenderer.Setup(mainCamera, transform, rlayer, Vector2.one, textureResolution.value);
-            else  _layerRenderer.Setup(mainCamera, transform, layers, new Vector2(1f, 1.5f), textureResolution.value);
+            else _layerRenderer.Setup(mainCamera, transform, layers, new Vector2(1f, 1.5f), textureResolution.value);
             OnSettingsChanged();
             SetupVariables();
             reflectionCamera = GetComponent<Camera>();
@@ -279,7 +280,6 @@ namespace Water2D
         {
             if (reflectorMat == null)
             {
-
                 if (Resources.Load(reflectorMatPath, typeof(Material)) as Material == null) Debug.LogError("Material 'reflectorMat' doesn't exist in path : " + reflectorMatPath);
                 else reflectorMat = Resources.Load(reflectorMatPath, typeof(Material)) as Material;
             }
@@ -300,13 +300,12 @@ namespace Water2D
 
         private void OnDestroy()
         {
-       
 #if UNITY_EDITOR
             EditorApplication.update -= Update;
 #endif
         }
 
-        #endregion
+        #endregion Enable&Disable
 
         #region Updates
 
@@ -323,7 +322,6 @@ namespace Water2D
             if (reflectionCamera != null) reflectionCamera.hideFlags = (cameraVisible.value ? HideFlags.None : HideFlags.HideInInspector);
             layerRenderer.Loop();
 
-
             if (!topdown)
             {
                 if (mainCamera == null) mainCamera = Camera.main;
@@ -337,27 +335,23 @@ namespace Water2D
             }
         }
 
-
         private void UpdateReflections()
         {
-
             update_extended = true;
             UpdateReflectionsShader();
             UpdateReflectionsPhysics();
         }
 
-
-        Transform[] cleaner = new Transform[50000];
-        int cleanIdx = 0;
-
+        private Transform[] cleaner = new Transform[50000];
+        private int cleanIdx = 0;
 
         private void UpdateReflectionsPhysics()
         {
-            if(cleaner==null) cleaner = new Transform[50000];
+            if (cleaner == null) cleaner = new Transform[50000];
 
             foreach (var reflectorPair in reflectors)
             {
-                if (reflectorPair.Key == null || reflectorPair.Value==null ||  reflectorPair.Value.reflectionPivot == null || reflectorPair.Value.reflection == null)
+                if (reflectorPair.Key == null || reflectorPair.Value == null || reflectorPair.Value.reflectionPivot == null || reflectorPair.Value.reflection == null)
                 {
                     cleaner[cleanIdx] = reflectorPair.Key;
                     cleanIdx++;
@@ -367,7 +361,7 @@ namespace Water2D
             }
 
             //clean
-            for(int i = 0; i < cleanIdx; i++) reflectors.Remove(cleaner[i]);
+            for (int i = 0; i < cleanIdx; i++) reflectors.Remove(cleaner[i]);
             cleanIdx = 0;
             update_extended = false;
         }
@@ -376,75 +370,71 @@ namespace Water2D
 
         private void UpdateReflection(ReflectionSO reflection)
         {
-            if (!reflection.raymarched && (reflection.reflectionSr.sprite != reflection.sourceSr.sprite)  ) reflection.reflectionSr.sprite = ( reflection.MSP_ReflectionGenerator ? reflection.reflectionSr.sprite : reflection.sourceSr.sprite) ;
-            
+            if (!reflection.raymarched && (reflection.reflectionSr.sprite != reflection.sourceSr.sprite)) reflection.reflectionSr.sprite = (reflection.MSP_ReflectionGenerator ? reflection.reflectionSr.sprite : reflection.sourceSr.sprite);
+
             SetReflectionXOrientation(reflection);
 
             if (reflection.reflection.localScale != Vector3.one) reflection.reflection.localScale = Vector3.one;
 
             if (!update_extended) return;
 
-            if (reflection.reflectionPivot.rotation != Quaternion.Euler(_reflectionsSettings.tilt.value + reflection.additionalTilt, reflection.reflectionPivot.rotation.y, 180 + _reflectionsSettings.angle.value)) reflection.reflectionPivot.rotation = Quaternion.Euler(_reflectionsSettings.tilt.value + reflection.additionalTilt, reflection.reflectionPivot.rotation.y,180+_reflectionsSettings.angle.value);
+            if (reflection.reflectionPivot.rotation != Quaternion.Euler(_reflectionsSettings.tilt.value + reflection.additionalTilt, reflection.reflectionPivot.rotation.y, 180 + _reflectionsSettings.angle.value)) reflection.reflectionPivot.rotation = Quaternion.Euler(_reflectionsSettings.tilt.value + reflection.additionalTilt, reflection.reflectionPivot.rotation.y, 180 + _reflectionsSettings.angle.value);
 
             SetReflectionPivotPos(reflection);
         }
 
         private void UpdateReflectionsShader()
         {
-            if(!Shader.IsKeywordEnabled(WaterShaderIdsREF.color)) Shader.SetGlobalColor(WaterShaderIdsREF.color, reflectionsSettings.color.value);
-            if(!Shader.IsKeywordEnabled(WaterShaderIdsREF.orgColor)) Shader.SetGlobalFloat(WaterShaderIdsREF.orgColor, reflectionsSettings.originalColor.value);
+            if (!Shader.IsKeywordEnabled(WaterShaderIdsREF.color)) Shader.SetGlobalColor(WaterShaderIdsREF.color, reflectionsSettings.color.value);
+            if (!Shader.IsKeywordEnabled(WaterShaderIdsREF.orgColor)) Shader.SetGlobalFloat(WaterShaderIdsREF.orgColor, reflectionsSettings.originalColor.value);
             if (!Shader.IsKeywordEnabled(WaterShaderIdsREF.alpha)) Shader.SetGlobalFloat(WaterShaderIdsREF.alpha, reflectionsSettings.alpha.value);
             if (!Shader.IsKeywordEnabled(WaterShaderIdsREF.reflectionsTexture) && topdown) Shader.SetGlobalTexture(WaterShaderIdsREF.reflectionsTexture, layerRenderer.LayerTexture());
             else if (!Shader.IsKeywordEnabled(WaterShaderIdsREF.reflectionsTexture3) && raymarch) Shader.SetGlobalTexture(WaterShaderIdsREF.reflectionsTexture3, layerRenderer.LayerTexture());
             else if (!Shader.IsKeywordEnabled(WaterShaderIdsREF.reflectionsTexture2) && !raymarch && !topdown) Shader.SetGlobalTexture(WaterShaderIdsREF.reflectionsTexture2, layerRenderer.LayerTexture());
         }
 
-
         private void SetReflectionXOrientation(ReflectionSO reflection)
         {
             if (reflection.reflectionSr.flipX == ((defaultReflectionSprflipx.value ? reflection.flipX : !reflection.flipX) ? !reflection.sourceSr.flipX : reflection.sourceSr.flipX)) return;
-            reflection.reflectionSr.flipX =  ( (defaultReflectionSprflipx.value ? reflection.flipX : !reflection.flipX) ? !reflection.sourceSr.flipX : reflection.sourceSr.flipX);
+            reflection.reflectionSr.flipX = ((defaultReflectionSprflipx.value ? reflection.flipX : !reflection.flipX) ? !reflection.sourceSr.flipX : reflection.sourceSr.flipX);
         }
 
         private void SetReflectionPivotPos(ReflectionSO reflection)
         {
-
             //pivot pos
             switch (reflection.reflectionPivotSourceMode)
             {
                 case ReflectionPivotSourceMode.auto:
-                    reflection.reflectionPivot.localPosition =  - ( reflection.source.lossyScale * GetSpritePivot(reflection.sourceSr.sprite)) + reflection.displacement;
+                    reflection.reflectionPivot.localPosition = -(reflection.source.lossyScale * GetSpritePivot(reflection.sourceSr.sprite)) + reflection.displacement;
                     if (reflection.raymarched) { reflection.reflection.localPosition = Vector3.zero; break; }
-                    else reflection.reflection.localPosition = GetSpritePivot(reflection.reflectionSr.sprite) ;
+                    else reflection.reflection.localPosition = GetSpritePivot(reflection.reflectionSr.sprite);
                     break;
+
                 case ReflectionPivotSourceMode.sprite_pivot:
-                    reflection.reflectionPivot.localPosition = reflection.displacement ;
+                    reflection.reflectionPivot.localPosition = reflection.displacement;
                     reflection.reflection.localPosition = Vector2.zero;
                     break;
+
                 case ReflectionPivotSourceMode.custom_transform:
                     reflection.reflectionPivot.position = (Vector2)reflection.customPivot.position + reflection.displacement;
-                    reflection.reflection.localPosition = (Vector2)reflection.reflectionPivot.position - (Vector2)reflection.customPivot.position ;
+                    reflection.reflection.localPosition = (Vector2)reflection.reflectionPivot.position - (Vector2)reflection.customPivot.position;
                     break;
             }
         }
 
-        #endregion
+        #endregion Updates
 
         #region Pivot
-
 
         private bool IsSpriteFromSpriteSheet(Sprite s)
         {
             if (s.rect.width >= s.texture.width && s.rect.height >= s.texture.height)
                 return false;
             return true;
-
         }
-
 
         public Vector2 GetSpritePivotSpriteSheet(Sprite org)
         {
-
             //sprite sheets
             if (!pivotsSH.ContainsKey(org))
             {
@@ -469,7 +459,7 @@ namespace Water2D
                 for (int i = 0; i < colors.Length; i++)
                     if (colors[i].a > pivotDetectionAlphaTreshold)
                     {
-                        pos = new Vector2(org.rect.width/2f, i / width);
+                        pos = new Vector2(org.rect.width / 2f, i / width);
                         break;
                     }
 
@@ -493,7 +483,6 @@ namespace Water2D
         /// <returns></returns>
         public Vector2 GetSpritePivot(Sprite org)
         {
-
             if (IsSpriteFromSpriteSheet(org))
                 return GetSpritePivotSpriteSheet(org);
 
@@ -507,7 +496,7 @@ namespace Water2D
                 for (int i = 0; i < colors.Length; i++)
                     if (colors[i].a > pivotDetectionAlphaTreshold)
                     {
-                        pos = new Vector2( (float)org.rect.width/2f , i / width);
+                        pos = new Vector2((float)org.rect.width / 2f, i / width);
                         break;
                     }
 
@@ -524,8 +513,6 @@ namespace Water2D
             return pivots[org.texture];
         }
 
-
         #endregion Pivot
     }
-
 }

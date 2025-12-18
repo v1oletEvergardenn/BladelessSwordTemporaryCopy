@@ -57,6 +57,7 @@ public class CameraManager : MonoBehaviour
 
     private void Update()
     {
+        mainCam = Camera.main;
         if (mainCam.TryGetComponent<PixelPerfectCamera>(out PixelPerfectCamera cam))
         {
             if (cam.enabled != desiredPixelPerfectCamState)

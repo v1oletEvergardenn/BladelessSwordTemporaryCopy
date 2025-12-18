@@ -1,5 +1,6 @@
 using DG.Tweening;
 using EditorAttributes;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -7,11 +8,10 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Void = EditorAttributes.Void;
 
-[ExecuteAlways]
-public class HSAbilityUpgradeUI : UIChildNavigate
+public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
 {
-    [ButtonField("CreateConnectionLines", "CreateConnectionLines")] public Void buttonHolder;
     [ButtonField("Show", "Show")] public Void ShowHolder;
     [ButtonField("Hide", "Hide")] public Void HideHolder;
 
@@ -44,19 +44,32 @@ public class HSAbilityUpgradeUI : UIChildNavigate
     public IHeartSwordAbility ability;
     public HeartSwordAbilities hsManager;
 
-    private Color upgradedColor_transparent = new Color(0.56f, 0.82f, 1, 0f);
-    private Color upgradedColor_opaque = new Color(0.56f, 0.82f, 1, 1f);
+    public Color upgradedColor_transparent = new Color(0.56f, 0.82f, 1, 0f);
+    public Color upgradedColor_opaque = new Color(0.56f, 0.82f, 1, 1f);
     private Color normalColor_transparent = new Color(Color.white.r, Color.white.g, Color.white.b, 0f);
-
-    private Color normalColor_opaque = Color.white;
+    public Color glowColor = new Color(0f, 0.42f, 1, 1f);
+    public Color normalColor_opaque = Color.white;
 
     private void Start()
     {
+        if (abilityEnum == HSEnum.None) return;
+        upgradedColor_transparent = upgradedColor_opaque;
+        upgradedColor_transparent.a = 0f;
+        normalColor_transparent = normalColor_opaque;
+        normalColor_transparent.a = 0f;
+
+        GetComponent<Button>().onClick.AddListener(() =>
+        {
+            EventSystem.current.SetSelectedGameObject(origin.gameObject);
+        });
+
+        CreateConnectionLines();
     }
 
     // Update is called once per frame
     private void Update()
     {
+        if (abilityEnum == HSEnum.None) return;
         if (!Application.isPlaying)
         {
             // Only update if lines are created and all references are assigned
@@ -70,6 +83,7 @@ public class HSAbilityUpgradeUI : UIChildNavigate
 
     public void ShowOrHide(bool show)
     {
+        if (abilityEnum == HSEnum.None) return;
         if (!isActiveAndEnabled) return;
         if (show)
         {
@@ -83,6 +97,7 @@ public class HSAbilityUpgradeUI : UIChildNavigate
 
     public override void OnEnable()
     {
+        //if (abilityEnum == HSEnum.None) return;
         if (!Application.isPlaying) hsManager = FindAnyObjectByType<HeartSwordAbilities>();
         else hsManager = HeartSwordAbilities.instance; base.OnEnable();
         if (hsManager == null) return;
@@ -99,6 +114,15 @@ public class HSAbilityUpgradeUI : UIChildNavigate
                 Color _c = img.color;
                 _c.a = 1f;
                 img.color = _c;
+                img.material.SetColor("_GlowColor", glowColor);
+            }
+        }
+        foreach (var lineObj in upgradedLines)
+        {
+            if (lineObj != null)
+            {
+                var img = lineObj.GetComponent<Image>();
+                img.material.SetColor("_GlowColor", glowColor);
             }
         }
         foreach (var img in images)
@@ -108,6 +132,18 @@ public class HSAbilityUpgradeUI : UIChildNavigate
                 Color col = img.color;
                 col.a = 0f;
                 SetColor(img.material, col);
+                img.material.SetColor("_GlowColor", glowColor);
+
+                BackToLastMenu backToMenu;
+                if (TryGetComponent<BackToLastMenu>(out BackToLastMenu _backToMenu))
+                {
+                    backToMenu = _backToMenu;
+                }
+                else
+                {
+                    backToMenu = img.gameObject.AddComponent<BackToLastMenu>();
+                }
+                backToMenu.goBackObject = this.gameObject;
             }
         }
         Color c = abilityName.color;
@@ -117,27 +153,31 @@ public class HSAbilityUpgradeUI : UIChildNavigate
 
     public void LevelUp(int index)
     {
-        ability.Upgrade(index);
+        if (ability.GetUpgradedLevel() >= index) return;
+        if (!ability.Upgrade(index)) return;
         StartCoroutine(ConnectLinesUICoroutine(index - 1, true));
-        print(ability.GetUpgradedLevel());
+        //print(ability.GetUpgradedLevel());
     }
 
     public void UnlockBranch2()
     {
-        ability.UnlockBranch(false);
+        if (ability.IsBranch2Unlocked()) return;
+        if (!ability.UnlockBranch(false)) return;
         StartCoroutine(ConnectLinesUICoroutine(4, true));
-        print("Unlocked branch 2");
+        //print("Unlocked branch 2");
     }
 
     public void UnlockBranch1()
     {
-        ability.UnlockBranch(true);
+        if (ability.IsBranch1Unlocked()) return;
+        if (!ability.UnlockBranch(true)) return;
         StartCoroutine(ConnectLinesUICoroutine(3, true));
-        print("Unlocked branch 1");
+        //print("Unlocked branch 1");
     }
 
     public void UnlockOrigin()
     {
+        if (ability.IsUnlocked()) return;
         ability.Unlock();
         SetColor(origin.material, upgradedColor_opaque);
     }
@@ -145,15 +185,30 @@ public class HSAbilityUpgradeUI : UIChildNavigate
     public IEnumerator ShowCoroutine()
     {
         // Gather all images
-        List<Image> images = new List<Image> { origin, p1, p2, p3, branch1, branch2 };
+        List<Image> images = new List<Image> { p1, p2, p3, branch1, branch2 };
         yield return new WaitForSeconds(0.8f);
+
+        if (ability.IsUnlocked())
+        {
+            origin.color = upgradedColor_opaque; // Add this line
+            SetColor(origin.material, upgradedColor_opaque);
+            SetGlowStrength(origin.material, 2f);
+        }
+        else
+        {
+            SetColor(origin.material, normalColor_transparent);
+            SetGlowStrength(origin.material, 0f);
+        }
+        StartCoroutine(FadeUI(0.5f, origin, true));
 
         for (int i = 0; i < images.Count; i++)
         {
             SetColor(images[i].material, normalColor_transparent);
+
+            SetGlowStrength(images[i].material, 0f);
             StartCoroutine(FadeUI(0.5f, images[i], true));
         }
-        if (ability.IsUnlocked()) SetColor(origin.material, upgradedColor_transparent);
+
         yield return new WaitForSeconds(0.3f);
         yield return StartCoroutine(ConnectLinesUICoroutine(0, false));
         yield return StartCoroutine(ConnectLinesUICoroutine(1, false));
@@ -221,12 +276,13 @@ public class HSAbilityUpgradeUI : UIChildNavigate
         if (isUpgraded)
         {
             elapsed = 0f;
-            duration = 0.1f;
+            duration = 0.2f;
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / duration);
                 SetColor(images[index].material, Color.Lerp(normalColor_opaque, upgradedColor_opaque, t));
+                SetGlowStrength(images[index].material, Mathf.Lerp(0f, 2f, t));
                 yield return null;
             }
         }
@@ -276,9 +332,9 @@ public class HSAbilityUpgradeUI : UIChildNavigate
             Debug.LogWarning("Please assign all Image references before creating connection lines.");
             return;
         }
-        foreach (GameObject line in connectionLines) { DestroyImmediate(line); }
+        foreach (GameObject line in connectionLines) { Destroy(line); }
         connectionLines.Clear();
-        foreach (GameObject line in upgradedLines) { DestroyImmediate(line); }
+        foreach (GameObject line in upgradedLines) { Destroy(line); }
         upgradedLines.Clear();
 
         List<Image> images = new List<Image> { origin, p1, p2, p3, branch1, branch2 };
@@ -286,6 +342,9 @@ public class HSAbilityUpgradeUI : UIChildNavigate
         {
             Material newMat = new Material(mat);
             images[i].material = newMat;
+            images[i].material.SetColor("_GlowColor", glowColor);
+            SetGlowStrength(images[i].material, 0f);
+            SetAlpha(images[i].material, 0);
         }
 
         CreateLineBetween(origin, p1, false);
@@ -374,6 +433,7 @@ public class HSAbilityUpgradeUI : UIChildNavigate
         lineImage.fillMethod = Image.FillMethod.Vertical;
         Material newMat = new Material(mat);
         lineObj.GetComponent<Image>().material = newMat;
+        lineObj.GetComponent<Image>().material.SetColor("_GlowColor", glowColor);
 
         if (isUpgraded)
         {
@@ -384,7 +444,8 @@ public class HSAbilityUpgradeUI : UIChildNavigate
         else
         {
             lineObj.transform.SetAsFirstSibling();
-            SetColor(lineImage.material, normalColor_opaque);
+            SetColor(lineImage.material, normalColor_transparent);
+            SetGlowStrength(lineImage.material, 0f);
         }
 
         RectTransform fromRect = from.rectTransform;
@@ -443,11 +504,31 @@ public class HSAbilityUpgradeUI : UIChildNavigate
     {
         eventData.selectedObject.transform.DOComplete();
         Material mat = eventData.selectedObject.GetComponent<Image>().material;
+
+        float glowStrength = 0f;
+        if (eventData.selectedObject == origin.gameObject)
+        {
+            if (ability.IsUnlocked()) { glowStrength = 2f; }
+        }
+        else
+        {
+            List<Image> images = new List<Image> { p1, p2, p3, branch1, branch2 };
+            int index = images.IndexOf(eventData.selectedObject.GetComponent<Image>());
+            if (index <= 2) if (ability.GetUpgradedLevel() > index) { glowStrength = 2f; }
+            if (index == 3) if (ability.GetUpgradedLevel() >= 3 && ability.IsBranch1Unlocked()) { glowStrength = 2f; }//branch1
+            if (index == 4) if (ability.GetUpgradedLevel() >= 3 && ability.IsBranch2Unlocked()) { glowStrength = 2f; }//branch2
+        }
+
         DOTween.To(
             () => mat.GetFloat("_GlowStrength"),
             x => SetGlowStrength(mat, x),
-            0.1f,
+            glowStrength,
             0.3f
         ).SetEase(Ease.OutQuad);
+    }
+
+    public void GoBack()
+    {
+        MenuManager.instance.CloseHSUpgradeMenu(true);
     }
 }

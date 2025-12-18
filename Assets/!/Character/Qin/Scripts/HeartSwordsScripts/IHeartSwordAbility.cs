@@ -31,7 +31,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     protected int upgradedLevel = 0;
 
     [Space(20)] public Void spaceholder;
-    protected SO_HeartSwordAttribute abilityAttribute;
+    protected int abilityAttributeIndex;
 
     [HideProperty] public bool isPerforming = false;
     [HideProperty] protected bool isEquipped = false;
@@ -136,7 +136,11 @@ public abstract class IHeartSwordAbility : MonoBehaviour
 
     public void SetLockedStates(bool unlocked) => this.unlocked = unlocked;
 
-    public void Unlock() => unlocked = true;
+    public void Unlock()
+    {
+        SetAttribute(0);
+        unlocked = true;
+    }
 
     /// <summary>
     /// Changes the currently equipped ability branch and updates attributes.
@@ -153,9 +157,25 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     public void SetNoneBranch()
     { branchIndex = 0; SetAttribute(commonAttribute); }
 
-    public void SetAttribute(SO_HeartSwordAttribute attribute) => abilityAttribute = attribute;
+    public void SetAttribute(SO_HeartSwordAttribute attribute)
+    {
+        if (attribute == commonAttribute) { SetAttribute(0); }
+        else if (attribute == branch1Attribute) { SetAttribute(1); }
+        else if (attribute == branch2Attribute) { SetAttribute(2); }
+    }
 
-    public SO_HeartSwordAttribute GetCurrentAttribute() => abilityAttribute;
+    public void SetAttribute(int index)
+    {
+        abilityAttributeIndex = index;
+    }
+
+    public SO_HeartSwordAttribute GetCurrentAttribute()
+    {
+        if (abilityAttributeIndex == 0) { return commonAttribute; }
+        else if (abilityAttributeIndex == 1) { return branch1Attribute; }
+        else if (abilityAttributeIndex == 2) { return branch2Attribute; }
+        else return commonAttribute;
+    }
 
     #endregion Branch Management
 
