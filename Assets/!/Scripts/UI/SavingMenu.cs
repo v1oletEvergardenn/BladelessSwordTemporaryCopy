@@ -316,7 +316,7 @@ public class SavingMenu : MonoBehaviour
         yield return new WaitForSeconds(0.4f);
         yield return StartCoroutine(MenuManager.Fade(true));
         Debug.Log($"Creating new game in slot {slot}.");
-        SaveSystem.currentSaveSlot = slot;
+        SaveSystem.SetCurrentSaveSlot(slot);
         // Initialize new game data here
         GameManager.instance.CreateNewGame(slot);
         yield return StartCoroutine(MenuManager.Fade(false));

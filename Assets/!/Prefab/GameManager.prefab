@@ -17466,6 +17466,7 @@ Transform:
   - {fileID: 5027171471582678012}
   - {fileID: 8337936514451963454}
   - {fileID: 8656937359819341745}
+  - {fileID: 2871826186364804641}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7793295186504432712
@@ -33293,6 +33294,52 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &4685082298502403929
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2871826186364804641}
+  - component: {fileID: 657422745798615780}
+  m_Layer: 0
+  m_Name: StoreManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2871826186364804641
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4685082298502403929}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7465553223938533007}
+  m_Father: {fileID: 584282488413863748}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &657422745798615780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4685082298502403929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3966cf88a5c1eab48bee6fe31656af43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  yinYangFishStore: {fileID: 7134186740990812165}
 --- !u!1 &4697182977616631305
 GameObject:
   m_ObjectHideFlags: 0
@@ -61021,7 +61068,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff414a7047fa7a43aa3b6bd8cd8154a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currency: 10
+  currency: 200
 --- !u!1 &8772022728478394090
 GameObject:
   m_ObjectHideFlags: 0
@@ -67681,6 +67728,63 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &9153586976918948429
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7465553223938533007}
+  - component: {fileID: 7134186740990812165}
+  m_Layer: 0
+  m_Name: YinyangfishStore__TEST
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7465553223938533007
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9153586976918948429}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2871826186364804641}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7134186740990812165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9153586976918948429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee179a7053d7a84ba72b26553fae596, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemsForSale:
+  - {fileID: 11400000, guid: 9866fec0db19f344c9b843a6ba9ac786, type: 2}
+  - {fileID: 11400000, guid: 4f74be8429f2a684f8a0243db4cde690, type: 2}
+  - {fileID: 11400000, guid: 51a46e357f4a47b4396adcd0b70ed72a, type: 2}
+  - {fileID: 11400000, guid: 02744c3c264c76847a6699d48a11e02d, type: 2}
+  - {fileID: 11400000, guid: adfae6fbeb650a24d87abc356c0526ed, type: 2}
+  - {fileID: 11400000, guid: f974197ee8768904e8404c43fc4dfc4e, type: 2}
+  - {fileID: 11400000, guid: b31150176053fe74da29f2f705bd436e, type: 2}
+  - {fileID: 11400000, guid: 9a83b1237546d274ca7bf9fe182d2ac4, type: 2}
+  - {fileID: 11400000, guid: 76f7c56d146fba44c8e8142170df8cf4, type: 2}
+  - {fileID: 11400000, guid: 8874ca190f2ef48438c542a47417f50b, type: 2}
+  - {fileID: 11400000, guid: 31e00197a66c69c4689932cedeefb546, type: 2}
+  remainingQuantities: 10000000ffffffff220000000700000018000000ffffffff150000002f000000040000000d000000ffffffff
 --- !u!1 &9160190255805660286
 GameObject:
   m_ObjectHideFlags: 0

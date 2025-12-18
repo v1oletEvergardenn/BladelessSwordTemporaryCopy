@@ -6,8 +6,18 @@ using UnityEngine.SceneManagement;
 
 public class SaveSystem
 {
-    public static int currentSaveSlot = 0;
+    private static int currentSaveSlot = 0;
     public static SaveData _saveData = new SaveData();
+
+    public static void SetCurrentSaveSlot(int slot)
+    {
+        currentSaveSlot = slot;
+    }
+
+    public static int GetCurrentSaveSlot()
+    {
+        return currentSaveSlot;
+    }
 
     // Returns the full path for a given slot index
     public static string SaveFileName(int slot)
@@ -42,6 +52,8 @@ public class SaveSystem
         PlayerSave.instance.Save(ref _saveData.playerData);
         PlayerSave.instance.Save(ref _saveData.levelData);
         PlayerSave.instance.Save(ref _saveData.heartSwordData);
+        CurrencyManager.instance.Save(ref _saveData.currencyData);
+        StoreManager.instance.Save(ref _saveData.storeData);
         Debug.Log("saving at slot" + currentSaveSlot);
     }
 
@@ -77,6 +89,9 @@ public class SaveSystem
     {
         SceneManager.LoadScene(_saveData.levelData.lastSavedScene);
         GameManager.instance.LoadPlayer();
+
+        CurrencyManager.instance.Load(_saveData.currencyData);
+        StoreManager.instance.Load(_saveData.storeData);
     }
 }
 
@@ -88,5 +103,7 @@ public struct SaveData
     public HeartSwordSaveData heartSwordData;
     public int autoSaveSlot;
     public bool newGameCreated;
+    public CurrencySaveData currencyData;
+    public StoreSaveData storeData;
     // Add other game data here as needed
 }

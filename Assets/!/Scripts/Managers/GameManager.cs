@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
         if (SceneManager.GetActiveScene().name != "MainMenu" &&
             SceneManager.GetActiveScene().name != "PreLoad")
         {
-            SaveSystem.currentSaveSlot = -1;
+            //SaveSystem.SetCurrentSaveSlot(-1);
             if (CharacterController2D.instance != null) CreatePlayerReference(CharacterController2D.instance.gameObject);
             else CreateNewPlayer();
         }
@@ -139,7 +139,7 @@ public class GameManager : MonoBehaviour
     public void CreateNewGame(int slot)
     {
         //created new Game
-        SaveSystem.currentSaveSlot = slot;
+        SaveSystem.SetCurrentSaveSlot(slot);
         CreateNewPlayer();
         SceneManager.LoadScene("YingYangFish_Scene");
         InputMaster.SwitchToGameplayAction();

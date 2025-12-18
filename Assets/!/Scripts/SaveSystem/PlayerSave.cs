@@ -36,16 +36,12 @@ public struct HeartSwordSaveData
 [System.Serializable]
 public struct HSAblitySaveData
 {
-    public int branchIndex;
     public bool unlocked;
     public bool toggleToActivate;
-    public List<HSAblityBranchSaveData> branches;
-}
-
-[System.Serializable]
-public struct HSAblityBranchSaveData
-{
-    public bool unlocked;
+    public int upgradeLevel;
+    public int branchIndex;
+    public bool branch1unlocked;
+    public bool branch2unlocked;
 }
 
 public class PlayerSave : MonoBehaviour

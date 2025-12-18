@@ -4,27 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-[System.Serializable]
-public struct StoreItem
-{
-    public TradeItemSO item;
-    [Range(-1, 50)] public int quantity; // Set in Inspector: -1 means infinite, otherwise finite
-}
-
 public class Store : MonoBehaviour
 {
-    [SerializeField] public StoreItem[] itemsForSale;
-    [HideInInspector] public int[] remainingQuantities;
-
-    private void Awake()
-    {
-        remainingQuantities = new int[itemsForSale.Length];
-        for (int i = 0; i < itemsForSale.Length; i++)
-        {
-            // If quantity is -1, treat as infinite (store as -1)
-            remainingQuantities[i] = itemsForSale[i].quantity;
-        }
-    }
+    public StoreEnum store;
+    public int[] remainingQuantities => StoreManager.GetStore(store).remainingQuantities;
+    public TradeItemSO[] itemsForSale => StoreManager.GetStore(store).itemsForSale;
 
     // Call this to display store UI and available items
     public void OpenStore()
@@ -46,14 +30,14 @@ public class Store : MonoBehaviour
             Debug.LogWarning("Invalid item index.");
             return;
         }
-        TradeItemSO item = itemsForSale[itemIndex].item;
+        TradeItemSO item = itemsForSale[itemIndex];
         if (IsSoldOut(itemIndex) || !CurrencyManager.instance.hasEnoughCurrency(item.price))
         {
             btn.Fail();
             Debug.LogWarning("Not enough currency or item sold out.");
             return;
         }
-        WarningSystem.ShowWarning($"Are you sure you want to buy {itemsForSale[itemIndex].item.name}?",
+        WarningSystem.ShowWarning($"Are you sure you want to buy {itemsForSale[itemIndex].name}?",
             () => CurrencyManager.instance.TryBuyItem(item, btn, this));
     }
 
@@ -88,7 +72,7 @@ public class Store : MonoBehaviour
 
     public bool SellItem(int itemIndex)
     {
-        TradeItemSO item = itemsForSale[itemIndex].item;
+        TradeItemSO item = itemsForSale[itemIndex];
 
         // Only decrement if not infinite
         if (remainingQuantities[itemIndex] != -1)
@@ -144,6 +128,6 @@ public class Store : MonoBehaviour
     public TradeItemSO GetItem(int itemIndex)
     {
         if (itemIndex < 0 || itemIndex >= itemsForSale.Length) return null;
-        return itemsForSale[itemIndex].item;
+        return itemsForSale[itemIndex];
     }
 }

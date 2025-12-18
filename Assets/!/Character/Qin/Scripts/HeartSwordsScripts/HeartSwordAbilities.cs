@@ -25,7 +25,7 @@ public class HeartSwordAbilities : MonoBehaviour
     [SerializeField, HideProperty] public HS_CriticalSlash hs_CriticalSlash;
     [SerializeField, HideProperty] public HS_CounterAttack hs_CounterAttack;
     [SerializeField, HideProperty] public HS_SlashWave hs_SlashWave;
-    [HideProperty] public List<IHeartSwordAbility> allAbilities = new List<IHeartSwordAbility>();
+    [HideProperty] public List<IHeartSwordAbility> allAbilities = new List<IHeartSwordAbility>();//add all abilities here
 
     [GUIColor(GUIColor.Lime)]
     [FoldoutGroup("HeartSword Abilities", nameof(maxHS_point),
@@ -320,7 +320,9 @@ public class HeartSwordAbilities : MonoBehaviour
                 branchIndex = ability.GetBranchIndex(),
                 unlocked = ability.IsUnlocked(),
                 toggleToActivate = ability.toggleToActivate,
-                branches = new List<HSAblityBranchSaveData>()
+                upgradeLevel = ability.GetUpgradedLevel(),
+                branch1unlocked = ability.IsBranch1Unlocked(),
+                branch2unlocked = ability.IsBranch2Unlocked(),
             };
             data.hsAbilities.Add(abilityData);
         }
@@ -336,13 +338,12 @@ public class HeartSwordAbilities : MonoBehaviour
         EquipAbility(GetWestAbility(), AbilitySlot.West, true);
         for (int i = 0; i < allAbilities.Count; i++)
         {
-            //allAbilities[i].ChangeBranch(data.hsAbilities[i].branchIndex);
+            allAbilities[i].ChangeBranch(data.hsAbilities[i].branchIndex);
             allAbilities[i].SetLockedStates(data.hsAbilities[i].unlocked);
             allAbilities[i].toggleToActivate = data.hsAbilities[i].toggleToActivate;
-            //for (int j = 0; j < allAbilities[i].GetBranches().Count; j++)
-            //{
-            //allAbilities[i].GetBranches()[j].learned = data.hsAbilities[i].branches[j].learned;
-            //}
+            allAbilities[i].SetUpgradeLevel(data.hsAbilities[i].upgradeLevel);
+            allAbilities[i].SetBranch1LockedStates(data.hsAbilities[i].branch1unlocked);
+            allAbilities[i].SetBranch2LockedStates(data.hsAbilities[i].branch2unlocked);
         }
     }
 

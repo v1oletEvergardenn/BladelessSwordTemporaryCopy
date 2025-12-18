@@ -1,5 +1,11 @@
 using UnityEngine;
 
+[System.Serializable]
+public struct CurrencySaveData
+{
+    public int currency;
+}
+
 public class CurrencyManager : MonoBehaviour
 {
     public static CurrencyManager instance;
@@ -8,6 +14,16 @@ public class CurrencyManager : MonoBehaviour
     private int currency = 0;
 
     public int Currency => currency;
+
+    public void Save(ref CurrencySaveData saveData)
+    {
+        saveData.currency = currency;
+    }
+
+    public void Load(CurrencySaveData saveData)
+    {
+        currency = saveData.currency;
+    }
 
     private void Awake()
     {

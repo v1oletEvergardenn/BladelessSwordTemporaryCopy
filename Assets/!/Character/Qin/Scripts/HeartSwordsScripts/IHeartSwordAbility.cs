@@ -134,6 +134,12 @@ public abstract class IHeartSwordAbility : MonoBehaviour
 
     public bool IsUnlocked() => unlocked;
 
+    public void SetUpgradeLevel(int level) => upgradedLevel = level;
+
+    public void SetBranch1LockedStates(bool unlocked) => unlockedBranch1 = unlocked;
+
+    public void SetBranch2LockedStates(bool unlocked) => unlockedBranch2 = unlocked;
+
     public void SetLockedStates(bool unlocked) => this.unlocked = unlocked;
 
     public void Unlock()
