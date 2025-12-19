@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
+//using Unity.VisualScripting;
+
 namespace Microlight.MicroBar
 {
     // ****************************************************************************************************
@@ -13,138 +15,146 @@ namespace Microlight.MicroBar
     public class SimpleMicroBar
     {
         // General
-        [SerializeField] RenderType _renderType;
+        [SerializeField] private RenderType _renderType;
+
         internal RenderType RenderType => _renderType;
-        [SerializeField] bool _isAnimated = true;   // Will the bar be animated
+        [SerializeField] private bool _isAnimated = true;   // Will the bar be animated
         internal bool IsAnimated => _isAnimated;
 
         // SpriteRenderer
-        [SerializeField] SpriteRenderer _srBackground;
+        [SerializeField] private SpriteRenderer _srBackground;
+
         internal SpriteRenderer SRBackground => _srBackground;
-        [SerializeField] SpriteRenderer _srPrimaryBar;
+        [SerializeField] private SpriteRenderer _srPrimaryBar;
         internal SpriteRenderer SRPrimaryBar => _srPrimaryBar;
         internal SpriteMask SRPrimaryBarMask { get; private set; }
-        [SerializeField] SpriteRenderer _srGhostBar;
+        [SerializeField] private SpriteRenderer _srGhostBar;
         internal SpriteRenderer SRGhostBar => _srGhostBar;
         internal SpriteMask SRGhostBarMask { get; private set; }
 
         // Image
-        [SerializeField] Image _uiBackground;
+        [SerializeField] private Image _uiBackground;
+
         internal Image UIBackground => _uiBackground;
-        [SerializeField] Image _uiPrimaryBar;
+        [SerializeField] private Image _uiPrimaryBar;
         internal Image UIPrimaryBar => _uiPrimaryBar;
-        [SerializeField] Image _uiGhostBar;
+        [SerializeField] private Image _uiGhostBar;
         internal Image UIGhostBar => _uiGhostBar;
 
         // Colors
-        [SerializeField] bool _adaptiveColor = true;   // Does health bar uses adaptive color based on current hp
+        [SerializeField] private bool _adaptiveColor = true;   // Does health bar uses adaptive color based on current hp
+
         internal bool AdaptiveColor => _adaptiveColor;
-        [SerializeField] Color _barPrimaryColor = new Color(1f, 1f, 1f);   // Color of the main health bar, also used as a color for full health in adaptive color
+        [SerializeField] private Color _barPrimaryColor = new Color(1f, 1f, 1f);   // Color of the main health bar, also used as a color for full health in adaptive color
         internal Color BarPrimaryColor => _barPrimaryColor;
-        [SerializeField] Color _barAdaptiveColor = new Color(1f, 0f, 0f);   // Color that health changes to as it gets lower
+        [SerializeField] private Color _barAdaptiveColor = new Color(1f, 0f, 0f);   // Color that health changes to as it gets lower
         internal Color BarAdaptiveColor => _barAdaptiveColor;
 
         // Ghost bar
-        [SerializeField] bool _useGhostBar = true;   // Is ghost bar used
+        [SerializeField] private bool _useGhostBar = true;   // Is ghost bar used
+
         internal bool UseGhostBar => IsAnimated && _useGhostBar;
-        [SerializeField] bool _dualGhostBars = false;   // Are ghost bars two separate bars for healing and damaging or single bar for both
+        [SerializeField] private bool _dualGhostBars = false;   // Are ghost bars two separate bars for healing and damaging or single bar for both
         internal bool DualGhostBars => UseGhostBar && _dualGhostBars;
-        [SerializeField] Color _ghostBarDamageColor = new Color(1f, 0f, 0f);   // Color of ghost bar in single mode and when hurt in dual mode
+        [SerializeField] private Color _ghostBarDamageColor = new Color(1f, 0f, 0f);   // Color of ghost bar in single mode and when hurt in dual mode
         internal Color GhostBarDamageColor => _ghostBarDamageColor;
-        [SerializeField] Color _ghostBarHealColor = new Color(1f, 1f, 1f);   // Color of ghost bar when healed
+        [SerializeField] private Color _ghostBarHealColor = new Color(1f, 1f, 1f);   // Color of ghost bar when healed
         internal Color GhostBarHealColor => _ghostBarHealColor;
 
         // Duplicate fields are here to have more control over how they are displayed in editor
         // Putting them in separate class/field only makes things uglier
         // Damage Animation
-        [SerializeField] SimpleAnim _damageAnim;   // Type of animation that will be played when the bar is damaged
+        [SerializeField] private SimpleAnim _damageAnim;   // Type of animation that will be played when the bar is damaged
+
         internal SimpleAnim DamageAnim => _damageAnim;
-        [SerializeField][Range(0.01f, 1f)] float _damageAnimDuration = 0.5f;   // Duration of the animation
+        [SerializeField][Range(0.01f, 1f)] private float _damageAnimDuration = 0.5f;   // Duration of the animation
         internal float DamageAnimDuration => _damageAnimDuration;
-        [SerializeField][Range(0f, 1f)] float _damageAnimDelay = 0f;   // How long will animation wait before following ghost bar
+        [SerializeField][Range(0f, 1f)] private float _damageAnimDelay = 0f;   // How long will animation wait before following ghost bar
         internal float DamageAnimDelay => _damageAnimDelay;
-        [SerializeField] Color _damageFlashColor = new Color(1f, 1f, 1f, 1f);
+        [SerializeField] private Color _damageFlashColor = new Color(1f, 1f, 1f, 1f);
         internal Color DamageFlashColor => _damageFlashColor;
-        [SerializeField][Range(0f, 1f)] float _damageAnimStrength = 0.5f;
+        [SerializeField][Range(0f, 1f)] private float _damageAnimStrength = 0.5f;
         internal float DamageAnimStrength => _damageAnimStrength;
 
         // Heal Animation
-        [SerializeField] SimpleAnim _healAnim;   // Type of animation that will be played when the bar is healed
+        [SerializeField] private SimpleAnim _healAnim;   // Type of animation that will be played when the bar is healed
+
         internal SimpleAnim HealAnim => _healAnim;
-        [SerializeField][Range(0.01f, 1f)] float _healAnimDuration = 0.5f;   // Duration of the animation
+        [SerializeField][Range(0.01f, 1f)] private float _healAnimDuration = 0.5f;   // Duration of the animation
         internal float HealAnimDuration => _healAnimDuration;
-        [SerializeField][Range(0f, 1f)] float _healAnimDelay = 0f;   // Delay before animation starts playing
+        [SerializeField][Range(0f, 1f)] private float _healAnimDelay = 0f;   // Delay before animation starts playing
         internal float HealAnimDelay => _healAnimDelay;
-        [SerializeField] Color _healFlashColor = new Color(1f, 1f, 1f, 1f);
+        [SerializeField] private Color _healFlashColor = new Color(1f, 1f, 1f, 1f);
         internal Color HealFlashColor => _healFlashColor;
-        [SerializeField][Range(0f, 1f)] float _healAnimStrength = 0.5f;
+        [SerializeField][Range(0f, 1f)] private float _healAnimStrength = 0.5f;
         internal float HealAnimStrength => _healAnimStrength;
 
         // Variables
         internal MicroBar ParentBar { get; private set; }
-        Sequence sequence;   // Sequence for animations
+
+        private Sequence sequence;   // Sequence for animations
         public Sequence Sequence => sequence;
 
         internal bool Initialize(MicroBar bar)
         {
-            if(RenderType == RenderType.Image)
+            if (RenderType == RenderType.Image)
             {
-                if(UIBackground == null)
+                if (UIBackground == null)
                 {
                     Debug.LogError("[MicroBar] RenderType set to 'Image' but 'UIBackground' is null");
                     return false;
                 }
-                if(UIPrimaryBar == null)
+                if (UIPrimaryBar == null)
                 {
                     Debug.LogError("[MicroBar] RenderType set to 'Image' but 'UIPrimaryBar' is null");
                     return false;
                 }
-                if(UseGhostBar && UIGhostBar == null)
+                if (UseGhostBar && UIGhostBar == null)
                 {
                     Debug.LogError("[MicroBar] RenderType set to 'Image' but 'UIGhostBar' is null");
                     return false;
                 }
             }
-            if(RenderType == RenderType.Sprite)
+            if (RenderType == RenderType.Sprite)
             {
-                if(SRBackground == null)
+                if (SRBackground == null)
                 {
                     Debug.LogError("[MicroBar] RenderType set to 'Sprite' but 'SRBackground' is null");
                     return false;
                 }
-                if(SRPrimaryBar == null)
+                if (SRPrimaryBar == null)
                 {
                     Debug.LogError("[MicroBar] RenderType set to 'Sprite' but 'SRPrimaryBar' is null");
                     return false;
                 }
                 else
                 {
-                    if(SRPrimaryBar.GetComponent<SortingGroup>() == null)
+                    if (SRPrimaryBar.GetComponent<SortingGroup>() == null)
                     {
                         Debug.LogError("[MicroBar] Couldn't find the 'SortingGroup' for the 'SRPrimaryBar'");
                         return false;
                     }
                     SRPrimaryBarMask = SRPrimaryBar.GetComponentInChildren<SpriteMask>();
-                    if(SRPrimaryBarMask == null)
+                    if (SRPrimaryBarMask == null)
                     {
                         Debug.LogError("[MicroBar] Couldn't find the 'SpriteMask' for the 'SRPrimaryBar'");
                         return false;
                     }
                 }
-                if(UseGhostBar && SRGhostBar == null)
+                if (UseGhostBar && SRGhostBar == null)
                 {
                     Debug.LogError("[MicroBar] RenderType set to 'Sprite' but 'SRGhostBar' is null");
                     return false;
                 }
-                else if(UseGhostBar)
+                else if (UseGhostBar)
                 {
-                    if(SRGhostBar.GetComponent<SortingGroup>() == null)
+                    if (SRGhostBar.GetComponent<SortingGroup>() == null)
                     {
                         Debug.LogError("[MicroBar] Couldn't find the 'SortingGroup' for the 'SRPrimaryBar'");
                         return false;
                     }
                     SRGhostBarMask = SRGhostBar.GetComponentInChildren<SpriteMask>();
-                    if(SRGhostBarMask == null)
+                    if (SRGhostBarMask == null)
                     {
                         Debug.LogError("[MicroBar] Couldn't find the 'SpriteMask' for the 'SRGhostBar'");
                         return false;
@@ -161,16 +171,16 @@ namespace Microlight.MicroBar
         }
 
         // Sets some starting values
-        void InitializeValues()
+        private void InitializeValues()
         {
             bool isSprite = RenderType == RenderType.Sprite;
 
             SilentUpdate();
 
             // Update colors
-            if(!AdaptiveColor)   // Adaptive color is handled through silent update
+            if (!AdaptiveColor)   // Adaptive color is handled through silent update
             {
-                if(isSprite)
+                if (isSprite)
                 {
                     SRPrimaryBar.color = BarPrimaryColor;
                 }
@@ -181,20 +191,20 @@ namespace Microlight.MicroBar
             }
 
             // Ghost bar
-            if(!UseGhostBar)
+            if (!UseGhostBar)
             {
-                if(SRGhostBar != null)
+                if (SRGhostBar != null)
                 {
                     SRGhostBar.gameObject.SetActive(false);
                 }
-                if(UIGhostBar != null)
+                if (UIGhostBar != null)
                 {
                     UIGhostBar.gameObject.SetActive(false);
                 }
             }
-            else if(!DualGhostBars)
+            else if (!DualGhostBars)
             {
-                if(isSprite)
+                if (isSprite)
                 {
                     SRGhostBar.color = GhostBarDamageColor;
                 }
@@ -206,10 +216,10 @@ namespace Microlight.MicroBar
         }
 
         // animationType is there only to connect to the event, but is not actually connected
-        void Update(bool skipAnimation, UpdateAnim animationType)
+        private void Update(bool skipAnimation, UpdateAnim animationType)
         {
             // Always kill when bar is updating, because we dont want to have for example active damage animation if heal animation is active
-            if(sequence.IsActive())
+            if (sequence.IsActive())
             {
                 sequence.Kill();
                 sequence = null;
@@ -218,7 +228,7 @@ namespace Microlight.MicroBar
             // Decide if animation should be skipped
             bool isHealAnimation = ParentBar.CurrentValue > ParentBar.PreviousValue;
             SimpleAnim animToBePlayed = isHealAnimation ? HealAnim : DamageAnim;
-            if(skipAnimation || !IsAnimated || animToBePlayed == SimpleAnim.None)
+            if (skipAnimation || !IsAnimated || animToBePlayed == SimpleAnim.None)
             {
                 SilentUpdate();
                 return;
@@ -228,45 +238,45 @@ namespace Microlight.MicroBar
         }
 
         // Silently updates bars to the values without animating
-        void SilentUpdate()
+        private void SilentUpdate()
         {
-            if(ParentBar == null)
+            if (ParentBar == null)
             {
                 Debug.LogError("[MicroBar] Missing reference to the 'ParentBar'");
                 return;
             }
 
-            if(RenderType == RenderType.Image)
+            if (RenderType == RenderType.Image)
             {
                 UIPrimaryBar.fillAmount = ParentBar.HPPercent;
-                if(UseGhostBar)
+                if (UseGhostBar)
                 {
                     UIGhostBar.fillAmount = ParentBar.HPPercent;
                 }
             }
-            else if(RenderType == RenderType.Sprite)
+            else if (RenderType == RenderType.Sprite)
             {
                 SRPrimaryBarMask.transform.localScale = new Vector3(ParentBar.HPPercent, SRPrimaryBarMask.transform.localScale.y, SRPrimaryBarMask.transform.localScale.z);
-                if(UseGhostBar)
+                if (UseGhostBar)
                 {
                     SRGhostBarMask.transform.localScale = new Vector3(ParentBar.HPPercent, SRGhostBarMask.transform.localScale.y, SRGhostBarMask.transform.localScale.z);
                 }
             }
 
-            if(AdaptiveColor)
+            if (AdaptiveColor)
             {
                 SimpleAnimBuilder.SetAdaptiveBarColor(this, false);
             }
 
-            if(DualGhostBars)
+            if (DualGhostBars)
             {
                 SimpleAnimBuilder.SetGhostBarColor(this);
             }
         }
 
-        void Destroy()
+        private void Destroy()
         {
-            if(sequence.IsActive())
+            if (sequence.IsActive())
             {
                 sequence.Kill();
                 sequence = null;

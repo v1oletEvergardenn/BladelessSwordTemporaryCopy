@@ -283,6 +283,7 @@ public class MenuManager : MonoBehaviour
         currentIndexTab = 0;
         HeartSwordAbilities.instance.SwitchToHSUpgradeCamera();
         Health.instance.SetCharacterUI(false);
+
         InputMaster.SwitchToUIAction();
 
         HSAbilityUpgradeMenu.SetActive(true);

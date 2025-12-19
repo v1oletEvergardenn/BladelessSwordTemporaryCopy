@@ -14,27 +14,27 @@ namespace FastScriptReload.Editor.NewFields
     public class NewFieldsRendererDefaultEditorPatch
     {
         private static List<string> _cachedKeys = new List<string>();
-        
+
         static NewFieldsRendererDefaultEditorPatch()
         {
             if ((bool)FastScriptReloadPreference.EnableExperimentalAddedFieldsSupport.GetEditorPersistedValueOrDefault())
             {
                 var harmony = new Harmony(nameof(NewFieldsRendererDefaultEditorPatch));
-            
+
                 var renderAdditionalFieldsOnOptimizedGuiPostfix = AccessTools.Method(typeof(NewFieldsRendererDefaultEditorPatch), nameof(OnOptimizedInspectorGUI));
-                var noCustomEditorOriginalRenderingMethdod =  AccessTools.Method("UnityEditor.GenericInspector:OnOptimizedInspectorGUI");
+                var noCustomEditorOriginalRenderingMethdod = AccessTools.Method("UnityEditor.GenericInspector:OnOptimizedInspectorGUI");
                 harmony.Patch(noCustomEditorOriginalRenderingMethdod, postfix: new HarmonyMethod(renderAdditionalFieldsOnOptimizedGuiPostfix));
-            
+
                 var renderAdditionalFieldsDrawDefaultInspectorPostfix = AccessTools.Method(typeof(NewFieldsRendererDefaultEditorPatch), nameof(DrawDefaultInspector));
                 var customEditorRenderingMethod = AccessTools.Method("UnityEditor.Editor:DrawDefaultInspector");
-                harmony.Patch(customEditorRenderingMethod, postfix: new HarmonyMethod(renderAdditionalFieldsDrawDefaultInspectorPostfix)); 
+                harmony.Patch(customEditorRenderingMethod, postfix: new HarmonyMethod(renderAdditionalFieldsDrawDefaultInspectorPostfix));
 
-#if ODIN_INSPECTOR
-                // Odin Inspector support
-                var renderAdditionalFieldsDrawOdinInspectorPostfix = AccessTools.Method(typeof(NewFieldsRendererDefaultEditorPatch), nameof(DrawOdinInspector));
-                var customOdinEditorRenderingMethod = AccessTools.Method("Sirenix.OdinInspector.Editor.OdinEditor:DrawOdinInspector");
-                harmony.Patch(customOdinEditorRenderingMethod, postfix: new HarmonyMethod(renderAdditionalFieldsDrawOdinInspectorPostfix));
-#endif
+                //#if ODIN_INSPECTOR
+                //                // Odin Inspector support
+                //                var renderAdditionalFieldsDrawOdinInspectorPostfix = AccessTools.Method(typeof(NewFieldsRendererDefaultEditorPatch), nameof(DrawOdinInspector));
+                //                var customOdinEditorRenderingMethod = AccessTools.Method("Sirenix.OdinInspector.Editor.OdinEditor:DrawOdinInspector");
+                //                harmony.Patch(customOdinEditorRenderingMethod, postfix: new HarmonyMethod(renderAdditionalFieldsDrawOdinInspectorPostfix));
+                //#endif
             }
         }
 
@@ -42,7 +42,7 @@ namespace FastScriptReload.Editor.NewFields
         {
             RenderNewlyAddedFields(__instance);
         }
-        
+
         private static void DrawDefaultInspector(UnityEditor.Editor __instance)
         {
             RenderNewlyAddedFields(__instance);
@@ -70,10 +70,10 @@ namespace FastScriptReload.Editor.NewFields
                         var newFieldNameToGetTypeFn = CreateNewFieldInitMethodRewriter.ResolveNewFieldsToTypeFn(
                             AssemblyChangesLoader.Instance.GetRedirectedType(__instance.target.GetType())
                         );
-                        
-                        if(newFieldNameToGetTypeFn.Count == 0)
+
+                        if (newFieldNameToGetTypeFn.Count == 0)
                             return;
-                        
+
                         foreach (var addedFieldValueKey in _cachedKeys)
                         {
                             var newFieldType = (Type)newFieldNameToGetTypeFn[addedFieldValueKey]();
@@ -111,7 +111,6 @@ namespace FastScriptReload.Editor.NewFields
                             {
                                 addedFieldValues[addedFieldValueKey] = EditorGUILayout.ObjectField(new GUIContent(addedFieldValueKey), (UnityEngine.Object)addedFieldValues[addedFieldValueKey], newFieldType, __instance.target);
                             }
-
                             else
                             {
                                 EditorGUILayout.BeginHorizontal();

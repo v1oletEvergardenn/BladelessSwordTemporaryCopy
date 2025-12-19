@@ -1,6 +1,9 @@
 using DG.Tweening;
+using DG.Tweening.Core;
 using UnityEngine;
 using UnityEngine.UI;
+
+//using Unity.VisualScripting;
 
 namespace Microlight.MicroBar
 {
@@ -21,25 +24,29 @@ namespace Microlight.MicroBar
             // Decide to take heal or damage animation
             SimpleAnim anim = bar.DamageAnim;
             bool isHealAnimation = bar.ParentBar.CurrentValue > bar.ParentBar.PreviousValue;
-            if(isHealAnimation)
+            if (isHealAnimation)
             {
                 anim = bar.HealAnim;
             }
 
             // Decide which animation to create
-            switch(anim)
+            switch (anim)
             {
                 case SimpleAnim.None:
                     break;
+
                 case SimpleAnim.Fill:
                     FillAnim(bar, sequence);
                     break;
+
                 case SimpleAnim.Flash:
                     FlashAnim(bar, sequence);
                     break;
+
                 case SimpleAnim.Shake:
                     ShakeAnim(bar, sequence);
                     break;
+
                 default:
                     Debug.LogError($"[MicroBar] Unknown 'SimpleAnim': {anim}");
                     break;
@@ -49,20 +56,21 @@ namespace Microlight.MicroBar
         }
 
         #region Animation
+
         // **************************************************
         // Animations
         // **************************************************
 
         // Creates animation which just fills the bar to the value
-        static void FillAnim(SimpleMicroBar bar, Sequence sequence)
+        private static void FillAnim(SimpleMicroBar bar, Sequence sequence)
         {
             bool isHealAnimation = bar.ParentBar.CurrentValue > bar.ParentBar.PreviousValue;
             bool isSprite = bar.RenderType == RenderType.Sprite;
 
             // Prepare the bar values before the animation
-            if(bar.UseGhostBar)
+            if (bar.UseGhostBar)
             {
-                if(isHealAnimation)
+                if (isHealAnimation)
                 {
                     SetGhostBarValue(bar);
                 }
@@ -80,7 +88,7 @@ namespace Microlight.MicroBar
             float animDelay;
 
             // Decide timings
-            if(isHealAnimation)
+            if (isHealAnimation)
             {
                 animDuration = bar.HealAnimDuration;
                 animDelay = bar.HealAnimDelay;
@@ -92,15 +100,15 @@ namespace Microlight.MicroBar
             }
 
             // Decide which graphics to control and create animation
-            if(isSprite)
+            if (isSprite)
             {
-                if(isHealAnimation)
+                if (isHealAnimation)
                 {
                     srBarToAnimate = bar.SRPrimaryBarMask.transform;
                 }
                 else
                 {
-                    if(bar.UseGhostBar)
+                    if (bar.UseGhostBar)
                     {
                         srBarToAnimate = bar.SRGhostBarMask.transform;
                     }
@@ -114,13 +122,13 @@ namespace Microlight.MicroBar
             }
             else
             {
-                if(isHealAnimation)
+                if (isHealAnimation)
                 {
                     uiBarToAnimate = bar.UIPrimaryBar;
                 }
                 else
                 {
-                    if(bar.UseGhostBar)
+                    if (bar.UseGhostBar)
                     {
                         uiBarToAnimate = bar.UIGhostBar;
                     }
@@ -134,22 +142,22 @@ namespace Microlight.MicroBar
             }
 
             // Adaptive color support
-            if(bar.AdaptiveColor)
+            if (bar.AdaptiveColor)
             {
                 sequence.OnUpdate(() => SetAdaptiveBarColor(bar));
             }
         }
 
         // Creates animation which first flashes the bar and then fills it to the value
-        static void FlashAnim(SimpleMicroBar bar, Sequence sequence)
+        private static void FlashAnim(SimpleMicroBar bar, Sequence sequence)
         {
             bool isHealAnimation = bar.ParentBar.CurrentValue > bar.ParentBar.PreviousValue;
             bool isSprite = bar.RenderType == RenderType.Sprite;
 
             // Prepare the bar values before the animation
-            if(bar.UseGhostBar)
+            if (bar.UseGhostBar)
             {
-                if(isHealAnimation)
+                if (isHealAnimation)
                 {
                     SetGhostBarValue(bar);
                 }
@@ -165,7 +173,7 @@ namespace Microlight.MicroBar
             Color ghostBarColor = SetGhostBarColor(bar);
 
             // Decide colors
-            if(isHealAnimation)
+            if (isHealAnimation)
             {
                 flashColor = bar.HealFlashColor;
             }
@@ -175,9 +183,9 @@ namespace Microlight.MicroBar
             }
 
             // Set bars to the flash color
-            if(bar.RenderType == RenderType.Sprite)
+            if (bar.RenderType == RenderType.Sprite)
             {
-                if(bar.UseGhostBar)
+                if (bar.UseGhostBar)
                 {
                     bar.SRGhostBar.color = flashColor;
                 }
@@ -185,7 +193,7 @@ namespace Microlight.MicroBar
             }
             else
             {
-                if(bar.UseGhostBar)
+                if (bar.UseGhostBar)
                 {
                     bar.UIGhostBar.color = flashColor;
                 }
@@ -199,7 +207,7 @@ namespace Microlight.MicroBar
             float fillAnimDelay;
             float animDelay;
 
-            if(isHealAnimation)
+            if (isHealAnimation)
             {
                 flashAnimDuration = bar.HealAnimDuration * 0.7f;
                 fillAnimDuration = bar.HealAnimDuration * 0.7f;
@@ -214,15 +222,15 @@ namespace Microlight.MicroBar
                 animDelay = bar.DamageAnimDelay;
             }
 
-            if(isSprite)
+            if (isSprite)
             {
-                if(isHealAnimation)
+                if (isHealAnimation)
                 {
                     srBarToAnimate = bar.SRPrimaryBarMask.transform;
                 }
                 else
                 {
-                    if(bar.UseGhostBar)
+                    if (bar.UseGhostBar)
                     {
                         srBarToAnimate = bar.SRGhostBarMask.transform;
                     }
@@ -233,7 +241,7 @@ namespace Microlight.MicroBar
                 }
 
                 sequence.Append(bar.SRPrimaryBar.DOColor(barColor, flashAnimDuration).SetDelay(animDelay));
-                if(bar.UseGhostBar)
+                if (bar.UseGhostBar)
                 {
                     sequence.Join(bar.SRGhostBar.DOColor(ghostBarColor, flashAnimDuration));
                 }
@@ -241,13 +249,13 @@ namespace Microlight.MicroBar
             }
             else
             {
-                if(isHealAnimation)
+                if (isHealAnimation)
                 {
                     uiBarToAnimate = bar.UIPrimaryBar;
                 }
                 else
                 {
-                    if(bar.UseGhostBar)
+                    if (bar.UseGhostBar)
                     {
                         uiBarToAnimate = bar.UIGhostBar;
                     }
@@ -258,7 +266,7 @@ namespace Microlight.MicroBar
                 }
 
                 sequence.Append(bar.UIPrimaryBar.DOColor(barColor, flashAnimDuration).SetDelay(animDelay));
-                if(bar.UseGhostBar)
+                if (bar.UseGhostBar)
                 {
                     sequence.Join(bar.UIGhostBar.DOColor(ghostBarColor, flashAnimDuration));
                 }
@@ -267,15 +275,15 @@ namespace Microlight.MicroBar
         }
 
         // Creates animation that shakes the background and fill bar quickly fills in the middle of the animation
-        static void ShakeAnim(SimpleMicroBar bar, Sequence sequence)
+        private static void ShakeAnim(SimpleMicroBar bar, Sequence sequence)
         {
             bool isHealAnimation = bar.ParentBar.CurrentValue > bar.ParentBar.PreviousValue;
             bool isSprite = bar.RenderType == RenderType.Sprite;
 
             // Prepare the bar values before the animation
-            if(bar.UseGhostBar)
+            if (bar.UseGhostBar)
             {
-                if(isHealAnimation)
+                if (isHealAnimation)
                 {
                     SetGhostBarValue(bar);
                 }
@@ -295,10 +303,10 @@ namespace Microlight.MicroBar
             float animStrength;
 
             // Decide timings
-            if(isHealAnimation)
+            if (isHealAnimation)
             {
                 animDuration = bar.HealAnimDuration;
-                if(isSprite)
+                if (isSprite)
                 {
                     animStrength = bar.HealAnimStrength * 0.2f;
                 }
@@ -310,7 +318,7 @@ namespace Microlight.MicroBar
             else
             {
                 animDuration = bar.DamageAnimDuration;
-                if(isSprite)
+                if (isSprite)
                 {
                     animStrength = bar.DamageAnimStrength * 0.2f;
                 }
@@ -323,7 +331,7 @@ namespace Microlight.MicroBar
             fillDuration = animDuration * 0.6f;
 
             // Create shake animation
-            if(isSprite)
+            if (isSprite)
             {
                 bar.SRBackground.transform.localPosition = Vector3.zero;
                 sequence.Append(bar.SRBackground.transform.DOShakePosition(animDuration, animStrength, 40));
@@ -335,15 +343,15 @@ namespace Microlight.MicroBar
             }
 
             // Decide which graphics to control and create animation
-            if(isSprite)
+            if (isSprite)
             {
-                if(isHealAnimation)
+                if (isHealAnimation)
                 {
                     srFillBar = bar.SRPrimaryBarMask.transform;
                 }
                 else
                 {
-                    if(bar.UseGhostBar)
+                    if (bar.UseGhostBar)
                     {
                         srFillBar = bar.SRGhostBarMask.transform;
                     }
@@ -357,13 +365,13 @@ namespace Microlight.MicroBar
             }
             else
             {
-                if(isHealAnimation)
+                if (isHealAnimation)
                 {
                     uiFillBar = bar.UIPrimaryBar;
                 }
                 else
                 {
-                    if(bar.UseGhostBar)
+                    if (bar.UseGhostBar)
                     {
                         uiFillBar = bar.UIGhostBar;
                     }
@@ -376,39 +384,41 @@ namespace Microlight.MicroBar
                 sequence.Join(uiFillBar.DOFillAmount(bar.ParentBar.HPPercent, fillDuration).SetDelay(fillDelay));
             }
 
-            if(bar.AdaptiveColor)
+            if (bar.AdaptiveColor)
             {
                 sequence.OnUpdate(() => SetAdaptiveBarColor(bar));
             }
         }
-        #endregion
+
+        #endregion Animation
 
         #region Utility
+
         // **************************************************
         // Utility
         // **************************************************
 
         // Sets primary bar based on values
-        static void SetBarValue(SimpleMicroBar bar)
+        private static void SetBarValue(SimpleMicroBar bar)
         {
-            if(bar.RenderType == RenderType.Image)
+            if (bar.RenderType == RenderType.Image)
             {
                 bar.UIPrimaryBar.fillAmount = bar.ParentBar.HPPercent;
             }
-            else if(bar.RenderType == RenderType.Sprite)
+            else if (bar.RenderType == RenderType.Sprite)
             {
                 bar.SRPrimaryBarMask.transform.localScale = new Vector3(bar.ParentBar.HPPercent, bar.SRPrimaryBarMask.transform.localScale.y, bar.SRPrimaryBarMask.transform.localScale.z);
             }
         }
 
         // Sets ghost bar based on values
-        static void SetGhostBarValue(SimpleMicroBar bar)
+        private static void SetGhostBarValue(SimpleMicroBar bar)
         {
-            if(bar.RenderType == RenderType.Image)
+            if (bar.RenderType == RenderType.Image)
             {
                 bar.UIGhostBar.fillAmount = bar.ParentBar.HPPercent;
             }
-            else if(bar.RenderType == RenderType.Sprite)
+            else if (bar.RenderType == RenderType.Sprite)
             {
                 bar.SRGhostBarMask.transform.localScale = new Vector3(bar.ParentBar.HPPercent, bar.SRGhostBarMask.transform.localScale.y, bar.SRGhostBarMask.transform.localScale.z);
             }
@@ -417,14 +427,14 @@ namespace Microlight.MicroBar
         // Sets ghost bar color if ghost bar uses dual colors
         internal static Color SetGhostBarColor(SimpleMicroBar bar)
         {
-            if(!bar.UseGhostBar)
+            if (!bar.UseGhostBar)
             {
                 return Color.white;
             }
 
-            if(!bar.DualGhostBars)
+            if (!bar.DualGhostBars)
             {
-                if(bar.RenderType == RenderType.Sprite)
+                if (bar.RenderType == RenderType.Sprite)
                 {
                     bar.SRGhostBar.color = bar.GhostBarDamageColor;
                 }
@@ -438,7 +448,7 @@ namespace Microlight.MicroBar
             bool isDamage = bar.ParentBar.CurrentValue < bar.ParentBar.PreviousValue;
 
             Color ghostBarColor;
-            if(isDamage)
+            if (isDamage)
             {
                 ghostBarColor = bar.GhostBarDamageColor;
             }
@@ -447,7 +457,7 @@ namespace Microlight.MicroBar
                 ghostBarColor = bar.GhostBarHealColor;
             }
 
-            if(bar.RenderType == RenderType.Sprite)
+            if (bar.RenderType == RenderType.Sprite)
             {
                 bar.SRGhostBar.color = ghostBarColor;
             }
@@ -464,15 +474,15 @@ namespace Microlight.MicroBar
         // false will use bar current numerical value
         internal static Color SetAdaptiveBarColor(SimpleMicroBar bar, bool useBarValue = true)
         {
-            if(!bar.AdaptiveColor)
+            if (!bar.AdaptiveColor)
             {
                 return bar.BarPrimaryColor;
             }
 
             Color barColor;
-            if(bar.RenderType == RenderType.Sprite)
+            if (bar.RenderType == RenderType.Sprite)
             {
-                if(useBarValue)
+                if (useBarValue)
                 {
                     barColor = Color.Lerp(bar.BarAdaptiveColor, bar.BarPrimaryColor, bar.SRPrimaryBarMask.transform.localScale.x);
                 }
@@ -484,7 +494,7 @@ namespace Microlight.MicroBar
             }
             else
             {
-                if(useBarValue)
+                if (useBarValue)
                 {
                     barColor = Color.Lerp(bar.BarAdaptiveColor, bar.BarPrimaryColor, bar.UIPrimaryBar.fillAmount);
                 }
@@ -497,6 +507,7 @@ namespace Microlight.MicroBar
 
             return barColor;
         }
-        #endregion
+
+        #endregion Utility
     }
 }

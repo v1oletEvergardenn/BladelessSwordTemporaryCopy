@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static UnityEngine.Rendering.DebugUI;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public abstract class IProjectile : MonoBehaviour

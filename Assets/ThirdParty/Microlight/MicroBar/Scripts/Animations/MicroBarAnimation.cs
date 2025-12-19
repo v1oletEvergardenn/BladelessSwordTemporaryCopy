@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using DG.Tweening;
+
+//using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -14,43 +16,43 @@ namespace Microlight.MicroBar
     [System.Serializable]
     public class MicroBarAnimation
     {
-        [SerializeField] UpdateAnim animationType;
-        [SerializeField] RenderType renderType;
-        [SerializeField] Image targetImage;
-        [SerializeField] SpriteRenderer targetSprite;
-        Transform targetSpriteMask;
-        [SerializeField] bool notBar;   // If turned on, when animation is skipped, will not fill image/sprite
-        [SerializeField] List<AnimCommand> commands;
+        [SerializeField] private UpdateAnim animationType;
+        [SerializeField] private RenderType renderType;
+        [SerializeField] private Image targetImage;
+        [SerializeField] private SpriteRenderer targetSprite;
+        private Transform targetSpriteMask;
+        [SerializeField] private bool notBar;   // If turned on, when animation is skipped, will not fill image/sprite
+        [SerializeField] private List<AnimCommand> commands;
 
-        MicroBar parentBar;
-        GraphicsDefaultValues defaultValues;
+        private MicroBar parentBar;
+        private GraphicsDefaultValues defaultValues;
         internal GraphicsDefaultValues DefaultValues => defaultValues;
-        Vector3 defaultMaskScale;
+        private Vector3 defaultMaskScale;
         internal Vector3 DefaultMaskScale => defaultMaskScale;
         internal bool NotBar => notBar;
 
-        Sequence sequence;   // Sequence for animations
+        private Sequence sequence;   // Sequence for animations
         public Sequence Sequence => sequence;
 
         internal bool Initialize(MicroBar bar)
         {
-            if(renderType == RenderType.Image && targetImage == null)
+            if (renderType == RenderType.Image && targetImage == null)
             {
                 Debug.LogError("[MicroBar] RenderType set to 'Image' but 'targetImage' is null");
                 return false;
             }
-            if(renderType == RenderType.Sprite)
+            if (renderType == RenderType.Sprite)
             {
-                if(targetSprite == null)
+                if (targetSprite == null)
                 {
                     Debug.LogError("[MicroBar] RenderType set to 'Sprite' but 'targetSprite' is null");
                     return false;
                 }
 
                 // SpriteMask is checked only if component is not tagged as 'NotBar'
-                if(!notBar)
+                if (!notBar)
                 {
-                    if(targetSprite.GetComponent<SortingGroup>() == null)
+                    if (targetSprite.GetComponent<SortingGroup>() == null)
                     {
                         Debug.LogWarning("[MicroBar] Couldn't find the 'SortingGroup' for the 'targetSprite'." +
                             "While the game will still run and update the bar values, it might lead to unintended behaviour." +
@@ -60,7 +62,7 @@ namespace Microlight.MicroBar
                     // This is only improvization for the backwards compatibility for the older versions of the MicroBar
                     // Will use targetSprite as a target for the fill animations
                     SpriteMask spriteMask = targetSprite.GetComponentInChildren<SpriteMask>();
-                    if(spriteMask == null)
+                    if (spriteMask == null)
                     {
                         targetSpriteMask = targetSprite.transform;
                         Debug.LogError("[MicroBar] Couldn't find the 'SpriteMask' for the 'targetSprite'." +
@@ -85,28 +87,28 @@ namespace Microlight.MicroBar
         }
 
         // When bar is updated, decide what this animation should do
-        void Update(bool skipAnimation, UpdateAnim animationType)
+        private void Update(bool skipAnimation, UpdateAnim animationType)
         {
             // Always kill when bar is updating, because we dont want to have for example active damage animation if heal animation is active
-            if(sequence.IsActive())
+            if (sequence.IsActive())
             {
                 sequence.Kill();
                 sequence = null;
             }
-            if(animationType != this.animationType)
+            if (animationType != this.animationType)
             {
                 return;
             }
-            if(skipAnimation)
+            if (skipAnimation)
             {
-                if(!notBar)
+                if (!notBar)
                 {
                     SilentUpdate();
                 }
                 return;
             }
 
-            if(renderType == RenderType.Image)
+            if (renderType == RenderType.Image)
             {
                 AnimationInfo animInfo = new AnimationInfo(commands, targetImage, parentBar, this);
                 sequence = AnimBuilder.BuildAnimation(animInfo);
@@ -120,14 +122,14 @@ namespace Microlight.MicroBar
 
         internal void DefaultValuesSnapshot()
         {
-            if(renderType == RenderType.Image)
+            if (renderType == RenderType.Image)
             {
                 defaultValues = new GraphicsDefaultValues(targetImage);
             }
-            else if(renderType == RenderType.Sprite)
+            else if (renderType == RenderType.Sprite)
             {
                 defaultValues = new GraphicsDefaultValues(targetSprite);
-                if(targetSpriteMask != null)
+                if (targetSpriteMask != null)
                 {
                     defaultMaskScale = targetSpriteMask.transform.localScale;
                 }
@@ -139,27 +141,27 @@ namespace Microlight.MicroBar
         }
 
         // When animation is skipped, bar can be updated silently
-        void SilentUpdate()
+        private void SilentUpdate()
         {
-            if(parentBar == null)
+            if (parentBar == null)
             {
                 Debug.LogError("[MicroBar] Missing reference to the 'ParentBar'");
                 return;
             }
-            if(renderType == RenderType.Image)
+            if (renderType == RenderType.Image)
             {
                 targetImage.fillAmount = parentBar.HPPercent;
             }
-            else if(renderType == RenderType.Sprite)
+            else if (renderType == RenderType.Sprite)
             {
                 targetSpriteMask.localScale = new Vector3(parentBar.HPPercent, targetSpriteMask.localScale.y, targetSpriteMask.localScale.z);
             }
         }
 
         // When health bar is being destroyed
-        void Destroy()
+        private void Destroy()
         {
-            if(sequence.IsActive())
+            if (sequence.IsActive())
             {
                 sequence.Kill();
                 sequence = null;

@@ -1,11 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-
 #if LLG_USE_URP
+
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using System.Linq;
+using Unity.VisualScripting;
 
 #elif LLG_USE_HDRP
 using UnityEngine.Rendering;
@@ -13,7 +14,9 @@ using UnityEngine.Rendering.HighDefinition;
 #endif
 
 #if UNITY_EDITOR
+
 using UnityEditor;
+
 #endif
 
 namespace Lith.LiquidGlass
@@ -28,18 +31,22 @@ namespace Lith.LiquidGlass
         public const string materialBlurTexName = "_ExternalBlurTex";
         public const string matOffsetName = "_Offset";
 #if LLG_USE_URP
-    public const RenderPipeline renderPipeline = RenderPipeline.URP;
+        public const RenderPipeline renderPipeline = RenderPipeline.URP;
 #elif LLG_USE_HDRP
     public const RenderPipeline renderPipeline = RenderPipeline.HDRP;
 #else
         public const RenderPipeline renderPipeline = RenderPipeline.Default;
 #endif
 
-        public enum SourceMode { Camera, RenderTexture }
-        public enum RenderPipeline { Default, URP, HDRP }
+        public enum SourceMode
+        { Camera, RenderTexture }
+
+        public enum RenderPipeline
+        { Default, URP, HDRP }
 
         [Header("Source")]
         public SourceMode mode = SourceMode.Camera;
+
         public RenderTexture sourceRT; // sadece mode = RenderTexture iken
 
         [Header("Material Settings")]
@@ -67,6 +74,7 @@ namespace Lith.LiquidGlass
 
         [Tooltip("Optional blur target RT (Camera mode). Leave empty = auto-create")]
         public RenderTexture blurRT;
+
         private RenderTexture pongRT;
         private Material blurMat;
 
@@ -75,10 +83,10 @@ namespace Lith.LiquidGlass
         private Camera cam;
 
 #if LLG_USE_URP || LLG_USE_HDRP
-    private static List<LiquidGlassCapture> capturerList = new List<LiquidGlassCapture>();
+        private static List<LiquidGlassCapture> capturerList = new List<LiquidGlassCapture>();
 #endif
 
-        void Awake()
+        private void Awake()
         {
             if (mode == SourceMode.Camera)
             {
@@ -92,7 +100,7 @@ namespace Lith.LiquidGlass
             }
         }
 
-        void OnEnable()
+        private void OnEnable()
         {
 #if UNITY_EDITOR
             EditorApplication.delayCall += EditorClean;
@@ -103,11 +111,11 @@ namespace Lith.LiquidGlass
             Shader blurShader = Shader.Find("Hidden/Lith/Blur");
 
 #if LLG_USE_URP || LLG_USE_HDRP
-        if (blurShader != null)
-            blurMat = CoreUtils.CreateEngineMaterial(blurShader);
+            if (blurShader != null)
+                blurMat = CoreUtils.CreateEngineMaterial(blurShader);
 
-        if (mode == SourceMode.Camera && !capturerList.Contains(this))
-            capturerList.Add(this);
+            if (mode == SourceMode.Camera && !capturerList.Contains(this))
+                capturerList.Add(this);
 #else
             Shader.DisableKeyword("LLG_USE_URP");
             if (blurShader != null)
@@ -118,27 +126,32 @@ namespace Lith.LiquidGlass
 #endif
         }
 
-        void OnValidate()
+        private void OnValidate()
         {
             Clean();
         }
+
 #if UNITY_EDITOR
-        void Update()
+
+        private void Update()
         {
 #if LLG_USE_URP || LLG_USE_HDRP
-        if (mode == SourceMode.Camera && !capturerList.Contains(this))
-            capturerList.Add(this);
-        else if (mode != SourceMode.Camera && capturerList.Contains(this))
-            capturerList.Remove(this);
+            if (mode == SourceMode.Camera && !capturerList.Contains(this))
+                capturerList.Add(this);
+            else if (mode != SourceMode.Camera && capturerList.Contains(this))
+                capturerList.Remove(this);
 #endif
         }
+
 #endif
-        void LateUpdate()
+
+        private void LateUpdate()
         {
             if (mode == SourceMode.RenderTexture)
                 HandleExternalRT();
         }
-        void HandleExternalRT()
+
+        private void HandleExternalRT()
         {
             if (sourceRT == null)
             {
@@ -165,7 +178,8 @@ namespace Lith.LiquidGlass
 
             PushTexture(blurRT, globalBlurTexName, materialBlurTexName);
         }
-        void BlitTo(ref RenderTexture src, ref RenderTexture targetRT, int w, int h, string rtName = "")
+
+        private void BlitTo(ref RenderTexture src, ref RenderTexture targetRT, int w, int h, string rtName = "")
         {
             if (targetRT == null || targetRT.width != w || targetRT.height != h)
             {
@@ -176,7 +190,8 @@ namespace Lith.LiquidGlass
 
             Graphics.Blit(src, targetRT);
         }
-        RenderTexture CalculateBlur(ref RenderTexture src, int w, int h)
+
+        private RenderTexture CalculateBlur(ref RenderTexture src, int w, int h)
         {
             if (blurRT == null || blurRT.width != w || blurRT.height != h)
             {
@@ -200,83 +215,88 @@ namespace Lith.LiquidGlass
                 blurMat.SetFloat(matOffsetName, currentOffset);
                 // Horizontal pass (Pass 0)
                 Graphics.Blit(blurRT, pongRT, blurMat, 0);
-                // Vertical pass (Pass 1) 
+                // Vertical pass (Pass 1)
                 Graphics.Blit(pongRT, blurRT, blurMat, 1);
             }
 
             return blurRT;
         }
+
 #if LLG_USE_URP
-    public static void OnRenderFeatureExecute(ScriptableRenderContext context, ref RenderingData renderingData)
-    {
-        for (int i = 0; i < capturerList.Count; i++)
-            capturerList[i].OnRenderImageURP(context, ref renderingData);
-    }
-    private void OnRenderImageURP(ScriptableRenderContext context, ref RenderingData renderingData)
-    {
-        if (cam == null || cam != renderingData.cameraData.camera)
-            return;
 
-        var cmd = CommandBufferPool.Get("LiquidGlassCapture");
-
-        var colorTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-        int w = Mathf.Max(1, renderingData.cameraData.camera.pixelWidth / downsample);
-        int h = Mathf.Max(1, renderingData.cameraData.camera.pixelHeight / downsample);
-
-        if (targetRT == null || targetRT.width != w || targetRT.height != h)
+        public static void OnRenderFeatureExecute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            if (targetRT != null) targetRT.Release();
-            targetRT = new RenderTexture(w, h, 0);
-            targetRT.name = "ExternalTexRT (URP)";
+            for (int i = 0; i < capturerList.Count; i++)
+                capturerList[i].OnRenderImageURP(context, ref renderingData);
         }
 
-        cmd.Blit(colorTarget, targetRT);
-        PushTexture(targetRT, globalTexName, materialTexName);
-
-        w = Mathf.Max(1, renderingData.cameraData.camera.pixelWidth / blurDownsample);
-        h = Mathf.Max(1, renderingData.cameraData.camera.pixelHeight / blurDownsample);
-
-        if (blurMat != null && blurIterations > 0)
-            blurRT = CalculateBlur(cmd, colorTarget, w, h);
-        else
-            blurRT = targetRT;
-        
-        PushTexture(blurRT, globalBlurTexName, materialBlurTexName);
-
-        context.ExecuteCommandBuffer(cmd);
-        CommandBufferPool.Release(cmd);
-    }
-    RenderTexture CalculateBlur(CommandBuffer cmd, RTHandle src, int w, int h)
-    {
-        if (blurRT == null || blurRT.width != w || blurRT.height != h)
+        private void OnRenderImageURP(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            if (blurRT != null) blurRT.Release();
-            blurRT = new RenderTexture(w, h, 0);
-            blurRT.name = "ExternalTexBlurRT (Camera)";
+            if (cam == null || cam != renderingData.cameraData.camera)
+                return;
+
+            var cmd = CommandBufferPool.Get("LiquidGlassCapture");
+
+            var colorTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;
+
+            int w = Mathf.Max(1, renderingData.cameraData.camera.pixelWidth / downsample);
+            int h = Mathf.Max(1, renderingData.cameraData.camera.pixelHeight / downsample);
+
+            if (targetRT == null || targetRT.width != w || targetRT.height != h)
+            {
+                if (targetRT != null) targetRT.Release();
+                targetRT = new RenderTexture(w, h, 0);
+                targetRT.name = "ExternalTexRT (URP)";
+            }
+
+            cmd.Blit(colorTarget, targetRT);
+            PushTexture(targetRT, globalTexName, materialTexName);
+
+            w = Mathf.Max(1, renderingData.cameraData.camera.pixelWidth / blurDownsample);
+            h = Mathf.Max(1, renderingData.cameraData.camera.pixelHeight / blurDownsample);
+
+            if (blurMat != null && blurIterations > 0)
+                blurRT = CalculateBlur(cmd, colorTarget, w, h);
+            else
+                blurRT = targetRT;
+
+            PushTexture(blurRT, globalBlurTexName, materialBlurTexName);
+
+            context.ExecuteCommandBuffer(cmd);
+            CommandBufferPool.Release(cmd);
         }
 
-        if (pongRT == null || pongRT.width != w || pongRT.height != h)
+        private RenderTexture CalculateBlur(CommandBuffer cmd, RTHandle src, int w, int h)
         {
-            if (pongRT != null) pongRT.Release();
-            pongRT = new RenderTexture(w, h, 0);
-            pongRT.name = "ExternalTexPongRT (Camera)";
+            if (blurRT == null || blurRT.width != w || blurRT.height != h)
+            {
+                if (blurRT != null) blurRT.Release();
+                blurRT = new RenderTexture(w, h, 0);
+                blurRT.name = "ExternalTexBlurRT (Camera)";
+            }
+
+            if (pongRT == null || pongRT.width != w || pongRT.height != h)
+            {
+                if (pongRT != null) pongRT.Release();
+                pongRT = new RenderTexture(w, h, 0);
+                pongRT.name = "ExternalTexPongRT (Camera)";
+            }
+
+            cmd.Blit(src, blurRT);
+
+            for (int i = 0; i < blurIterations; i++)
+            {
+                float currentOffset = blurOffset * (i + 1);
+                blurMat.SetFloat(matOffsetName, currentOffset);
+                // Horizontal pass (Pass 0)
+                cmd.Blit(blurRT, pongRT, blurMat, 0);
+                // Vertical pass (Pass 1)
+                cmd.Blit(pongRT, blurRT, blurMat, 1);
+            }
+
+            return blurRT;
         }
 
-        cmd.Blit(src, blurRT);
-
-        for (int i = 0; i < blurIterations; i++)
-        {
-            float currentOffset = blurOffset * (i + 1);
-            blurMat.SetFloat(matOffsetName, currentOffset);
-            // Horizontal pass (Pass 0)
-            cmd.Blit(blurRT, pongRT, blurMat, 0);
-            // Vertical pass (Pass 1) 
-            cmd.Blit(pongRT, blurRT, blurMat, 1);
-        }
-
-        return blurRT;
-    }
 #elif LLG_USE_HDRP
     public static void OnRenderFeatureExecute(CustomPassContext ctx)
     {
@@ -343,7 +363,7 @@ namespace Lith.LiquidGlass
             blurMat.SetFloat(matOffsetName, currentOffset);
             // Horizontal pass (Pass 0)
             cmd.Blit(blurRT, pongRT, blurMat, 0);
-            // Vertical pass (Pass 1) 
+            // Vertical pass (Pass 1)
             cmd.Blit(pongRT, blurRT, blurMat, 1);
         }
 
@@ -381,7 +401,8 @@ namespace Lith.LiquidGlass
             PushTexture(blurRT, globalBlurTexName, materialBlurTexName);
         }
 #endif
-        void PushTexture(RenderTexture rt, string globalTexName, string materialTexName)
+
+        private void PushTexture(RenderTexture rt, string globalTexName, string materialTexName)
         {
             if (targetMaterials == null || targetMaterials.Count == 0)
             {
@@ -445,18 +466,18 @@ namespace Lith.LiquidGlass
             }
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             PushTexture(null, globalTexName, materialTexName);
             Clean();
 
 #if LLG_USE_URP || LLG_USE_HDRP
-        if (capturerList.Contains(this))
-            capturerList.Remove(this);
+            if (capturerList.Contains(this))
+                capturerList.Remove(this);
 #endif
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             Clean();
         }
@@ -483,15 +504,18 @@ namespace Lith.LiquidGlass
         }
 
 #if UNITY_EDITOR
-        void EditorClean()
+
+        private void EditorClean()
         {
             if (this == null) return;
             Clean();
             EditorApplication.delayCall -= EditorClean;
         }
+
 #endif
 
-        void ClearKeyword(Material m) => m.DisableKeyword("USE_TEXTURE_PROPERTY");
-        void AddKeyword(Material m) => m.EnableKeyword("USE_TEXTURE_PROPERTY");
+        private void ClearKeyword(Material m) => m.DisableKeyword("USE_TEXTURE_PROPERTY");
+
+        private void AddKeyword(Material m) => m.EnableKeyword("USE_TEXTURE_PROPERTY");
     }
 }

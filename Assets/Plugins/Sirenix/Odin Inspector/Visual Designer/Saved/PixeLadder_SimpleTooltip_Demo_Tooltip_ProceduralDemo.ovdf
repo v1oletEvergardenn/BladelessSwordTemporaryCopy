@@ -1,0 +1,30 @@
+OVDF v1.1
+PixeLadder.SimpleTooltip.Demo.Tooltip_ProceduralDemo, ThridParty
+MetaGuid:0507fd2290a7eba4ca5d2fc3bc2c200d
+
+# $6LwHDkaFRew6rVQTaGaXgq
+Position: $root:4
++ [Sirenix.OdinInspector.BoxGroupAttribute]
+
+# infoButton
+Visibility: Shown
++ [Sirenix.OdinInspector.ButtonAttribute]
+	Name = "test"
+	drawResult = True
+	drawResultIsSet = True
+	buttonHeight = 2
+	HasDefinedButtonHeight = True
+	buttonAlignment = 3
+	HasDefinedButtonAlignment = True
+
+# warningButton
+Visibility: Shown
+
+# itemButton
+Visibility: Shown
+
+# Start()
+Position: $6LwHDkaFRew6rVQTaGaXgq:1
+
+# SetupTooltips()
+Position: $6LwHDkaFRew6rVQTaGaXgq:0

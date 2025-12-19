@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Windows;
-using UnityEngine.InputSystem.Samples.RebindUI;
 using static ControllerInput;
 using System;
 using UnityEngine.UI;
