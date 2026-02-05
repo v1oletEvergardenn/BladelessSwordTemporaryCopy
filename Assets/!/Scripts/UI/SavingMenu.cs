@@ -168,7 +168,7 @@ public class SavingMenu : MonoBehaviour
     {
         if (EventSystem.current.currentSelectedGameObject == null && _lastSelected != null)
         {
-            EventSystem.current.SetSelectedGameObject(_lastSelected.gameObject);
+            EventSystemExtension.SetSelectObject(_lastSelected.gameObject);
         }
     }
 
@@ -180,7 +180,7 @@ public class SavingMenu : MonoBehaviour
         foreach (var btn in slotButtons)
             btn.interactable = true;
         autoSaveSlot.gameObject.SetActive(false);
-        EventSystem.current.SetSelectedGameObject(slotButtons[0].gameObject);
+        EventSystemExtension.SetSelectObject(slotButtons[0].gameObject);
         // Check each slot for existing save file
         for (int i = 0; i < slotButtons.Count; i++)
         {
@@ -217,7 +217,7 @@ public class SavingMenu : MonoBehaviour
         if (System.IO.File.Exists(SaveSystem.SaveFileName(-1)))
         {
             autoSaveSlot.gameObject.SetActive(true);
-            EventSystem.current.SetSelectedGameObject(autoSaveSlot.gameObject);
+            EventSystemExtension.SetSelectObject(autoSaveSlot.gameObject);
             autoSaveSlot.onClick.RemoveAllListeners();
             autoSaveSlot.onClick.AddListener(() =>
             {
@@ -232,7 +232,7 @@ public class SavingMenu : MonoBehaviour
         else
         {
             autoSaveSlot.gameObject.SetActive(false);
-            EventSystem.current.SetSelectedGameObject(slotButtons[0].gameObject);
+            EventSystemExtension.SetSelectObject(slotButtons[0].gameObject);
             MoveSlots(false);
         }
 

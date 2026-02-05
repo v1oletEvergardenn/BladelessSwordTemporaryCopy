@@ -429,6 +429,15 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Uninstall"",
+                    ""type"": ""Button"",
+                    ""id"": ""7cdab770-3931-43e5-9257-4c871e3c1f9b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -926,6 +935,17 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""action"": ""FlipPage_LB"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""75a98242-b949-42a8-ba19-6d3c17560428"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Uninstall"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1012,6 +1032,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         m_UI_FlipPageRight = m_UI.FindAction("FlipPageRight", throwIfNotFound: true);
         m_UI_FlipPage_LB = m_UI.FindAction("FlipPage_LB", throwIfNotFound: true);
         m_UI_FlipPage_RB = m_UI.FindAction("FlipPage_RB", throwIfNotFound: true);
+        m_UI_Uninstall = m_UI.FindAction("Uninstall", throwIfNotFound: true);
         // WarningWindow
         m_WarningWindow = asset.FindActionMap("WarningWindow", throwIfNotFound: true);
         m_WarningWindow_Confirm = m_WarningWindow.FindAction("Confirm", throwIfNotFound: true);
@@ -1234,6 +1255,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_FlipPageRight;
     private readonly InputAction m_UI_FlipPage_LB;
     private readonly InputAction m_UI_FlipPage_RB;
+    private readonly InputAction m_UI_Uninstall;
     public struct UIActions
     {
         private @ControllerInput m_Wrapper;
@@ -1253,6 +1275,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         public InputAction @FlipPageRight => m_Wrapper.m_UI_FlipPageRight;
         public InputAction @FlipPage_LB => m_Wrapper.m_UI_FlipPage_LB;
         public InputAction @FlipPage_RB => m_Wrapper.m_UI_FlipPage_RB;
+        public InputAction @Uninstall => m_Wrapper.m_UI_Uninstall;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1307,6 +1330,9 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @FlipPage_RB.started += instance.OnFlipPage_RB;
             @FlipPage_RB.performed += instance.OnFlipPage_RB;
             @FlipPage_RB.canceled += instance.OnFlipPage_RB;
+            @Uninstall.started += instance.OnUninstall;
+            @Uninstall.performed += instance.OnUninstall;
+            @Uninstall.canceled += instance.OnUninstall;
         }
 
         private void UnregisterCallbacks(IUIActions instance)
@@ -1356,6 +1382,9 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @FlipPage_RB.started -= instance.OnFlipPage_RB;
             @FlipPage_RB.performed -= instance.OnFlipPage_RB;
             @FlipPage_RB.canceled -= instance.OnFlipPage_RB;
+            @Uninstall.started -= instance.OnUninstall;
+            @Uninstall.performed -= instance.OnUninstall;
+            @Uninstall.canceled -= instance.OnUninstall;
         }
 
         public void RemoveCallbacks(IUIActions instance)
@@ -1460,6 +1489,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         void OnFlipPageRight(InputAction.CallbackContext context);
         void OnFlipPage_LB(InputAction.CallbackContext context);
         void OnFlipPage_RB(InputAction.CallbackContext context);
+        void OnUninstall(InputAction.CallbackContext context);
     }
     public interface IWarningWindowActions
     {

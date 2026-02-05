@@ -109,7 +109,7 @@ public abstract class UIChildNavigate : MonoBehaviour
     {
         if (EventSystem.current.currentSelectedGameObject == null && _lastSelected != null)
         {
-            EventSystem.current.SetSelectedGameObject(_lastSelected.gameObject);
+            EventSystemExtension.SetSelectObject(_lastSelected.gameObject);
         }
     }
 }

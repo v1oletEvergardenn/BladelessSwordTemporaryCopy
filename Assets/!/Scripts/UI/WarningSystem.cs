@@ -79,7 +79,7 @@ public class WarningSystem : MonoBehaviour
     private void HideWarning()
     {
         _isWarningActive = false;
-        if (lastSelectedObj != null) EventSystem.current.SetSelectedGameObject(lastSelectedObj);
+        if (lastSelectedObj != null) EventSystemExtension.SetSelectObject(lastSelectedObj);
         warningPanel.SetActive(false);
         messageText.text = "";
         onConfirm = null;

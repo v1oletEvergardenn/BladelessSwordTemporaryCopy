@@ -1,0 +1,65 @@
+OVDF v1.1
+Item, Project.Main
+MetaGuid:31c58d79de3bb4648b22927a2ac7be6f
+
+# $NeA62pqjuzNMiyuKYvymZX
+Position: $FunuTECyHoSQbAXKs7Re7f:1
++ [Sirenix.OdinInspector.ShowIfGroupAttribute]
+	VisibleIf = "isStackable"
+	GroupName = "stackGroup"
+
+# $FunuTECyHoSQbAXKs7Re7f
+Position: $root:9
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "Stackable"
+
+# $5MiicqWSj6aJWdCcgghpxD
+Position: $root:0
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "Item Attributes"
+
+# $E9JwuiCtq2mtRmoVLNP9A9
+Position: $5MiicqWSj6aJWdCcgghpxD:2
++ [Sirenix.OdinInspector.HorizontalGroupAttribute]
+
+# itemDescription
+Position: $5MiicqWSj6aJWdCcgghpxD:3
++ [UnityEngine.TextAreaAttribute]
+	maxLines = 11
+	minLines = 8
++ [Sirenix.OdinInspector.PropertySpaceAttribute]
+	SpaceBefore = 9.58
+	SpaceAfter = 8.71
+
+# maxStack
+Position: $NeA62pqjuzNMiyuKYvymZX:1
+
+# currentStack
+Position: $NeA62pqjuzNMiyuKYvymZX:0
+
+# isStackable
+Position: $FunuTECyHoSQbAXKs7Re7f:0
+
+# itemName
+Position: $5MiicqWSj6aJWdCcgghpxD:0
+
+# itemIcon
+Position: $5MiicqWSj6aJWdCcgghpxD:1
++ [Sirenix.OdinInspector.PropertySpaceAttribute]
+	SpaceBefore = 2.9
+	SpaceAfter = 3.37
+
+# itemID
+Position: $E9JwuiCtq2mtRmoVLNP9A9:0
++ [Sirenix.OdinInspector.ReadOnlyAttribute]
+
+# duration
++ [Sirenix.OdinInspector.PropertySpaceAttribute]
+	SpaceBefore = 19.36
+
+# ResetID()
+Position: $E9JwuiCtq2mtRmoVLNP9A9:1
+Visibility: Shown
+
+# itemLevel
++ [Sirenix.OdinInspector.EnumToggleButtonsAttribute]

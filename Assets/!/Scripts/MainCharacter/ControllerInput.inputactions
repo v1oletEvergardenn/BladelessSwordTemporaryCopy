@@ -407,6 +407,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Uninstall",
+                    "type": "Button",
+                    "id": "7cdab770-3931-43e5-9257-4c871e3c1f9b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -902,6 +911,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "FlipPage_LB",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "75a98242-b949-42a8-ba19-6d3c17560428",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Uninstall",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

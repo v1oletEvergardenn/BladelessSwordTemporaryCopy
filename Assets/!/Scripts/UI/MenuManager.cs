@@ -49,96 +49,77 @@ public class MenuManager : MonoBehaviour
 
     #region Fields & Inspector
 
-    [FoldoutGroup("Pause InGame Canvas",
-        nameof(PauseGameCanvas),
-        nameof(pauseMenuTabHolder),
-        nameof(canChangeTab),
-        nameof(canCloseMenu))]
-    public Void pauseGameVoidHolder;
+    #region PauseGame Menu
 
-    [SerializeField, HideProperty] public GameObject PauseGameCanvas;
-    [SerializeField, HideProperty] public Transform pauseMenuTabHolder;
-    [SerializeField, HideProperty] public bool canChangeTab = true;
-    [SerializeField, HideProperty] public bool canCloseMenu = true;
+    public GameObject PauseGameCanvas;
+    public Transform pauseMenuTabHolder;
+    public bool canChangeTab = true;
+    public bool canCloseMenu = true;
 
     private List<GameObject> PauseMenuTabs = new List<GameObject>();
     public int currentIndexTab = 0;
 
-    [FoldoutGroup("Save Point Canvas",
-        nameof(SavePointCanvas),
-        nameof(SavePointMenu),
-        nameof(HSAbilitySwapMenu),
-        nameof(HSAbilityUpgradeMenu),
-        nameof(backgroundImage1),
-        nameof(backgroundImage2),
-        nameof(hsUpgrade_rotator))]
-    public Void SaveGameVoidHolder;
+    #endregion PauseGame Menu
 
-    [SerializeField, HideProperty] public GameObject SavePointCanvas;
-    [SerializeField, HideProperty] public GameObject SavePointMenu;
-    [SerializeField, HideProperty] public GameObject HSAbilitySwapMenu;
-    [SerializeField, HideProperty] public GameObject HSAbilityUpgradeMenu;
-    [SerializeField, HideProperty] public Image backgroundImage1;
-    [SerializeField, HideProperty] public Image backgroundImage2;
-    [SerializeField, HideProperty] public Transform hsUpgrade_rotator;
+    #region SavePoint Menu
+
+    public GameObject SavePointCanvas;
+    public GameObject SavePointMenu;
+    public GameObject HSAbilitySwapMenu;
+    public GameObject HSAbilityUpgradeMenu;
+    public Image backgroundImage1;
+    public Image backgroundImage2;
+    public Transform hsUpgrade_rotator;
     public List<HSAbilityUpgradeUI> hsUpgradeUIs = new List<HSAbilityUpgradeUI>();
 
-    [FoldoutGroup("EndCanvas",
-        nameof(EndGameCanvas))]
-    public Void EndGameVoidHolder;
+    #endregion SavePoint Menu
 
-    [SerializeField, HideProperty] public GameObject EndGameCanvas;
+    #region End and Fade Menu
 
-    [FoldoutGroup("Transition",
-        nameof(FadeCanvas),
-        nameof(fadeOutImage),
-        nameof(_fadeOutTime),
-        nameof(_fadeInTime))]
-    public Void TransitionVoidHolder;
+    public GameObject EndGameCanvas;
 
-    [SerializeField, HideProperty] public GameObject FadeCanvas;
-    [SerializeField, HideProperty] public Image fadeOutImage;
-    [SerializeField, HideProperty][Range(0.1f, 10f)] public float _fadeOutTime = 1f;
-    [SerializeField, HideProperty][Range(0.1f, 10f)] public float _fadeInTime = 1f;
+    public GameObject FadeCanvas;
+    public Image fadeOutImage;
+    [Range(0.1f, 10f)] public float _fadeOutTime = 1f;
+    [Range(0.1f, 10f)] public float _fadeInTime = 1f;
 
-    [FoldoutGroup("Store",
-        nameof(tradeItemPrefab),
-        nameof(StoreCanvas),
-        nameof(storeScrollRect),
-        nameof(tradeItemsHolder),
-        nameof(storeMenuTabHolder),
-        nameof(currencyText),
-        nameof(itemDetail_name),
-        nameof(itemDetail_description),
-        nameof(itemDetail_icon))]
-    public Void SToreHolder;
+    #endregion End and Fade Menu
 
-    [SerializeField, HideProperty] public GameObject tradeItemPrefab;
-    [SerializeField, HideProperty] public GameObject StoreCanvas;
-    [SerializeField, HideProperty] public ScrollRect storeScrollRect;
-    [SerializeField, HideProperty] public Transform tradeItemsHolder;
-    [SerializeField, HideProperty] public Transform storeMenuTabHolder;
-    [SerializeField, HideProperty] public TextMeshProUGUI currencyText;
-    [SerializeField, HideProperty] public TextMeshProUGUI itemDetail_name;
-    [SerializeField, HideProperty] public TextMeshProUGUI itemDetail_description;
-    [SerializeField, HideProperty] public Image itemDetail_icon;
+    #region Store Menu
+
+    public GameObject tradeItemPrefab;
+    public GameObject StoreCanvas;
+    public ScrollRect storeScrollRect;
+    public Transform tradeItemsHolder;
+    public Transform storeMenuTabHolder;
+    public TextMeshProUGUI currencyText;
+    public TextMeshProUGUI itemDetail_name;
+    public TextMeshProUGUI itemDetail_description;
+    public Image itemDetail_icon;
     private List<GameObject> StoreMenuTabs = new List<GameObject>();
     [HideInInspector] public List<GameObject> tradeItemPool = new List<GameObject>();
     private TradeItemType tradeItemType;
     [HideInInspector] public Store currentStore;
 
-    [FoldoutGroup("Quest",
-        nameof(questHolder),
-        nameof(border),
-        nameof(questUIPrefab),
-        nameof(objectiveUIPrefab))]
-    public Void QuestVoidHolder;
+    #endregion Store Menu
 
-    [SerializeField, HideProperty] public Transform questHolder;
-    [SerializeField, HideProperty] public Transform border;
-    [SerializeField, HideProperty] public GameObject questUIPrefab;
-    [SerializeField, HideProperty] public GameObject objectiveUIPrefab;
+    #region Quest UI
+
+    public Transform questHolder;
+    public Transform border;
+    public GameObject questUIPrefab;
+    public GameObject objectiveUIPrefab;
     [HideInInspector] public List<UI_Objective> ui_objs = new List<UI_Objective>();
+
+    #endregion Quest UI
+
+    #region Item Menu
+
+    public ItemMenuSlots[] itemMenuSlots;
+    public GameObject itemMenuCanvas;
+    public GameObject itemSelectionCanvas;
+
+    #endregion Item Menu
 
     #endregion Fields & Inspector
 
@@ -169,14 +150,6 @@ public class MenuManager : MonoBehaviour
         {
             PauseMenuTabs.Add(child.gameObject);
         }
-
-        //hsUpgradeUIs.Clear();
-        //foreach (Transform t in hsUpgrade_rotator.GetComponentsInChildren<Transform>(true))
-        //{
-        //    var ui = t.GetComponent<HSAbilityUpgradeUI>();
-        //    if (ui != null)
-        //        hsUpgradeUIs.Add(ui);
-        //}
     }
 
     #endregion Unity Methods
@@ -207,13 +180,18 @@ public class MenuManager : MonoBehaviour
             CloseSavePointCanvas();
             currentIndexTab = -1;
             NextTab();
+            CameraManager.instance.SwitchToNormalCam();
+        }
+        else if (itemMenuCanvas.activeInHierarchy)
+        {
+            CloseItemMenuCanvas();
         }
         canChangeTab = true;
+        Health.instance.SetCharacterUI(true);
     }
 
     public void BackToLastMenu()
     {
-        print("backed to last menu");
         EventSystem.current.currentSelectedGameObject?.GetComponent<IBackToLastMenu>()?.GoBack();
     }
 
@@ -224,7 +202,7 @@ public class MenuManager : MonoBehaviour
     {
         GameManager.instance.PauseGame();
         EndGameCanvas.SetActive(true);
-        EventSystem.current.SetSelectedGameObject(EndGameCanvas.GetComponent<FirstSelectObjectSerializer>().Selected());
+        EventSystemExtension.SetSelectObject(EndGameCanvas.GetComponent<FirstSelectObjectSerializer>().Selected());
     }
 
     #region PauseGame Menu
@@ -259,12 +237,13 @@ public class MenuManager : MonoBehaviour
     /// </summary>
     public void OpenSavePointCanvas()
     {
+        Health.instance.SetCharacterUI(false);
         currentIndexTab = -1;
         NextTab();
         SavePointCanvas.SetActive(true);
         SavePointMenu.SetActive(true);
         HSAbilitySwapMenu.SetActive(false);
-        EventSystem.current.SetSelectedGameObject(SavePointMenu.GetComponent<FirstSelectObjectSerializer>().Selected());
+        EventSystemExtension.SetSelectObject(SavePointMenu.GetComponent<FirstSelectObjectSerializer>().Selected());
         InputMaster.SwitchToUIAction();
     }
 
@@ -330,7 +309,6 @@ public class MenuManager : MonoBehaviour
             yield return new WaitForSeconds(0.3f);
             InputMaster.SwitchToGameplayAction();
         }
-        Health.instance.SetCharacterUI(true);
         currentIndexTab = 0;
         hsUpgrade_rotator.localRotation = Quaternion.Euler(0, 0, 0);
     }
@@ -354,7 +332,8 @@ public class MenuManager : MonoBehaviour
     /// <param name="store">The store to open.</param>
     public void OpenStoreCanvas(Store store)
     {
-        EventSystem.current.SetSelectedGameObject(tradeItemPool[0]);
+        Health.instance.SetCharacterUI(false);
+        EventSystemExtension.SetSelectObject(tradeItemPool[0]);
         StoreCanvas.SetActive(true);
 
         InputMaster.SwitchToUIAction();
@@ -413,6 +392,150 @@ public class MenuManager : MonoBehaviour
 
     #endregion StoreMenu
 
+    #region Item Menu
+
+    public void OpenItemMenu()
+    {
+        itemMenuCanvas.SetActive(true);
+        ItemManager itemManager = ItemManager.instance;
+        //according to the current equipped itemModule, update the itemMenuSlots, a
+        if (itemManager.currentItemModule != null)
+        {
+            OpenItemModule(itemManager.currentItemModule);
+            currentIndexTab = itemManager.availableItemModules.IndexOf(itemManager.currentItemModule);
+        }
+        else
+        {
+            if (itemManager.availableItemModules.Count > 0)
+            {
+                OpenItemModule(itemManager.availableItemModules[0]);
+                currentIndexTab = 0;
+            }
+        }
+    }
+
+    public void ShowItemMenuTab()
+    {
+        currentIndexTab = currentIndexTab % ItemManager.instance.availableItemModules.Count;
+        if (currentIndexTab < 0) { currentIndexTab = ItemManager.instance.availableItemModules.Count - 1; }
+        SwitchItemModule(ItemManager.instance.availableItemModules[currentIndexTab]);
+    }
+
+    public void OpenItemModule(ItemModule module)
+    {
+        CloseItemSelectionMenu();
+        foreach (ItemMenuSlots slot in itemMenuSlots)
+        {
+            slot.gameObject.SetActive(false);
+        }
+
+        List<ItemSlot> itemSlots = new List<ItemSlot>
+        {
+            module.item1,
+            module.item2,
+            module.item3,
+            module.item4,
+            module.item5,
+            module.item6
+        };
+
+        for (int i = 0; i < itemSlots.Count; i++)
+        {
+            if (itemSlots[i].slotLevel != ItemLevel.None)
+            {
+                itemMenuSlots[i].gameObject.SetActive(true);
+                itemMenuSlots[i].slotLevel = itemSlots[i].slotLevel;
+            }
+            else
+            {
+                itemMenuSlots[i].gameObject.SetActive(false);
+            }
+        }
+
+        ItemManager.SetCurrentItemModule(module);
+        UpdateItemSlotUI();
+        SelectFirstAvailableItemSlot();
+    }
+
+    public void SwitchItemModule(ItemModule module)
+    {
+        CloseItemSelectionMenu();
+        List<ItemSlot> itemSlots = new List<ItemSlot>
+        {
+            module.item1,
+            module.item2,
+            module.item3,
+            module.item4,
+            module.item5,
+            module.item6
+        };
+
+        for (int i = 0; i < itemSlots.Count; i++)
+        {
+            if (itemSlots[i].slotLevel != ItemLevel.None)
+            {
+                itemMenuSlots[i].gameObject.SetActive(true);
+                itemMenuSlots[i].slotLevel = itemSlots[i].slotLevel;
+                itemMenuSlots[i].FinishFadeTween();
+            }
+            else
+            {
+                itemMenuSlots[i].gameObject.SetActive(false);
+            }
+        }
+
+        ItemManager.SetCurrentItemModule(module);
+        UpdateItemSlotUI();
+        SelectFirstAvailableItemSlot();
+    }
+
+    public static void UpdateItemSlotUI()
+    {
+        foreach (ItemMenuSlots slot in instance.itemMenuSlots)
+        {
+            slot.UpdateUI();
+        }
+    }
+
+    public void SelectFirstAvailableItemSlot()
+    {
+        foreach (ItemMenuSlots slot in itemMenuSlots)
+        {
+            if (slot.gameObject.activeInHierarchy)
+            {
+                EventSystemExtension.SetSelectObject(slot.gameObject);
+                break;
+            }
+        }
+    }
+
+    public void CloseItemMenuCanvas()
+    {
+        itemMenuCanvas.SetActive(false);
+        OpenSavePointCanvas();
+    }
+
+    public void OpenItemSelectionMenu(ItemMenuSlots itemMenuSlot, ItemLevel itemLevel)
+    {
+        if (itemSelectionCanvas.GetComponent<ItemSelectionUI>().OpenItemSelectionMenu(itemMenuSlot, itemLevel))
+        {
+            itemSelectionCanvas.SetActive(true);
+        }
+    }
+
+    public void CloseItemSelectionMenu()
+    {
+        if (itemSelectionCanvas.activeInHierarchy)
+        {
+            GameObject obj = itemSelectionCanvas.GetComponent<ItemSelectionUI>().currentSlot.gameObject;
+            if (obj != null) EventSystemExtension.SetSelectObject(obj);
+            else SelectFirstAvailableItemSlot();
+            itemSelectionCanvas.SetActive(false);
+        }
+    }
+
+    #endregion Item Menu
+
     #region Tab Navigation
 
     /// <summary>
@@ -452,6 +575,10 @@ public class MenuManager : MonoBehaviour
         {
             ShowHSAbilityUpgradeTab();
         }
+        else if (itemMenuCanvas.activeInHierarchy)
+        {
+            ShowItemMenuTab();
+        }
     }
 
     public void ShowStoreTab()
@@ -474,7 +601,7 @@ public class MenuManager : MonoBehaviour
         UpdateStoreUI();
         var firstActive = tradeItemPool.FirstOrDefault(obj => obj.activeSelf);
         if (firstActive != null)
-            EventSystem.current.SetSelectedGameObject(firstActive);
+            EventSystemExtension.SetSelectObject(firstActive);
         storeScrollRect.GetComponent<ScrollRectAutoScroll>().ScrollToSelected(false);
     }
 
@@ -493,7 +620,7 @@ public class MenuManager : MonoBehaviour
         if (PauseMenuTabs[currentIndexTab] != null)
         {
             PauseMenuTabs[currentIndexTab].SetActive(true);
-            EventSystem.current.SetSelectedGameObject(PauseMenuTabs[currentIndexTab].GetComponent<FirstSelectObjectSerializer>().Selected());
+            EventSystemExtension.SetSelectObject(PauseMenuTabs[currentIndexTab].GetComponent<FirstSelectObjectSerializer>().Selected());
         }
     }
 
@@ -522,7 +649,7 @@ public class MenuManager : MonoBehaviour
 
         previousHSUpgradeTabIndex = currentIndexTab;
 
-        EventSystem.current.SetSelectedGameObject(
+        EventSystemExtension.SetSelectObject(
             hsUpgradeUIs[currentIndexTab * 2].gameObject
         );
     }

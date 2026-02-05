@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,7 @@ public class SavePoint : IDamagable
     private float hitTimer = 0f;
     private int hitCount = 0;
     public float comboTimeout = 1f; // seconds to wait before triggering combo
+    public CinemachineVirtualCamera cam;
 
     public void Update()
     {
@@ -53,6 +55,8 @@ public class SavePoint : IDamagable
     public void OpenMenu()
     {
         MenuManager.instance.OpenSavePointCanvas();
+        CharacterController2D.instance.RunToPosition(transform.position.x + 1f, null);
+        CameraManager.SwitchCamera(cam);
     }
 
     //third hit gives tokens

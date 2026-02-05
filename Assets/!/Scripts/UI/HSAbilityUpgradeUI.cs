@@ -60,7 +60,7 @@ public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
 
         GetComponent<Button>().onClick.AddListener(() =>
         {
-            EventSystem.current.SetSelectedGameObject(origin.gameObject);
+            EventSystemExtension.SetSelectObject(origin.gameObject);
         });
 
         CreateConnectionLines();

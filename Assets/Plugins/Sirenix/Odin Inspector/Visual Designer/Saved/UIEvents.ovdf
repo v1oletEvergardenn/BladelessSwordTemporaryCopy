@@ -1,0 +1,33 @@
+OVDF v1.1
+UIEvents, Project.Main
+MetaGuid:8f92b1893ead55046b3be42e77760649
+
+# $UNTfRkgFBVJazHUKqY1BAT
+Position: $root:6
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "Back To Last Page"
+
+# $WyfUfgujJkwJMFHPqFzfU1
+Position: $root:5
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "Events"
+
+# menuToGoBack
+Position: $UNTfRkgFBVJazHUKqY1BAT:1
+
+# backToLastPageEvent
+Position: $UNTfRkgFBVJazHUKqY1BAT:0
+
+# disableEvent
+Position: $WyfUfgujJkwJMFHPqFzfU1:3
+
+# onenableEvent
+Position: $WyfUfgujJkwJMFHPqFzfU1:2
+
+# selectedObjectOnEnable
+Position: $WyfUfgujJkwJMFHPqFzfU1:1
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "setSelectedObjectOnEnable"
+
+# setSelectedObjectOnEnable
+Position: $WyfUfgujJkwJMFHPqFzfU1:0

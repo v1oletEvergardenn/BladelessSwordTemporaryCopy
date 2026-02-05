@@ -376,6 +376,15 @@ public class CharacterController2D : MonoBehaviour
         }
     }
 
+    public void FaceTarget(Vector3 pos)
+    {
+        if ((pos.x <= transform.position.x && FacingRight) ||
+                   (pos.x > transform.position.x && !FacingRight))
+        {
+            Flip();
+        }
+    }
+
     #endregion Flipping & Facing
 
     #region Teleportation
@@ -391,7 +400,7 @@ public class CharacterController2D : MonoBehaviour
         co_teleport = StartCoroutine(TeleportCoroutine(FacingRight));
     }
 
-    public IEnumerator RunToPositionCoroutine(Vector3 target, Action callBack = null)
+    public IEnumerator RunToPositionCoroutine(Vector3 target, Action callBack = null, bool faceTarget = true)
     {
         bool originalEnabled = InputMaster.instance._defendAction.enabled;
         InputMaster.instance._defendAction.Disable();
@@ -403,12 +412,19 @@ public class CharacterController2D : MonoBehaviour
         if (originalEnabled)
             InputMaster.instance._defendAction.Enable();
         yield return null;
+        if (faceTarget)
+            FaceTarget(target);
         callBack?.Invoke();
     }
 
-    public void RunToPosition(Vector3 target, Action callBack)
+    public void RunToPosition(Vector3 target, Action callBack = null, bool faceTarget = true)
     {
-        StartCoroutine(RunToPositionCoroutine(target, callBack));
+        StartCoroutine(RunToPositionCoroutine(target, callBack, faceTarget));
+    }
+
+    public void RunToPosition(float x, Action callBack = null, bool faceTarget = true)
+    {
+        RunToPosition(new Vector3(x, transform.position.y, 0), callBack, faceTarget);
     }
 
     public void DesignatedPositionTeleport(Vector3 pos)

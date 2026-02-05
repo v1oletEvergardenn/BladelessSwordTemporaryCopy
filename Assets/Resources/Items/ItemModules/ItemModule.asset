@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a61e6c4bd087b2a448aa87d6a22f4146, type: 3}
+  m_Name: ItemModule
+  m_EditorClassIdentifier: 
+  moduleName: test1
+  item1:
+    slotLevel: 1
+    itemID: 6
+    item: {fileID: 11400000, guid: 7a6dc44394e239f4083f5726427016ff, type: 2}
+  item2:
+    slotLevel: 2
+    itemID: 21
+    item: {fileID: 11400000, guid: 78db0df2e12ecd84cbc52992b076a8ab, type: 2}
+  item3:
+    slotLevel: 2
+    itemID: 21
+    item: {fileID: 0}
+  item4:
+    slotLevel: 1
+    itemID: 24
+    item: {fileID: 11400000, guid: f13282334b3114b489a044a1f8063977, type: 2}
+  item5:
+    slotLevel: 1
+    itemID: 22
+    item: {fileID: 11400000, guid: 69a3d78757bda7646b6a0f9af2621a36, type: 2}
+  item6:
+    slotLevel: 3
+    itemID: 0
+    item: {fileID: 0}

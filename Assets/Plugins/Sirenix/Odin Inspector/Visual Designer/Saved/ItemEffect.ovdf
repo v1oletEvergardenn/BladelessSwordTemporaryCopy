@@ -1,0 +1,21 @@
+OVDF v1.1
+ItemEffect, Project.Main
+
+# $HTAL2MAJY3zcjAkzLbdYSa
+Position: $root
++ [Sirenix.OdinInspector.HorizontalGroupAttribute]
+
+# effectType
+Position: $HTAL2MAJY3zcjAkzLbdYSa:0
++ [Sirenix.OdinInspector.PropertySpaceAttribute]
+	SpaceBefore = 0
+	SpaceAfter = 0
++ [Sirenix.OdinInspector.EnumPagingAttribute]
++ [Sirenix.OdinInspector.GUIColorAttribute]
+	Color = #F5392DFF
+	GetColor = "GetColor"
+
+# factor
+Position: $HTAL2MAJY3zcjAkzLbdYSa:1
++ [Sirenix.OdinInspector.GUIColorAttribute]
+	GetColor = "GetColor"
