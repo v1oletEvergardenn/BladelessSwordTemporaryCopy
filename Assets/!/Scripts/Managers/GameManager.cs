@@ -112,6 +112,7 @@ public class GameManager : MonoBehaviour
 
     public void CreatePlayerReference(GameObject _player)
     {
+        InputMaster.SwitchToGameplayAction();
         if (_player == null) return;
         player = _player;
         playerhealth = _player.GetComponentInChildren<Health>();

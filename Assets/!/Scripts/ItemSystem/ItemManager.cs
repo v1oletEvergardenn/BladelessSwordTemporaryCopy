@@ -88,7 +88,7 @@ public class ItemManager : MonoBehaviour
 
     public static List<Item> GetEquippedItems()
     {
-        return instance.currentItemModule.GetEquippedItems();
+        return GetCurrentItemModule().GetEquippedItems();
     }
 
     private void BuildItemDictionary()

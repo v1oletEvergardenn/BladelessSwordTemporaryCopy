@@ -28,6 +28,9 @@ public class InputMaster : MonoBehaviour
     [HideInInspector] public InputAction _EventKeyAction;
     [HideInInspector] public InputAction _EventFlipPageAction;
     [HideInInspector] public InputAction _MenuOpenAction;
+
+    [HideInInspector] public InputAction _OpenMapAction;
+    [HideInInspector] public InputAction _CloseMapAction;
     [HideInInspector] public InputAction _AbilityX;
     [HideInInspector] public InputAction _AbilityY;
     [HideInInspector] public InputAction _AbilityB;
@@ -67,6 +70,8 @@ public class InputMaster : MonoBehaviour
         _EventKeyAction = gameplayActions.EventKey;
         _EventFlipPageAction = gameplayActions.Event_flip_page;
         _MenuOpenAction = gameplayActions.MenuOpen;
+        _OpenMapAction = gameplayActions.OpenMap;
+        _CloseMapAction = uiActions.MapClose;
         _AbilityX = gameplayActions.AbilityX;
         _AbilityB = gameplayActions.AbilityB;
         _AbilityY = gameplayActions.AbilityY;

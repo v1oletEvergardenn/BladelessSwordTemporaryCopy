@@ -143,6 +143,15 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OpenMap"",
+                    ""type"": ""Button"",
+                    ""id"": ""7816c927-e525-4af0-926f-77fa531da828"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -288,6 +297,17 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""action"": ""AbilityB"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fe5c25d7-53e6-41ff-b5ec-7767a362f168"",
+                    ""path"": ""<Gamepad>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenMap"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -395,6 +415,15 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""MapClose"",
+                    ""type"": ""Button"",
+                    ""id"": ""12515cfe-fd75-4b74-992b-4ce723ebae1b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""FlipPageLeft"",
                     ""type"": ""Button"",
                     ""id"": ""0a4f7744-d4b6-4826-8697-bad0a2e80016"",
@@ -434,6 +463,42 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""name"": ""Uninstall"",
                     ""type"": ""Button"",
                     ""id"": ""7cdab770-3931-43e5-9257-4c871e3c1f9b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ZoomIn"",
+                    ""type"": ""Value"",
+                    ""id"": ""e5d3b839-8cd1-46d0-bb89-39ff53045068"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ZoomOut"",
+                    ""type"": ""Value"",
+                    ""id"": ""d15a5fb4-89f3-4e30-80ac-fb6bb75fe48e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Move"",
+                    ""type"": ""Value"",
+                    ""id"": ""c9f29ce7-d8a6-47bf-a7cb-1c503414ecff"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Delete"",
+                    ""type"": ""Button"",
+                    ""id"": ""33d61687-8abf-46f4-95f0-c8a7cbb827b5"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -946,6 +1011,83 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Uninstall"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ff776ee7-7300-44f2-8cd7-34892fd82480"",
+                    ""path"": ""<Gamepad>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MapClose"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""65dade15-104f-4896-846a-98a53eec55f4"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ZoomIn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0a5f1ca6-46d5-4801-8e0e-83ece976329e"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ZoomOut"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6d47dda6-5597-4f2a-a1c3-924e120940e2"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""77f62b84-d99b-460c-9e40-b9e6e59be4c6"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1e653666-56a1-4729-842f-8a0a682c5188"",
+                    ""path"": ""<Gamepad>/dpad"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b18b24fa-0c84-4127-aace-98637db7131c"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Delete"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1015,6 +1157,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         m_Gameplay_AbilityX = m_Gameplay.FindAction("AbilityX", throwIfNotFound: true);
         m_Gameplay_AbilityY = m_Gameplay.FindAction("AbilityY", throwIfNotFound: true);
         m_Gameplay_AbilityB = m_Gameplay.FindAction("AbilityB", throwIfNotFound: true);
+        m_Gameplay_OpenMap = m_Gameplay.FindAction("OpenMap", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1028,11 +1171,16 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
         m_UI_MenuClose = m_UI.FindAction("MenuClose", throwIfNotFound: true);
+        m_UI_MapClose = m_UI.FindAction("MapClose", throwIfNotFound: true);
         m_UI_FlipPageLeft = m_UI.FindAction("FlipPageLeft", throwIfNotFound: true);
         m_UI_FlipPageRight = m_UI.FindAction("FlipPageRight", throwIfNotFound: true);
         m_UI_FlipPage_LB = m_UI.FindAction("FlipPage_LB", throwIfNotFound: true);
         m_UI_FlipPage_RB = m_UI.FindAction("FlipPage_RB", throwIfNotFound: true);
         m_UI_Uninstall = m_UI.FindAction("Uninstall", throwIfNotFound: true);
+        m_UI_ZoomIn = m_UI.FindAction("ZoomIn", throwIfNotFound: true);
+        m_UI_ZoomOut = m_UI.FindAction("ZoomOut", throwIfNotFound: true);
+        m_UI_Move = m_UI.FindAction("Move", throwIfNotFound: true);
+        m_UI_Delete = m_UI.FindAction("Delete", throwIfNotFound: true);
         // WarningWindow
         m_WarningWindow = asset.FindActionMap("WarningWindow", throwIfNotFound: true);
         m_WarningWindow_Confirm = m_WarningWindow.FindAction("Confirm", throwIfNotFound: true);
@@ -1111,6 +1259,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_AbilityX;
     private readonly InputAction m_Gameplay_AbilityY;
     private readonly InputAction m_Gameplay_AbilityB;
+    private readonly InputAction m_Gameplay_OpenMap;
     public struct GameplayActions
     {
         private @ControllerInput m_Wrapper;
@@ -1128,6 +1277,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         public InputAction @AbilityX => m_Wrapper.m_Gameplay_AbilityX;
         public InputAction @AbilityY => m_Wrapper.m_Gameplay_AbilityY;
         public InputAction @AbilityB => m_Wrapper.m_Gameplay_AbilityB;
+        public InputAction @OpenMap => m_Wrapper.m_Gameplay_OpenMap;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1176,6 +1326,9 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @AbilityB.started += instance.OnAbilityB;
             @AbilityB.performed += instance.OnAbilityB;
             @AbilityB.canceled += instance.OnAbilityB;
+            @OpenMap.started += instance.OnOpenMap;
+            @OpenMap.performed += instance.OnOpenMap;
+            @OpenMap.canceled += instance.OnOpenMap;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -1219,6 +1372,9 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @AbilityB.started -= instance.OnAbilityB;
             @AbilityB.performed -= instance.OnAbilityB;
             @AbilityB.canceled -= instance.OnAbilityB;
+            @OpenMap.started -= instance.OnOpenMap;
+            @OpenMap.performed -= instance.OnOpenMap;
+            @OpenMap.canceled -= instance.OnOpenMap;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -1251,11 +1407,16 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_TrackedDevicePosition;
     private readonly InputAction m_UI_TrackedDeviceOrientation;
     private readonly InputAction m_UI_MenuClose;
+    private readonly InputAction m_UI_MapClose;
     private readonly InputAction m_UI_FlipPageLeft;
     private readonly InputAction m_UI_FlipPageRight;
     private readonly InputAction m_UI_FlipPage_LB;
     private readonly InputAction m_UI_FlipPage_RB;
     private readonly InputAction m_UI_Uninstall;
+    private readonly InputAction m_UI_ZoomIn;
+    private readonly InputAction m_UI_ZoomOut;
+    private readonly InputAction m_UI_Move;
+    private readonly InputAction m_UI_Delete;
     public struct UIActions
     {
         private @ControllerInput m_Wrapper;
@@ -1271,11 +1432,16 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         public InputAction @TrackedDevicePosition => m_Wrapper.m_UI_TrackedDevicePosition;
         public InputAction @TrackedDeviceOrientation => m_Wrapper.m_UI_TrackedDeviceOrientation;
         public InputAction @MenuClose => m_Wrapper.m_UI_MenuClose;
+        public InputAction @MapClose => m_Wrapper.m_UI_MapClose;
         public InputAction @FlipPageLeft => m_Wrapper.m_UI_FlipPageLeft;
         public InputAction @FlipPageRight => m_Wrapper.m_UI_FlipPageRight;
         public InputAction @FlipPage_LB => m_Wrapper.m_UI_FlipPage_LB;
         public InputAction @FlipPage_RB => m_Wrapper.m_UI_FlipPage_RB;
         public InputAction @Uninstall => m_Wrapper.m_UI_Uninstall;
+        public InputAction @ZoomIn => m_Wrapper.m_UI_ZoomIn;
+        public InputAction @ZoomOut => m_Wrapper.m_UI_ZoomOut;
+        public InputAction @Move => m_Wrapper.m_UI_Move;
+        public InputAction @Delete => m_Wrapper.m_UI_Delete;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1318,6 +1484,9 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @MenuClose.started += instance.OnMenuClose;
             @MenuClose.performed += instance.OnMenuClose;
             @MenuClose.canceled += instance.OnMenuClose;
+            @MapClose.started += instance.OnMapClose;
+            @MapClose.performed += instance.OnMapClose;
+            @MapClose.canceled += instance.OnMapClose;
             @FlipPageLeft.started += instance.OnFlipPageLeft;
             @FlipPageLeft.performed += instance.OnFlipPageLeft;
             @FlipPageLeft.canceled += instance.OnFlipPageLeft;
@@ -1333,6 +1502,18 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @Uninstall.started += instance.OnUninstall;
             @Uninstall.performed += instance.OnUninstall;
             @Uninstall.canceled += instance.OnUninstall;
+            @ZoomIn.started += instance.OnZoomIn;
+            @ZoomIn.performed += instance.OnZoomIn;
+            @ZoomIn.canceled += instance.OnZoomIn;
+            @ZoomOut.started += instance.OnZoomOut;
+            @ZoomOut.performed += instance.OnZoomOut;
+            @ZoomOut.canceled += instance.OnZoomOut;
+            @Move.started += instance.OnMove;
+            @Move.performed += instance.OnMove;
+            @Move.canceled += instance.OnMove;
+            @Delete.started += instance.OnDelete;
+            @Delete.performed += instance.OnDelete;
+            @Delete.canceled += instance.OnDelete;
         }
 
         private void UnregisterCallbacks(IUIActions instance)
@@ -1370,6 +1551,9 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @MenuClose.started -= instance.OnMenuClose;
             @MenuClose.performed -= instance.OnMenuClose;
             @MenuClose.canceled -= instance.OnMenuClose;
+            @MapClose.started -= instance.OnMapClose;
+            @MapClose.performed -= instance.OnMapClose;
+            @MapClose.canceled -= instance.OnMapClose;
             @FlipPageLeft.started -= instance.OnFlipPageLeft;
             @FlipPageLeft.performed -= instance.OnFlipPageLeft;
             @FlipPageLeft.canceled -= instance.OnFlipPageLeft;
@@ -1385,6 +1569,18 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
             @Uninstall.started -= instance.OnUninstall;
             @Uninstall.performed -= instance.OnUninstall;
             @Uninstall.canceled -= instance.OnUninstall;
+            @ZoomIn.started -= instance.OnZoomIn;
+            @ZoomIn.performed -= instance.OnZoomIn;
+            @ZoomIn.canceled -= instance.OnZoomIn;
+            @ZoomOut.started -= instance.OnZoomOut;
+            @ZoomOut.performed -= instance.OnZoomOut;
+            @ZoomOut.canceled -= instance.OnZoomOut;
+            @Move.started -= instance.OnMove;
+            @Move.performed -= instance.OnMove;
+            @Move.canceled -= instance.OnMove;
+            @Delete.started -= instance.OnDelete;
+            @Delete.performed -= instance.OnDelete;
+            @Delete.canceled -= instance.OnDelete;
         }
 
         public void RemoveCallbacks(IUIActions instance)
@@ -1471,6 +1667,7 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         void OnAbilityX(InputAction.CallbackContext context);
         void OnAbilityY(InputAction.CallbackContext context);
         void OnAbilityB(InputAction.CallbackContext context);
+        void OnOpenMap(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
@@ -1485,11 +1682,16 @@ public partial class @ControllerInput: IInputActionCollection2, IDisposable
         void OnTrackedDevicePosition(InputAction.CallbackContext context);
         void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
         void OnMenuClose(InputAction.CallbackContext context);
+        void OnMapClose(InputAction.CallbackContext context);
         void OnFlipPageLeft(InputAction.CallbackContext context);
         void OnFlipPageRight(InputAction.CallbackContext context);
         void OnFlipPage_LB(InputAction.CallbackContext context);
         void OnFlipPage_RB(InputAction.CallbackContext context);
         void OnUninstall(InputAction.CallbackContext context);
+        void OnZoomIn(InputAction.CallbackContext context);
+        void OnZoomOut(InputAction.CallbackContext context);
+        void OnMove(InputAction.CallbackContext context);
+        void OnDelete(InputAction.CallbackContext context);
     }
     public interface IWarningWindowActions
     {

@@ -49,6 +49,12 @@ public class MenuManager : MonoBehaviour
 
     #region Fields & Inspector
 
+    #region Map Menu
+
+    public GameObject MapCanvas;
+
+    #endregion Map Menu
+
     #region PauseGame Menu
 
     public GameObject PauseGameCanvas;
@@ -133,7 +139,10 @@ public class MenuManager : MonoBehaviour
         InputMaster.instance.uiActions.FlipPage_RB.performed += ctx => NextTab();
         InputMaster.instance._MenuOpenAction.performed += ctx => OpenPauseGameCanvas();
         InputMaster.instance.uiActions.MenuClose.performed += ctx => CloseMenu();
+        InputMaster.instance.uiActions.Uninstall.performed += ctx => CloseMenu();
         InputMaster.instance.uiActions.Cancel.performed += ctx => BackToLastMenu();
+        InputMaster.instance._OpenMapAction.performed += ctx => OpenMapCanvas();
+        InputMaster.instance._CloseMapAction.performed += ctx => CloseMapCanvas();
         // Register input events for tab navigation and menu open/close
 
         UpdateQuestUI();
@@ -162,6 +171,12 @@ public class MenuManager : MonoBehaviour
         if (PauseGameCanvas.activeInHierarchy)
         {
             ClosePauseGameCanvas();
+            currentIndexTab = -1;
+            NextTab();
+        }
+        else if (MapCanvas.activeInHierarchy)
+        {
+            CloseMapCanvas();
             currentIndexTab = -1;
             NextTab();
         }
@@ -204,6 +219,20 @@ public class MenuManager : MonoBehaviour
         EndGameCanvas.SetActive(true);
         EventSystemExtension.SetSelectObject(EndGameCanvas.GetComponent<FirstSelectObjectSerializer>().Selected());
     }
+
+    #region Map Menu
+
+    public void OpenMapCanvas()
+    {
+        MapManager.instance.OpenMap();
+    }
+
+    public void CloseMapCanvas()
+    {
+        MapManager.instance.CloseMap();
+    }
+
+    #endregion Map Menu
 
     #region PauseGame Menu
 

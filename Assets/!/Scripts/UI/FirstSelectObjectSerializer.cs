@@ -29,7 +29,19 @@ public class FirstSelectObjectSerializer : MonoBehaviour
 
     public void SetFirstObject()
     {
-        EventSystemExtension.SetSelectObject(FirstSelectObject);
+        StartCoroutine(DeferredSelect());
+    }
+
+    private IEnumerator DeferredSelect()
+    {
+        // Clear current selection immediately so the submit that opened this UI doesn't hit a control
+        if (EventSystem.current != null)
+            EventSystem.current.SetSelectedGameObject(null);
+
+        // Wait at least one frame to let the input that opened this UI be released/ignored
+        yield return null;
+        if (EventSystem.current != null && FirstSelectObject != null)
+            EventSystemExtension.SetSelectObject(FirstSelectObject);
     }
 
     public void DisSelected()
