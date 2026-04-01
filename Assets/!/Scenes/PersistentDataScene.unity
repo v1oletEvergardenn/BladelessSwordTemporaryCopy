@@ -2522,7 +2522,6 @@ GameObject:
   - component: {fileID: 1557597963}
   - component: {fileID: 1557597962}
   - component: {fileID: 1557597961}
-  - component: {fileID: 1557597964}
   - component: {fileID: 1557597967}
   m_Layer: 24
   m_Name: MapCanvas
@@ -2619,19 +2618,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 2
   m_TargetDisplay: 0
---- !u!114 &1557597964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1557597959}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42032a675a2e9e440b34190901cc399d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  disactiveTime: 0
 --- !u!225 &1557597967
 CanvasGroup:
   m_ObjectHideFlags: 0

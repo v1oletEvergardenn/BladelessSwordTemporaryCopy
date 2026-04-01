@@ -105,8 +105,6 @@ public class MapManager : MonoBehaviour
     {
         inputMaster = InputMaster.instance;
 
-        inputMaster._OpenMapAction.performed += ctx => OpenMap();
-        inputMaster._CloseMapAction.performed += ctx => CloseMap();
         inputMaster.uiActions.Move.performed += ctx => cursorInput = ctx.ReadValue<Vector2>();
         inputMaster.uiActions.Move.canceled += ctx => cursorInput = Vector2.zero;
         inputMaster.uiActions.Submit.started += ctx => OnPlaceOrSelectIcon();
@@ -139,8 +137,6 @@ public class MapManager : MonoBehaviour
     {
         if (inputMaster != null)
         {
-            inputMaster._OpenMapAction.performed -= ctx => OpenMap();
-            inputMaster._CloseMapAction.performed -= ctx => CloseMap();
             inputMaster.uiActions.Move.performed -= ctx => cursorInput = ctx.ReadValue<Vector2>();
             inputMaster.uiActions.Move.canceled -= ctx => cursorInput = Vector2.zero;
             inputMaster.uiActions.Submit.started -= ctx => OnPlaceOrSelectIcon();
@@ -330,7 +326,6 @@ public class MapManager : MonoBehaviour
     public void OpenMap()
     {
         if (isMapOpen) return;
-
         isMapOpen = true;
         mapCanvas.SetActive(true);
 
