@@ -30,9 +30,10 @@ public class YYF_BubbleTrap : IEnemyAction
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         proceedCall = false;
-        bool isBlack = true;
-        if (bossAI.isBlackBusy) { isBlack = false; }
-        bossAI.SetBusy(isBlack);
+        //bool isBlack = true;
+        //if (bossAI.isBlackBusy) { isBlack = false; }
+        //bossAI.SetBusy(isBlack);
+        bool isBlack = factor == 0 ? true : false;
 
         Animator anim = isBlack ? bossAI.blackAnim : bossAI.whiteAnim;
         Transform fish = isBlack ? bossAI.blackFish : bossAI.whiteFish;
@@ -40,7 +41,7 @@ public class YYF_BubbleTrap : IEnemyAction
         Transform fishGFX = isBlack ? bossAI.blackFishGFX : bossAI.whiteFishGFX;
 
         // dive
-        yield return bossAI.co_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack, bossAI.IsPlayerLeft()));
+        //yield return bossAI.co_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack, bossAI.IsPlayerLeft()));
         if (isBlack) { bossAI.SetBlackTargetRotateSpeed(0); bossAI.black_rotateSpeed = 0; }
         else { bossAI.SetWhiteTargetRotateSpeed(0); bossAI.white_rotateSpeed = 0; }
         origin.eulerAngles = new Vector3(0, 0, 180);
@@ -110,15 +111,9 @@ public class YYF_BubbleTrap : IEnemyAction
 
         yield return new WaitForSeconds(0.3f);
         origin.localScale = new Vector3(1, 1, 1);
-        fish.DOLocalMoveY(3, 1f);
-
+        fish.DOLocalMoveY(3, 0.2f);
         anim.Play("close_swim");
-        //swim back
-        yield return bossAI.co_singleReturnToCenter = StartCoroutine(bossAI.IEReturnToCenter(isBlack));
-
-        //end
-        bossAI.SetNotBusy(isBlack);
-        bossAI.AddActionBreak(actionBreakAmount);
-        bossAI.EndAction();
+        //bossAI.AddActionBreak(actionBreakAmount);
+        yield return null;
     }
 }

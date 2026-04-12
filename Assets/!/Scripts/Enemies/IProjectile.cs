@@ -146,7 +146,7 @@ public abstract class IProjectile : MonoBehaviour
             if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
             if (collision.gameObject == gameManager.player && collision.gameObject.layer == 14) { return; }
             vfx.SpawnHitEffect(false, GetPivot());
-            target.Damage(damage, transform, stunDuration, stunValue: stunValue);
+            target.Damage(damage, this.transform, stunDuration, stunValue: stunValue);
             this.gameObject.SetActive(false);
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0)

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.UI.Image;
 
 public class YYF_Swing : IEnemyAction
 {
@@ -11,10 +12,12 @@ public class YYF_Swing : IEnemyAction
 
     public bool showRange = true;
     public GameObject swingEffect;
+    public GameObject sinlgeSwingEffect;
     public GameObject swing_outline;
 
     public MeleeAttack swingAttack = new MeleeAttack(2, 0.5f, 0.2f, new Vector2(0.25f, 0.4f), 0.2f, 20f, 0.1f);
     public float swingRange;
+    public float largeSwingRange;
     public float swingAttackDuration;
     public float stunValue = 35f;
 
@@ -30,6 +33,7 @@ public class YYF_Swing : IEnemyAction
     {
         base.CancelAct();
         swingEffect.SetActive(false);
+        sinlgeSwingEffect.SetActive(false);
         swing_outline.SetActive(false);
     }
 
@@ -38,104 +42,146 @@ public class YYF_Swing : IEnemyAction
         return (!bossAI.isWhiteBusy && !bossAI.isBlackBusy);
     }
 
-    /// <summary>
-    ///1 = qte for counter attack, final phase
-    ///<para>2 = qte for sword teleport, final phase </para>
-    ///<para>3 = double swing, final phase  </para>
-    ///<para>4 = combo from water spear, if counter attacked, 50% chance double swing</para>
-    /// </summary>
-    /// <param name="factor"> </param>
-    /// <returns></returns>
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         proceedCall = false;
-        bossAI.SetBlackBusy();
-        bossAI.SetWhiteBusy();
-        localFactor = factor;
-        if (factor != 3)
+        if (factor == 0 || factor == 1)
         {
-            yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
-            yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
-        }
+            bool isBlack = factor == 0 ? true : false;
+            Animator anim = isBlack ? bossAI.blackAnim : bossAI.whiteAnim;
+            Transform fish = isBlack ? bossAI.blackFish : bossAI.whiteFish;
+            Transform origin = isBlack ? bossAI.blackOrigin : bossAI.whiteOrigin;
+            Transform fishGFX = isBlack ? bossAI.blackFishGFX : bossAI.whiteFishGFX;
 
-        bossAI.SetBlackTargetRotateSpeed(bossAI.idleRotateSpeed / 4);
-        bossAI.SetWhiteTargetRotateSpeed(bossAI.idleRotateSpeed / 4);
+            Vector3 target = player.transform.position + new Vector3(0, 3, 0);
+            bool toLeft = target.x < origin.position.x;
 
-        bossAI.whiteAnim.Play("swing");
-        bossAI.blackAnim.Play("swing");
+            // move to appropriate x position
+            if (toLeft) { origin.DOMove(new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0), 1f); }
+            else { origin.DOMove(new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0), 1f); }
 
-        swing_outline.transform.SetParent(transform);
-        swing_outline.transform.localPosition = Vector3.zero;
-        if (factor == 1)
-        {
-            yield return new WaitForSeconds(0.4f);
+            //reset to initial
+            origin.eulerAngles = Vector3.zero;
+            fish.localPosition = new Vector3(0, 1, 0);
+            fishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.1f);
+            fishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.1f);
+
+            // rotate to target position angle
+            float angle = 210;
+            if (!toLeft) { angle += 90; }
+            origin.Rotate(bossAI.Dir, angle);
+
+            yield return new WaitForSeconds(1f);
+
+            //jump out
+            float temp_x = toLeft ? player.transform.position.x - 2 : player.transform.position.x + 2;
+            origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 4.5f, 0), 0.5f).SetEase(Ease.OutSine);
+
+            //pre swing attack
+            yield return new WaitForSeconds(0.3f);
+            anim.Play("swing", 0, 0.5f);
+            swing_outline.transform.SetParent(origin);
+            swing_outline.transform.position = origin.position;
             swing_outline.SetActive(true);
-            InputKeyType inputKey = InputKeyType.left_attack_key;
-            if (bossAI.IsPlayerLeft()) { inputKey = InputKeyType.right_attack_key; }
-            InputMaster.instance.StartQTE(inputKey, player.transform.position + new Vector3(0, 4, 0), 0.3f, () =>
+
+            //swing attack movement
+            yield return new WaitForSeconds(0.3f);
+            if (isBlack)
             {
-                playerAttack.Attack(bossAI.IsPlayerLeft() ? false : true);
-            }, null);
-        }//qte
+                float _x = origin.position.x + 5;
+                if (player.transform.position.x <= fish.position.x) { _x = origin.position.x - 5; }
+                origin.DOMoveX(_x, 0.3f).SetEase(Ease.InQuint);
+            }
+
+            //actual attack
+            yield return new WaitForSeconds(0.2f);
+            anim.Play("swing_attack");
+            Vector3 dirToPlayer = player.transform.position - sinlgeSwingEffect.transform.position;
+            float angleToPlayer = Mathf.Atan2(dirToPlayer.y, dirToPlayer.x) * Mathf.Rad2Deg;
+            sinlgeSwingEffect.transform.eulerAngles = new Vector3(0, 0, angleToPlayer);
+            sinlgeSwingEffect.transform.SetParent(origin);
+            sinlgeSwingEffect.transform.position = origin.position;
+            sinlgeSwingEffect.SetActive(true);
+            StartCoroutine(ApplyAttackInCircle(swingAttackDuration, isBlack ? swingRange : largeSwingRange, origin, swingAttack));
+
+            //return to water
+            yield return bossAI.co_return_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack, !toLeft));
+        }
         else if (factor == 2)
         {
-            yield return new WaitForSeconds(0.4f);
-            swing_outline.SetActive(true);
-            InputKeyType inputKey = InputKeyType.swordTeleport_key;
-            Vector3 pos = new Vector3(12, 5, 0);
-            if (bossAI.IsPlayerLeft()) { pos = new Vector3(-12, 5, 0); }
-            InputMaster.instance.StartQTE(inputKey, player.transform.position + new Vector3(0, 4, 0),
-                0.3f, () => { playerController.DesignatedPositionTeleport(player.transform.position + pos); }, null);
-            yield return new WaitUntil(() => !InputMaster.instance.isQTE);
-        }
-        else
-        {
-            yield return new WaitForSeconds(0.5f);
-            swing_outline.SetActive(true);
+            swing_outline.transform.SetParent(transform);
+            swing_outline.transform.localPosition = Vector3.zero;
+
+            Transform origin = bossAI.fish_origin;
+
+            //reset to initial
+            origin.position = bossAI.blackOrigin.position;
+            bossAI.blackOrigin.localPosition = Vector3.zero;
+            bossAI.whiteOrigin.localPosition = Vector3.zero;
+            bossAI.blackFish.localPosition = new Vector3(0, 1, 0);
+            bossAI.whiteFish.localPosition = new Vector3(0, 1, 0);
+            bossAI.blackOrigin.eulerAngles = new Vector3(0, 0, 180);
+            bossAI.whiteOrigin.eulerAngles = Vector3.zero;
+            bossAI.whiteFishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.1f);
+            bossAI.whiteFishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.1f);
+            bossAI.blackFishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.1f);
+            bossAI.blackFishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.1f);
+
+            //move to position
+            Vector3 target = player.transform.position + new Vector3(0, 3, 0);
+            bool toLeft = target.x < origin.position.x;
+            if (toLeft) { origin.DOMove(new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0), 1f); }
+            else { origin.DOMove(new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0), 1f); }
+
+            // rotate to target position angle
+            float angle = 210;
+            if (!toLeft) { angle += 90; }
+            bossAI.whiteOrigin.Rotate(bossAI.Dir, angle);
+            bossAI.blackOrigin.Rotate(bossAI.Dir, angle);
+
+            yield return new WaitForSeconds(1f);
+
+            //out of the water
+            float temp_x = toLeft ? player.transform.position.x - 2 : player.transform.position.x + 2;
+            origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 4.5f, 0), 0.5f).SetEase(Ease.OutSine);
+
+            //pre swing attack
             yield return new WaitForSeconds(0.3f);
+            bossAI.blackAnim.Play("swing", 0, 0.5f);
+            bossAI.whiteAnim.Play("swing", 0, 0.5f);
+            swing_outline.transform.SetParent(origin);
+            swing_outline.transform.position = origin.position;
+            swing_outline.SetActive(true);
+
+            //swing attack movement
+            yield return new WaitForSeconds(0.3f);
+            float _x = origin.position.x + 5;
+            if (player.transform.position.x <= origin.position.x) { _x = origin.position.x - 5; }
+            origin.DOMoveX(_x, 0.3f).SetEase(Ease.InQuint);
+
+            //actual attack
+            yield return new WaitForSeconds(0.2f);
+            bossAI.blackAnim.Play("swing_attack");
+            bossAI.whiteAnim.Play("swing_attack");
+            Vector3 dirToPlayer = player.transform.position - sinlgeSwingEffect.transform.position;
+            float angleToPlayer = Mathf.Atan2(dirToPlayer.y, dirToPlayer.x) * Mathf.Rad2Deg;
+            swingEffect.transform.eulerAngles = new Vector3(0, 0, angleToPlayer);
+            swingEffect.transform.SetParent(origin);
+            swingEffect.transform.position = origin.position;
+            swingEffect.SetActive(true);
+            StartCoroutine(ApplyAttackInCircle(swingAttackDuration, largeSwingRange, origin, swingAttack));
+
+            //return to water
+            yield return bossAI.co_multiCoroutine = StartCoroutine(bossAI.StartMultipleCoroutines(new List<IEnumerator>() {
+                 bossAI.IESingleFishDive(true, !toLeft),
+                 bossAI.IESingleFishDive(false, !toLeft)
+            }));
         }
-
-        //move
-        float x = transform.position.x + 5;
-        if (bossAI.IsPlayerLeft()) { x = transform.position.x - 5; }
-        transform.DOMoveX(x, 0.3f).SetEase(Ease.InQuint);
-        if (factor == 1) { yield return new WaitUntil(() => !InputMaster.instance.isQTE); }
-        else { yield return new WaitForSeconds(0.2f); }
-
-        bossAI.whiteAnim.Play("swing_attack");
-        bossAI.blackAnim.Play("swing_attack");
-
-        swingEffect.transform.eulerAngles = bossAI.whiteFish.eulerAngles;
-        swingEffect.SetActive(true);
-
-        //apply attack in circle
-        StartCoroutine(ApplyAttackInCircle(swingAttackDuration, swingRange, transform, swingAttack));
-        yield return new WaitForSeconds(.7f);
-
         swingEffect.SetActive(false);
         swing_outline.SetActive(false);
-
-        if (factor == 0 || factor == 1 || factor == 3)
-        {
-            bossAI.SetNormalRotateSpeed();
-            if (factor == 1) { CharacterController2D.instance.FaceTarget(this.transform); }
-            bossAI.SetBlackNotBusy();
-            bossAI.SetWhiteNotBusy();
-            bossAI.AddActionBreak(actionBreakAmount);
-            bossAI.EndAction();
-        }
-        else if (factor == 2)
-        {
-            CharacterController2D.instance.FaceTarget(this.transform);
-            yield return StartCoroutine(Act_coroutine(3));
-            yield return null;
-        }
-        else if (factor == 4)
-        {
-            bossAI.SetBlackNotBusy();
-            bossAI.SetWhiteNotBusy();
-            bossAI.EndAction();
-        }
+        sinlgeSwingEffect.SetActive(false);
+        bossAI.AddActionBreak(actionBreakAmount);
+        yield return null;
     }
 
     /// <summary>
@@ -165,30 +211,6 @@ public class YYF_Swing : IEnemyAction
             vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
 
             bossAI.DecreaseStun(stunValue);
-
-            if (bossAI.initialAction = bossAI.swing)
-            {
-                bool b = Possibility((bossAI.currentHealth / bossAI.maxHealth) < 0.5 ? 70 : 50);
-                //双摆尾->潜水->水凝枪 = 单摆尾 / 泡泡牢笼 / 压缩泡泡光线。
-                //条件：玩家成功弹反双摆尾后有50 % 机率触发，若此时Boss血量低于50 % 则这个概率提升20 %。 在释放完双摆尾后潜入水中后立刻在远离玩家一定距离的点现身。
-                if (b)
-                {
-                    bossAI.movingTarget = bossAI.GetBoundaryFarOfPlayer();
-                    bossAI.AddAction(bossAI.dive);
-                    bossAI.AddAction(bossAI.waterSpear);
-                    bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.singleSwing, bossAI.bubbleTrap, bossAI.gatling));
-                }
-                //双摆尾->翻腾 / 双摆尾
-                //条件：成功弹反双摆尾时 or 被双摆尾成功击中时。
-                else
-                {
-                    bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.splash, bossAI.swing));
-                }
-            }
-            else if (localFactor == 4)//combo from water spear
-            {
-                bossAI.AddAction(bossAI.swing);
-            }
         }
         else if (dealtDamage == 1)//defend
         {
@@ -197,8 +219,6 @@ public class YYF_Swing : IEnemyAction
             vfx.CameraShake(melee.cameraShake);
             vfx.RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
             vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
-
-            if (bossAI.initialAction = bossAI.swing) bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.splash, bossAI.swing));
         }
         else if (dealtDamage == 0)//dealtDamage
         {
@@ -207,8 +227,6 @@ public class YYF_Swing : IEnemyAction
             else { playerIDamagable.Repel(melee.repel * 2, left); }
             vfx.RumblePulse(melee.rumble.x, melee.rumble.y, melee.rumbleDuration);
             vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
-
-            if (bossAI.initialAction = bossAI.swing) bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.splash, bossAI.swing));
         }
     }
 

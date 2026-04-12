@@ -216,7 +216,7 @@ public class PlayerAttack : MonoBehaviour
                     if (dist <= counterRadius)// if normal attack
                     {
                         if (counterAttackCheckTimer <= perfectCounterAttackCheckDuration) CounterAttack(proj, true);
-                        if (counterAttackCheckTimer <= counterAttackCheckDuration) CounterAttack(proj, false);
+                        else if (counterAttackCheckTimer <= counterAttackCheckDuration) CounterAttack(proj, false);
                     }
                 }
             }
@@ -250,7 +250,7 @@ public class PlayerAttack : MonoBehaviour
     public void CounterAttack(IProjectile projectile, bool isPerfect)
     {
         //if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
-        attackTimer = attackGap + 0.5f;
+        attackTimer = attackGap;
         canDefend = true;
         if (isPerfect)
         {
@@ -284,7 +284,7 @@ public class PlayerAttack : MonoBehaviour
 
     public void CommonHitEffect(IDamagable dmg)
     {
-        if (dmg.resetAttackCDOnHit) attackTimer = attackGap + 0.5f;
+        if (dmg.resetAttackCDOnHit) attackTimer = attackGap;
         if (!dmg.consumeEnergyOnHit) energy.PerfectCounterAttackRestore();
         vfx.RumblePulse(commonHitEffect.frequncy_perfect.x, commonHitEffect.frequncy_perfect.y, commonHitEffect.rumbleDuration);
         vfx.CameraShake(commonHitEffect.cameraShakeForce.y);

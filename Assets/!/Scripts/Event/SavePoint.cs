@@ -36,6 +36,8 @@ public class SavePoint : IDamagable
     public override int Damage(float damageAmount, Transform sender = null, float stunDuration = 0f, bool damageFlash = true, float stunValue = 0)
     {
         hitCount++;
+        if (sender.gameObject != PlayerAttack.instance.transform) return 0;
+        print(sender.name);
         if (hitCount >= 3)
         {
             GiveTokens();

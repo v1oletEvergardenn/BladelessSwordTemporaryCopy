@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.U2D;
@@ -63,7 +64,7 @@ public abstract class IEnemyController : IDamagable
     [SerializeField, HideInInspector] public Transform rightBoundary;
     [SerializeField, HideInInspector] public GameObject GFX;
     [SerializeField, HideInInspector] public InternalObjectPooler selfPooler;
-    [HideProperty] public List<EnemyActionCaller> actionList = new List<EnemyActionCaller>();
+    public List<List<ActionCaller>> actionList = new List<List<ActionCaller>>();
     [HideProperty] public IEnemyAction lastAction;
 
     #endregion BASIC_LOGIC
@@ -129,7 +130,7 @@ public abstract class IEnemyController : IDamagable
     public virtual IEnemyAction NextAction()
     {
         if (actionList.Count < 2) { return null; }
-        return actionList[1].action;
+        return actionList[1][0].action;
     }
 
     /// <summary>
@@ -137,6 +138,7 @@ public abstract class IEnemyController : IDamagable
     /// </summary>
     public virtual void EndAction()
     {
+        print("ended Action");
         if (actionList.Count > 0)
         {
             actionList.RemoveAt(0);
@@ -148,22 +150,32 @@ public abstract class IEnemyController : IDamagable
     /// </summary>
     /// <param name="action">The action to insert.</param>
     /// <param name="index">The index to insert at (default is 1).</param>
-    public virtual void AddAction(IEnemyAction action, float factor = 0)
+    public virtual void AddAction(IEnemyAction action, float factor = 0, float delay = 0)
     {
-        EnemyActionCaller i = new EnemyActionCaller { action = action, factor = factor };
-        actionList.Add(i);
+        ActionCaller i = new ActionCaller(action, factor, delay);
+        actionList[0].Add(i);
     }
 
-    public virtual void InsertAction(IEnemyAction action, int index, float factor = 0)
-    {
-        if (index < 0 || index > actionList.Count)
-        {
-            Debug.LogError("Index out of bounds for action list insertion.");
-            return;
-        }
-        EnemyActionCaller i = new EnemyActionCaller { action = action, factor = factor };
-        actionList.Insert(index, i);
-    }
+    //public virtual void InsertAction(IEnemyAction action, int index, float factor = 0, float delay = 0)
+    //{
+    //    if (index < 0 || index > actionList.Count)
+    //    {
+    //        Debug.LogError("Index out of bounds for action list insertion.");
+    //        return;
+    //    }
+    //    EnemyActionCaller i = new EnemyActionCaller(action, factor, delay);
+    //    actionList.Insert(index, i);
+    //}
+
+    //public virtual void InsertAction(EnemyActionCaller action, int index)
+    //{
+    //    if (index < 0 || index > actionList.Count)
+    //    {
+    //        Debug.LogError("Index out of bounds for action list insertion.");
+    //        return;
+    //    }
+    //    actionList.Insert(index, action);
+    //}
 
     public Coroutine co_act;
 
@@ -174,13 +186,16 @@ public abstract class IEnemyController : IDamagable
     {
         while (actionList.Count > 0 && actionList[0] != null)
         {
-            EnemyActionCaller caller = actionList[0];
-            yield return caller.action.act_routine = StartCoroutine(caller.action.Act_coroutine(caller.factor));
-            yield return null;
+            foreach (List<ActionCaller> list in actionList)
+            {
+                yield return co_multiActions = StartCoroutine(StartMultipleActions(list));
+                EndAction();
+            }
         }
+
         isActing = false;
-        if (currentActionBreakAmount >= maxActionBreakCapacity) { yield return StartCoroutine(Break()); }//break
-        else { StartAction(); }//startover
+        if (currentActionBreakAmount >= maxActionBreakCapacity) { yield return StartCoroutine(Break()); }
+        else { StartAction(); }
         yield return null;
     }
 
@@ -456,21 +471,97 @@ public abstract class IEnemyController : IDamagable
     {
     }
 
-    public T RandomPick<T>(params T[] items)
+    private IEnumerator Run(ActionCaller caller, Action onDone)
     {
-        if (items == null || items.Length == 0)
-            throw new ArgumentException("At least one item must be provided.");
+        yield return new WaitForSeconds(caller.delay);
+        yield return caller.action.act_routine = StartCoroutine(caller.action.Act_coroutine(caller.factor));
+        onDone?.Invoke();
+    }
 
-        int index = UnityEngine.Random.Range(0, items.Length);
-        return items[index];
+    public Coroutine co_multiRun;
+
+    private IEnumerator Run(IEnumerator caller, Action onDone)
+    {
+        yield return StartCoroutine(caller);
+        onDone?.Invoke();
+    }
+
+    public Coroutine co_multiActions;
+    public Coroutine co_multiCoroutine;
+
+    // Waits until all provided coroutines complete.
+    public IEnumerator StartMultipleActions(List<ActionCaller> caller)
+    {
+        if (caller == null || caller.Count == 0) yield break;
+
+        int remaining = caller.Count;
+        for (int i = 0; i < caller.Count; i++)
+        {
+            co_multiRun = StartCoroutine(Run(caller[i], () => remaining--));
+        }
+
+        yield return new WaitUntil(() => remaining <= 0);
+    }
+
+    public IEnumerator StartMultipleCoroutines(List<IEnumerator> caller)
+    {
+        if (caller == null || caller.Count == 0) yield break;
+
+        int remaining = caller.Count;
+        for (int i = 0; i < caller.Count; i++)
+        {
+            if (caller[i] != null) co_multiRun = StartCoroutine(Run(caller[i], () => remaining--));
+        }
+
+        yield return new WaitUntil(() => remaining <= 0);
+    }
+
+    // Convert a coroutine to a Task so you can use async/await + Task.WhenAll.
+    public Task AsTask(IEnumerator routine)
+    {
+        var tcs = new TaskCompletionSource<bool>();
+        StartCoroutine(RunTask(routine, tcs));
+        return tcs.Task;
+    }
+
+    private IEnumerator RunTask(IEnumerator routine, TaskCompletionSource<bool> tcs)
+    {
+        yield return StartCoroutine(routine);
+        tcs.SetResult(true);
+    }
+
+    public T RandomChoice<T>(params T[] options)
+    {
+        if (options == null || options.Length == 0) throw new ArgumentException("options must contain at least one element", nameof(options));
+        return options[UnityEngine.Random.Range(0, options.Length)];
+    }
+
+    public T RandomChoice<T>(T a, T b)
+    {
+        return UnityEngine.Random.value < 0.5f ? a : b;
     }
 
     #endregion UTILITY
 }
 
 [Serializable]
-public class EnemyActionCaller
+public class ActionCaller
 {
     public IEnemyAction action;
     public float factor;
+    public float delay;
+
+    public ActionCaller(IEnemyAction _action, float _factor = 0, float _delay = 0)
+    {
+        action = _action;
+        factor = _factor;
+        delay = _delay;
+    }
+
+    public ActionCaller(IEnemyAction _action, bool isBlack, float _delay = 0)
+    {
+        action = _action;
+        factor = isBlack ? 0f : 1f;
+        delay = _delay;
+    }
 }

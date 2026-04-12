@@ -61,6 +61,7 @@ public class SoundManager : MonoBehaviour
 
     public static void PlaySound(string tag, float volume = 1)
     {
+        return;
         if (!instance.soundDcitionary.ContainsKey(tag))
         {
             Debug.LogWarning("Sound tag not found: " + tag);
@@ -72,6 +73,8 @@ public class SoundManager : MonoBehaviour
 
     public static void PlaySound(AudioClip clip, float volume = 1)
     {
+        print("canceled sound");
+        return;
         var source = instance.GetNextSoundFXSource();
         source.PlayOneShot(clip, volume);
     }

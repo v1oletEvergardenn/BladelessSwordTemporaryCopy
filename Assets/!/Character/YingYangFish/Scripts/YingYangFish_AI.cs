@@ -2,6 +2,7 @@ using DG.Tweening;
 using EditorAttributes;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
@@ -217,11 +218,11 @@ public class YingYangFish_AI : IEnemyController
         blackOrigin.Rotate(new Vector3(0, 0, -1), black_rotateSpeed * Time.deltaTime);
         whiteOrigin.Rotate(new Vector3(0, 0, -1), white_rotateSpeed * Time.deltaTime);
 
-        if (!isActing && actionList.Count > 0)
-        {
-            isActing = true;
-            co_act = StartCoroutine(Act());
-        }
+        //if (!isActing && actionList.Count > 0)
+        //{
+        //    isActing = true;
+        //    co_act = StartCoroutine(Act());
+        //}
     }
 
     #endregion Unity Lifecycle
@@ -564,6 +565,9 @@ public class YingYangFish_AI : IEnemyController
         TryStopCoroutine(co_singleReturnToCenter);
         TryStopCoroutine(co_singleJumpToPos);
         TryStopCoroutine(co_circling);
+        TryStopCoroutine(co_multiCoroutine);
+        TryStopCoroutine(co_multiActions);
+        TryStopCoroutine(co_multiRun);
 
         isReturnDive_black = false;
         isReturnDive_white = false;
@@ -861,33 +865,45 @@ public class YingYangFish_AI : IEnemyController
         yield return null;
     }
 
+    public void SummonFishAroundCenter()
+    {
+        fish_origin.localPosition = Vector3.zero;
+        //black fish summon and reset
+        blackFishGFX.localPosition = Vector3.zero;
+        blackFish.localPosition = new Vector3(1, 0, 0);
+        blackOrigin.localPosition = Vector3.zero;
+        anim.Play("black_idle");
+
+        //white fish summon and reset
+        whiteFishGFX.localPosition = Vector3.zero;
+        whiteFish.localPosition = new Vector3(1, 0, 0);
+        whiteOrigin.localPosition = Vector3.zero;
+        anim.Play("white_idle");
+        SetNormalRotateSpeed();
+    }
+
     #endregion Phase & Ultimate Coroutines
 
     #region IEnemyController Overrides
 
     public override IEnumerator Act()
     {
-        if (secondPhase) { yield return null; }
-        else
-        {
-            while (actionList.Count > 0 && actionList[0] != null)
-            {
-                EnemyActionCaller caller = actionList[0];
-                caller.action.act_routine = StartCoroutine(caller.action.Act_coroutine(caller.factor));
-                yield return null;
+        //if the fish is still around the center, make the fish swim into the water first. then decide the actions.
 
-                EnemyActionCaller next = null;
-                if (actionList.Count >= 2)
-                {
-                    next = actionList[1];
-                    if (next.action.CanAct())
-                    {
-                        next.action.act_routine = StartCoroutine(next.action.Act_coroutine(next.factor));
-                    }
-                }
-                yield return new WaitUntil(() => !isBlackBusy && !isWhiteBusy);
+        if (secondPhase) { yield break; }
+
+        while (actionList[0] != null)
+        {
+            yield return co_multiCoroutine = StartCoroutine(StartMultipleCoroutines(new List<IEnumerator>()
+            {
+                whiteFish.transform.position.y >= waterLevel.position.y? IESingleFishDive(false, true):null,
+                blackFish.transform.position.y >= waterLevel.position.y? IESingleFishDive(true, false):null
+            }));
+
+            foreach (List<ActionCaller> list in actionList)
+            {
+                yield return co_multiActions = StartCoroutine(StartMultipleActions(list));
             }
-            isActing = false;
             if (!secondPhase && currentActionBreakAmount >= maxActionBreakCapacity) { yield return StartCoroutine(Break()); }
             else { StartAction(); }
             yield return null;
@@ -897,98 +913,150 @@ public class YingYangFish_AI : IEnemyController
     public override void StartAction()
     {
         if (secondPhase || DEAD) { return; }
+
+        //initalize
         actionList.Clear();
-        List<IEnemyAction> possibleActions = new List<IEnemyAction>();
+        List<ActionCaller> possibleActions = new List<ActionCaller>();
 
-        bool isPlayerFar = distanceToPlayer >= far_distance_threshhold;
-        bool isPlayerClose = distanceToPlayer <= close_distance_threshhold;
-        float waterSpearRange = 10f;
-        //water spear --- if player qi less than certain amount or player distance is further than a certain amount
-        int energy_Threshhold = 5;
-        if (playerEnergy.currentEnergy <= energy_Threshhold) if (lastAction != waterSpear) possibleActions.Add(waterSpear);
+        //logic: after fish is under the water, fish starts actions,
+        //when calls the action method, put in the factor to determine which fish to use for the action:
+        //0:black fish,
+        //1:white fish,
+        //2:both fish
 
-        //splash --- if player is moving towards here for 3 seconds;
-        int playerDistanceDeltaThreshhold = -20;
-        if (playerDistanceDelta <= playerDistanceDeltaThreshhold) if (lastAction != splash) possibleActions.Add(splash);
+        ///TEST********
 
-        // if player close
-        if (isPlayerClose)
+        int randomInitial = Random.Range(0, 4);
+
+        if (randomInitial == 0)//water spear
         {
-            float i = Random.Range(0, 10);
-            if (i < 3 && lastAction != swing) { possibleActions.Add(swing); } //30%
-            else if (i < 6 && lastAction != splash) { possibleActions.Add(splash); } //30%
-            else if (lastAction != dive)
-            {
-                possibleActions.Add(dive);
-                movingTarget = GetFarTargetOutOfTwo(player, GetBoundaryFarOfPlayer());
-                //get away from player since too close
-            } // 40%
+            initialAction = waterSpear;
+        }
+        else if (randomInitial == 1)
+        {
+            initialAction = splash;
+        }
+        else if (randomInitial == 2)
+        {
+            initialAction = swing;
+        }
+        else if (randomInitial == 3)
+        {
+            initialAction = bubbleTrap;
         }
 
-        if (distanceToPlayer >= waterSpearRange)
-        {
-            IEnemyAction action = Possibility(70) ? waterSpear : gatling;
-            if (lastAction != action) possibleActions.Add(action);
-        }
-
-        // if player far
-        if (isPlayerFar && lastAction != dive)
-        {
-            possibleActions.Add(dive);
-            movingTarget = player;// get near to player since too far
-        }
-
-        initialAction = null;
-        if (possibleActions.Count > 0)
-        {
-            int index = Random.Range(0, possibleActions.Count);
-            initialAction = possibleActions[index];
-        }
-        else
-        {
-            StartAction(); return;
-        }
-
+        //water spear as first action
         if (initialAction == waterSpear)
         {
-            float i = Random.Range(0, 10);
-            if (i < 3) { AddAction(bubbleTrap); }
-            else if (i < 6)
+            int randomNum = Random.Range(0, 3);
+
+            //First Scenario
+            if (randomNum == 0)
             {
-                AddAction(gatling);
-                InsertAction(waterSpear, 0, 8); return;
-            } //30%
-            else if (i < 9)
-            {
-                AddAction(singleSwing);
-                InsertAction(waterSpear, 0, 9); return;
-            }//30%
-        }
-        else if (initialAction == gatling)
-        {
-            float i = Random.Range(0, 10);
-            if (i < 3) { AddAction(bubbleTrap); }
-            else if (i < 6) { AddAction(singleSwing); } //30%
-        }
-        else if (initialAction == dive)
-        {
-            if (playerEnergy.energyPercentage < 0.6f || HeartSwordAbilities.instance.currentHS_point < 2)
-            {
-                movingTarget = player;
-                AddAction(RandomPick<IEnemyAction>(swing, splash));
+                bool isBlack = RandomFishBool();
+                actionList = new List<List<ActionCaller>>
+                    {
+                        new List<ActionCaller> {
+                            //***ADD water spear charging
+                            RandomChoice(new ActionCaller(swing, isBlack),
+                            new ActionCaller(splash,  isBlack))
+                        },
+                        new List<ActionCaller> {
+                            RandomChoice(new ActionCaller(swing,!isBlack),
+                            new ActionCaller(splash,  !isBlack)),
+                            new ActionCaller(waterSpear)
+                        },
+                    };
             }
-            else if (HeartSwordAbilities.instance.currentHS_point >= 2)
+
+            //Second Scenario
+            else if (randomNum == 1)
             {
-                movingTarget = GetBoundaryFarOfPlayer();
-                AddAction(waterSpear);
-                AddAction(RandomPick<IEnemyAction>(singleSwing, bubbleTrap, gatling));
+                actionList = new List<List<ActionCaller>>
+                    {
+                        new List<ActionCaller> {
+                            //***ADD water spear charging
+                           new ActionCaller(swing, 2),
+                           new ActionCaller(waterSpear,0,1f)
+                        }
+                    };
+            }
+
+            //Third Scenario
+            else
+            {
+                actionList = new List<List<ActionCaller>>
+                    {
+                        new List<ActionCaller> {
+                            //***ADD water spear charging
+                            new ActionCaller(bubbleTrap, RandomFish())
+                        },
+                        new List<ActionCaller> {
+                            RandomChoice(new ActionCaller(swing, RandomFish()),
+                            new ActionCaller(splash,  RandomFish())),
+                            new ActionCaller(waterSpear)
+                        },
+                    };
             }
         }
+        else if (initialAction == splash)
+        {
+            bool isBlack = RandomFishBool();
+            actionList = new List<List<ActionCaller>>
+                    {
+                        new List<ActionCaller> {
+                            new ActionCaller(splash,isBlack)
+                        },
+                        new List<ActionCaller> {
+                            new ActionCaller(splash,!isBlack)
+                        },
+                        new List<ActionCaller> {
+                            new ActionCaller(swing,2)
+                        }
+                    };
+        }
+        else if (initialAction == swing)
+        {
+            bool isBlack = RandomFishBool();
+            actionList = new List<List<ActionCaller>>
+                    {
+                        new List<ActionCaller> {
+                            new ActionCaller(swing,isBlack)
+                        },
+                        new List<ActionCaller> {
+                            new ActionCaller(swing,!isBlack)
+                        },
+                        new List<ActionCaller> {
+                            new ActionCaller(splash,2)
+                        }
+                    };
+        }
+        else if (initialAction == bubbleTrap)
+        {
+            bool isBlack = RandomFishBool();
+            actionList = new List<List<ActionCaller>>
+                    {
+                        new List<ActionCaller> {
+                            new ActionCaller(bubbleTrap,isBlack)
+                        },
+                        new List<ActionCaller> {
+                            RandomChoice(new ActionCaller(swing, RandomFish()),
+                            new ActionCaller(splash,  RandomFish())),
+                            new ActionCaller(gatling,0,2)
+                        }
+                    };
+        }
+
+        DebugPrintActionList();
+
+        //start action
         if (initialAction != null)
         {
-            InsertAction(initialAction, 0);
+            //InsertAction(initialAction, 0);
             lastAction = initialAction;
+            //co_act = StartCoroutine(Act());
         }
+        else { StartAction(); return; }
     }
 
     public override IEnumerator IE_Activate()
@@ -1010,7 +1078,7 @@ public class YingYangFish_AI : IEnemyController
             yield return null;
         }
 
-        fish_origin.transform.position = new Vector3(pos.x + 5, waterLevel.position.y - 7, 0);
+        fish_origin.transform.position = new Vector3(pos.x, waterLevel.position.y, 0);
 
         // prepare to jump out
 
@@ -1027,11 +1095,10 @@ public class YingYangFish_AI : IEnemyController
         blackFishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.1f);
         blackFishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.1f);
 
-        float angle = 210;
+        float angle = 270;
         blackOrigin.Rotate(Dir, angle);
         whiteOrigin.Rotate(Dir, angle);
 
-        float x = pos.x - 1;
         fish_origin.DOLocalMove(Vector3.zero, 1f).SetEase(Ease.OutCubic);
 
         while (fish_origin.position.y < waterLevel.position.y + 4.5f)
@@ -1067,6 +1134,7 @@ public class YingYangFish_AI : IEnemyController
         co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
         yield return new WaitForSeconds(2f);
         StartAction();
+        StartCoroutine(Act());
     }
 
     public override int Damage(float damageAmount, Transform sender, float stunDuration = 0, bool damageFlash = true, float stunValue = 0)
@@ -1113,6 +1181,23 @@ public class YingYangFish_AI : IEnemyController
         return Damage(damageAmount, sender, stunDuration, false, stunValue);
     }
 
+    public override IEnumerator Break()
+    {
+        // summon two new fish around the center.
+
+        SummonFishAroundCenter();
+
+        //far swim
+        StartCoroutine(IECloseSwim(false));
+
+        //break for a while
+        yield return new WaitForSeconds(breakDuration);
+        currentActionBreakAmount = 0;
+
+        //start action
+        StartAction();
+    }
+
     #endregion IEnemyController Overrides
 
     #region Utility & Interaction
@@ -1128,10 +1213,10 @@ public class YingYangFish_AI : IEnemyController
     {
         if (!secondPhase)
         {
+            camLimit.UpdateLimit();
+            ///CameraFollow.instance.targets.Add(center);
             StartCoroutine(IE_Activate());
 
-            CameraFollow.instance.targets.Add(center);
-            camLimit.UpdateLimit();
             EventInteract.SetActive(false);
         }
         else
@@ -1191,11 +1276,10 @@ public class YingYangFish_AI : IEnemyController
         VFXManager.instance.UnBulletTime();
         isBossBreaking = false;
         yield return new WaitForSeconds(1f);
-        StartCoroutine(IEReturnToInitialState(true));
-        StartCoroutine(IEReturnToInitialState(false));
-        yield return new WaitUntil(() => blackOrigin.localPosition == Vector3.zero && whiteOrigin.localPosition == Vector3.zero);
-        yield return StartCoroutine(IESprintBackEqual());
+
+        SummonFishAroundCenter();
         StartAction();
+        StartCoroutine(Act());
         yield return null;
     }
 
@@ -1247,5 +1331,36 @@ public class YingYangFish_AI : IEnemyController
         white_targetRotateSpeed = speed;
     }
 
+    public int RandomFish() => Random.Range(0, 2);
+
+    public bool RandomFishBool() => Random.Range(0, 2) == 0;
+
     #endregion Utility & Interaction
+
+    private void DebugPrintActionList()
+    {
+        if (actionList == null || actionList.Count == 0)
+        {
+            Debug.Log("[YingYangFish_AI] actionList is empty");
+            return;
+        }
+
+        var sb = new StringBuilder();
+        sb.AppendLine("[YingYangFish_AI] Selected actionList:");
+        for (int phase = 0; phase < actionList.Count; phase++)
+        {
+            var group = actionList[phase];
+            sb.AppendFormat(" Phase {0} (count={1}):", phase, group?.Count ?? 0).AppendLine();
+            if (group == null) continue;
+
+            for (int i = 0; i < group.Count; i++)
+            {
+                var ac = group[i];
+                string actionName = ac?.action != null ? ac.action.GetType().Name : "null";
+                sb.AppendFormat("  - [{0},{1}] Action: {2}, factor: {3}, delay: {4}", phase, i, actionName, ac?.factor ?? 0f, ac?.delay ?? 0f).AppendLine();
+            }
+        }
+
+        Debug.Log(sb.ToString());
+    }
 }

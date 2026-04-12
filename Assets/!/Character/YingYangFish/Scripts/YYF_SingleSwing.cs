@@ -54,8 +54,8 @@ public class YYF_SingleSwing : IEnemyAction
 
         // dive
         yield return bossAI.co_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack, bossAI.IsPlayerLeft()));
-        if (bossAI.initialAction == bossAI.waterSpear)
-        { bossAI.waterSpear.OnProceedCall(); }
+        //if (bossAI.initialAction == bossAI.waterSpear)
+        //{ bossAI.waterSpear.OnProceedCall(); }
         if (isBlack) { bossAI.SetBlackTargetRotateSpeed(0); bossAI.black_rotateSpeed = 0; }
         else { bossAI.SetWhiteTargetRotateSpeed(0); bossAI.white_rotateSpeed = 0; }
         Vector3 target = player.transform.position + new Vector3(0, 3, 0);
