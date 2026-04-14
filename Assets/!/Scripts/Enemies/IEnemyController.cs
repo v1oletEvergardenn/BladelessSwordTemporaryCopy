@@ -511,6 +511,7 @@ public abstract class IEnemyController : IDamagable
         for (int i = 0; i < caller.Count; i++)
         {
             if (caller[i] != null) co_multiRun = StartCoroutine(Run(caller[i], () => remaining--));
+            if (caller[i] == null) remaining--;
         }
 
         yield return new WaitUntil(() => remaining <= 0);

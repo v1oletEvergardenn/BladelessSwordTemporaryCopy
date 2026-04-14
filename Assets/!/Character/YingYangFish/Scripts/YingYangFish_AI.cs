@@ -1,12 +1,10 @@
 using DG.Tweening;
-using EditorAttributes;
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
-using Void = EditorAttributes.Void;
 
 public class YingYangFish_AI : IEnemyController
 {
@@ -36,44 +34,58 @@ public class YingYangFish_AI : IEnemyController
 
     #region FISH REFERENCES
 
-    [FoldoutGroup("Fish References", nameof(center), nameof(blackFish), nameof(whiteFish),
-        nameof(blackFishGFX), nameof(whiteFishGFX), nameof(blackOrigin), nameof(whiteOrigin))]
-    public Void fishRefsGroup;
+    [FoldoutGroup("Fish References")]
+    [SerializeField] public Transform center;
 
-    [SerializeField, HideInInspector] public Transform center;
-    [SerializeField, HideInInspector] public Transform blackFish;
-    [SerializeField, HideInInspector] public Transform whiteFish;
-    [SerializeField, HideInInspector] public Transform blackFishGFX;
-    [SerializeField, HideInInspector] public Transform whiteFishGFX;
-    [SerializeField, HideInInspector] public Transform blackOrigin;
-    [SerializeField, HideInInspector] public Transform whiteOrigin;
+    [FoldoutGroup("Fish References")]
+    [SerializeField] public Transform blackFish;
+
+    [FoldoutGroup("Fish References")]
+    [SerializeField] public Transform whiteFish;
+
+    [FoldoutGroup("Fish References")]
+    [SerializeField] public Transform blackFishGFX;
+
+    [FoldoutGroup("Fish References")]
+    [SerializeField] public Transform whiteFishGFX;
+
+    [FoldoutGroup("Fish References")]
+    [SerializeField] public Transform blackOrigin;
+
+    [FoldoutGroup("Fish References")]
+    [SerializeField] public Transform whiteOrigin;
 
     #endregion FISH REFERENCES
 
     #region ROTATION & MOVEMENT
 
-    [FoldoutGroup("Rotation & Movement", nameof(idleRotateSpeed), nameof(sprintRotateSpeed),
-        nameof(swimToCenterSpeed), nameof(minMaxDistanceTocenter), nameof(far_distance_threshhold),
-        nameof(close_distance_threshhold))]
-    public Void rotationMoveGroup;
+    [FoldoutGroup("Rotation & Movement")]
+    [SerializeField] public float idleRotateSpeed;
 
-    [SerializeField, HideInInspector] public float idleRotateSpeed;
-    [SerializeField, HideInInspector] public float sprintRotateSpeed;
-    [SerializeField, HideInInspector] public float swimToCenterSpeed = 2f;
-    [SerializeField, HideInInspector, MinMaxSlider(1f, 3f)] public Vector2 minMaxDistanceTocenter;
+    [FoldoutGroup("Rotation & Movement")]
+    [SerializeField] public float sprintRotateSpeed;
 
-    [HideProperty] public float white_distanceToCenter = 0f;
-    [HideProperty] public float black_distanceToCenter = 0f;
-    [HideProperty] public Transform movingTarget;
+    [FoldoutGroup("Rotation & Movement")]
+    [SerializeField] public float swimToCenterSpeed = 2f;
 
-    [HideProperty] public bool isCloseSwimming;
-    [HideProperty] public float black_rotateSpeed;
-    [HideProperty] public float white_rotateSpeed;
-    [HideProperty] public float black_targetRotateSpeed;
-    [HideProperty] public float white_targetRotateSpeed;
+    [FoldoutGroup("Rotation & Movement")]
+    [SerializeField, MinMaxSlider(1f, 3f, true)] public Vector2 minMaxDistanceTocenter;
 
-    [SerializeField, HideInInspector] public float far_distance_threshhold = 30f;
-    [SerializeField, HideInInspector] public float close_distance_threshhold = 10f;
+    [FoldoutGroup("Rotation & Movement")]
+    [SerializeField] public float far_distance_threshhold = 30f;
+
+    [FoldoutGroup("Rotation & Movement")]
+    [SerializeField] public float close_distance_threshhold = 10f;
+
+    [HideInInspector] public float white_distanceToCenter = 0f;
+    [HideInInspector] public float black_distanceToCenter = 0f;
+    [HideInInspector] public Transform movingTarget;
+
+    [HideInInspector] public bool isCloseSwimming;
+    [HideInInspector] public float black_rotateSpeed;
+    [HideInInspector] public float white_rotateSpeed;
+    [HideInInspector] public float black_targetRotateSpeed;
+    [HideInInspector] public float white_targetRotateSpeed;
 
     public bool isBlackBusy = false;
 
@@ -83,76 +95,134 @@ public class YingYangFish_AI : IEnemyController
 
     #region GENERAL REFERENCES
 
-    [FoldoutGroup("General References", nameof(waterLevel), nameof(endCanvas),
-        nameof(EventInteract), nameof(black_particle), nameof(white_particle),
-       nameof(black_tex), nameof(white_tex), nameof(swimEffect), nameof(fish_origin),
-        nameof(interaction), nameof(camLimit))]
-    public Void refenereceGroup;
+    [FoldoutGroup("General References")]
+    [SerializeField] public Transform endCanvas;
 
-    [SerializeField, HideInInspector] public Transform endCanvas;
-    [SerializeField, HideInInspector] public Transform waterLevel;
-    [SerializeField, HideInInspector] public GameObject EventInteract;
-    [SerializeField, HideInInspector] public GameObject black_particle;
-    [SerializeField, HideInInspector] public GameObject white_particle;
-    [SerializeField, HideInInspector] public Sprite black_tex;
-    [SerializeField, HideInInspector] public Sprite white_tex;
-    [SerializeField, HideInInspector] public GameObject swimEffect;
-    [SerializeField, HideInInspector] public Transform fish_origin;
-    [SerializeField, HideInInspector] public CameraLimit camLimit;
-    [SerializeField, HideInInspector] public GeneralEventInteraction interaction;
+    [FoldoutGroup("General References")]
+    [SerializeField] public Transform waterLevel;
+
+    [FoldoutGroup("General References")]
+    [SerializeField] public GameObject EventInteract;
+
+    [FoldoutGroup("General References")]
+    [SerializeField] public GameObject black_particle;
+
+    [FoldoutGroup("General References")]
+    [SerializeField] public GameObject white_particle;
+
+    [FoldoutGroup("General References")]
+    [SerializeField] public Sprite black_tex;
+
+    [FoldoutGroup("General References")]
+    [SerializeField] public Sprite white_tex;
+
+    [FoldoutGroup("General References")]
+    [SerializeField] public GameObject swimEffect;
+
+    [FoldoutGroup("General References")]
+    [SerializeField] public Transform fish_origin;
+
+    [FoldoutGroup("General References")]
+    [SerializeField] public CameraLimit camLimit;
+
+    [FoldoutGroup("General References")]
+    [SerializeField] public GeneralEventInteraction interaction;
 
     #endregion GENERAL REFERENCES
 
     #region ULTIMATE REFERENCES
 
-    [FoldoutGroup("Ultimate", nameof(ultimateWave), nameof(slash_effect),
-        nameof(waterDragon1),
-        nameof(waterSpearPos_black1), nameof(waterSpearPos_black2),
-        nameof(waterSpearPos_white1), nameof(waterSpearPos_white2))]
-    public Void voidWaterDragon;
+    [FoldoutGroup("Ultimate")]
+    [SerializeField] public GameObject ultimateWave;
 
-    [SerializeField, HideInInspector] public GameObject ultimateWave;
-    [SerializeField, HideInInspector] public GameObject slash_effect;
-    [SerializeField, HideInInspector] public Transform waterDragon1;
-    [SerializeField, HideInInspector] public Transform waterSpearPos_black1;
-    [SerializeField, HideInInspector] public Transform waterSpearPos_black2;
-    [SerializeField, HideInInspector] public Transform waterSpearPos_white1;
-    [SerializeField, HideInInspector] public Transform waterSpearPos_white2;
+    [FoldoutGroup("Ultimate")]
+    [SerializeField] public GameObject slash_effect;
 
-    [HideProperty] public bool secondPhase;
-    [HideProperty] public bool blackPositioned = false;
-    [HideProperty] public bool whitePositioned = false;
-    [HideProperty] public bool finishedWaterSpearUltimate = false;
+    [FoldoutGroup("Ultimate")]
+    [SerializeField] public Transform waterDragon1;
+
+    [FoldoutGroup("Ultimate")]
+    [SerializeField] public Transform waterSpearPos_black1;
+
+    [FoldoutGroup("Ultimate")]
+    [SerializeField] public Transform waterSpearPos_black2;
+
+    [FoldoutGroup("Ultimate")]
+    [SerializeField] public Transform waterSpearPos_white1;
+
+    [FoldoutGroup("Ultimate")]
+    [SerializeField] public Transform waterSpearPos_white2;
+
+    [HideInInspector] public bool secondPhase;
+    [HideInInspector] public bool blackPositioned = false;
+    [HideInInspector] public bool whitePositioned = false;
+    [HideInInspector] public bool finishedWaterSpearUltimate = false;
     public List<Transform> ultimate_bullets;
 
     #endregion ULTIMATE REFERENCES
 
     #region Action Fields
 
-    [FoldoutGroup("Action References", nameof(waterSpear), nameof(swing),
-        nameof(singleSwing), nameof(bubbleTrap), nameof(dive),
-        nameof(gatling), nameof(splash))]
-    public Void actionRefsGroup;
+    [FoldoutGroup("Action References")]
+    [SerializeField] public YYF_WaterSpear waterSpear;
 
-    [SerializeField, HideInInspector] public YYF_WaterSpear waterSpear;
-    [SerializeField, HideInInspector] public YYF_Swing swing;
-    [SerializeField, HideInInspector] public YYF_SingleSwing singleSwing;
-    [SerializeField, HideInInspector] public YYF_BubbleTrap bubbleTrap;
-    [SerializeField, HideInInspector] public YYF_Dive dive;
-    [SerializeField, HideInInspector] public YYF_Gatling gatling;
-    [SerializeField, HideInInspector] public YYF_Splash splash;
+    [FoldoutGroup("Action References")]
+    [SerializeField] public YYF_Swing swing;
 
-    public bool Actions;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("ForceDie", "ForceDie")] public Transform void112;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("ForceStun", "ForceStun")] public Transform void114;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("StartAction", "StartAction")] public Transform void11;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("WaterSpear", "WaterSpear")] public Void void1;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("Swing", "Swing")] public Void void8;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("Splash", "Splash")] public Void void9;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("Dive", "Dive")] public Void void10;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("SingleSwing", "SingleSwing")] public Void voidSingleswing;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("BubbleTrap", "BubbleTrap")] public Void voidbubble;
-    [ShowField(nameof(Actions))][SerializeField, ButtonField("Gatling", "Gatling")] public Void voidgatling;
+    [FoldoutGroup("Action References")]
+    [SerializeField] public YYF_SingleSwing singleSwing;
+
+    [FoldoutGroup("Action References")]
+    [SerializeField] public YYF_BubbleTrap bubbleTrap;
+
+    [FoldoutGroup("Action References")]
+    [SerializeField] public YYF_Dive dive;
+
+    [FoldoutGroup("Action References")]
+    [SerializeField] public YYF_Gatling gatling;
+
+    [FoldoutGroup("Action References")]
+    [SerializeField] public YYF_Splash splash;
+
+    [FoldoutGroup("Debug Actions")]
+    [Button("Force Die")]
+    private void DebugForceDie() => ForceDie();
+
+    [FoldoutGroup("Debug Actions")]
+    [Button("Force Stun")]
+    private void DebugForceStun() => ForceStun();
+
+    [FoldoutGroup("Debug Actions")]
+    [Button("Start Action")]
+    private void DebugStartAction() => StartAction();
+
+    [FoldoutGroup("Debug Actions")]
+    [Button("Water Spear")]
+    private void DebugWaterSpear() => WaterSpear();
+
+    [FoldoutGroup("Debug Actions")]
+    [Button("Swing")]
+    private void DebugSwing() => Swing();
+
+    [FoldoutGroup("Debug Actions")]
+    [Button("Splash")]
+    private void DebugSplash() => Splash();
+
+    [FoldoutGroup("Debug Actions")]
+    [Button("Dive")]
+    private void DebugDive() => Dive();
+
+    [FoldoutGroup("Debug Actions")]
+    [Button("Single Swing")]
+    private void DebugSingleSwing() => SingleSwing();
+
+    [FoldoutGroup("Debug Actions")]
+    [Button("Bubble Trap")]
+    private void DebugBubbleTrap() => BubbleTrap();
+
+    [FoldoutGroup("Debug Actions")]
+    [Button("Gatling")]
+    private void DebugGatling() => Gatling();
 
     #endregion Action Fields
 
@@ -432,27 +502,43 @@ public class YingYangFish_AI : IEnemyController
         if (isBlack) { blackAnim.Play("sprint"); SetBlackTargetRotateSpeed(sprintRotateSpeed); }
         else { whiteAnim.Play("sprint"); SetWhiteTargetRotateSpeed(sprintRotateSpeed); }
 
-        while ((isBlack ? black_distanceToCenter : white_distanceToCenter) < minMaxDistanceTocenter.y)
-        {
-            if (isBlack) { blackFish.position += blackFish.up * swimToCenterSpeed * Time.deltaTime; }
-            else { whiteFish.position += whiteFish.up * swimToCenterSpeed * Time.deltaTime; }
-            yield return null;
-        }
+        //// Quickly tween the fish outward to max distance instead of frame-by-frame swimming
+        Transform fish = isBlack ? blackFish : whiteFish;
+        //float currentDist = isBlack ? black_distanceToCenter : white_distanceToCenter;
+        //if (currentDist < minMaxDistanceTocenter.y)
+        //{
+        //    float remaining = minMaxDistanceTocenter.y - currentDist;
+        //    float swimOutDuration = remaining / (swimToCenterSpeed * 4f); // 4x faster
+        //    bool swimOutDone = false;
+        //    Vector3 targetPos = fish.position + fish.up * remaining;
+        //    fish.DOMove(targetPos, swimOutDuration).SetEase(Ease.OutSine).OnComplete(() => swimOutDone = true);
+        //    yield return new WaitUntil(() => swimOutDone);
+        //}
 
         float z = isleft ? -90 : 30;
 
-        bool finished = false;
         Transform origin = isBlack ? blackOrigin : whiteOrigin;
-        yield return co_sprintToAngle = StartCoroutine(IESprintToAngle(isBlack, z));
+
+        // Fast direct rotation instead of IESprintToAngle (which waits for gradual orbit)
+        float currentZ = origin.eulerAngles.z;
+        float delta = ((z - currentZ - 360f) % 360f);
+        float rotationDuration = Mathf.Abs(delta) / (sprintRotateSpeed * 4f); // 4x faster rotation
+        bool rotateDone = false;
+        origin.DORotate(new Vector3(0, 0, delta), rotationDuration)
+            .SetRelative(true)
+            .SetEase(Ease.InOutSine)
+            .OnComplete(() => rotateDone = true);
+        yield return new WaitUntil(() => rotateDone);
 
         if (isBlack) { SetBlackTargetRotateSpeed(sprintRotateSpeed); black_rotateSpeed = sprintRotateSpeed * 2; }
         else { SetWhiteTargetRotateSpeed(sprintRotateSpeed); white_rotateSpeed = sprintRotateSpeed * 2; }
 
         float x = isleft ? origin.position.x - 8 : origin.position.x + 10;
-        origin.DOMove(new Vector3(x, waterLevel.position.y - 4, 0), 1f)
-            .SetEase(Ease.InSine).OnComplete(() => finished = true);
+        bool moveDone = false;
+        origin.DOMove(new Vector3(x, waterLevel.position.y - 4, 0), 0.6f)
+            .SetEase(Ease.InSine).OnComplete(() => moveDone = true);
 
-        yield return new WaitUntil(() => finished);
+        yield return new WaitUntil(() => moveDone);
         origin.localScale = new Vector3(1, 1, 1);
         isReturnDive_black = false;
         isReturnDive_white = false;

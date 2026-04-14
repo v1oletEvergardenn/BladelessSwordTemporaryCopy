@@ -41,8 +41,8 @@ public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
     private bool linesCreated = false;
 
     public HSEnum abilityEnum;
-    public IHeartSwordAbility ability;
-    public HeartSwordAbilities hsManager;
+    [HideInInspector] public IHeartSwordAbility ability;
+    [HideInInspector] public HeartSwordAbilities hsManager;
 
     public Color upgradedColor_transparent = new Color(0.56f, 0.82f, 1, 0f);
     public Color upgradedColor_opaque = new Color(0.56f, 0.82f, 1, 1f);

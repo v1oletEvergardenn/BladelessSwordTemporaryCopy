@@ -8,6 +8,7 @@ ScriptedImporter:
   assetBundleName: 
   assetBundleVariant: 
   script: {fileID: 11500000, guid: 62a9f0aa5b59740cfbadc7e5f9823bb0, type: 3}
+  importerVersion: 2
   textureImporterSettings:
     alphaSource: 1
     mipMapMode: 0
@@ -123,7 +124,7 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: Sky_down
     originalName: 
-    pivot: {x: 0.5, y: 0.46783626}
+    pivot: {x: 0.5, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -143,7 +144,7 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 4}
   - name: cloud
     originalName: 
-    pivot: {x: 0.5, y: 0.7079646}
+    pivot: {x: 0.5, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -163,7 +164,7 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 354}
   - name: Mountain_Back
     originalName: 
-    pivot: {x: 0.5, y: 1.032258}
+    pivot: {x: 0.5, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -183,7 +184,7 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 588}
   - name: Mountain_middle
     originalName: 
-    pivot: {x: 0.5, y: 1.1764706}
+    pivot: {x: 0.5, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -203,7 +204,7 @@ ScriptedImporter:
     uvTransform: {x: 192, y: 4}
   - name: Mountain_front
     originalName: 
-    pivot: {x: 0.5, y: 1.1594203}
+    pivot: {x: 0.5, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -223,7 +224,7 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 751}
   - name: ground
     originalName: 
-    pivot: {x: 0.5, y: 3.3333333}
+    pivot: {x: 0.5, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -243,7 +244,7 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 897}
   - name: Lake
     originalName: 
-    pivot: {x: 0.5, y: 3.4782608}
+    pivot: {x: 0.5, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -264,7 +265,12 @@ ScriptedImporter:
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: -147146866
+    uuid:
+      value0: 951662406
+      value1: 0
+      value2: 0
+      value3: 0
+    guid: 951662406
     name: General
     layerFlags: 3
     layerType: 1
@@ -273,7 +279,12 @@ ScriptedImporter:
     linkedCells: []
     parentIndex: -1
   - layerIndex: 1
-    guid: 2090549725
+    uuid:
+      value0: 1184320961
+      value1: 0
+      value2: 0
+      value3: 0
+    guid: 1184320961
     name: Sky_down
     layerFlags: 3
     layerType: 0
@@ -291,7 +302,12 @@ ScriptedImporter:
     linkedCells: []
     parentIndex: 0
   - layerIndex: 2
-    guid: -412858073
+    uuid:
+      value0: 1662793652
+      value1: 0
+      value2: 0
+      value3: 0
+    guid: 1662793652
     name: cloud
     layerFlags: 3
     layerType: 0
@@ -309,7 +325,12 @@ ScriptedImporter:
     linkedCells: []
     parentIndex: 0
   - layerIndex: 3
-    guid: -1077259240
+    uuid:
+      value0: 3165639542
+      value1: 0
+      value2: 0
+      value3: 0
+    guid: -1129327754
     name: Mountain_Back
     layerFlags: 3
     layerType: 0
@@ -327,7 +348,12 @@ ScriptedImporter:
     linkedCells: []
     parentIndex: 0
   - layerIndex: 4
-    guid: 984409981
+    uuid:
+      value0: 2361327424
+      value1: 0
+      value2: 0
+      value3: 0
+    guid: -1933639872
     name: Mountain_middle
     layerFlags: 3
     layerType: 0
@@ -345,7 +371,12 @@ ScriptedImporter:
     linkedCells: []
     parentIndex: 0
   - layerIndex: 5
-    guid: 1333543448
+    uuid:
+      value0: 2209974476
+      value1: 0
+      value2: 0
+      value3: 0
+    guid: -2084992820
     name: Mountain_front
     layerFlags: 3
     layerType: 0
@@ -363,7 +394,12 @@ ScriptedImporter:
     linkedCells: []
     parentIndex: 0
   - layerIndex: 6
-    guid: 552218795
+    uuid:
+      value0: 321490524
+      value1: 0
+      value2: 0
+      value3: 0
+    guid: 321490524
     name: ground
     layerFlags: 3
     layerType: 0
@@ -381,7 +417,12 @@ ScriptedImporter:
     linkedCells: []
     parentIndex: 0
   - layerIndex: 7
-    guid: 885374140
+    uuid:
+      value0: 2137148096
+      value1: 0
+      value2: 0
+      value3: 0
+    guid: 2137148096
     name: Lake
     layerFlags: 3
     layerType: 0
@@ -487,3 +528,4 @@ ScriptedImporter:
   secondarySpriteTextures: []
   spritePackingTag: 
   canvasSize: {x: 180, y: 320}
+  previousTextureSize: {x: 512, y: 1024}
