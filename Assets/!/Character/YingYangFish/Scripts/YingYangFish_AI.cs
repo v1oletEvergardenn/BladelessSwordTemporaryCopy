@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using static UnityEngine.UI.Image;
 using Random = UnityEngine.Random;
 
 public class YingYangFish_AI : IEnemyController
@@ -499,11 +500,12 @@ public class YingYangFish_AI : IEnemyController
 
     public IEnumerator IESingleFishDive(bool isBlack, bool isleft)
     {
-        if (isBlack) { blackAnim.Play("sprint"); SetBlackTargetRotateSpeed(sprintRotateSpeed); }
-        else { whiteAnim.Play("sprint"); SetWhiteTargetRotateSpeed(sprintRotateSpeed); }
+        //if (isBlack) { blackAnim.Play("sprint"); SetBlackTargetRotateSpeed(sprintRotateSpeed); }
+        //else { whiteAnim.Play("sprint"); SetWhiteTargetRotateSpeed(sprintRotateSpeed); }
 
         //// Quickly tween the fish outward to max distance instead of frame-by-frame swimming
         Transform fish = isBlack ? blackFish : whiteFish;
+        Animator anim = isBlack ? blackAnim : whiteAnim;
         //float currentDist = isBlack ? black_distanceToCenter : white_distanceToCenter;
         //if (currentDist < minMaxDistanceTocenter.y)
         //{
@@ -515,33 +517,40 @@ public class YingYangFish_AI : IEnemyController
         //    yield return new WaitUntil(() => swimOutDone);
         //}
 
-        float z = isleft ? -90 : 30;
+        float z = -90;
 
+        if (isBlack) { SetBlackTargetRotateSpeed(0); black_rotateSpeed = 0; }
+        else { SetWhiteTargetRotateSpeed(0); white_rotateSpeed = 0; }
+
+        Transform fishGFX = isBlack ? blackFishGFX : whiteFishGFX;
         Transform origin = isBlack ? blackOrigin : whiteOrigin;
 
         // Fast direct rotation instead of IESprintToAngle (which waits for gradual orbit)
         float currentZ = origin.eulerAngles.z;
-        float delta = ((z - currentZ - 360f) % 360f);
-        float rotationDuration = Mathf.Abs(delta) / (sprintRotateSpeed * 4f); // 4x faster rotation
-        bool rotateDone = false;
-        origin.DORotate(new Vector3(0, 0, delta), rotationDuration)
-            .SetRelative(true)
-            .SetEase(Ease.InOutSine)
-            .OnComplete(() => rotateDone = true);
-        yield return new WaitUntil(() => rotateDone);
+        anim.Play("rotate");
+        float rotationDuration = 0.4f;
 
-        if (isBlack) { SetBlackTargetRotateSpeed(sprintRotateSpeed); black_rotateSpeed = sprintRotateSpeed * 2; }
-        else { SetWhiteTargetRotateSpeed(sprintRotateSpeed); white_rotateSpeed = sprintRotateSpeed * 2; }
+        float targetAngle = Mathf.MoveTowardsAngle(currentZ, z, float.MaxValue);
 
-        float x = isleft ? origin.position.x - 8 : origin.position.x + 10;
+        // Ensure the rotation is always clockwise by adding 360 if needed
+        if (targetAngle > currentZ) targetAngle -= 360f;
+
+        fishGFX.DORotate(new Vector3(0, 0, targetAngle), rotationDuration, RotateMode.Fast)
+            .SetEase(Ease.InSine);
+        yield return new WaitForSeconds(rotationDuration);
+
+        float x = origin.position.x;
         bool moveDone = false;
-        origin.DOMove(new Vector3(x, waterLevel.position.y - 4, 0), 0.6f)
-            .SetEase(Ease.InSine).OnComplete(() => moveDone = true);
+        origin.DOMove(new Vector3(x, waterLevel.position.y - 6, 0), 30f)
+             .SetSpeedBased()
+             .SetEase(Ease.Linear).OnComplete(() => moveDone = true);
 
         yield return new WaitUntil(() => moveDone);
+
         origin.localScale = new Vector3(1, 1, 1);
         isReturnDive_black = false;
         isReturnDive_white = false;
+        origin.eulerAngles = new Vector3(0, 0, 0);
     }
 
     public IEnumerator IESingleFishJumpOut(bool isBlack, Transform _target, Vector3 offset)
