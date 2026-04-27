@@ -21,12 +21,6 @@ public class YYF_BubbleTrap : IEnemyAction
         bossAI = GetComponent<YingYangFish_AI>();
     }
 
-    public override bool CanAct()
-    {
-        if (bossAI.isWhiteBusy && bossAI.isBlackBusy) return false;
-        else return true;
-    }
-
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         proceedCall = false;
@@ -40,16 +34,18 @@ public class YYF_BubbleTrap : IEnemyAction
         Transform origin = isBlack ? bossAI.blackOrigin : bossAI.whiteOrigin;
         Transform fishGFX = isBlack ? bossAI.blackFishGFX : bossAI.whiteFishGFX;
 
+        bossAI.ResetFishGFX(factor);
+        bossAI.ResetFish(factor);
         // dive
         //yield return bossAI.co_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack, bossAI.IsPlayerLeft()));
-        if (isBlack) { bossAI.SetBlackTargetRotateSpeed(0); bossAI.black_rotateSpeed = 0; }
-        else { bossAI.SetWhiteTargetRotateSpeed(0); bossAI.white_rotateSpeed = 0; }
+        if (isBlack) { bossAI.SetBlackRotateSpeed(0); bossAI.black_rotateSpeed = 0; }
+        else { bossAI.SetWhiteRotateSpeed(0); bossAI.white_rotateSpeed = 0; }
         origin.eulerAngles = new Vector3(0, 0, 180);
 
         //move to player
         float elpasedTime = 0f;
         float duration = 0.5f;
-        Vector3 start = origin.position;
+        Vector3 start = new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, origin.position.z);
         bool toleft = playerController.FacingRight;
         bool isPlayerMoving = playerController.isRunning;
 
@@ -74,11 +70,11 @@ public class YYF_BubbleTrap : IEnemyAction
         angle = 180;
         float currentZ = origin.eulerAngles.z;
         float delta = (toleft ? (angle - currentZ + 360f) : (angle - currentZ - 360f)) % 360f;
-        origin.DORotate(new Vector3(0, 0, delta), bossAI.sprintRotateSpeed, RotateMode.WorldAxisAdd)
+        origin.DORotate(new Vector3(0, 0, delta), 120, RotateMode.WorldAxisAdd)
            .SetSpeedBased(true)
            .SetEase(Ease.Linear);
 
-        anim.Play("sprint_swim");
+        anim.Play("fast_down");
         //emitting bubbles
 
         yield return new WaitForSeconds(0.22f);
@@ -111,7 +107,7 @@ public class YYF_BubbleTrap : IEnemyAction
 
         yield return new WaitForSeconds(0.3f);
         origin.localScale = new Vector3(1, 1, 1);
-        fish.DOLocalMoveY(3, 0.2f);
+        bossAI.ResetFish(factor);
         anim.Play("close_swim");
         //bossAI.AddActionBreak(actionBreakAmount);
         yield return null;

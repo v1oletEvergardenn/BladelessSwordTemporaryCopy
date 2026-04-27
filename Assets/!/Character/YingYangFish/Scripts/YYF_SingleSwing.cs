@@ -33,19 +33,11 @@ public class YYF_SingleSwing : IEnemyAction
         swing_outline.SetActive(false);
     }
 
-    public override bool CanAct()
-    {
-        if (bossAI.isWhiteBusy && bossAI.isBlackBusy) return false;
-        else return true;
-    }
-
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         // initialize
         proceedCall = false;
         bool isBlack = false;
-        if (bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = true; }
-        bossAI.SetBusy(isBlack);
         //references
         Animator anim = isBlack ? bossAI.blackAnim : bossAI.whiteAnim;
         Transform fish = isBlack ? bossAI.blackFish : bossAI.whiteFish;
@@ -56,8 +48,8 @@ public class YYF_SingleSwing : IEnemyAction
         yield return bossAI.co_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack, bossAI.IsPlayerLeft()));
         //if (bossAI.initialAction == bossAI.waterSpear)
         //{ bossAI.waterSpear.OnProceedCall(); }
-        if (isBlack) { bossAI.SetBlackTargetRotateSpeed(0); bossAI.black_rotateSpeed = 0; }
-        else { bossAI.SetWhiteTargetRotateSpeed(0); bossAI.white_rotateSpeed = 0; }
+        if (isBlack) { bossAI.SetBlackRotateSpeed(0); bossAI.black_rotateSpeed = 0; }
+        else { bossAI.SetWhiteRotateSpeed(0); bossAI.white_rotateSpeed = 0; }
         Vector3 target = player.transform.position + new Vector3(0, 3, 0);
         bool toLeft = target.x < origin.position.x;
 
@@ -147,12 +139,11 @@ public class YYF_SingleSwing : IEnemyAction
         yield return bossAI.co_singleReturnToCenter = StartCoroutine(bossAI.IEReturnToCenter(isBlack));
 
         //end
-        bossAI.SetNotBusy(isBlack);
         bossAI.AddActionBreak(actionBreakAmount);
         bossAI.EndAction();
     }
 
-    public override void HitPlayer(MeleeAttack melee, Transform attackPos)
+    public override void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default)
     {
         int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
         bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;

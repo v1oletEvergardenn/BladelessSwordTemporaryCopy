@@ -3,16 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static UnityEditor.PlayerSettings;
 using static UnityEngine.UI.Image;
 
 public class YYF_Splash : IEnemyAction
 {
     private YingYangFish_AI bossAI;
+    public Transform splashEffect;
     public float[] shootPositionX;
     public float bulletSpeed = 150f;
     public int damage = 2;
     public float gravityScale = 5f;
     public float stunValue = 5f;
+    private Coroutine co_facePlayer;
+    public float hitRange = 3f;
+    public MeleeAttack splashAttack;
 
     public override void Start()
     {
@@ -20,9 +26,10 @@ public class YYF_Splash : IEnemyAction
         bossAI = GetComponent<YingYangFish_AI>();
     }
 
-    public override bool CanAct()
+    public override void CancelAct()
     {
-        return (!bossAI.isWhiteBusy && !bossAI.isBlackBusy);
+        base.CancelAct();
+        if (co_facePlayer != null) StopCoroutine(co_facePlayer);
     }
 
     public override IEnumerator Act_coroutine(float factor = 0)
@@ -41,115 +48,180 @@ public class YYF_Splash : IEnemyAction
 
             Vector3 target = player.transform.position + new Vector3(0, 3, 0);
             bool toLeft = target.x < origin.position.x;
+            origin.position = new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, origin.position.z);
 
             //before jump out
-            if (toLeft) { origin.DOMove(new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0), 1f); }
-            else { origin.DOMove(new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0), 1f); }
+            if (toLeft) { origin.DOMove(new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0), 0.3f); }
+            else { origin.DOMove(new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0), 0.3f); }
 
             //reset to initial
             origin.eulerAngles = Vector3.zero;
-            fish.localPosition = new Vector3(0, 1, 0);
-            fishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.1f);
-            fishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.1f);
-            yield return new WaitForSeconds(1f);
+            fish.localPosition = new Vector3(0, 0, 0);
+            bossAI.ResetFishGFX(factor);
+            yield return new WaitForSeconds(0.3f);
 
             //jump out
             float temp_x = toLeft ? player.transform.position.x + 2 : player.transform.position.x - 2;
             if (isBlack) temp_x = toLeft ? player.transform.position.x - 2 : player.transform.position.x + 2;
-            origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 6f, 0), 0.5f).SetEase(Ease.OutSine);
-            anim.Play("swing", 0, 0.5f);
+            origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 10f, 0), 0.5f).SetEase(Ease.OutSine);
+            anim.Play("splash");
+
+            //keep rotating fishGFX
+            Tween rotating = fishGFX.DOLocalRotate(new Vector3(0, 0, -360f), 0.2f, RotateMode.FastBeyond360)
+              .SetEase(Ease.Linear)
+              .SetLoops(-1, LoopType.Restart);
+
+            //set splash effect position to fish GFX position
+            splashEffect.position = fish.position;
+            splashEffect.localPosition = new Vector3(1, 0, 0);
+
+            co_facePlayer = StartCoroutine(IEFaceSplashAtPlayer(fish, isBlack));
+            if (!isBlack) splashEffect.eulerAngles = new Vector3(0, 0, -90);
+
+            //fade in to show splash effect
+            splashEffect.gameObject.SetActive(true);
+            splashEffect.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+            splashEffect.GetComponent<SpriteRenderer>().DOFade(1, 0.8f);
 
             //be ready;
-            yield return new WaitForSeconds(0.7f);
+            yield return new WaitForSeconds(1f);
 
             //blackfish: be ready and dash to player.
             if (isBlack)
             {
-                origin.DOMove(new Vector3(player.transform.position.x, bossAI.waterLevel.position.y, 0), 0.3f).SetEase(Ease.OutSine);
+                origin.DOMove(new Vector3(player.transform.position.x, bossAI.waterLevel.position.y, 0), bossAI.fastSwimSpeed)
+                    .SetEase(Ease.OutSine)
+                    .SetSpeedBased();
             }
             //white fish: be ready dash to ground
             else
             {
-                origin.DOMove(new Vector3(origin.position.x, bossAI.waterLevel.position.y, 0), 0.3f).SetEase(Ease.OutSine);
+                origin.DOMove(new Vector3(origin.position.x, bossAI.waterLevel.position.y, 0), bossAI.fastSwimSpeed)
+                    .SetEase(Ease.OutSine)
+                    .SetSpeedBased();
             }
-            yield return new WaitForSeconds(0.15f);
-            anim.Play("swing_attack");
-            yield return new WaitForSeconds(0.15f);
+
+            StartCoroutine(ApplyAttackInCircle(0.3f, hitRange, origin, splashAttack, new Vector3(2, 0, 0)));
+
+            yield return new WaitForSeconds(0.3f);
+
             //spawn bullets
-            for (int i = 0; i < shootPositionX.Count(); i++)
-            {
-                SpawnWaterBullet(origin, i);
-                yield return new WaitForSeconds(0.2f);
-            }
-            yield return bossAI.co_return_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack, !toLeft));
+            StartCoroutine(IESpawnBullet(origin.position));
+
+            splashEffect.gameObject.SetActive(false);
+
+            //move origin down water
+            StopCoroutine(co_facePlayer);
+            rotating.Kill();
+            origin.DOKill();
+            origin.DOMove(new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, 0f), 0.05f).SetEase(Ease.Linear);
         }
         else if (factor == 2)//both fish
         {
-            for (int i = 0; i < shootPositionX.Count(); i++)
-            {
-                SpawnWaterBullet(bossAI.fish_origin, i);
-                yield return new WaitForSeconds(0.2f);
-            }
+            Vector3 target = player.transform.position + new Vector3(0, 3, 0);
+            Transform origin = bossAI.fish_origin;
+            bool toLeft = target.x < origin.position.x;
+
+            bossAI.ResetFish();
+            bossAI.ResetFishGFX();
+            bossAI.ResetFishOrigin();
+
+            origin.position = new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, origin.position.z);
+
+            //before jump out
+            if (toLeft) { origin.DOMove(new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0), 0.3f); }
+            else { origin.DOMove(new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0), 0.3f); }
+
+            bossAI.whiteOrigin.Rotate(bossAI.Dir, -90);
+            bossAI.blackOrigin.Rotate(bossAI.Dir, 90);
+            //reset to initial
+            origin.eulerAngles = Vector3.zero;
+            bossAI.blackFish.localPosition = new Vector3(0, 0.3f, 0);
+            bossAI.whiteFish.localPosition = new Vector3(0, 0.3f, 0);
+            yield return new WaitForSeconds(0.3f);
+
+            //jump out
+            float temp_x = toLeft ? player.transform.position.x + 2 : player.transform.position.x - 2;
+            origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 10f, 0), 0.5f).SetEase(Ease.OutSine);
+            bossAI.blackAnim.Play("splash");
+            bossAI.whiteAnim.Play("splash");
+
+            //keep rotating fishGFX
+            Tween rotating = origin.DOLocalRotate(new Vector3(0, 0, -360f), 0.2f, RotateMode.FastBeyond360)
+              .SetEase(Ease.Linear)
+              .SetLoops(-1, LoopType.Restart);
+
+            //set splash effect position to fish GFX position
+            splashEffect.position = origin.position;
+            //splashEffect.SetParent(origin);
+            splashEffect.localPosition = new Vector3(2f, 0, 0);
+
+            co_facePlayer = StartCoroutine(IEFaceSplashAtPlayer(origin, true));
+
+            //fade in to show splash effect
+            splashEffect.gameObject.SetActive(true);
+            splashEffect.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+            splashEffect.GetComponent<SpriteRenderer>().DOFade(1, 0.8f);
+
+            //be ready;
+            yield return new WaitForSeconds(1f);
+
+            //blackfish: be ready and dash to player.
+
+            origin.DOMove(new Vector3(player.transform.position.x, bossAI.waterLevel.position.y, 0), bossAI.fastSwimSpeed)
+                .SetEase(Ease.OutSine)
+                .SetSpeedBased();
+
+            StartCoroutine(ApplyAttackInCircle(0.3f, hitRange, origin, splashAttack, new Vector3(2, 0, 0)));
+            yield return new WaitForSeconds(0.3f);
+            //spawn bullets
+            StartCoroutine(IESpawnBullet(origin.position));
+            StartCoroutine(IESpawnBullet(origin.position, 0.4f));
+            splashEffect.gameObject.SetActive(false);
+
+            //move origin down water
+            StopCoroutine(co_facePlayer);
+            rotating.Kill();
+            origin.DOKill();
+            origin.DOMove(new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, 0f), 0.05f).SetEase(Ease.Linear);
         }
-        //bossAI.SetWhiteBusy();
-        //bossAI.SetBlackBusy();
-        //yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
-        //yield return bossAI.co_sprintToAngle = StartCoroutine(bossAI.IESprintToAngle(false, -180));
-        //yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
-        //bossAI.SetFishTargetRotateSpeed(false, 0);
-        //bossAI.SetFishTargetRotateSpeed(true, 0);
-        //bossAI.co_circling = StartCoroutine(bossAI.Circling(1.2f));
-        //transform.DOMoveY(bossAI.waterLevel.position.y + 8f, 1f).SetEase(Ease.InOutSine).OnComplete(() =>
-        //{
-        //    transform.DOMoveY(bossAI.waterLevel.position.y + 1f, 0.3f).SetEase(Ease.InSine);
-        //});
 
-        //yield return new WaitForSeconds(1.3f);
-        //transform.DOMoveY(bossAI.waterLevel.position.y + 4.5f, 1f).SetEase(Ease.OutSine);
-        //bossAI.SetBlackTargetRotateSpeed(bossAI.idleRotateSpeed);
-        //bossAI.SetWhiteTargetRotateSpeed(bossAI.idleRotateSpeed);
-        //yield return new WaitForSeconds(0.5f);
-
-        //if (bossAI.initialAction = bossAI.splash)
-        //{
-        //    if (bossAI.distanceToPlayer <= bossAI.close_distance_threshhold)
-        //    {
-        //        //翻腾->水凝枪 / 压缩泡泡光线
-        //        //条件：距离大于一定值。
-        //        if (Possibility(70)) bossAI.AddAction(bossAI.swing);
-        //        else { bossAI.movingTarget = bossAI.GetBoundaryFarOfPlayer(); bossAI.AddAction(bossAI.dive); }
-        //        //翻腾->潜水
-        //        //条件: 距离大于一定值时（靠近） or 距离小于一定值时（远离)。
-        //    }
-        //    else if (bossAI.distanceToPlayer >= bossAI.far_distance_threshhold)
-        //    {
-        //        //翻腾->双摆尾
-        //        //条件：距离小于一定值时。
-        //        if (Possibility(70)) bossAI.AddAction(RandomPick<IEnemyAction>(bossAI.waterSpear, bossAI.gatling));
-        //        else { bossAI.movingTarget = bossAI.player; bossAI.AddAction(bossAI.dive); }
-        //        //翻腾->潜水
-        //        //条件: 距离大于一定值时（靠近） or 距离小于一定值时（远离）。
-        //    }
-        //}
-
-        //bossAI.SetNormalRotateSpeed();
-        //bossAI.SetWhiteNotBusy();
-        //bossAI.SetBlackNotBusy();
-
-        //bossAI.EndAction();
+        yield return new WaitForSeconds(1f);
+        anim.Play("swim_up");
+        splashEffect.gameObject.SetActive(false);
         bossAI.AddActionBreak(actionBreakAmount);
         yield return null;
     }
 
-    public void SpawnWaterBullet(Transform origin, int index)
+    private IEnumerator IEFaceSplashAtPlayer(Transform transform, bool face)
+    {
+        while (true)
+        {
+            splashEffect.position = transform.position;
+            if (face) splashEffect.eulerAngles = CalculateWantedEuler(player.transform.position, splashEffect.position);
+            yield return null;
+        }
+    }
+
+    public IEnumerator IESpawnBullet(Vector3 pos, float delay = 0)
+    {
+        yield return new WaitForSeconds(delay);
+        for (int i = 0; i < shootPositionX.Count(); i++)
+        {
+            SpawnWaterBullet(pos, i);
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+
+    public void SpawnWaterBullet(Vector3 pos, int index)
     {
         IProjectile bullet = bossAI.selfPooler.SpawnFromPool("water_bullet",
-            new Vector3(origin.position.x + shootPositionX[index],
+            new Vector3(pos.x + shootPositionX[index],
             bossAI.waterLevel.position.y + 1.5f, 0)).
             GetComponent<IProjectile>();
 
         GameObject bulletEffect = bossAI.selfPooler.SpawnFromPool("water_bullet_hit_effect",
-            new Vector3(origin.position.x + shootPositionX[index],
+            new Vector3(pos.x + shootPositionX[index],
             bossAI.waterLevel.position.y, 0));
         bulletEffect.transform.rotation = Quaternion.Euler(0, 0, 90);
 
@@ -161,12 +233,12 @@ public class YYF_Splash : IEnemyAction
             _stunValue: stunValue);
 
         IProjectile bullet2 = bossAI.selfPooler.SpawnFromPool("water_bullet",
-           new Vector3(origin.position.x - shootPositionX[index],
+           new Vector3(pos.x - shootPositionX[index],
            bossAI.waterLevel.position.y + 1.5f, 0)).
            GetComponent<IProjectile>();
 
         GameObject bulletEffect2 = bossAI.selfPooler.SpawnFromPool("water_bullet_hit_effect",
-            new Vector3(origin.position.x - shootPositionX[index],
+            new Vector3(pos.x - shootPositionX[index],
             bossAI.waterLevel.position.y, 0));
         bulletEffect2.transform.rotation = Quaternion.Euler(0, 0, 90);
 
@@ -176,5 +248,10 @@ public class YYF_Splash : IEnemyAction
             _speed: bulletSpeed,
             gravityScale: gravityScale,
             _stunValue: stunValue);
+    }
+
+    public void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawWireSphere(transform.position, hitRange);
     }
 }

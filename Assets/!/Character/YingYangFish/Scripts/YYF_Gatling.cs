@@ -51,12 +51,6 @@ public class YYF_Gatling : IEnemyAction
         StartCoroutine(CenterEnd());
     }
 
-    public override bool CanAct()
-    {
-        if (bossAI.isWhiteBusy && bossAI.isBlackBusy) return false;
-        else return true;
-    }
-
     public IEnumerator CenterEnd()
     {
         if (gatlingPos.gameObject.activeInHierarchy) gatlingPos.GetComponent<Animator>().Play("end");

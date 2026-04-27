@@ -25,11 +25,6 @@ public class YYF_Dive : IEnemyAction
         bossAI.whiteAnim.SetBool("dive_end", false);
     }
 
-    public override bool CanAct()
-    {
-        return (!bossAI.isWhiteBusy && !bossAI.isBlackBusy);
-    }
-
     public override IEnumerator Act_coroutine(float factor = 0)
     {
         proceedCall = false;
@@ -38,7 +33,6 @@ public class YYF_Dive : IEnemyAction
         bool ToLeft = true;
 
         Vector3 pos = bossAI.movingTarget.transform.position;
-        bossAI.SetBlackBusy(); bossAI.SetWhiteBusy();
 
         if (factor == 0 && (Mathf.Abs(pos.x - transform.position.x) <= 2))
         {
@@ -50,8 +44,8 @@ public class YYF_Dive : IEnemyAction
             yield return bossAI.co_sprintBackEqual = StartCoroutine(bossAI.IESprintBackEqual());
             bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(true));
             yield return new WaitForSeconds(0.2f);
-            bossAI.SetBlackTargetRotateSpeed(bossAI.sprintRotateSpeed);
-            bossAI.SetWhiteTargetRotateSpeed(bossAI.sprintRotateSpeed);
+            bossAI.SetBlackRotateSpeed(bossAI.fastRotateSpeed);
+            bossAI.SetWhiteRotateSpeed(bossAI.fastRotateSpeed);
 
             //dive
             transform.DOMoveY(pos.y - 5, 2f).SetEase(Ease.InOutBack).OnComplete(() =>
@@ -142,8 +136,6 @@ public class YYF_Dive : IEnemyAction
         bossAI.EndAction();
         bossAI.blackAnim.SetBool("dive_end", false);
         bossAI.whiteAnim.SetBool("dive_end", false);
-        bossAI.SetBlackNotBusy();
-        bossAI.SetWhiteNotBusy();
         yield return null;
     }
 
@@ -151,11 +143,11 @@ public class YYF_Dive : IEnemyAction
     {
         if (isBlack)
         {
-            bossAI.SetBlackTargetRotateSpeed(bossAI.idleRotateSpeed);
+            bossAI.SetBlackRotateSpeed(bossAI.idleRotateSpeed);
         }
         else
         {
-            bossAI.SetWhiteTargetRotateSpeed(bossAI.idleRotateSpeed);
+            bossAI.SetWhiteRotateSpeed(bossAI.idleRotateSpeed);
         }
     }
 

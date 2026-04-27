@@ -73,7 +73,15 @@ public abstract class IEnemyAction : MonoBehaviour
         yield return null;
     }
 
-    public virtual IEnumerator ApplyAttackInCircle(float duration, float range, Transform attackPos, MeleeAttack melee)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="duration"></param>
+    /// <param name="range"></param>
+    /// <param name="attackPos"></param>
+    /// <param name="melee"></param>
+    /// <returns></returns>
+    public virtual IEnumerator ApplyAttackInCircle(float duration, float range, Transform attackPos, MeleeAttack melee, Vector3 offset = default)
     {
         bool hitPlayerAlready = false;
         List<IDamagable> hitIdamagables = new List<IDamagable>();
@@ -82,7 +90,7 @@ public abstract class IEnemyAction : MonoBehaviour
         while (elapsedTime <= duration)
         {
             elapsedTime += Time.deltaTime;
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPos.position, range);
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPos.position + offset, range);
             foreach (Collider2D collider in colliders)
             {
                 if (bossController.subDamagables.Contains(collider.GetComponent<IDamagable>())
@@ -116,7 +124,7 @@ public abstract class IEnemyAction : MonoBehaviour
             // hit player
             if (!hitPlayerAlready)
             {
-                float d = Vector3.Distance(playerIDamagable.GetHitPos(), attackPos.position);
+                float d = Vector3.Distance(playerIDamagable.GetHitPos(), attackPos.position + offset);
                 if (d <= range) { HitPlayer(melee, attackPos); hitPlayerAlready = true; }
             }
             yield return null;
@@ -125,10 +133,10 @@ public abstract class IEnemyAction : MonoBehaviour
         yield return null;
     }
 
-    public virtual void HitPlayer(MeleeAttack melee, Transform attackPos)
+    public virtual void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default)
     {
         int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
-        bool direction = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
+        bool direction = playerIDamagable.GetHitPos().x < attackPos.position.x + offset.x ? true : false;
 
         if (dealtDamage == 2)//counter attack
         {
