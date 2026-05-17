@@ -4,9 +4,8 @@ using UnityEngine;
 
 public abstract class IDamagable : MonoBehaviour
 {
-    [FoldoutGroup("HitPos", nameof(getHitPosition), nameof(color))] public Void hitposVoid1;
-    [SerializeField, HideInInspector] public Vector3 getHitPosition;
-    [SerializeField, HideInInspector] public Color color = Color.red;
+    [SerializeField] public Vector3 getHitPosition;
+    [SerializeField] public Color color = Color.red;
     public bool canBeHitWithoutHSAttack = false;
     public bool resetAttackCDOnHit = false;
     public bool consumeEnergyOnHit = true;

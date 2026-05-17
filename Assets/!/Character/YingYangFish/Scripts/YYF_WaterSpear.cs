@@ -13,7 +13,6 @@ public class YYF_WaterSpear : IEnemyAction
     public int spearDamage = 10;
     public float spearSpeed = 100f;
     public float spear_stunDuration = 1f;
-    public float stunValue = 25f;
 
     public int small_spearDamage = 5;
     public float small_spearSpeed = 100f;
@@ -138,8 +137,6 @@ public class YYF_WaterSpear : IEnemyAction
 
         ShootSpear(_spear); spear = null;
         yield return new WaitForSeconds(0.5f);
-
-        bossAI.AddActionBreak(actionBreakAmount);
 
         yield return null;
 

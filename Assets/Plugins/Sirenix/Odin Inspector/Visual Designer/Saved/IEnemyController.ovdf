@@ -1,0 +1,167 @@
+OVDF v1.1
+IEnemyController, Project.Main
+MetaGuid:3c49df15e1605774ea85769fa786a2ca
+
+# $4N9uH59ymaRpuHfbStWt2W
+Position: $root:1
+
+# $JTbuR7yJykQv9FTW1rVJb5
+Position: $root:1
+
+# $R9yhVhLeycyVZGW5m8FxPg
+Position: $root:2
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "Health and Stun"
+
+# $4mK9HQuhfjfP12kGzx3DTp
+Position: $QMuopHuRV5YxhSB4DKDn5i:0
++ [Sirenix.OdinInspector.HorizontalGroupAttribute]
+	Width = 0
+	MarginLeft = 0
+	HideWhenChildrenAreInvisible = True
+	LabelWidth = 0
+
+# $4TtzFAncLBmMK7Y9DmYj3Q
+Position: $R9yhVhLeycyVZGW5m8FxPg:0
++ [Sirenix.OdinInspector.TabGroupAttribute]
+
+# $QMuopHuRV5YxhSB4DKDn5i
+Position: $4TtzFAncLBmMK7Y9DmYj3Q:0
++ [Sirenix.OdinInspector.TabGroupAttribute+TabSubGroupAttribute]
+	GroupName = "health"
+
+# $MDymr8mSeXbU61qrw73dVh
+Position: $4TtzFAncLBmMK7Y9DmYj3Q:1
++ [Sirenix.OdinInspector.TabGroupAttribute+TabSubGroupAttribute]
+	GroupName = "Stun"
+	Icon = None
+
+# $R72cLQzxngnd7AP1cyciRf
+Position: $root:3
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "General Setting"
+
+# $VZVgHBETbfc3YhCncoJAmB
+Position: $root:4
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "Debug"
+
+# maxHealth
+Position: $QMuopHuRV5YxhSB4DKDn5i:1
+
+# HealthUI
+Position: $4mK9HQuhfjfP12kGzx3DTp:0
+
+# healthBar
+Position: $4mK9HQuhfjfP12kGzx3DTp:1
+
+# maxStun
+Position: $MDymr8mSeXbU61qrw73dVh:1
+
+# stunBar
+Position: $MDymr8mSeXbU61qrw73dVh:0
+
+# currentStun
+Position: $MDymr8mSeXbU61qrw73dVh:3
+Visibility: Shown
+
+# stunDuration
+Position: $MDymr8mSeXbU61qrw73dVh:2
+
+# isGrounded
+Position: $VZVgHBETbfc3YhCncoJAmB:0
+
+# m_WhatIsGround
+Position: $R72cLQzxngnd7AP1cyciRf:6
+
+# col
+Position: $R72cLQzxngnd7AP1cyciRf:0
+
+# IN_COMBAT
+Position: $VZVgHBETbfc3YhCncoJAmB:4
+Visibility: Shown
+
+# canFlip
+Position: $VZVgHBETbfc3YhCncoJAmB:2
+Visibility: Shown
+
+# isFacingRight
+Position: $VZVgHBETbfc3YhCncoJAmB:1
+Visibility: Shown
+
+# inAct
+Position: $VZVgHBETbfc3YhCncoJAmB:3
+Visibility: Shown
+
+# speed
+Position: $R72cLQzxngnd7AP1cyciRf:5
+
+# leftBoundary
+Position: $R72cLQzxngnd7AP1cyciRf:1
+
+# rightBoundary
+Position: $R72cLQzxngnd7AP1cyciRf:2
+
+# GFX
+Position: $R72cLQzxngnd7AP1cyciRf:3
+
+# selfPooler
+Position: $R72cLQzxngnd7AP1cyciRf:4
+
+# healthPercentage
+Position: $VZVgHBETbfc3YhCncoJAmB:5
+Visibility: Shown
+
+# lastAttackId
+Position: $root:5
+Visibility: Hidden
+
+# lastAttackTime
+Position: $root:6
+
+# attackCooldown
+Position: $root:7
+
+# canTakeDamage
+Position: $VZVgHBETbfc3YhCncoJAmB:6
+Visibility: Shown
+
+# isBossBreaking
+Position: $VZVgHBETbfc3YhCncoJAmB:7
+Visibility: Shown
+
+# isActing
+Position: $VZVgHBETbfc3YhCncoJAmB:8
+
+# canMove
+Position: $VZVgHBETbfc3YhCncoJAmB:9
+
+# distanceToPlayer
+Position: $VZVgHBETbfc3YhCncoJAmB:11
+
+# currentHealth
+Position: $VZVgHBETbfc3YhCncoJAmB:12
+
+# DEAD
+Position: $VZVgHBETbfc3YhCncoJAmB:10
+
+# co_act
+Visibility: Hidden
+
+# co_multiRun
+Visibility: Hidden
+
+# co_multiActions
+Visibility: Hidden
+
+# co_multiCoroutine
+Visibility: Hidden
+
+# initialAction
+Position: $VZVgHBETbfc3YhCncoJAmB:13
+
+# lastAction
+Position: $VZVgHBETbfc3YhCncoJAmB:14
+
+# actionList
+Position: $VZVgHBETbfc3YhCncoJAmB:15

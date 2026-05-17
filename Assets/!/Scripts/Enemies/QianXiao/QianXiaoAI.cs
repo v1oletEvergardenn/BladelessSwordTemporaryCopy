@@ -87,8 +87,6 @@ public class QianXiaoAI : IEnemyController
                 if (x >= this.transform.position.x && !isFacingRight) { Flip(); }//face right
                 else if (x < this.transform.position.x && isFacingRight) { Flip(); } //face left
             }
-
-            Move();
         }
     }
 
@@ -188,39 +186,6 @@ public class QianXiaoAI : IEnemyController
         maxHealth = stage2MaxHealth;
         currentHealth = maxHealth;
         healthBar.UpdateBar(currentHealth);
-    }
-
-    public void Move()
-    {
-        Vector2 targetVelocity = Vector2.zero;
-        if (canMove)
-        {
-            if (targetPos == nullTargetPos)
-            {
-                if (isStage2)
-                {
-                    targetVelocity = new Vector2(stage2Speed, rb.velocity.y) * transform.right;
-                }
-                else
-                {
-                    targetVelocity = new Vector2(speed, rb.velocity.y) * transform.right;
-                }
-            }
-        }
-        else if (targetPos != nullTargetPos)
-        {
-            float f_speed = 0f;
-            if (isStage2) f_speed = stage2Speed;
-            else f_speed = speed;
-
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, f_speed * Time.deltaTime);
-            if (Vector3.Distance(transform.position, targetPos) <= 1f)
-            {
-                targetPos = nullTargetPos;
-            }
-        }
-        anim.SetBool("moving", canMove);
-        //rb.velocity = Vector2.SmoothDamp(rb.velocity, targetVelocity, ref m_Velocity, 0.1f);
     }
 
     public void SetCombat(bool isCombat)

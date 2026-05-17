@@ -16,10 +16,9 @@ public abstract class IEnemyController : IDamagable
 {
     #region HEALTH
 
-    [FoldoutGroup("Health", nameof(maxHealth), nameof(HealthUI), nameof(healthBar))] public Void healthVoid;
-    [SerializeField, HideInInspector] public int maxHealth;
-    [SerializeField, HideInInspector] public GameObject HealthUI;
-    [SerializeField, HideInInspector] public MicroBar healthBar;
+    public int maxHealth;
+    public GameObject HealthUI;
+    public MicroBar healthBar;
     [HideInInspector] public float healthPercentage;
     [HideInInspector] public int lastAttackId = -1;
     [HideInInspector] public float lastAttackTime = -1f;
@@ -30,61 +29,41 @@ public abstract class IEnemyController : IDamagable
 
     #region STUN
 
-    [FoldoutGroup("Stun", nameof(maxStun), nameof(stunBar), nameof(currentStun), nameof(stunDuration))] public Void stunVoid1;
-    [SerializeField, HideInInspector] public float maxStun = 10;
-    [SerializeField, HideInInspector] public MicroBar stunBar;
-    [SerializeField, HideInInspector] public float currentStun;
-    [SerializeField, HideInInspector] public float stunDuration = 5f;
+    public float maxStun = 10;
+    public MicroBar stunBar;
+    public float currentStun;
+    public float stunDuration = 5f;
     [HideInInspector] public bool isBossBreaking = false;
 
     #endregion STUN
 
-    #region GROUNDCHECK
-
-    [FoldoutGroup("GroundCheck", nameof(isGrounded), nameof(m_WhatIsGround), nameof(col))] public Void groundvoid;
-    [SerializeField, HideInInspector] public bool isGrounded = true;
-    [SerializeField, HideInInspector] public LayerMask m_WhatIsGround;
-    [SerializeField, HideInInspector] public Collider2D col;
-
-    #endregion GROUNDCHECK
-
     #region BASIC_LOGIC
 
-    [FoldoutGroup("Basic Logic", nameof(IN_COMBAT), nameof(canFlip), nameof(isFacingRight),
-        nameof(inAct), nameof(speed), nameof(leftBoundary), nameof(rightBoundary), nameof(GFX),
-        nameof(selfPooler))]
-    public Void logicvoid;
-
-    [SerializeField, HideInInspector] public bool IN_COMBAT = false;
-    [SerializeField, HideInInspector] public bool canFlip = true;
-    [SerializeField, HideInInspector] public bool isFacingRight;
-    [SerializeField, HideInInspector] public bool inAct = false;
-    [SerializeField, HideInInspector] public float speed = 20f;
-    [SerializeField, HideInInspector] public Transform leftBoundary;
-    [SerializeField, HideInInspector] public Transform rightBoundary;
-    [SerializeField, HideInInspector] public GameObject GFX;
-    [SerializeField, HideInInspector] public InternalObjectPooler selfPooler;
+    public bool isGrounded = true;
+    public LayerMask m_WhatIsGround;
+    public Collider2D col;
+    public bool IN_COMBAT = false;
+    public Transform leftBoundary;
+    public Transform rightBoundary;
+    public GameObject GFX;
+    public InternalObjectPooler selfPooler;
     public List<List<ActionCaller>> actionList = new List<List<ActionCaller>>();
-    [HideProperty] public IEnemyAction lastAction;
+    public IEnemyAction lastAction;
+
+    public bool canFlip = true;
+    public bool isFacingRight;
+    public bool inAct = false;
 
     #endregion BASIC_LOGIC
 
-    [FoldoutGroup("Break Setting",
-       nameof(maxActionBreakCapacity), nameof(currentActionBreakAmount), nameof(breakDuration))]
-    public Void breakVoid;
-
-    [SerializeField, HideInInspector] public int maxActionBreakCapacity = 10;
-    [SerializeField, HideInInspector] public int currentActionBreakAmount = 0;
-    [SerializeField, HideInInspector] public float breakDuration = 3f;
-
     #region PRIVATE VARIABLES
 
-    [HideProperty] public bool isActing = false;
-    [HideProperty] public IEnemyAction initialAction;
-    [HideProperty] public bool canMove = false;
-    [HideProperty] public float distanceToPlayer;
-    [HideProperty] public float currentHealth;
-    [HideProperty] public bool DEAD = false;
+    public bool isActing = false;
+    public IEnemyAction initialAction;
+    public bool canMove = false;
+    public float distanceToPlayer;
+    public float currentHealth;
+    public bool DEAD = false;
     [HideInInspector] public DamageFlash flash;
     [HideInInspector] public Rigidbody2D rb;
     [HideInInspector] public AnimationCurve outline_flash_anim_curve;
@@ -156,27 +135,6 @@ public abstract class IEnemyController : IDamagable
         actionList[0].Add(i);
     }
 
-    //public virtual void InsertAction(IEnemyAction action, int index, float factor = 0, float delay = 0)
-    //{
-    //    if (index < 0 || index > actionList.Count)
-    //    {
-    //        Debug.LogError("Index out of bounds for action list insertion.");
-    //        return;
-    //    }
-    //    EnemyActionCaller i = new EnemyActionCaller(action, factor, delay);
-    //    actionList.Insert(index, i);
-    //}
-
-    //public virtual void InsertAction(EnemyActionCaller action, int index)
-    //{
-    //    if (index < 0 || index > actionList.Count)
-    //    {
-    //        Debug.LogError("Index out of bounds for action list insertion.");
-    //        return;
-    //    }
-    //    actionList.Insert(index, action);
-    //}
-
     public Coroutine co_act;
 
     /// <summary>
@@ -194,29 +152,9 @@ public abstract class IEnemyController : IDamagable
         }
 
         isActing = false;
-        if (currentActionBreakAmount >= maxActionBreakCapacity) { yield return StartCoroutine(Break()); }
-        else { StartAction(); }
-        yield return null;
-    }
 
-    /// <summary>
-    /// Coroutine for handling action breaks.
-    /// </summary>
-    public virtual IEnumerator Break()
-    {
-        yield return new WaitForSeconds(breakDuration);
-        currentActionBreakAmount = 0;
         StartAction();
         yield return null;
-    }
-
-    /// <summary>
-    /// Adds to the current action break amount.
-    /// </summary>
-    /// <param name="amount">Amount to add.</param>
-    public virtual void AddActionBreak(int amount)
-    {
-        currentActionBreakAmount += amount;
     }
 
     #endregion ACTION_MANAGEMENT

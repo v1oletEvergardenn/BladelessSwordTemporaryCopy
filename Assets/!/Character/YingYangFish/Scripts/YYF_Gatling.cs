@@ -96,7 +96,6 @@ public class YYF_Gatling : IEnemyAction
         yield return new WaitForSeconds(0.5f);
 
         gatlingPos.gameObject.SetActive(false);
-        bossAI.AddActionBreak(actionBreakAmount);
     }
 
     private string[] bulletTags = { "gatling_bullet_1", "gatling_bullet_2", "gatling_bullet_3" };
@@ -120,6 +119,7 @@ public class YYF_Gatling : IEnemyAction
             bulletTurnSpeed,
             bulletDamage
         );
+        bullet.stunValue = stunValue;
     }
 
     public void Hit(Gatling_bubbles bubble)

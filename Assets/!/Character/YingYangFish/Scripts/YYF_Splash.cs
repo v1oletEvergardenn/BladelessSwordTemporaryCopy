@@ -15,7 +15,6 @@ public class YYF_Splash : IEnemyAction
     public float bulletSpeed = 150f;
     public int damage = 2;
     public float gravityScale = 5f;
-    public float stunValue = 5f;
     private Coroutine co_facePlayer;
     public float hitRange = 3f;
     public MeleeAttack splashAttack;
@@ -101,12 +100,12 @@ public class YYF_Splash : IEnemyAction
                     .SetSpeedBased();
             }
 
-            StartCoroutine(ApplyAttackInCircle(0.3f, hitRange, origin, splashAttack, new Vector3(2, 0, 0)));
+            StartCoroutine(ApplyAttackInCircle(1f, hitRange, origin, splashAttack));
 
             yield return new WaitForSeconds(0.3f);
 
             //spawn bullets
-            StartCoroutine(IESpawnBullet(origin.position));
+            StartCoroutine(IESpawnBullet(origin.position, isBlack));
 
             splashEffect.gameObject.SetActive(false);
 
@@ -172,11 +171,11 @@ public class YYF_Splash : IEnemyAction
                 .SetEase(Ease.OutSine)
                 .SetSpeedBased();
 
-            StartCoroutine(ApplyAttackInCircle(0.3f, hitRange, origin, splashAttack, new Vector3(2, 0, 0)));
+            StartCoroutine(ApplyAttackInCircle(1f, hitRange, origin, splashAttack));
             yield return new WaitForSeconds(0.3f);
             //spawn bullets
-            StartCoroutine(IESpawnBullet(origin.position));
-            StartCoroutine(IESpawnBullet(origin.position, 0.4f));
+            StartCoroutine(IESpawnBullet(origin.position, false));
+            StartCoroutine(IESpawnBullet(origin.position, true, 0.1f));
             splashEffect.gameObject.SetActive(false);
 
             //move origin down water
@@ -189,7 +188,6 @@ public class YYF_Splash : IEnemyAction
         yield return new WaitForSeconds(1f);
         anim.Play("swim_up");
         splashEffect.gameObject.SetActive(false);
-        bossAI.AddActionBreak(actionBreakAmount);
         yield return null;
     }
 
@@ -203,12 +201,13 @@ public class YYF_Splash : IEnemyAction
         }
     }
 
-    public IEnumerator IESpawnBullet(Vector3 pos, float delay = 0)
+    public IEnumerator IESpawnBullet(Vector3 pos, bool isBlack, float delay = 0)
     {
         yield return new WaitForSeconds(delay);
-        for (int i = 0; i < shootPositionX.Count(); i++)
+        for (int i = 0; i < shootPositionX.Count() - (isBlack ? 1 : 0); i++)
         {
-            SpawnWaterBullet(pos, i);
+            if (isBlack) SpawnIceThorn(pos, i);
+            else SpawnWaterBullet(pos, i);
             yield return new WaitForSeconds(0.2f);
         }
     }
@@ -248,6 +247,23 @@ public class YYF_Splash : IEnemyAction
             _speed: bulletSpeed,
             gravityScale: gravityScale,
             _stunValue: stunValue);
+    }
+
+    public void SpawnIceThorn(Vector3 pos, int index)
+    {
+        IceThorn thorn = bossAI.selfPooler.SpawnFromPool("ice_thorn",
+            new Vector3(pos.x + shootPositionX[index],
+            bossAI.waterLevel.position.y, 0)).
+            GetComponent<IceThorn>();
+        StartCoroutine(thorn.Action(new Vector3(pos.x + shootPositionX[index] + 1.5f,
+            bossAI.waterLevel.position.y, 0)));
+        IceThorn thorn2 = bossAI.selfPooler.SpawnFromPool("ice_thorn",
+           new Vector3(pos.x - shootPositionX[index],
+           bossAI.waterLevel.position.y, 0)).
+           GetComponent<IceThorn>();
+        StartCoroutine(thorn2.Action(new Vector3(pos.x - shootPositionX[index] - 1.5f,
+            bossAI.waterLevel.position.y, 0)));
+        return;
     }
 
     public void OnDrawGizmosSelected()

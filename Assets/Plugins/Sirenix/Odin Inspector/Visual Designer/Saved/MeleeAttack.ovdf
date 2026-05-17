@@ -1,0 +1,38 @@
+OVDF v1.1
+MeleeAttack, Project.Main
+
+# $Ui9oQYMgqagWBb8yu4bPoW
+Position: $root:7
++ [Sirenix.OdinInspector.BoxGroupAttribute]
+
+# damage
+Position: $Ui9oQYMgqagWBb8yu4bPoW:0
+
+# stun
+Position: $Ui9oQYMgqagWBb8yu4bPoW:1
++ [Sirenix.OdinInspector.PropertyRangeAttribute]
+	Max = 2
+
+# freezeTime
+Position: $Ui9oQYMgqagWBb8yu4bPoW:2
++ [Sirenix.OdinInspector.PropertyRangeAttribute]
+	Max = 2
+
+# repel
+Position: $Ui9oQYMgqagWBb8yu4bPoW:3
++ [UnityEngine.RangeAttribute]
+	min = 100
+	max = 400
+
+# rumble
+Position: $Ui9oQYMgqagWBb8yu4bPoW:5
+
+# rumbleDuration
+Position: $Ui9oQYMgqagWBb8yu4bPoW:4
++ [UnityEngine.RangeAttribute]
+	max = 1
+
+# cameraShake
+Position: $Ui9oQYMgqagWBb8yu4bPoW:6
++ [UnityEngine.RangeAttribute]
+	max = 1

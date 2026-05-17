@@ -23,6 +23,7 @@ public abstract class IEnemyAction : MonoBehaviour
 
     [HideInInspector] public IEnemyController bossController;
     public int actionBreakAmount = 1;
+    public float stunValue = 1;
 
     [HideInInspector] public bool proceedCall = false;
     public Coroutine act_routine;
@@ -51,10 +52,8 @@ public abstract class IEnemyAction : MonoBehaviour
 
     public virtual void CancelAct()
     {
-        if (act_routine != null)
-        {
-            StopCoroutine(act_routine);
-        }
+        TryStopCoroutine(act_routine);
+        StopAllCachedCoroutines();
 
         //OutLine_Activate(0);
     }
@@ -83,7 +82,6 @@ public abstract class IEnemyAction : MonoBehaviour
     /// <returns></returns>
     public virtual IEnumerator ApplyAttackInCircle(float duration, float range, Transform attackPos, MeleeAttack melee, Vector3 offset = default)
     {
-        bool hitPlayerAlready = false;
         List<IDamagable> hitIdamagables = new List<IDamagable>();
         List<IProjectile> hitProjectiles = new List<IProjectile>();
         float elapsedTime = 0f;
@@ -98,34 +96,27 @@ public abstract class IEnemyAction : MonoBehaviour
                 {
                     continue; // Skip if it's the boss itself or a sub-damagable of the boss
                 }
-                else if (collider.gameObject != player)
+
+                //Hit Idamagables
+                if (collider.TryGetComponent<IDamagable>(out IDamagable idmg))
                 {
-                    //Hit Idamagables
-                    if (collider.TryGetComponent<IDamagable>(out IDamagable idmg))
+                    if (!hitIdamagables.Contains(idmg))
                     {
-                        if (!hitIdamagables.Contains(idmg))
-                        {
-                            hitIdamagables.Add(idmg);
-                            foreach (IDamagable subIdmg in idmg.subDamagables) { hitIdamagables.Add(subIdmg); }
-                            idmg.Damage(melee.damage, this.transform, melee.stun);
-                        }
-                    }
-                    //Hit Iprojectiles
-                    if (collider.TryGetComponent<IProjectile>(out IProjectile iProj))
-                    {
-                        if (!hitProjectiles.Contains(iProj))
-                        {
-                            hitProjectiles.Add(iProj);
-                            iProj.HitByMeleeAttack();
-                        }
+                        hitIdamagables.Add(idmg);
+                        foreach (IDamagable subIdmg in idmg.subDamagables) { hitIdamagables.Add(subIdmg); }
+                        if (idmg == playerIDamagable) { HitPlayer(melee, attackPos, offset); }
+                        else { idmg.Damage(melee.damage, this.transform, melee.stun); }
                     }
                 }
-            }
-            // hit player
-            if (!hitPlayerAlready)
-            {
-                float d = Vector3.Distance(playerIDamagable.GetHitPos(), attackPos.position + offset);
-                if (d <= range) { HitPlayer(melee, attackPos); hitPlayerAlready = true; }
+                //Hit Iprojectiles
+                if (collider.TryGetComponent<IProjectile>(out IProjectile iProj))
+                {
+                    if (!hitProjectiles.Contains(iProj) || !iProj.IsOwner(this.gameObject))
+                    {
+                        hitProjectiles.Add(iProj);
+                        iProj.HitByMeleeAttack();
+                    }
+                }
             }
             yield return null;
         }
@@ -133,34 +124,69 @@ public abstract class IEnemyAction : MonoBehaviour
         yield return null;
     }
 
+    public virtual IEnumerator ApplyAttackInCollider(float duration, Transform attackPos, Collider2D attack_collider, MeleeAttack melee, Vector3 offset = default)
+    {
+        List<IDamagable> hitIdamagables = new List<IDamagable>();
+        List<IProjectile> hitProjectiles = new List<IProjectile>();
+        float elapsedTime = 0f;
+        while (elapsedTime <= duration)
+        {
+            elapsedTime += Time.deltaTime;
+            List<Collider2D> results = new List<Collider2D>();
+            Physics2D.OverlapCollider(attack_collider, new ContactFilter2D().NoFilter(), results);
+            foreach (Collider2D collider in results)
+            {
+                if (bossController.subDamagables.Contains(collider.GetComponent<IDamagable>())
+                    || collider.gameObject == this.gameObject)
+                {
+                    continue; // Skip if it's the boss itself or a sub-damagable of the boss
+                }
+
+                //Hit Idamagables
+                if (collider.TryGetComponent<IDamagable>(out IDamagable idmg))
+                {
+                    if (!hitIdamagables.Contains(idmg))
+                    {
+                        hitIdamagables.Add(idmg);
+                        foreach (IDamagable subIdmg in idmg.subDamagables) { hitIdamagables.Add(subIdmg); }
+                        if (idmg == playerIDamagable) { HitPlayer(melee, attackPos, offset); }
+                        else { idmg.Damage(melee.damage, this.transform, melee.stun); }
+                    }
+                }
+                //Hit Iprojectiles
+                if (collider.TryGetComponent<IProjectile>(out IProjectile iProj))
+                {
+                    if (!hitProjectiles.Contains(iProj) || !iProj.IsOwner(this.gameObject))
+                    {
+                        hitProjectiles.Add(iProj);
+                        iProj.HitByMeleeAttack();
+                    }
+                }
+            }
+
+            yield return null;
+        }
+        yield return null;
+    }
+
     public virtual void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default)
     {
+        print("damaged!");
         int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
-        bool direction = playerIDamagable.GetHitPos().x < attackPos.position.x + offset.x ? true : false;
+        bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
 
         if (dealtDamage == 2)//counter attack
         {
-            //counter attack effect
-            vfx.SpawnHitEffect(true, playerIDamagable.hitEffectPosition.position);
-            playerIDamagable.Repel(melee.repel, direction);
-            vfx.CameraShake(melee.cameraShake);
-            vfx.RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
-            vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
+            vfx.MeleeAttackEffect(melee, playerIDamagable, left);
+            bossController.DecreaseStun(stunValue);
         }
         else if (dealtDamage == 1)//defend
         {
-            vfx.SpawnHitEffect(true, playerIDamagable.GetHitPos());
-            playerIDamagable.Repel(melee.repel, direction);
-            vfx.CameraShake(melee.cameraShake);
-            vfx.RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
-            vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
+            vfx.MeleeAttackEffect(melee, playerIDamagable, left);
         }
         else if (dealtDamage == 0)//dealtDamage
         {
-            vfx.SpawnHitEffect(true, playerIDamagable.GetHitPos());
-            playerIDamagable.Repel(melee.repel * 2, direction);
-            vfx.RumblePulse(melee.rumble.x, melee.rumble.y, melee.rumbleDuration);
-            vfx.SlowTimeForSeconds(melee.freezeTime, 0f);
+            vfx.MeleeAttackEffect(melee, playerIDamagable, left);
         }
     }
 
@@ -219,6 +245,43 @@ public abstract class IEnemyAction : MonoBehaviour
     {
         proceedCall = true;
         // Optional override in derived classes
+    }
+
+    public List<Coroutine> allCachedCoroutines = new List<Coroutine>();
+
+    public virtual IEnumerator StartMultipleCoroutines(List<IEnumerator> caller)
+    {
+        if (caller == null || caller.Count == 0) yield break;
+
+        int remaining = caller.Count;
+        for (int i = 0; i < caller.Count; i++)
+        {
+            if (caller[i] != null)
+            {
+                int index = i;
+                StartCoroutine(Run(caller[i], () => remaining--, c => allCachedCoroutines.Add(c)));
+            }
+            else
+            {
+                remaining--;
+            }
+        }
+
+        yield return new WaitUntil(() => remaining <= 0);
+    }
+
+    public void StopAllCachedCoroutines()
+    {
+        foreach (Coroutine c in allCachedCoroutines) TryStopCoroutine(c);
+        allCachedCoroutines.Clear();
+    }
+
+    private IEnumerator Run(IEnumerator caller, Action onDone, Action<Coroutine> routineCache)
+    {
+        Coroutine c = StartCoroutine(caller);
+        routineCache?.Invoke(c);
+        yield return c;
+        onDone?.Invoke();
     }
 }
 

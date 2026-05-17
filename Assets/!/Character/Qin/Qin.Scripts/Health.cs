@@ -152,7 +152,18 @@ public class Health : IDamagable
         return Damage(damageAmount, null, 0f);
     }
 
-    public int DamageFromMeleeAttack(Transform attackPos, float damageAmount, float t = 0f)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="attackPos"></param>
+    /// <param name="damageAmount"></param>
+    /// <param name="freezeTime"></param>
+    /// <returns>
+    ///  0: damaged successfully
+    /// 1: target is defending,
+    /// 2: target is countering,
+    /// 4: target is immune,</returns>
+    public int DamageFromMeleeAttack(Transform attackPos, float damageAmount, float freezeTime = 0f, bool canCounterAttack = true)
     {
         if (this.transform.gameObject.layer == 14) { return 4; }
         if ((attackPos.position.x < transform.position.x && !controller.FacingRight)
@@ -165,9 +176,9 @@ public class Health : IDamagable
                 anim.Play("defend_hit");
                 return 1;
             }
-            if (playerAttack.isCounterAttacking) { playerAttack.CounterMeleeAttack(); return 2; }
+            if (canCounterAttack && playerAttack.isCounterAttacking) { playerAttack.CounterMeleeAttack(); return 2; }
         }
-        DamageDirectlyWithStun(damageAmount, t);
+        DamageDirectlyWithStun(damageAmount, freezeTime);
         return 0;
     }
 

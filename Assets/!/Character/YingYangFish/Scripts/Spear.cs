@@ -100,6 +100,7 @@ public class Spear : IProjectile
 
     public override void Hit()
     {
+        if (!collisionActive) return;
         GetComponent<SpriteRenderer>().sprite = null;
         GetComponent<Animator>().Play("spear_hit");
         rb.velocity = Vector3.zero;
