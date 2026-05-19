@@ -7,10 +7,10 @@ using UnityEngine;
 public class IceThorn : IDamagable
 {
     private bool canBeCounterAttacked = true;
-    private bool canDealDamage = true;
-    public Vector2 startLocalPos = new Vector2(-1.2f, -2.2f);
+    private bool canDealDamage = false;
     public MeleeAttack iceAttack;
     private Health player;
+    public Transform GFX;
 
     private void Start()
     {
@@ -26,17 +26,13 @@ public class IceThorn : IDamagable
     {
         canBeCounterAttacked = true;
         canDealDamage = true;
-        transform.position = pos + startLocalPos;
+        transform.position = pos;
 
         //move up animation
-        yield return transform
-                   .DOMove(pos, 0.3f)
-                   .SetEase(Ease.InSine)
-                   .WaitForCompletion();
+        yield return new WaitForSeconds(1.5f);
         //after move up, cancel counter attack.
         canBeCounterAttacked = false;
-        yield return new WaitForSeconds(1f);
-
+        yield return new WaitForSeconds(1.35f);
         canDealDamage = false;
         yield return new WaitForSeconds(0.4f);
         gameObject.SetActive(false);
@@ -65,7 +61,6 @@ public class IceThorn : IDamagable
 
     public void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default, bool canCounterAttack = true)
     {
-        print("damaged!");
         VFXManager vfx = VFXManager.instance;
         int dealtDamage = player.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun, canCounterAttack);
         bool left = player.GetHitPos().x < attackPos.position.x ? true : false;
@@ -73,6 +68,9 @@ public class IceThorn : IDamagable
         if (dealtDamage == 2)//counter attack
         {
             vfx.MeleeAttackEffect(melee, player, left);
+            GFX.GetComponent<Animator>().Play("hit");
+            canDealDamage = false;
+            canBeCounterAttacked = false;
         }
         else if (dealtDamage == 1)//defend
         {
@@ -81,6 +79,8 @@ public class IceThorn : IDamagable
         else if (dealtDamage == 0)//dealtDamage
         {
             vfx.MeleeAttackEffect(melee, player, left);
+            canDealDamage = false;
+            canBeCounterAttacked = false;
         }
     }
 }

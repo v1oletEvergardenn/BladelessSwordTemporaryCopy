@@ -1778,7 +1778,7 @@ Transform:
   m_GameObject: {fileID: 2423474427461210019}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -26.68, y: -4.27, z: 0}
+  m_LocalPosition: {x: -7.59, y: -4.22, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -2055,7 +2055,7 @@ MonoBehaviour:
   consumeEnergyOnHit: 1
   anim_bool: {fileID: 1670082175976385656}
   anim: {fileID: 5610019840959657370}
-  maxHealth: 30
+  maxHealth: 3e+11
   currentHealth: 0
   healthBar: {fileID: 515801862903960319}
   characterUI: {fileID: 5769736533489229269}
@@ -2989,7 +2989,7 @@ Transform:
   m_GameObject: {fileID: 5394270623248741142}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -25.68, y: -4.27, z: -10}
+  m_LocalPosition: {x: -6.59, y: -4.22, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3870,9 +3870,9 @@ MonoBehaviour:
   - {fileID: 7700881654836060864}
   - {fileID: 9055875050913893345}
   - {fileID: 1388019030509448985}
-  abilityWest: 0
-  abilityNorth: 0
-  abilityEast: 0
+  abilityWest: 1
+  abilityNorth: 2
+  abilityEast: 3
   currentActivatedAbility: 0
 --- !u!1 &6292435455098606858
 GameObject:

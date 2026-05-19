@@ -28,9 +28,40 @@ Position: $root:8
 	GroupName = "General References"
 
 # $N7jkK2cQ4seLcxZaFLjhYZ
-Position: $root:30
+Position: $root:10
 + [Sirenix.OdinInspector.FoldoutGroupAttribute]
 	GroupName = "Action References"
+
+# $GvPXSRJi5Q7nNG4dcbS89A
+Position: $root:112
++ [Sirenix.OdinInspector.TabGroupAttribute]
+	GroupName = "Actions"
+	VisibleIf = ""
+	TabLayouting = MultiRow
+	UseFixedHeight = False
+	Paddingless = False
+
+# $Lyuyu6Xpj1bh6izMVSuZkB
+Position: $GvPXSRJi5Q7nNG4dcbS89A:0
++ [Sirenix.OdinInspector.TabGroupAttribute+TabSubGroupAttribute]
+	GroupName = "Center Start Combos"
+
+# $EMaqZ1ScG4vBwabSTsSmhH
+Position: $GvPXSRJi5Q7nNG4dcbS89A:1
++ [Sirenix.OdinInspector.TabGroupAttribute+TabSubGroupAttribute]
+	GroupName = "Fish Start Combos"
+
+# $J8bG2TDWzZNZ56NYwgHSvm
+Position: $GvPXSRJi5Q7nNG4dcbS89A:2
++ [Sirenix.OdinInspector.TabGroupAttribute+TabSubGroupAttribute]
+	GroupName = "Center Start Low Health"
+	TextColor = "red"
+
+# $XgXKWcubhWyhnosQLfBiLi
+Position: $GvPXSRJi5Q7nNG4dcbS89A:3
++ [Sirenix.OdinInspector.TabGroupAttribute+TabSubGroupAttribute]
+	GroupName = "Fish Start Low Health"
+	TextColor = "red"
 
 # center
 Position: $PhNSuf7mSr9TmNdyVK1umo:0
@@ -112,3 +143,51 @@ Position: $PhNSuf7mSr9TmNdyVK1umo:5
 
 # fastSwimSpeed
 Position: $PhNSuf7mSr9TmNdyVK1umo:6
+
+# TestActionList
+* [Sirenix.OdinInspector.TitleAttribute]
+	TitleAlignment = Left
+
+# TEST
+Position: $root:111
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "enableTest"
+
+# enableTest
+Position: $root:110
+
+# centerStart1
+Position: $Lyuyu6Xpj1bh6izMVSuZkB:0
+
+# centerStart2
+Position: $Lyuyu6Xpj1bh6izMVSuZkB:1
+
+# centerStart3
+Position: $Lyuyu6Xpj1bh6izMVSuZkB:2
+
+# centerStart1_lowHealth
+Position: $J8bG2TDWzZNZ56NYwgHSvm:0
+
+# centerStart2_lowHealth
+Position: $J8bG2TDWzZNZ56NYwgHSvm:1
+
+# centerStart3_lowHealth
+Position: $J8bG2TDWzZNZ56NYwgHSvm:2
+
+# splashStart
+Position: $EMaqZ1ScG4vBwabSTsSmhH:0
+
+# swingStart
+Position: $EMaqZ1ScG4vBwabSTsSmhH:1
+
+# bubbleTrapStart
+Position: $EMaqZ1ScG4vBwabSTsSmhH:2
+
+# splashStart_lowHealth
+Position: $XgXKWcubhWyhnosQLfBiLi:0
+
+# swingStart_lowHealth
+Position: $XgXKWcubhWyhnosQLfBiLi:1
+
+# bubbleTrapStart_lowHealth
+Position: $XgXKWcubhWyhnosQLfBiLi:2

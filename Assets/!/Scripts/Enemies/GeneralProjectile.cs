@@ -23,7 +23,7 @@ public class GeneralProjectile : IProjectile
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
         if (target != null && collision.gameObject != owner && !collided)
         {
-            if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
+            if (isHostileToPlayer && (collision.gameObject.layer == 13 || collision.gameObject.layer == 25)) { return; }
 
             if (collision.gameObject == gameManager.player)
             {

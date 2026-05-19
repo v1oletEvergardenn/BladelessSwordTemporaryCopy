@@ -105,7 +105,8 @@ public class YYF_Splash : IEnemyAction
             yield return new WaitForSeconds(0.3f);
 
             //spawn bullets
-            StartCoroutine(IESpawnBullet(origin.position, isBlack));
+
+            StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), isBlack));
 
             splashEffect.gameObject.SetActive(false);
 
@@ -174,8 +175,8 @@ public class YYF_Splash : IEnemyAction
             StartCoroutine(ApplyAttackInCircle(1f, hitRange, origin, splashAttack));
             yield return new WaitForSeconds(0.3f);
             //spawn bullets
-            StartCoroutine(IESpawnBullet(origin.position, false));
-            StartCoroutine(IESpawnBullet(origin.position, true, 0.1f));
+            StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), false));
+            StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), true, 0.1f));
             splashEffect.gameObject.SetActive(false);
 
             //move origin down water
@@ -193,10 +194,12 @@ public class YYF_Splash : IEnemyAction
 
     private IEnumerator IEFaceSplashAtPlayer(Transform transform, bool face)
     {
-        while (true)
+        float elapsedTime = 0f;
+        while (elapsedTime < 2f)
         {
             splashEffect.position = transform.position;
-            if (face) splashEffect.eulerAngles = CalculateWantedEuler(player.transform.position, splashEffect.position);
+            if (face && elapsedTime <= 1f) splashEffect.eulerAngles = CalculateWantedEuler(player.transform.position, splashEffect.position);
+            elapsedTime += Time.deltaTime;
             yield return null;
         }
     }
@@ -255,13 +258,13 @@ public class YYF_Splash : IEnemyAction
             new Vector3(pos.x + shootPositionX[index],
             bossAI.waterLevel.position.y, 0)).
             GetComponent<IceThorn>();
-        StartCoroutine(thorn.Action(new Vector3(pos.x + shootPositionX[index] + 1.5f,
+        StartCoroutine(thorn.Action(new Vector3(pos.x + shootPositionX[index] + 2.5f,
             bossAI.waterLevel.position.y, 0)));
         IceThorn thorn2 = bossAI.selfPooler.SpawnFromPool("ice_thorn",
            new Vector3(pos.x - shootPositionX[index],
            bossAI.waterLevel.position.y, 0)).
            GetComponent<IceThorn>();
-        StartCoroutine(thorn2.Action(new Vector3(pos.x - shootPositionX[index] - 1.5f,
+        StartCoroutine(thorn2.Action(new Vector3(pos.x - shootPositionX[index] - 2.5f,
             bossAI.waterLevel.position.y, 0)));
         return;
     }

@@ -496,11 +496,4 @@ public class ActionCaller
         factor = _factor;
         delay = _delay;
     }
-
-    public ActionCaller(IEnemyAction _action, bool isBlack, float _delay = 0)
-    {
-        action = _action;
-        factor = isBlack ? 0f : 1f;
-        delay = _delay;
-    }
 }

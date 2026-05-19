@@ -2,6 +2,7 @@ using DG.Tweening;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using static UnityEngine.UI.Image;
@@ -85,6 +86,24 @@ public class YingYangFish_AI : IEnemyController
     #endregion Action Fields
 
     public static YingYangFish_AI instance;
+
+    public bool enableTest = false;
+
+    [SerializeField] private List<YYFActionPhase> TEST = new List<YYFActionPhase>();
+
+    [SerializeField] private List<YYFActionPhase> centerStart1 = new List<YYFActionPhase>();
+    [SerializeField] private List<YYFActionPhase> centerStart2 = new List<YYFActionPhase>();
+    [SerializeField] private List<YYFActionPhase> centerStart3 = new List<YYFActionPhase>();
+    [SerializeField] private List<YYFActionPhase> centerStart1_lowHealth = new List<YYFActionPhase>();
+    [SerializeField] private List<YYFActionPhase> centerStart2_lowHealth = new List<YYFActionPhase>();
+    [SerializeField] private List<YYFActionPhase> centerStart3_lowHealth = new List<YYFActionPhase>();
+
+    [SerializeField] private List<YYFActionPhase> splashStart = new List<YYFActionPhase>();
+    [SerializeField] private List<YYFActionPhase> swingStart = new List<YYFActionPhase>();
+    [SerializeField] private List<YYFActionPhase> bubbleTrapStart = new List<YYFActionPhase>();
+    [SerializeField] private List<YYFActionPhase> splashStart_lowHealth = new List<YYFActionPhase>();
+    [SerializeField] private List<YYFActionPhase> swingStart_lowHealth = new List<YYFActionPhase>();
+    [SerializeField] private List<YYFActionPhase> bubbleTrapStart_lowHealth = new List<YYFActionPhase>();
 
     #region Unity Lifecycle
 
@@ -702,115 +721,38 @@ public class YingYangFish_AI : IEnemyController
         {
             int randomNum = Random.Range(0, 3);
 
-            //First Scenario
-            if (randomNum == 0)
+            // above 50% hp
+            if (healthPercentage >= 0.5f)
             {
-                bool isBlack = RandomFishBool();
-                actionList = new List<List<ActionCaller>>
-                    {
-                        new List<ActionCaller> {
-                            //***ADD water spear charging
-                            RandomChoice(new ActionCaller(swing, isBlack),
-                            new ActionCaller(splash,  isBlack))
-                        },
-                        new List<ActionCaller> {
-                            RandomChoice(new ActionCaller(swing,!isBlack),
-                            new ActionCaller(splash,  !isBlack)),
-                            new ActionCaller(waterSpear)
-                        },
-                    };
+                //First Combo
+                if (randomNum == 0) ApplyActionList(centerStart1);
+                else if (randomNum == 1) ApplyActionList(centerStart2);
+                else ApplyActionList(centerStart3);
             }
-
-            //Second Scenario
-            else if (randomNum == 1)
-            {
-                actionList = new List<List<ActionCaller>>
-                    {
-                        new List<ActionCaller> {
-                            //***ADD water spear charging
-                           new ActionCaller(swing, 2),
-                           new ActionCaller(waterSpear,0,1f)
-                        }
-                    };
-            }
-
-            //Third Scenario
             else
             {
-                actionList = new List<List<ActionCaller>>
-                    {
-                        new List<ActionCaller> {
-                            //***ADD water spear charging
-                            new ActionCaller(bubbleTrap, RandomFish())
-                        },
-                        new List<ActionCaller> {
-                            RandomChoice(new ActionCaller(swing, RandomFish()),
-                            new ActionCaller(splash,  RandomFish())),
-                            new ActionCaller(waterSpear)
-                        },
-                    };
+                if (randomNum == 0) ApplyActionList(centerStart1_lowHealth);
+                else if (randomNum == 1) ApplyActionList(centerStart2_lowHealth);
+                else ApplyActionList(centerStart3_lowHealth);
             }
         }
         else if (initialAction == splash)
         {
-            bool isBlack = RandomFishBool();
-            actionList = new List<List<ActionCaller>>
-                    {
-                        new List<ActionCaller> {
-                            new ActionCaller(splash,isBlack)
-                        },
-                        new List<ActionCaller> {
-                            new ActionCaller(splash,!isBlack)
-                        },
-                        new List<ActionCaller> {
-                            new ActionCaller(swing,2)
-                        }
-                    };
+            ApplyActionList(healthPercentage >= 0.5f ? splashStart : splashStart_lowHealth);
         }
         else if (initialAction == swing)
         {
-            bool isBlack = RandomFishBool();
-            actionList = new List<List<ActionCaller>>
-                    {
-                        new List<ActionCaller> {
-                            new ActionCaller(swing,isBlack)
-                        },
-                        new List<ActionCaller> {
-                            new ActionCaller(swing,!isBlack)
-                        },
-                        new List<ActionCaller> {
-                            new ActionCaller(splash,2)
-                        }
-                    };
+            ApplyActionList(healthPercentage >= 0.5f ? swingStart : swingStart_lowHealth);
         }
         else if (initialAction == bubbleTrap)
         {
-            bool isBlack = RandomFishBool();
-            actionList = new List<List<ActionCaller>>
-                    {
-                        new List<ActionCaller> {
-                            new ActionCaller(bubbleTrap,isBlack)
-                        },
-                        new List<ActionCaller> {
-                            RandomChoice(new ActionCaller(swing, RandomFish()),
-                            new ActionCaller(splash,  RandomFish())),
-                            new ActionCaller(gatling,0,2)
-                        }
-                    };
+            ApplyActionList(healthPercentage >= 0.5f ? bubbleTrapStart : bubbleTrapStart_lowHealth);
         }
 
-        actionList = new List<List<ActionCaller>>
-                    {
-                        new List<ActionCaller> {
-                            new ActionCaller(swing,0)
-                        },
-                        new List<ActionCaller> {
-                            new ActionCaller(swing,1)
-                        },
-                        new List<ActionCaller> {
-                            new ActionCaller(swing,2)
-                        }
-                    };
+        if (enableTest)
+        {
+            ApplyActionList(TEST);
+        }
         //DebugPrintActionList();
 
         //start action
@@ -821,6 +763,19 @@ public class YingYangFish_AI : IEnemyController
             //co_act = StartCoroutine(Act());
         }
         else { StartAction(); return; }
+    }
+
+    public void ApplyActionList(List<YYFActionPhase> actions)
+    {
+        actionList.Clear();
+        foreach (YYFActionPhase phase in actions)
+        {
+            List<ActionCaller> group = new List<ActionCaller>();
+            foreach (YYFActionEntry entry in phase.actionCombo)
+                group.Add(entry.ToActionCaller(this));
+            if (group.Count > 0)
+                actionList.Add(group);
+        }
     }
 
     public override IEnumerator IE_Activate()
@@ -1074,4 +1029,89 @@ public class YingYangFish_AI : IEnemyController
 
         Debug.Log(sb.ToString());
     }
+
+    public Vector3 CreateWaterLevelYAxis(Vector3 position)
+    {
+        return new Vector3(position.x, waterLevel.position.y, 0);
+    }
+
+    public Vector3 CreateWaterLevelYAxis(float x)
+    {
+        return new Vector3(x, waterLevel.position.y, 0);
+    }
+
+    public Vector3 CreateWaterLevelYAxis(Transform target)
+    {
+        return new Vector3(target.position.x, waterLevel.position.y, 0);
+    }
+}
+
+public enum YYFActionType
+{
+    WaterSpear,
+    Gatling,
+    BubbleTrap,
+    Swing,
+    Splash
+}
+
+public enum YYFFishTarget
+{
+    Black = 0,
+    White = 1,
+    Both = 2,
+    Random = 3
+}
+
+public class YYFActionCaller : ActionCaller
+{
+    public YYFActionCaller(IEnemyAction _action, int _factor = 0, float _delay = 0) : base(_action, _factor, _delay)
+    { }
+
+    public YYFActionCaller(IEnemyAction _action, bool isBlack, float _delay = 0)
+     : base(_action, isBlack ? 0f : 1f, _delay) { }
+}
+
+[System.Serializable]
+public class YYFActionEntry
+{
+    [HorizontalGroup("Row", Width = 230)]
+    [HideLabel] public YYFActionType actionType;
+
+    [HorizontalGroup("Row", Width = 400)]
+    [HideLabel]
+    [HideIf(nameof(HideFishTarget))]
+    public YYFFishTarget fishTarget;
+
+    [HorizontalGroup("Row")]
+    [HideLabel]
+    [SuffixLabel("sec")]
+    public float delay = 0f;
+
+    private bool HideFishTarget => actionType == YYFActionType.WaterSpear || actionType == YYFActionType.Gatling;
+
+    public YYFActionCaller ToActionCaller(YingYangFish_AI ai)
+    {
+        IEnemyAction action = actionType switch
+        {
+            YYFActionType.WaterSpear => ai.waterSpear,
+            YYFActionType.Swing => ai.swing,
+            YYFActionType.BubbleTrap => ai.bubbleTrap,
+            YYFActionType.Gatling => ai.gatling,
+            YYFActionType.Splash => ai.splash,
+            _ => null
+        };
+
+        int factor = fishTarget == YYFFishTarget.Random
+            ? ai.RandomFish()
+            : (int)fishTarget;
+
+        return new YYFActionCaller(action, factor, delay);
+    }
+}
+
+[System.Serializable]
+public class YYFActionPhase
+{
+    public List<YYFActionEntry> actionCombo = new List<YYFActionEntry>();
 }
