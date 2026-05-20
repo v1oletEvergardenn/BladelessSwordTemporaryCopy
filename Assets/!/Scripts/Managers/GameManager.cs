@@ -126,8 +126,8 @@ public class GameManager : MonoBehaviour
     public void InitializePlayer()
     {
         playerhealth.transform.position = Vector3.zero;
-        playerhealth.SetMaxHealth(50);
-        playerhealth.SetCurrentHealth(50);
+        //playerhealth.SetMaxHealth(10000000);
+        playerhealth.SetCurrentHealth(playerhealth.GetMaxHealth());
         playerEnergy.maxEnergy = 16;
         playerEnergy.currentEnergy = 16;
         hsManager.SetMaxHSPoint(6);
