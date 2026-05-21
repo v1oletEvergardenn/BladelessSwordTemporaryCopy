@@ -14,7 +14,7 @@ public class ParallaxManager : MonoBehaviour
 
     public List<layer> layers = new List<layer>();
 
-    [HideInInspector] public Transform bigCopiesHolder; // Holds all layer copy holders
+    [HideInInspector] public Transform bigCopiesHolder;
 
     public void RecreateAllLayerCopies()
     {
@@ -37,7 +37,6 @@ public class ParallaxManager : MonoBehaviour
                 }
                 i.copies.Clear();
             }
-            // Destroy layer's holder if it exists
             if (i.copiesHolder != null)
             {
 #if UNITY_EDITOR
@@ -51,7 +50,6 @@ public class ParallaxManager : MonoBehaviour
                 i.copiesHolder = null;
             }
         }
-        // Destroy big holder if it exists
         if (bigCopiesHolder != null)
         {
 #if UNITY_EDITOR
@@ -73,15 +71,29 @@ public class ParallaxManager : MonoBehaviour
         UpdateLayerCopies();
         foreach (layer i in layers)
         {
-            i.sprite = i.trans.GetComponent<SpriteRenderer>();
-            i.spriteLength = i.sprite.bounds.size.x;
-            i.lastLerpPosition = i.trans.position; // Initialize
+            i.trans.TryGetComponent<SpriteRenderer>(out var sr);
+            if (sr != null)
+            {
+                i.sprite = sr;
+                i.spriteLength = i.sprite.bounds.size.x;
+                i.lastLerpPosition = i.trans.position;
+            }
+            else
+            {
+                i.trans.TryGetComponent<MeshRenderer>(out var mr);
+                if (mr != null)
+                {
+                    i.meshRenderer = mr;
+                    i.spriteLength = mr.bounds.size.x;
+                    i.lastLerpPosition = i.trans.position;
+                }
+            }
         }
     }
 
     private float GetCameraWidth()
     {
-        if (cam == null) return 20f; // fallback
+        if (cam == null) return 20f;
         return cam.orthographicSize * 2f * cam.aspect;
     }
 
@@ -94,17 +106,24 @@ public class ParallaxManager : MonoBehaviour
         return all;
     }
 
+    /// <summary>Returns the world-space X bounds size for the layer's renderer (Sprite or Mesh).</summary>
+    private float GetRendererBoundsX(layer i)
+    {
+        if (i.sprite != null) return i.sprite.bounds.size.x;
+        if (i.meshRenderer != null) return i.meshRenderer.bounds.size.x;
+        return i.spriteLength; // fallback to cached value
+    }
+
     public void Update()
     {
         float camX = cam != null ? cam.transform.position.x : 0f;
         float camY = cam != null ? cam.transform.position.y : 0f;
-        float camWidth = GetCameraWidth();
 
         foreach (layer i in layers)
         {
-            if (i.sprite == null) continue;
+            if (i.sprite == null && i.meshRenderer == null) continue;
 
-            float scaledSpriteLength = i.sprite.bounds.size.x * i.trans.lossyScale.x;
+            float scaledSpriteLength = GetRendererBoundsX(i) * i.trans.lossyScale.x;
             float parallaxX = camX * i.movingSpeed;
             float parallaxY = camY * i.movingSpeedY;
             float baseZ = i.trans.position.z;
@@ -131,7 +150,6 @@ public class ParallaxManager : MonoBehaviour
                 );
             }
 
-            // Only X-axis repeat/snapping
             if (!i.disableSnapping)
             {
                 float totalWidth = scaledSpriteLength * (i.copyCount * 2 + 1);
@@ -142,13 +160,9 @@ public class ParallaxManager : MonoBehaviour
                     float tileX = tile.position.x;
 
                     if (tileX - camX > scaledSpriteLength * i.copyCount)
-                    {
                         tile.position -= new Vector3(totalWidth, 0, 0);
-                    }
                     else if (tileX - camX < -scaledSpriteLength * i.copyCount)
-                    {
                         tile.position += new Vector3(totalWidth, 0, 0);
-                    }
                 }
             }
         }
@@ -156,7 +170,6 @@ public class ParallaxManager : MonoBehaviour
 
     private void UpdateLayerCopies()
     {
-        // Create or find the big holder if any layer repeats
         bool anyRepeat = false;
         foreach (layer i in layers)
             if (i.repeat) { anyRepeat = true; break; }
@@ -191,11 +204,22 @@ public class ParallaxManager : MonoBehaviour
         {
             if (i.trans == null) continue;
 
+            // Resolve renderer — sprite takes priority, then mesh
             i.sprite = i.trans.GetComponent<SpriteRenderer>();
-            if (i.sprite == null) continue;
-            i.spriteLength = i.sprite.bounds.size.x;
+            if (i.sprite != null)
+            {
+                i.spriteLength = i.sprite.bounds.size.x;
+                i.meshRenderer = null;
+            }
+            else
+            {
+                i.meshRenderer = i.trans.GetComponent<MeshRenderer>();
+                if (i.meshRenderer != null)
+                    i.spriteLength = i.meshRenderer.bounds.size.x;
+                else
+                    continue; // no supported renderer found
+            }
 
-            // Only create or maintain the holder if repeat is true
             if (i.repeat)
             {
                 if (i.copiesHolder == null)
@@ -207,7 +231,6 @@ public class ParallaxManager : MonoBehaviour
                 i.copiesHolder.SetParent(bigCopiesHolder, false);
                 i.copiesHolder.localPosition = Vector3.zero;
 
-                // Remove old children if any
                 for (int c = i.copiesHolder.childCount - 1; c >= 0; c--)
                 {
 #if UNITY_EDITOR
@@ -222,7 +245,6 @@ public class ParallaxManager : MonoBehaviour
             }
             else
             {
-                // If repeat is false, destroy the holder if it exists
                 if (i.copiesHolder != null)
                 {
 #if UNITY_EDITOR
@@ -242,17 +264,13 @@ public class ParallaxManager : MonoBehaviour
             else
                 i.copies.Clear();
 
-            int desiredCopies = i.repeat && i.copyCount > 0 ? i.copyCount * 2 : 0;
-
-            // Add new copies if increasing copyCount
             if (i.repeat)
             {
-                float scaledSpriteLength = i.sprite.bounds.size.x * i.trans.lossyScale.x;
+                float scaledSpriteLength = GetRendererBoundsX(i) * i.trans.lossyScale.x;
                 for (int c = 1; c <= i.copyCount; c++)
                 {
                     if (i.copyCount <= 0) break;
 
-                    // Right copy
                     Transform copy = CreateSpriteOnlyCopy(
                         i.trans,
                         i.copiesHolder,
@@ -261,7 +279,6 @@ public class ParallaxManager : MonoBehaviour
                     );
                     i.copies.Add(copy);
 
-                    // Left copy
                     Transform leftCopy = CreateSpriteOnlyCopy(
                         i.trans,
                         i.copiesHolder,
@@ -323,6 +340,41 @@ public class ParallaxManager : MonoBehaviour
             }
         }
 
+        // Copy MeshFilter + MeshRenderer if present
+        var origMeshFilter = original.GetComponent<MeshFilter>();
+        var origMeshRenderer = original.GetComponent<MeshRenderer>();
+        if (origMeshFilter != null && origMeshRenderer != null)
+        {
+            var newMeshFilter = newObj.AddComponent<MeshFilter>();
+            var newMeshRenderer = newObj.AddComponent<MeshRenderer>();
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                UnityEditor.EditorApplication.delayCall += () =>
+                {
+                    if (newMeshFilter != null && newMeshRenderer != null)
+                    {
+                        newMeshFilter.sharedMesh = origMeshFilter.sharedMesh;
+                        newMeshRenderer.sharedMaterials = origMeshRenderer.sharedMaterials;
+                        newMeshRenderer.shadowCastingMode = origMeshRenderer.shadowCastingMode;
+                        newMeshRenderer.receiveShadows = origMeshRenderer.receiveShadows;
+                        newMeshRenderer.sortingLayerID = origMeshRenderer.sortingLayerID;
+                        newMeshRenderer.sortingOrder = origMeshRenderer.sortingOrder;
+                    }
+                };
+            }
+            else
+#endif
+            {
+                newMeshFilter.sharedMesh = origMeshFilter.sharedMesh;
+                newMeshRenderer.sharedMaterials = origMeshRenderer.sharedMaterials;
+                newMeshRenderer.shadowCastingMode = origMeshRenderer.shadowCastingMode;
+                newMeshRenderer.receiveShadows = origMeshRenderer.receiveShadows;
+                newMeshRenderer.sortingLayerID = origMeshRenderer.sortingLayerID;
+                newMeshRenderer.sortingOrder = origMeshRenderer.sortingOrder;
+            }
+        }
+
         // Copy Animator if present
         var origAnimator = original.GetComponent<Animator>();
         if (origAnimator != null)
@@ -344,14 +396,12 @@ public class ParallaxManager : MonoBehaviour
             newAnimation.animatePhysics = origAnimation.animatePhysics;
             newAnimation.cullingType = origAnimation.cullingType;
             foreach (AnimationState state in origAnimation)
-            {
                 newAnimation.AddClip(state.clip, state.name);
-            }
             if (origAnimation.clip != null)
                 newAnimation.clip = origAnimation.clip;
         }
 
-        // Recursively copy children (for tiled or composite objects)
+        // Recursively copy children
         for (int i = 0; i < original.childCount; i++)
         {
             Transform child = original.GetChild(i);
@@ -375,9 +425,10 @@ public class layer
 {
     public Transform trans;
     [HideInInspector] public SpriteRenderer sprite;
+    [HideInInspector] public MeshRenderer meshRenderer;
     [HideInInspector] public float spriteLength;
-    public float offsetX; // X-axis offset for this layer
-    public float offsetY; // Y-axis offset for this layer
+    public float offsetX;
+    public float offsetY;
     [Range(0, 1)] public float movingSpeed;
     [Range(0, 1)] public float movingSpeedY;
     public bool repeat;
