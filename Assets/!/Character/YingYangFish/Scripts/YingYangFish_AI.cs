@@ -177,7 +177,7 @@ public class YingYangFish_AI : IEnemyController
         float currentZ = origin.eulerAngles.z;
         anim.SetBool("isFast", true);
 
-        // LocalAxisAdd adds the delta ON TOP of current rotation — no absolute start needed
+        // LocalAxisAdd adds the delta ON TOP of current rotation ?no absolute start needed
         SetFishRotateSpeed(isBlack, fastRotateSpeed, true);
 
         const float angleThreshold = 20f;
