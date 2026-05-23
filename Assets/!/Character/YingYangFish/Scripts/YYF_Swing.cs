@@ -131,6 +131,9 @@ public class YYF_Swing : IEnemyAction
 
             //return to water
             yield return bossAI.co_return_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack));
+            if (isBlack) swingEffect_ice.SetActive(false);
+            else singleSwingEffect.SetActive(false);
+            swing_outline.SetActive(false);
         }
         else if (factor == 2)
         {
@@ -226,10 +229,11 @@ public class YYF_Swing : IEnemyAction
                bossAI.IESingleFishDive(true),
                bossAI.IESingleFishDive(false)
             }));
+            swing_outline.SetActive(false);
+            singleSwingEffect.SetActive(false);
+            swingEffect_ice.SetActive(false);
         }
-        swing_outline.SetActive(false);
-        singleSwingEffect.SetActive(false);
-        swingEffect_ice.SetActive(false);
+
         yield return null;
     }
 

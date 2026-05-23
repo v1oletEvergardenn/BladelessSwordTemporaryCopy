@@ -32,7 +32,7 @@ public class Bubble : IProjectile
             //if hit player
             if (collision.gameObject.layer == 14) { return; }//if is dashing, ignore
 
-            StartCoroutine(Explode());
+            StartCoroutine(Explode(target));
         }
         else if (collision.gameObject != owner &&
             (stopLayer.value & (1 << collision.gameObject.layer)) > 0 &&
@@ -50,31 +50,16 @@ public class Bubble : IProjectile
         }
         else if (collision.gameObject.layer == 8 && !collision.TryGetComponent<Bubble>(out Bubble i))// collision with other projectiles excpet this
         {
-            StartCoroutine(Explode());
+            StartCoroutine(Explode(null));
         }
-    }
-
-    public override void HitByHSAttack()
-    {
-        StartCoroutine(Explode());
-    }
-
-    public override void HitByMeleeAttack()
-    {
-        StartCoroutine(Explode());
-    }
-
-    public override void Hit()
-    {
-        StartCoroutine(Explode());
     }
 
     public override void Die()
     {
-        StartCoroutine(Explode());
+        StartCoroutine(Explode(null));
     }
 
-    public IEnumerator Explode()
+    public IEnumerator Explode(IDamagable dmg)
     {
         if (collided) { yield break; }
         anim.Play("explode");
@@ -85,20 +70,9 @@ public class Bubble : IProjectile
 
         yield return new WaitForSeconds(0.05f);
 
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, explodeRange);
-        foreach (Collider2D collider in colliders)
+        if (dmg != null)
         {
-            if (collider.TryGetComponent<IDamagable>(out IDamagable dmg))
-            {
-                if (dmg.gameObject == gameManager.player)
-                {
-                    if (dmg.gameObject.layer == 14) { continue; }// if is dashing, ignore
-                    vfx.RumblePulse(hitEffectSettings.frequency_norm, hitEffectSettings.rumbleDuration);
-                    vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
-                    gameManager.playerhealth.Repel(hitEffectSettings.repelForce, transform.right.x < 0 ? true : false);
-                }
-                dmg.Damage(damage, transform, stunDuration, stunValue: stunValue);
-            }
+            dmg.Damage(damage, transform, stunDuration, stunValue: stunValue);
         }
         yield return new WaitForSeconds(0.2f);
         gameObject.SetActive(false);
@@ -107,5 +81,17 @@ public class Bubble : IProjectile
     public override void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireSphere(transform.position, explodeRange);
+    }
+
+    public override void HitByHSAttack()
+    {
+    }
+
+    public override void HitByMeleeAttack()
+    {
+    }
+
+    public override void Hit()
+    {
     }
 }

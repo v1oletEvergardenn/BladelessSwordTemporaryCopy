@@ -171,7 +171,6 @@ public abstract class IEnemyAction : MonoBehaviour
 
     public virtual void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default)
     {
-        print("damaged!");
         int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
         bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
 

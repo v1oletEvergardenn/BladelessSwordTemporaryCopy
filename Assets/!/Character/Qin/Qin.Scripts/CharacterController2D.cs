@@ -293,6 +293,12 @@ public class CharacterController2D : MonoBehaviour
         }
     }
 
+    public static void CancelJump(float mutiplier = 0.1f)
+    {
+        if (!instance.isJumping || instance.rb.velocity.y <= 0) return;
+        instance.rb.velocity = new Vector2(instance.rb.velocity.x, instance.rb.velocity.y * mutiplier);
+    }
+
     public void Jump()
     {
         if (!canJump || coyoteTimer <= 0f) return;

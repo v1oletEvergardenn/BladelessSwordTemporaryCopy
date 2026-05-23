@@ -70,6 +70,11 @@ public class CameraFollow : MonoBehaviour
         {
             if (targets[i].gameObject.activeInHierarchy)
             {
+                if (targets[i].TryGetComponent<CameraFollowCondition>(out CameraFollowCondition condition))
+                {
+                    if (!condition.CheckCameraFollowCondition()) { continue; }
+                }
+
                 if (targets[i].TryGetComponent<IDamagable>(out IDamagable a))
                 {
                     bound.Encapsulate(a.GetHitPos());

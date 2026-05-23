@@ -118,7 +118,7 @@ public class HS_CriticalSlash : IHeartSwordAbility
     {
         if (controller != null) controller.canSwitchNormalAnim = true;
         isPerforming = false;
-        hitBox.enabled = true;
+        hitBox.enabled = false;
         hsHitEffectPlayed = false;
     }
 

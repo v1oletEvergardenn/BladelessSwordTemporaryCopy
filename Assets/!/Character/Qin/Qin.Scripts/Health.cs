@@ -120,6 +120,7 @@ public class Health : IDamagable
 
             _damageFlash.OnDamageFlash();
             inputPlayer.DisableFloat();
+            CharacterController2D.CancelJump();
             currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
             if (stun_duration != 0)
             {

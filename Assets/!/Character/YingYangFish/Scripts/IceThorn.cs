@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class IceThorn : IDamagable
 {
-    private bool canBeCounterAttacked = true;
-    private bool canDealDamage = false;
+    public bool canBeCounterAttacked = true;
+    public bool canDealDamage = false;
     public MeleeAttack iceAttack;
     private Health player;
     public Transform GFX;
@@ -29,7 +29,7 @@ public class IceThorn : IDamagable
         transform.position = pos;
 
         //move up animation
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(0.125f);
         //after move up, cancel counter attack.
         canBeCounterAttacked = false;
         yield return new WaitForSeconds(1.35f);
@@ -42,9 +42,9 @@ public class IceThorn : IDamagable
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!canDealDamage) return;
-        if (collision.gameObject.layer == 6)
+        if (collision.gameObject.layer == 6 && collision.gameObject == player.gameObject)
         {
-            if (canBeCounterAttacked && collision.gameObject == player.gameObject)
+            if (canBeCounterAttacked)
             {
                 //deal damage when hit player
                 if (player != null)

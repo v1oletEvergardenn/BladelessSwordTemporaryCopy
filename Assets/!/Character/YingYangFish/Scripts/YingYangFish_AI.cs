@@ -669,13 +669,10 @@ public class YingYangFish_AI : IEnemyController
 
         while (actionList[0] != null)
         {
-            print("action start");
-
             foreach (List<ActionCaller> list in actionList)
             {
                 yield return co_multiActions = StartCoroutine(StartMultipleActions(list));
             }
-            print("action end");
             StartAction();
             yield return co_fishAppear = StartCoroutine(FishAppear(true));
         }
@@ -687,7 +684,6 @@ public class YingYangFish_AI : IEnemyController
 
         //initalize
         actionList.Clear();
-        List<ActionCaller> possibleActions = new List<ActionCaller>();
 
         //logic: after fish is under the water, fish starts actions,
         //when calls the action method, put in the factor to determine which fish to use for the action:
@@ -699,21 +695,19 @@ public class YingYangFish_AI : IEnemyController
 
         int randomInitial = Random.Range(0, 4);
 
-        if (randomInitial == 0)//water spear
+        if (randomInitial == 0) initialAction = waterSpear;
+        else if (randomInitial == 1) initialAction = splash;
+        else if (randomInitial == 2) initialAction = swing;
+        else if (randomInitial == 3) initialAction = bubbleTrap;
+
+        // Re-roll until the new action differs from the last one
+        while (initialAction == lastAction)
         {
-            initialAction = waterSpear;
-        }
-        else if (randomInitial == 1)
-        {
-            initialAction = splash;
-        }
-        else if (randomInitial == 2)
-        {
-            initialAction = swing;
-        }
-        else if (randomInitial == 3)
-        {
-            initialAction = bubbleTrap;
+            randomInitial = Random.Range(0, 4);
+            if (randomInitial == 0) initialAction = waterSpear;
+            else if (randomInitial == 1) initialAction = splash;
+            else if (randomInitial == 2) initialAction = swing;
+            else if (randomInitial == 3) initialAction = bubbleTrap;
         }
 
         //water spear as first action
@@ -771,8 +765,30 @@ public class YingYangFish_AI : IEnemyController
         foreach (YYFActionPhase phase in actions)
         {
             List<ActionCaller> group = new List<ActionCaller>();
+            int lastResolvedFish = 0;
+
+            // For each Index value, randomly pick one entry among those sharing it
+            var indexedGroups = phase.actionCombo
+                .Where(e => e.UseIndex)
+                .GroupBy(e => e.Index)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var selectedIndexedEntries = new HashSet<YYFActionEntry>();
+            foreach (var kvp in indexedGroups)
+            {
+                YYFActionEntry chosen = kvp.Value[Random.Range(0, kvp.Value.Count)];
+                selectedIndexedEntries.Add(chosen);
+            }
+
             foreach (YYFActionEntry entry in phase.actionCombo)
-                group.Add(entry.ToActionCaller(this));
+            {
+                // Skip indexed entries that weren't selected
+                if (entry.UseIndex && !selectedIndexedEntries.Contains(entry))
+                    continue;
+
+                group.Add(entry.ToActionCaller(this, ref lastResolvedFish));
+            }
+
             if (group.Count > 0)
                 actionList.Add(group);
         }
@@ -1060,7 +1076,8 @@ public enum YYFFishTarget
     Black = 0,
     White = 1,
     Both = 2,
-    Random = 3
+    Random = 3,
+    Opposite = 4
 }
 
 public class YYFActionCaller : ActionCaller
@@ -1075,22 +1092,37 @@ public class YYFActionCaller : ActionCaller
 [System.Serializable]
 public class YYFActionEntry
 {
+    [HorizontalGroup("Row", Width = 15)]
+    [HideLabel]
+    public bool UseIndex = false;
+
+    [HorizontalGroup("Row", Width = 30)]
+    [ShowIf(nameof(UseIndex))]
+    [HideLabel]
+    public int Index;
+
     [HorizontalGroup("Row", Width = 230)]
     [HideLabel] public YYFActionType actionType;
 
+    // Add any YYFActionType values here that should expose raw factor instead of fishTarget
+    private bool UseFactorMode => actionType == YYFActionType.Gatling || actionType == YYFActionType.WaterSpear;
+
     [HorizontalGroup("Row", Width = 400)]
     [HideLabel]
-    [HideIf(nameof(HideFishTarget))]
+    [HideIf(nameof(UseFactorMode))]
     public YYFFishTarget fishTarget;
+
+    [HorizontalGroup("Row", Width = 400)]
+    [HideLabel]
+    [ShowIf(nameof(UseFactorMode))]
+    public int factor = 0;
 
     [HorizontalGroup("Row")]
     [HideLabel]
-    [SuffixLabel("sec")]
+    [PropertyRange(0, 10)]
     public float delay = 0f;
 
-    private bool HideFishTarget => actionType == YYFActionType.WaterSpear || actionType == YYFActionType.Gatling;
-
-    public YYFActionCaller ToActionCaller(YingYangFish_AI ai)
+    public YYFActionCaller ToActionCaller(YingYangFish_AI ai, ref int lastResolvedFish)
     {
         IEnemyAction action = actionType switch
         {
@@ -1101,12 +1133,27 @@ public class YYFActionEntry
             YYFActionType.Splash => ai.splash,
             _ => null
         };
+        int resolvedFactor;
 
-        int factor = fishTarget == YYFFishTarget.Random
-            ? ai.RandomFish()
-            : (int)fishTarget;
+        switch (fishTarget)
+        {
+            case YYFFishTarget.Random:
+                resolvedFactor = ai.RandomFish();
+                lastResolvedFish = resolvedFactor;
+                break;
 
-        return new YYFActionCaller(action, factor, delay);
+            case YYFFishTarget.Opposite:
+                resolvedFactor = lastResolvedFish == 0 ? 1 : 0;
+                lastResolvedFish = resolvedFactor;
+                break;
+
+            default:
+                resolvedFactor = UseFactorMode ? factor : (int)fishTarget;
+                lastResolvedFish = resolvedFactor;
+                break;
+        }
+
+        return new YYFActionCaller(action, resolvedFactor, delay);
     }
 }
 

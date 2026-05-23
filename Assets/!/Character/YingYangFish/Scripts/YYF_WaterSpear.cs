@@ -54,61 +54,17 @@ public class YYF_WaterSpear : IEnemyAction
     /// <returns></returns>
     public override IEnumerator Act_coroutine(float factor = 0)
     {
-        //proceedCall = false;
-        //bool isBlack = false;
-        //if (!bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = bossAI.CheckCloserFish() == bossAI.blackFish; }
-        //if (bossAI.isWhiteBusy && !bossAI.isBlackBusy) { isBlack = true; }
-        //bossAI.SetBusy(isBlack);
-        //if (factor == 0 || factor == 7 || factor == 8 || factor == 9)
-        //{
-        //    yield return bossAI.co_IEcloseSwim = StartCoroutine(bossAI.IECloseSwim(false));
-        //    yield return bossAI.co_sprintStartPoint = StartCoroutine(bossAI.IESprintStartPoint(isBlack ? "black" : "white"));
-        //}
-
-        //initial setup
-        //bossAI.SetFishTargetRotateSpeed(isBlack, 0);
         Spear _spear; Spear _smallSpear1 = null; Spear _smallSpear2 = null;
         bool addition = false;
+        if (factor == 1) { addition = true; }
 
-        //if (factor == 8 || factor == 9) yield return new WaitUntil(() => proceedCall == true);
-
-        int possiblity = 5;
-        int i = UnityEngine.Random.Range(0, 10);
-        addition = false; if (i < possiblity) { addition = true; }
-        //if (factor == 0 || factor == 8 || factor == 9)
-        //{
-        //}
-        //if (factor == 1 || factor == 3 || factor == 5)
-        //{
-        //    bossAI.SetBlackBusy();
-        //    while (!bossAI.blackPositioned) { yield return null; }
-        //    yield return StartCoroutine(bossAI.IESprintStartPoint("black"));
-        //    if (factor == 1 || factor == 3) { yield return new WaitForSeconds(0.6f); }
-
-        //    isBlack = true;
-        //}//black fish
-        //else if (factor == 2 || factor == 4 || factor == 6)
-        //{
-        //    bossAI.SetWhiteBusy();
-        //    while (!bossAI.whitePositioned) { yield return null; }
-        //    yield return StartCoroutine(bossAI.IESprintStartPoint("white"));
-        //    isBlack = false;
-        //}//white fish
-
-        //references
-        //Animator anim = isBlack ? bossAI.blackAnim : bossAI.whiteAnim;
-        //Transform fish = isBlack ? bossAI.blackFish : bossAI.whiteFish;
-        //Transform origin = isBlack ? bossAI.blackOrigin : bossAI.whiteOrigin;
-        //Transform fishGFX = isBlack ? bossAI.blackFishGFX : bossAI.whiteFishGFX;
-        //Transform waterSpearSpawnPos = isBlack ? waterSpearPos_black : waterSpearPos_white;
         Transform lauchPos = bossAI.center;
 
         //spawn spear
-        //anim.Play("spear_pre");
         _spear = bossAI.selfPooler.SpawnFromPool("water_Spear", lauchPos.position).GetComponent<Spear>();
 
         //set spear
-        if (factor == 0 || factor == 8 || factor == 9) { spear = _spear; }
+        spear = _spear;
         SetUp(_spear);
 
         //wait for launch
@@ -121,22 +77,38 @@ public class YYF_WaterSpear : IEnemyAction
             _smallSpear2 = bossAI.selfPooler.SpawnFromPool("small_water_spear", lauchPos.position + new Vector3(0, -1, 0)).GetComponent<Spear>();
             _smallSpear1.transform.localScale = Vector3.one; _smallSpear2.transform.localScale = new Vector3(1, -1, 1);
             SetUp(_smallSpear1); SetUp(_smallSpear2);
+            _smallSpear1.transform.SetParent(_spear.transform, true);
+            _smallSpear2.transform.SetParent(_spear.transform, true);
             smallSpear1 = _smallSpear1; smallSpear2 = _smallSpear2;
         }
 
-        yield return new WaitForSeconds(2.3f);
+        yield return new WaitForSeconds(1.55f);
+
+        if (addition)
+        {
+            bossAI.selfPooler.SpawnFromPool("ringEffect", bossAI.center.position, true);
+            yield return new WaitForSeconds(0.2f);
+            bossAI.selfPooler.SpawnFromPool("ringEffect", bossAI.center.position, true);
+            yield return new WaitForSeconds(0.5f);
+            bossAI.selfPooler.SpawnFromPool("ringEffect", bossAI.center.position, true);
+            yield return new WaitForSeconds(0.05f);
+        }
+        else
+        {
+            bossAI.selfPooler.SpawnFromPool("ringEffect", bossAI.center.position, true);
+            yield return new WaitForSeconds(0.75f);
+        }
 
         //launch spear
         if (addition)
         {
-            ShootSpear(_smallSpear1); smallSpear1 = null;
+            ShootSmallSpear(_smallSpear1); smallSpear1 = null;
             yield return new WaitForSeconds(0.2f);
-            ShootSpear(_smallSpear2); smallSpear2 = null;
+            ShootSmallSpear(_smallSpear2); smallSpear2 = null;
             yield return new WaitForSeconds(0.5f);
         }
 
         ShootSpear(_spear); spear = null;
-        yield return new WaitForSeconds(0.5f);
 
         yield return null;
 
@@ -152,10 +124,13 @@ public class YYF_WaterSpear : IEnemyAction
         spear.collisionActive = true;
         spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed, _stunValue: stunValue);
         spear.stunDuration = spear_stunDuration;
+        GameObject burst = bossAI.selfPooler.SpawnFromPool("burst", bossAI.center.position);
+        burst.transform.eulerAngles = spear.transform.eulerAngles;
     }
 
     public void ShootSmallSpear(Spear spear)
     {
+        spear.transform.SetParent(null);
         spear.collisionActive = true;
         spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed, _stunValue: stunValue);
         spear.stunDuration = spear_stunDuration;

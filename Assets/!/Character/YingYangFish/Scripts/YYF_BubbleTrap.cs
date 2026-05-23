@@ -88,7 +88,7 @@ public class YYF_BubbleTrap : IEnemyAction
             emitTimer += Time.deltaTime;
             if (emitTimer >= emitGap)
             {
-                Vector3 dir = (fish.position - (origin.position + new Vector3(0, jumpHeight))).normalized;
+                Vector3 dir = (origin.position - fish.position).normalized;
                 angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
                 Vector3 euler = new Vector3(0, 0, angle);
 
@@ -109,7 +109,6 @@ public class YYF_BubbleTrap : IEnemyAction
         origin.localScale = new Vector3(1, 1, 1);
         bossAI.ResetFish(factor);
         anim.Play("close_swim");
-        //bossAI.AddActionBreak(actionBreakAmount);
         yield return null;
     }
 }

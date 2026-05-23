@@ -10,7 +10,8 @@ using static UnityEngine.UI.Image;
 public class YYF_Splash : IEnemyAction
 {
     private YingYangFish_AI bossAI;
-    public Transform splashEffect;
+    public Transform splashEffect_1;
+    public Transform splashEffect_2;
     public float[] shootPositionX;
     public float bulletSpeed = 150f;
     public int damage = 2;
@@ -69,21 +70,23 @@ public class YYF_Splash : IEnemyAction
             Tween rotating = fishGFX.DOLocalRotate(new Vector3(0, 0, -360f), 0.2f, RotateMode.FastBeyond360)
               .SetEase(Ease.Linear)
               .SetLoops(-1, LoopType.Restart);
+            Transform splashEffect = isBlack ? splashEffect_2 : splashEffect_1;
+
+            yield return new WaitForSeconds(0.5f);
 
             //set splash effect position to fish GFX position
             splashEffect.position = fish.position;
             splashEffect.localPosition = new Vector3(1, 0, 0);
-
-            co_facePlayer = StartCoroutine(IEFaceSplashAtPlayer(fish, isBlack));
+            co_facePlayer = StartCoroutine(IEFaceSplashAtPlayer(splashEffect, fish, isBlack));
             if (!isBlack) splashEffect.eulerAngles = new Vector3(0, 0, -90);
 
             //fade in to show splash effect
             splashEffect.gameObject.SetActive(true);
             splashEffect.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
-            splashEffect.GetComponent<SpriteRenderer>().DOFade(1, 0.8f);
+            splashEffect.GetComponent<SpriteRenderer>().DOFade(1, 0.5f);
 
             //be ready;
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.5f);
 
             //blackfish: be ready and dash to player.
             if (isBlack)
@@ -152,16 +155,16 @@ public class YYF_Splash : IEnemyAction
               .SetLoops(-1, LoopType.Restart);
 
             //set splash effect position to fish GFX position
-            splashEffect.position = origin.position;
+            splashEffect_1.position = origin.position;
             //splashEffect.SetParent(origin);
-            splashEffect.localPosition = new Vector3(2f, 0, 0);
+            splashEffect_1.localPosition = new Vector3(2f, 0, 0);
 
-            co_facePlayer = StartCoroutine(IEFaceSplashAtPlayer(origin, true));
+            co_facePlayer = StartCoroutine(IEFaceSplashAtPlayer(splashEffect_1, origin, true));
 
             //fade in to show splash effect
-            splashEffect.gameObject.SetActive(true);
-            splashEffect.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
-            splashEffect.GetComponent<SpriteRenderer>().DOFade(1, 0.8f);
+            splashEffect_1.gameObject.SetActive(true);
+            splashEffect_1.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+            splashEffect_1.GetComponent<SpriteRenderer>().DOFade(1, 0.8f);
 
             //be ready;
             yield return new WaitForSeconds(1f);
@@ -177,7 +180,7 @@ public class YYF_Splash : IEnemyAction
             //spawn bullets
             StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), false));
             StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), true, 0.1f));
-            splashEffect.gameObject.SetActive(false);
+            splashEffect_1.gameObject.SetActive(false);
 
             //move origin down water
             StopCoroutine(co_facePlayer);
@@ -186,19 +189,19 @@ public class YYF_Splash : IEnemyAction
             origin.DOMove(new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, 0f), 0.05f).SetEase(Ease.Linear);
         }
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.1f);
         anim.Play("swim_up");
-        splashEffect.gameObject.SetActive(false);
+        splashEffect_1.gameObject.SetActive(false);
         yield return null;
     }
 
-    private IEnumerator IEFaceSplashAtPlayer(Transform transform, bool face)
+    private IEnumerator IEFaceSplashAtPlayer(Transform effect, Transform transform, bool face)
     {
         float elapsedTime = 0f;
         while (elapsedTime < 2f)
         {
-            splashEffect.position = transform.position;
-            if (face && elapsedTime <= 1f) splashEffect.eulerAngles = CalculateWantedEuler(player.transform.position, splashEffect.position);
+            effect.position = transform.position;
+            if (face && elapsedTime <= 1f) effect.eulerAngles = CalculateWantedEuler(player.transform.position, effect.position);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -258,13 +261,13 @@ public class YYF_Splash : IEnemyAction
             new Vector3(pos.x + shootPositionX[index],
             bossAI.waterLevel.position.y, 0)).
             GetComponent<IceThorn>();
-        StartCoroutine(thorn.Action(new Vector3(pos.x + shootPositionX[index] + 2.5f,
+        StartCoroutine(thorn.Action(new Vector3(pos.x + shootPositionX[index] - 2.5f,
             bossAI.waterLevel.position.y, 0)));
         IceThorn thorn2 = bossAI.selfPooler.SpawnFromPool("ice_thorn",
            new Vector3(pos.x - shootPositionX[index],
            bossAI.waterLevel.position.y, 0)).
            GetComponent<IceThorn>();
-        StartCoroutine(thorn2.Action(new Vector3(pos.x - shootPositionX[index] - 2.5f,
+        StartCoroutine(thorn2.Action(new Vector3(pos.x - shootPositionX[index] + 2.5f,
             bossAI.waterLevel.position.y, 0)));
         return;
     }
