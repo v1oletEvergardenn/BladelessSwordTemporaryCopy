@@ -6,10 +6,18 @@ using UnityEngine;
 public class YYF_BubbleTrap : IEnemyAction
 {
     private YingYangFish_AI bossAI;
+
+    [HeaderAttribute("Bubble Emitting Settings")]
+    public int bubbleCount = 7;
+
+    public float arcSpreadAngle = 160f;
+    public float delayAfterEmit = 0.22f;
     public float jumpRadius = 5f;
     public float jumpHeight = 3f;
 
+    [HeaderAttribute("Bubble Settings")]
     public float bubbleDamage = 2;
+
     public float bubbleSpeed = 5f;
     public float bubbleStunDuration = 0.5f;
     public float bubbleStunValue = 0.5f;
@@ -75,53 +83,72 @@ public class YYF_BubbleTrap : IEnemyAction
            .SetEase(Ease.Linear);
 
         anim.Play("fast_down");
-        //emitting bubbles
 
-        yield return new WaitForSeconds(0.22f);
+        // pre-calculate spawn positions symmetrically across the top arc
+        int count = Mathf.Max(1, bubbleCount);
+        float halfSpread = arcSpreadAngle / 2f;
+        Vector3 circleCenter = origin.position;
+        Vector3 convergencePoint = new Vector3(circleCenter.x, bossAI.waterLevel.position.y, 0f);
+        Vector3[] spawnPositions = new Vector3[count];
+        Vector3[] spawnEulers = new Vector3[count];
+
+        for (int i = 0; i < count; i++)
+        {
+            float t = count > 1 ? (i / (float)(count - 1)) * 2f - 1f : 0f;
+            float spawnAngleDeg = 90f + t * halfSpread;
+            float spawnAngleRad = spawnAngleDeg * Mathf.Deg2Rad;
+
+            spawnPositions[i] = new Vector3(
+                circleCenter.x + jumpRadius * Mathf.Cos(spawnAngleRad),
+                circleCenter.y + jumpRadius * Mathf.Sin(spawnAngleRad),
+                0f);
+
+            Vector3 fireDir = (convergencePoint - spawnPositions[i]).normalized;
+            float fireAngle = Mathf.Atan2(fireDir.y, fireDir.x) * Mathf.Rad2Deg;
+            spawnEulers[i] = new Vector3(0, 0, fireAngle);
+        }
+
+        // reverse spawn order: right to left when toleft, left to right otherwise
+        if (!toleft)
+        {
+            System.Array.Reverse(spawnPositions);
+            System.Array.Reverse(spawnEulers);
+        }
+
+        // spawn bubbles one by one at pre-calculated positions as the fish travels
         elpasedTime = 0f;
-        duration = 1.3f;
-        float emitGap = 0.14f;
-        float emitTimer = 0f;
+        duration = 1.5f;
         List<Bubble> bubbles = new List<Bubble>();
-        List<Vector3> eulers = new List<Vector3>();
+        int nextSpawnIndex = 0;
+        float spawnInterval = duration / count;
+        float nextSpawnTime = 0f;
+
         while (elpasedTime <= duration)
         {
             elpasedTime += Time.deltaTime;
-            emitTimer += Time.deltaTime;
-            if (emitTimer >= emitGap)
+
+            if (nextSpawnIndex < count && elpasedTime >= nextSpawnTime)
             {
-                Vector3 Tempdir = (origin.position - fish.position).normalized;
-                angle = Mathf.Atan2(Tempdir.y, Tempdir.x) * Mathf.Rad2Deg;
-                Vector3 euler = new Vector3(0, 0, angle);
-                eulers.Add(euler);
-                Bubble bubble = bossAI.selfPooler.SpawnFromPool("bubble", fish.position, Quaternion.identity).GetComponent<Bubble>();
+                Bubble bubble = bossAI.selfPooler.SpawnFromPool("bubble", spawnPositions[nextSpawnIndex], Quaternion.identity).GetComponent<Bubble>();
                 bubbles.Add(bubble);
-                bubble.SetUp(euler,
-                    transform.gameObject,
-                    _damage: bubbleDamage,
-                    _speed: 0,
-                    _stunValue: bubbleStunValue);
-                bubble.stunDuration = bubbleStunDuration;
-                bubble.explodeRange = bubbleRange;
-                emitTimer = 0f;
-            }
-            yield return null;
-        }
-        for (int i = 0; i < bubbles.Count; i++)
-        {
-            Bubble bubble = bubbles[i];
-            Vector3 euler = eulers[i];
-            bubble.SetUp(euler,
+                bubble.SetUp(spawnEulers[nextSpawnIndex],
                     transform.gameObject,
                     _damage: bubbleDamage,
                     _speed: bubbleSpeed,
-                    _stunValue: bubbleStunValue);
-        }
+                    _stunValue: bubbleStunValue,
+                    _delay: delayAfterEmit);
+                bubble.stunDuration = bubbleStunDuration;
+                bubble.explodeRange = bubbleRange;
 
+                nextSpawnTime += spawnInterval;
+                nextSpawnIndex++;
+            }
+
+            yield return null;
+        }
         yield return new WaitForSeconds(0.3f);
         origin.localScale = new Vector3(1, 1, 1);
         bossAI.ResetFish(factor);
-        anim.Play("close_swim");
         yield return null;
     }
 }

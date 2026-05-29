@@ -15,6 +15,7 @@ public abstract class IProjectile : MonoBehaviour
     public float stunDuration = 0.3f;
     public float lifeTime = 10f;
     public float stunValue = 1;
+    public float delay = 0f;
     public LayerMask stopLayer = 1 << 7 | 1 << 10 | 1 << 11 | 1 << 18;
 
     public bool showPivot;
@@ -34,10 +35,11 @@ public abstract class IProjectile : MonoBehaviour
     [HideInInspector] public bool isHostileToPlayer;
     [HideInInspector] public bool isPerfect;
 
+    private float delayTimer = 0;
+
     public virtual void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-
         vfx = VFXManager.instance;
         gameManager = GameManager.instance;
         originalSpeed = speed;
@@ -67,7 +69,8 @@ public abstract class IProjectile : MonoBehaviour
         float _damage = 0,
         float _speed = -1,
         float gravityScale = 0,
-        float _stunValue = 0)
+        float _stunValue = 0,
+        float _delay = 0f)
     {
         ResetAttributes();
         owner = _owner;
@@ -84,7 +87,8 @@ public abstract class IProjectile : MonoBehaviour
         speed = originalSpeed + additionSpeed;
         isPerfect = false;
         lifeTimer = 0f;
-        rb.velocity = transform.right * speed / 10;
+
+        delay = _delay;
     }
 
     public virtual void PerfectCounterAttack()
@@ -115,6 +119,7 @@ public abstract class IProjectile : MonoBehaviour
 
     public virtual void FixedUpdate()
     {
+        if (delayTimer < delay) { return; }
         if (rb.gravityScale != 0)
         {
             transform.right = rb.velocity;
@@ -123,6 +128,13 @@ public abstract class IProjectile : MonoBehaviour
 
     public virtual void Update()
     {
+        if (delayTimer < delay)
+        {
+            delayTimer += Time.deltaTime;
+        }
+
+        if (delayTimer < delay) { return; }
+        rb.velocity = transform.right * speed / 10;
         if (collided) { return; }
         lifeTimer += Time.deltaTime;
         if (lifeTimer >= lifeTime)

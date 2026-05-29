@@ -49,7 +49,8 @@ public class Gatling_bubbles : IProjectile
         float _damage = 0,
         float _speed = -1,
         float gravityScale = 0,
-        float _stunValue = 0)
+        float _stunValue = 0,
+        float _delay = 0f)
     {
         // Cancel tracking - go straight to shooting phase
         currentPhase = BulletPhase.Shooting;

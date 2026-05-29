@@ -6,7 +6,7 @@ public class Bullet : IProjectile
 
     public override void SetUp(Vector3 dir, GameObject _owner, float additionSpeed = 0f, bool _followTarget = false,
         IDamagable _target = null, bool _isHostileToPlayer = true,
-        float _damage = 0, float _speed = -1, float gravityScale = 0, float _stunValue = 0)
+        float _damage = 0, float _speed = -1, float gravityScale = 0, float _stunValue = 0, float _delay = 0f)
     {
         ResetAttributes();
         owner = _owner;
