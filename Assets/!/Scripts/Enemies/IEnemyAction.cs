@@ -22,8 +22,7 @@ public abstract class IEnemyAction : MonoBehaviour
     [HideInInspector] public CharacterController2D playerController;
 
     [HideInInspector] public IEnemyController bossController;
-    public int actionBreakAmount = 1;
-    public float stunValue = 1;
+    public float bossbreakValue = 1;
 
     [HideInInspector] public bool proceedCall = false;
     public Coroutine act_routine;
@@ -105,7 +104,7 @@ public abstract class IEnemyAction : MonoBehaviour
                         hitIdamagables.Add(idmg);
                         foreach (IDamagable subIdmg in idmg.subDamagables) { hitIdamagables.Add(subIdmg); }
                         if (idmg == playerIDamagable) { HitPlayer(melee, attackPos, offset); }
-                        else { idmg.Damage(melee.damage, this.transform, melee.stun); }
+                        else { idmg.Damage(melee.damage, this.transform, melee.breakAmount); }
                     }
                 }
                 //Hit Iprojectiles
@@ -150,7 +149,7 @@ public abstract class IEnemyAction : MonoBehaviour
                         hitIdamagables.Add(idmg);
                         foreach (IDamagable subIdmg in idmg.subDamagables) { hitIdamagables.Add(subIdmg); }
                         if (idmg == playerIDamagable) { HitPlayer(melee, attackPos, offset); }
-                        else { idmg.Damage(melee.damage, this.transform, melee.stun); }
+                        else { idmg.Damage(melee.damage, this.transform, melee.breakAmount); }
                     }
                 }
                 //Hit Iprojectiles
@@ -171,13 +170,13 @@ public abstract class IEnemyAction : MonoBehaviour
 
     public virtual void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default)
     {
-        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
+        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.breakAmount);
         bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
 
         if (dealtDamage == 2)//counter attack
         {
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
-            bossController.DecreaseStun(stunValue);
+            bossController.DoBreak(bossbreakValue);
         }
         else if (dealtDamage == 1)//defend
         {
@@ -288,17 +287,17 @@ public abstract class IEnemyAction : MonoBehaviour
 public struct MeleeAttack
 {
     public int damage;
-    public float stun;
+    public float breakAmount;
     public float freezeTime;
     public float repel;
     [SerializeField, MinMaxSlider(0, 3f)] public Vector2 rumble;
     public float rumbleDuration;
     public float cameraShake;
 
-    public MeleeAttack(int damage, float stun, float freezeTime, Vector2 rumble, float rumbleDuration, float repel, float cameraShake)
+    public MeleeAttack(int damage, float breakAmount, float freezeTime, Vector2 rumble, float rumbleDuration, float repel, float cameraShake)
     {
         this.damage = damage;
-        this.stun = stun;
+        this.breakAmount = breakAmount;
         this.freezeTime = freezeTime;
         this.rumble = rumble;
         this.rumbleDuration = rumbleDuration;

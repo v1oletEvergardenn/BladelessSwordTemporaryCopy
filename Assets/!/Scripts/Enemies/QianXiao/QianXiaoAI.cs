@@ -56,7 +56,7 @@ public class QianXiaoAI : IEnemyController
         base.Start();
         targetPos = nullTargetPos;
         oriGravity = rb.gravityScale;
-        stunBar.UpdateBar(currentStun);
+        bossBreakBar.UpdateBar(currentBreak);
     }
 
     public void Awake()
@@ -209,11 +209,11 @@ public class QianXiaoAI : IEnemyController
 
     public void Stun(int stunAmount)
     {
-        currentStun += stunAmount;
-        stunBar.UpdateBar(currentStun);
-        if (currentStun >= maxStun)
+        currentBreak += stunAmount;
+        bossBreakBar.UpdateBar(currentBreak);
+        if (currentBreak >= maxBreak)
         {
-            currentStun = 0;
+            currentBreak = 0;
             CancelAllActions();
             inAct = true;
             stun.Act();

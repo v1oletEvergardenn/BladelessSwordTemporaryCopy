@@ -27,15 +27,15 @@ public abstract class IEnemyController : IDamagable
 
     #endregion HEALTH
 
-    #region STUN
+    #region BREAK
 
-    public float maxStun = 10;
-    public MicroBar stunBar;
-    public float currentStun;
-    public float stunDuration = 5f;
+    public float maxBreak = 10;
+    public MicroBar bossBreakBar;
+    public float currentBreak;
+    public float breakDuration = 5f;
     [HideInInspector] public bool isBossBreaking = false;
 
-    #endregion STUN
+    #endregion BREAK
 
     #region BASIC_LOGIC
 
@@ -90,9 +90,9 @@ public abstract class IEnemyController : IDamagable
         player = playerAttack.gameObject.transform;
         anim = GFX.GetComponent<Animator>();
         currentHealth = maxHealth;
-        currentStun = maxStun;
+        currentBreak = maxBreak;
         healthBar.Initialize(maxHealth);
-        stunBar.Initialize(maxStun);
+        bossBreakBar.Initialize(maxBreak);
         flash = GetComponent<DamageFlash>();
         rb = GetComponent<Rigidbody2D>();
         outline_flash_anim_curve = GameManager.instance.outline_flash_anim_curve;
@@ -293,9 +293,9 @@ public abstract class IEnemyController : IDamagable
         Damage(maxHealth);
     }
 
-    public virtual void ForceStun()
+    public virtual void ForceBossBreak()
     {
-        DecreaseStun(maxStun);
+        DoBreak(maxBreak);
     }
 
     /// <summary>
@@ -355,17 +355,17 @@ public abstract class IEnemyController : IDamagable
     /// resets stun, cancels all actions, and triggers the boss break effect.
     /// </summary>
     /// <param name="amount">Amount to increase stun by.</param>
-    public virtual void DecreaseStun(float amount)
+    public virtual void DoBreak(float amount)
     {
         if (isBossBreaking || DEAD) { return; }
 
-        currentStun -= amount;
-        currentStun = Mathf.Clamp(currentStun, 0, maxStun);
+        currentBreak -= amount;
+        currentBreak = Mathf.Clamp(currentBreak, 0, maxBreak);
 
-        if (stunBar != null && maxStun > 0)
-            stunBar.UpdateBar(currentStun);
+        if (bossBreakBar != null && maxBreak > 0)
+            bossBreakBar.UpdateBar(currentBreak);
 
-        if (currentStun <= 0)
+        if (currentBreak <= 0)
         {
             isActing = false;
             // Cancel all actions
@@ -378,25 +378,25 @@ public abstract class IEnemyController : IDamagable
         isBossBreaking = true;
         CancelAllAction();
         VFXManager.instance.BulletTime();
-        float duration = stunDuration;
+        float duration = breakDuration;
         float elapsed = 0f;
-        float startStun = currentStun;
+        float startBreak = currentBreak;
 
         while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime; // Use unscaled time to be immune to bullet time
             float t = Mathf.Clamp01(elapsed / duration);
-            currentStun = Mathf.Lerp(startStun, maxStun, t);
+            currentBreak = Mathf.Lerp(startBreak, maxBreak, t);
 
-            if (stunBar != null && maxStun > 0)
-                stunBar.UpdateBar(currentStun);
+            if (bossBreakBar != null && maxBreak > 0)
+                bossBreakBar.UpdateBar(currentBreak);
 
             yield return null;
         }
 
-        currentStun = maxStun;
-        if (stunBar != null && maxStun > 0)
-            stunBar.UpdateBar(maxStun);
+        currentBreak = maxBreak;
+        if (bossBreakBar != null && maxBreak > 0)
+            bossBreakBar.UpdateBar(maxBreak);
 
         VFXManager.instance.UnBulletTime();
         isBossBreaking = false;

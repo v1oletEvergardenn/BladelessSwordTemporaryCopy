@@ -258,17 +258,24 @@ public class YingYangFish_AI : IEnemyController
         TryStopCoroutine(co_multiCoroutine);
         TryStopCoroutine(co_multiActions);
         TryStopCoroutine(co_multiRun);
-        //TryStopCoroutine(co_fishAppear);
+        TryStopCoroutine(co_fishAppear);
         TryStopCoroutine(co_sprintToAngleAndDive);
-
         center.GetComponent<SpriteRenderer>().sortingOrder = 1;
-
         actionList.Clear();
         TryStopCoroutine(co_act);
+
         waterSpear.CancelAct();
         swing.CancelAct();
         bubbleTrap.CancelAct();
+        splash.CancelAct();
         gatling.CancelAct();
+
+        fish_origin.DOKill();
+        center.DOKill();
+        blackFish.DOKill();
+        whiteFish.DOKill();
+        blackFishGFX.DOKill();
+        whiteFishGFX.DOKill();
         blackOrigin.DOKill();
         whiteOrigin.DOKill();
         SetNormalRotateSpeed();
@@ -345,125 +352,8 @@ public class YingYangFish_AI : IEnemyController
 
     public IEnumerator Ultimate()
     {
-        ////swing qte
-        //yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(1));
-
-        ////move to left boundary
-        //movingTarget = leftBoundary;
-        //yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
-        //yield return co_IEcloseSwim = StartCoroutine(IECloseSwim(false));
-        //SetNormalRotateSpeed();
-
-        ////double single swing and bubble gatling
-        //singleSwing.act_routine = StartCoroutine(singleSwing.Act_coroutine(1));
-        //yield return gatling.act_routine = StartCoroutine(gatling.Act_coroutine(1));
-
-        ////water spear ultimate
-        //yield return co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
-        //StartCoroutine(IESwimAway(waterSpearPos_black1.position, 10, true));
-        //StartCoroutine(IESwimAway(waterSpearPos_white1.position, 10, false));
-        //while (!blackPositioned || !whitePositioned) { yield return null; }
-        //yield return StartCoroutine(IESprintSamePos());
-        //StartCoroutine(waterSpear.Act_coroutine(1));
-        //StartCoroutine(waterSpear.Act_coroutine(2));
-        //while (!finishedWaterSpearUltimate) { yield return null; }
-
-        ////swing ultimate
-        //// move to player
-        //movingTarget = player;
-        //yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
-        //yield return swing.act_routine = StartCoroutine(swing.Act_coroutine(2));
-
-        ////move to right boundary
-        //movingTarget = rightBoundary;
-        //yield return dive.act_routine = StartCoroutine(dive.Act_coroutine());
-        //yield return co_sprintBackEqual = StartCoroutine(IESprintBackEqual());
-
-        //yield return new WaitForSeconds(1f);
-        ////water ball ultimate
-        //black_targetRotateSpeed = idleRotateSpeed / 3;
-        //white_targetRotateSpeed = idleRotateSpeed / 3;
-
-        ////circling
-        //StartCoroutine(Circling(30f));
-        //StartCoroutine(ChangeYPos(4));
-        //yield return new WaitForSeconds(1f);
-
-        ////ultimate wave show up
-        //ultimateWave.SetActive(true);
-        //ultimateWave.transform.position = new Vector3(transform.position.x, waterLevel.position.y, 0);
-
-        ////charge up for 2 seconds
-        //yield return new WaitForSeconds(2f);
-
-        ////ultimate water ball bullets shooting
-        //float[] bulletDelays = { 0f, 0.5f, 0.7f, 1.2f, 1.7f, 1.9f, 3f, 3.2f, 3.4f, 3.6f, 3.8f, 4f };
-        //for (int i = 0; i < bulletDelays.Length; i++)
-        //{
-        //    StartCoroutine(SpawnUltimateBullet(i, bulletDelays[i]));
-        //}
-
-        ////water dragons
-        //yield return new WaitForSeconds(1f);
-        //waterDragon1.gameObject.SetActive(true);
-        //yield return new WaitForSeconds(5f);
-
-        ////player run to position
-        //yield return StartCoroutine(playerController.RunToPositionCoroutine(transform.position - new Vector3(14f, 0, 0)));
-
-        ////sword teleport jump qte
-        //playerController.rb.velocity = Vector3.zero;
-        //InputMaster.instance.StartMustSuccessQTE(InputKeyType.swordTeleport_key, player.transform.position + new Vector3(0, 4, 0),
-        //    0.4f, () => { playerController.DesignatedPositionTeleport(player.transform.position + new Vector3(5, 7.5f, 0)); });
-
-        //yield return new WaitUntil(() => !InputMaster.instance.isQTE);
-        //playerController.EnableGravity(false);
-        //playerController.rb.velocity = Vector3.zero;
-
-        //yield return new WaitForSeconds(0.4f);
-        //playerController.anim.Play("slash_pre");
-        //yield return new WaitForSeconds(0.1f);
-
-        ////slash qte
-
-        //InputMaster.instance.StartMustSuccessQTE(InputKeyType.right_attack_key, player.transform.position + new Vector3(2, 2, 0),
-        //   0.4f, () =>
-        //   {
-        //       playerController.anim.Play("slash_end");
-        //   });
-        //yield return new WaitUntil(() => !InputMaster.instance.isQTE);
-        //yield return new WaitForSeconds(0.2f);
-
-        //player.position += new Vector3(12, -7);
-        //playerController.EnableGravity(true);
-        ////slash_effect.transform.position = new Vector3(transform.position.x, waterLevel.position.y, 0f);
-        ////slash_effect.SetActive(true);
-
-        //blackAnim.speed = 0;
-        //whiteAnim.speed = 0;
-        //blackSprite.sprite = black_tex; whiteSprite.sprite = white_tex;
-        //VFXManager.instance.SlowTimeForSeconds(0.5f, 0);
-        //yield return new WaitForSeconds(0.1f);
-
-        ////end
-        //SetWhiteRotateSpeed(0); white_rotateSpeed = 0;
-        //SetBlackRotateSpeed(0); black_rotateSpeed = 0;
-
-        ////whiteAnim.SetTrigger("circling_end"); blackAnim.SetTrigger("circling_end");
-
-        //ultimateWave.GetComponent<Animator>().SetTrigger("end");
-
-        //yield return new WaitForSeconds(3f);
-        //blackSprite.enabled = false;
-        //whiteSprite.enabled = false;
-        //black_particle.SetActive(true); white_particle.SetActive(true);
-        //yield return new WaitForSeconds(5f);
-        //black_particle.SetActive(false); white_particle.SetActive(false);
-
-        ////slash_effect.SetActive(false);
-
         yield return null;
-        //endCanvas.gameObject.SetActive(true);
+        endCanvas.gameObject.SetActive(true);
     }
 
     public IEnumerator Circling(float duration)
@@ -829,13 +719,12 @@ public class YingYangFish_AI : IEnemyController
         HealthUI.SetActive(true);
 
         StartAction();
-        StartCoroutine(Act());
+        co_act = StartCoroutine(Act());
     }
 
     public override int Damage(float damageAmount, Transform sender, float stunDuration = 0, bool damageFlash = true, float stunValue = 0)
     {
-        print(damageAmount + " dealt by " + (sender != null ? sender.name : "unknown"));
-        if (DEAD || !canTakeDamage) { return 0; }
+        if (DEAD || !canTakeDamage) { damageAmount = 0; }
 
         int attackId = sender != null ? sender.GetInstanceID() : 0;
         if (lastAttackId == attackId && Time.time - lastAttackTime < attackCooldown) return 0;
@@ -857,7 +746,7 @@ public class YingYangFish_AI : IEnemyController
         }
 
         healthBar.UpdateBar(currentHealth);
-        DecreaseStun(stunValue);
+        DoBreak(stunValue);
 
         if (currentHealth <= 0)
         {
@@ -906,36 +795,39 @@ public class YingYangFish_AI : IEnemyController
     public override IEnumerator BossBreak()
     {
         isBossBreaking = true;
+        canTakeDamage = true;
         CancelAllAction();
+        ResetAllFish();
         blackAnim.Play("break"); whiteAnim.Play("break");
         SetBothRotateSpeed(0);
         VFXManager.instance.BulletTime();
-        float duration = stunDuration;
+        float duration = breakDuration;
         float elapsed = 0f;
-        float startStun = currentStun;
+        float startStun = currentBreak;
 
         while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime; // Use unscaled time to be immune to bullet time
             float t = Mathf.Clamp01(elapsed / duration);
-            currentStun = Mathf.Lerp(startStun, maxStun, t);
+            currentBreak = Mathf.Lerp(startStun, maxBreak, t);
 
-            if (stunBar != null && maxStun > 0)
-                stunBar.UpdateBar(currentStun);
+            if (bossBreakBar != null && maxBreak > 0)
+                bossBreakBar.UpdateBar(currentBreak);
 
             yield return null;
         }
 
-        currentStun = maxStun;
-        if (stunBar != null && maxStun > 0)
-            stunBar.UpdateBar(maxStun);
+        currentBreak = maxBreak;
+        if (bossBreakBar != null && maxBreak > 0)
+            bossBreakBar.UpdateBar(maxBreak);
 
         VFXManager.instance.UnBulletTime();
         isBossBreaking = false;
 
         yield return co_fishAppear = StartCoroutine(FishAppear(true));
+        canTakeDamage = false;
         StartAction();
-        StartCoroutine(Act());
+        co_act = StartCoroutine(Act());
         yield return null;
     }
 

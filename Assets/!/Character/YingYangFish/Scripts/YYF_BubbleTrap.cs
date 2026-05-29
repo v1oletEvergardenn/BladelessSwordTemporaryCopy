@@ -80,29 +80,42 @@ public class YYF_BubbleTrap : IEnemyAction
         yield return new WaitForSeconds(0.22f);
         elpasedTime = 0f;
         duration = 1.3f;
-        float emitGap = 0.07f;
+        float emitGap = 0.14f;
         float emitTimer = 0f;
+        List<Bubble> bubbles = new List<Bubble>();
+        List<Vector3> eulers = new List<Vector3>();
         while (elpasedTime <= duration)
         {
             elpasedTime += Time.deltaTime;
             emitTimer += Time.deltaTime;
             if (emitTimer >= emitGap)
             {
-                Vector3 dir = (origin.position - fish.position).normalized;
-                angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+                Vector3 Tempdir = (origin.position - fish.position).normalized;
+                angle = Mathf.Atan2(Tempdir.y, Tempdir.x) * Mathf.Rad2Deg;
                 Vector3 euler = new Vector3(0, 0, angle);
-
+                eulers.Add(euler);
                 Bubble bubble = bossAI.selfPooler.SpawnFromPool("bubble", fish.position, Quaternion.identity).GetComponent<Bubble>();
+                bubbles.Add(bubble);
                 bubble.SetUp(euler,
                     transform.gameObject,
                     _damage: bubbleDamage,
-                    _speed: bubbleSpeed,
+                    _speed: 0,
                     _stunValue: bubbleStunValue);
                 bubble.stunDuration = bubbleStunDuration;
                 bubble.explodeRange = bubbleRange;
                 emitTimer = 0f;
             }
             yield return null;
+        }
+        for (int i = 0; i < bubbles.Count; i++)
+        {
+            Bubble bubble = bubbles[i];
+            Vector3 euler = eulers[i];
+            bubble.SetUp(euler,
+                    transform.gameObject,
+                    _damage: bubbleDamage,
+                    _speed: bubbleSpeed,
+                    _stunValue: bubbleStunValue);
         }
 
         yield return new WaitForSeconds(0.3f);

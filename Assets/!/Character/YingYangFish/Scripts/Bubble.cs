@@ -38,15 +38,7 @@ public class Bubble : IProjectile
             (stopLayer.value & (1 << collision.gameObject.layer)) > 0 &&
             !collided)// collision with walls and grounds
         {
-            // Estimate the collision normal
-            Vector2 normal = ((Vector2)transform.position - collision.ClosestPoint(transform.position)).normalized;
-            if (normal == Vector2.zero)
-            {
-                normal = -rb.velocity.normalized;
-            }
-
-            // Reflect the velocity based on the normal
-            rb.velocity = Vector2.Reflect(rb.velocity, normal);
+            StartCoroutine(Explode(null));
         }
         else if (collision.gameObject.layer == 8 && !collision.TryGetComponent<Bubble>(out Bubble i))// collision with other projectiles excpet this
         {

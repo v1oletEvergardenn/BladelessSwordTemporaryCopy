@@ -62,7 +62,7 @@ public class IceThorn : IDamagable
     public void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default, bool canCounterAttack = true)
     {
         VFXManager vfx = VFXManager.instance;
-        int dealtDamage = player.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun, canCounterAttack);
+        int dealtDamage = player.DamageFromMeleeAttack(attackPos, melee.damage, melee.breakAmount, canCounterAttack);
         bool left = player.GetHitPos().x < attackPos.position.x ? true : false;
 
         if (dealtDamage == 2)//counter attack

@@ -2,11 +2,11 @@ OVDF v1.1
 MeleeAttack, Project.Main
 
 # $Ui9oQYMgqagWBb8yu4bPoW
-Position: $root:7
+Position: $root:6
 + [Sirenix.OdinInspector.BoxGroupAttribute]
 
 # damage
-Position: $Ui9oQYMgqagWBb8yu4bPoW:0
+Position: $Ui9oQYMgqagWBb8yu4bPoW:1
 
 # stun
 Position: $Ui9oQYMgqagWBb8yu4bPoW:1
@@ -36,3 +36,6 @@ Position: $Ui9oQYMgqagWBb8yu4bPoW:4
 Position: $Ui9oQYMgqagWBb8yu4bPoW:6
 + [UnityEngine.RangeAttribute]
 	max = 1
+
+# breakAmount
+Position: $Ui9oQYMgqagWBb8yu4bPoW:0

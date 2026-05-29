@@ -185,7 +185,7 @@ public class HS_CounterAttack : IHeartSwordAbility
 
         vfx.SpawnHeartSwordHitEffect(damagable.GetHitPos());
 
-        damagable.Damage(attackEffect.damage, this.transform, 0, stunValue: attackEffect.stun);
+        damagable.Damage(attackEffect.damage, this.transform, 0, stunValue: attackEffect.breakAmount);
         playerAttack.canDefend = true;
     }
 

@@ -14,7 +14,7 @@ Position: $root:2
 	GroupName = "Health and Stun"
 
 # $4mK9HQuhfjfP12kGzx3DTp
-Position: $QMuopHuRV5YxhSB4DKDn5i:0
+Position: $QMuopHuRV5YxhSB4DKDn5i:1
 + [Sirenix.OdinInspector.HorizontalGroupAttribute]
 	Width = 0
 	MarginLeft = 0
@@ -33,7 +33,7 @@ Position: $4TtzFAncLBmMK7Y9DmYj3Q:0
 # $MDymr8mSeXbU61qrw73dVh
 Position: $4TtzFAncLBmMK7Y9DmYj3Q:1
 + [Sirenix.OdinInspector.TabGroupAttribute+TabSubGroupAttribute]
-	GroupName = "Stun"
+	GroupName = "break"
 	Icon = None
 
 # $R72cLQzxngnd7AP1cyciRf
@@ -47,7 +47,7 @@ Position: $root:4
 	GroupName = "Debug"
 
 # maxHealth
-Position: $QMuopHuRV5YxhSB4DKDn5i:1
+Position: $QMuopHuRV5YxhSB4DKDn5i:2
 
 # HealthUI
 Position: $4mK9HQuhfjfP12kGzx3DTp:0
@@ -140,7 +140,7 @@ Position: $VZVgHBETbfc3YhCncoJAmB:9
 Position: $VZVgHBETbfc3YhCncoJAmB:11
 
 # currentHealth
-Position: $VZVgHBETbfc3YhCncoJAmB:12
+Position: $QMuopHuRV5YxhSB4DKDn5i:3
 
 # DEAD
 Position: $VZVgHBETbfc3YhCncoJAmB:10
@@ -158,10 +158,30 @@ Visibility: Hidden
 Visibility: Hidden
 
 # initialAction
-Position: $VZVgHBETbfc3YhCncoJAmB:13
+Position: $VZVgHBETbfc3YhCncoJAmB:12
 
 # lastAction
-Position: $VZVgHBETbfc3YhCncoJAmB:14
+Position: $VZVgHBETbfc3YhCncoJAmB:13
 
 # actionList
-Position: $VZVgHBETbfc3YhCncoJAmB:15
+Position: $VZVgHBETbfc3YhCncoJAmB:14
+
+# maxBreak
+Position: $MDymr8mSeXbU61qrw73dVh:1
+
+# bossBreakBar
+Position: $MDymr8mSeXbU61qrw73dVh:4
+
+# currentBreak
+Position: $MDymr8mSeXbU61qrw73dVh:3
+
+# breakDuration
+Position: $MDymr8mSeXbU61qrw73dVh:2
+
+# ForceDie()
+Position: $QMuopHuRV5YxhSB4DKDn5i:0
+Visibility: Shown
+
+# ForceBossBreak()
+Position: $MDymr8mSeXbU61qrw73dVh:0
+Visibility: Shown

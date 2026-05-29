@@ -235,7 +235,7 @@ public class YYF_Splash : IEnemyAction
             _damage: damage,
             _speed: bulletSpeed,
             gravityScale: gravityScale,
-            _stunValue: stunValue);
+            _stunValue: bossbreakValue);
 
         IProjectile bullet2 = bossAI.selfPooler.SpawnFromPool("water_bullet",
            new Vector3(pos.x - shootPositionX[index],
@@ -252,7 +252,7 @@ public class YYF_Splash : IEnemyAction
             _damage: damage,
             _speed: bulletSpeed,
             gravityScale: gravityScale,
-            _stunValue: stunValue);
+            _stunValue: bossbreakValue);
     }
 
     public void SpawnIceThorn(Vector3 pos, int index)

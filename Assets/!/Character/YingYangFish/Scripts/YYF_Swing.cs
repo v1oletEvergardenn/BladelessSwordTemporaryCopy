@@ -53,8 +53,7 @@ public class YYF_Swing : IEnemyAction
             bool toLeft = target.x < origin.position.x;
 
             // move to appropriate x position
-            if (toLeft) { origin.DOMove(new Vector3(target.x + 4, bossAI.waterLevel.position.y - 6, 0), 0.1f); }
-            else { origin.DOMove(new Vector3(target.x - 4, bossAI.waterLevel.position.y - 6, 0), 0.1f); }
+            origin.DOMove(new Vector3(target.x, bossAI.waterLevel.position.y - 6, 0), 0.1f);
 
             //reset to initial
             origin.eulerAngles = Vector3.zero;
@@ -68,7 +67,7 @@ public class YYF_Swing : IEnemyAction
             yield return new WaitForSeconds(0.1f);
 
             //jump out
-            float temp_x = toLeft ? player.transform.position.x - 2 : player.transform.position.x + 2;
+            float temp_x = toLeft ? player.transform.position.x - 4 : player.transform.position.x + 4;
             origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + (isBlack ? 2.5f : 4.5f), 0), 0.5f).SetEase(Ease.OutSine);
 
             //pre swing attack
@@ -160,8 +159,8 @@ public class YYF_Swing : IEnemyAction
             // move to appropriate x position
             Vector3 target = player.transform.position + new Vector3(0, 3, 0);
             bool toLeft = target.x < origin.position.x;
-            if (toLeft) { origin.DOMove(new Vector3(target.x + 4, bossAI.waterLevel.position.y - 6, 0), 0.1f); }
-            else { origin.DOMove(new Vector3(target.x - 4, bossAI.waterLevel.position.y - 6, 0), 0.1f); }
+
+            origin.DOMove(new Vector3(target.x, bossAI.waterLevel.position.y - 6, 0), 0.1f);
 
             // rotate to target position angle
             float angle = -90;
@@ -170,7 +169,7 @@ public class YYF_Swing : IEnemyAction
             yield return new WaitForSeconds(0.1f);
 
             //out of the water
-            float temp_x = toLeft ? player.transform.position.x - 2 : player.transform.position.x + 2;
+            float temp_x = toLeft ? player.transform.position.x - 4 : player.transform.position.x + 4;
             bossAI.blackOrigin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 2.5f, 0), 0.5f).SetEase(Ease.OutSine);
             bossAI.whiteOrigin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 4.5f, 0), 0.5f).SetEase(Ease.OutSine);
 
@@ -252,13 +251,13 @@ public class YYF_Swing : IEnemyAction
     /// <param name="offset">The offset to apply to the attack position.</param>
     public override void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default)
     {
-        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.stun);
+        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.breakAmount);
         bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
 
         if (dealtDamage == 2)//counter attack
         {
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
-            bossAI.DecreaseStun(stunValue);
+            bossAI.DoBreak(bossbreakValue);
             //counter attack feedback
         }
         else if (dealtDamage == 1)//defend

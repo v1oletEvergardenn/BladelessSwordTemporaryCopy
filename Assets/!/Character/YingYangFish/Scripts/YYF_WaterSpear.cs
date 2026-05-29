@@ -122,7 +122,7 @@ public class YYF_WaterSpear : IEnemyAction
     public void ShootSpear(Spear spear)
     {
         spear.collisionActive = true;
-        spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed, _stunValue: stunValue);
+        spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed, _stunValue: bossbreakValue);
         spear.stunDuration = spear_stunDuration;
         GameObject burst = bossAI.selfPooler.SpawnFromPool("burst", bossAI.center.position);
         burst.transform.eulerAngles = spear.transform.eulerAngles;
@@ -132,7 +132,7 @@ public class YYF_WaterSpear : IEnemyAction
     {
         spear.transform.SetParent(null);
         spear.collisionActive = true;
-        spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed, _stunValue: stunValue);
+        spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed, _stunValue: bossbreakValue);
         spear.stunDuration = spear_stunDuration;
     }
 }

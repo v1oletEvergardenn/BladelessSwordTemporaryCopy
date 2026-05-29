@@ -119,7 +119,7 @@ public class YYF_Gatling : IEnemyAction
             bulletTurnSpeed,
             bulletDamage
         );
-        bullet.stunValue = stunValue;
+        bullet.stunValue = bossbreakValue;
     }
 
     public void Hit(Gatling_bubbles bubble)
