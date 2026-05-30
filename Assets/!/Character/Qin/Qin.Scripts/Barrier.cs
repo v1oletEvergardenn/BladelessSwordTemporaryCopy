@@ -34,7 +34,8 @@ public class Barrier : MonoBehaviour
     public void CounterAttackBarrier(IProjectile projectile)
     {
         Vector3 reverse = new Vector3(0, 0, -90);
-        projectile.SetUp(reverse, this.gameObject, _isHostileToPlayer: false);
+        projectile.SetUp(reverse, this.gameObject).
+            SetHostileToPlayer(false);
         projectile.NormalCounterAttack();
         lastHitNumbers++;
     }

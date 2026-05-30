@@ -22,6 +22,7 @@ public class YYF_Swing : IEnemyAction
     public float swingRange;
     public float swingAttackDuration;
 
+    public float bossbreakValue = 8f;
     private float localFactor;
 
     public override void Start()

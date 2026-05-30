@@ -372,7 +372,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
         vfx.SpawnHeartSwordHitEffect(damagable.GetHitPos());
 
         // Apply damage
-        damagable.Damage(attackEffect.damage, this.transform, 0, stunValue: attackEffect.breakAmount);
+        damagable.Damage(attackEffect.damage, this.transform, 0, bossBreakValue: attackEffect.breakAmount);
     }
 
     /// <summary>

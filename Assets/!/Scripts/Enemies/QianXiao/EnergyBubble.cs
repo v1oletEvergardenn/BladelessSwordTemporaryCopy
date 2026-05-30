@@ -22,9 +22,9 @@ public class EnergyBubble : IProjectile
             End();
             vfx.SpawnSlashEffect(transform.position, true);
             rb.velocity = Vector3.zero;
-            speed = 0f;
+            attribute.speed = 0f;
             collided = true;
-            target.Damage(damage, transform, stunDuration);
+            target.Damage(attribute, transform);
             //Invoke("Die", death_delay_time_after_hit);
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0)
@@ -32,7 +32,7 @@ public class EnergyBubble : IProjectile
             End();
             vfx.SpawnSlashEffect(transform.position, true);
             rb.velocity = Vector3.zero;
-            speed = 0f;
+            attribute.speed = 0f;
             collided = true;
             //Invoke("Die", death_delay_time_after_hit);
         }

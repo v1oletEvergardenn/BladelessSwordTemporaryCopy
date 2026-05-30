@@ -70,11 +70,16 @@ public abstract class AdvancedShooter : MonoBehaviour
         _bullet.rotationSpeed = bulletRotationSpeed;
         if (aimPlayer)
         {
-            _bullet.SetUp(shootPos.eulerAngles, senderOfProjectile, 0, follow_player, GameManager.instance.player.GetComponent<IDamagable>(), _damage: Damage, _speed: bulletSpeed);
+            _bullet.SetUp(shootPos.eulerAngles, senderOfProjectile).
+                SetFollowTarget(GameManager.instance.player.GetComponent<IDamagable>()).
+                SetDamage(Damage).
+                SetSpeed(bulletSpeed);
         }
         else
         {
-            _bullet.SetUp(shootPos.eulerAngles, senderOfProjectile, 0, false, _damage: Damage, _speed: bulletSpeed);
+            _bullet.SetUp(shootPos.eulerAngles, senderOfProjectile).
+                SetDamage(Damage).
+                SetSpeed(bulletSpeed);
         }
     }
 

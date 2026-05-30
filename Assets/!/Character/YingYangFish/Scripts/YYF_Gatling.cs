@@ -7,7 +7,7 @@ public class YYF_Gatling : IEnemyAction
     private YingYangFish_AI bossAI;
 
     public Transform gatlingPos;
-
+    public float bossbreakValue = 0.2f;
     public float trackingSpeed = 20f;
     public float shootInterval = 0.2f;
     public float shootDuration = 5f;
@@ -119,17 +119,17 @@ public class YYF_Gatling : IEnemyAction
             bulletTurnSpeed,
             bulletDamage
         );
-        bullet.stunValue = bossbreakValue;
+        bullet.attribute.bossBreakValue = bossbreakValue;
     }
 
     public void Hit(Gatling_bubbles bubble)
     {
         bool dealDamage = damageTimer >= damageCooldown;
         GameManager.instance.playerhealth.Damage(
-            dealDamage ? bubble.damage : 0,
+            dealDamage ? bubble.attribute.damage : 0,
             bubble.transform,
-            bubble.stunDuration,
-            stunValue: bubble.stunValue);
+            bubble.attribute.stunDuration,
+            stunValue: bubble.attribute.bossBreakValue);
         if (dealDamage) damageTimer = 0f;
     }
 
@@ -137,10 +137,10 @@ public class YYF_Gatling : IEnemyAction
     {
         bool dealDamage = selfDamageTimer >= damageCooldown;
         bossAI.Damage(
-            dealDamage ? bubble.damage : 0,
+            dealDamage ? bubble.attribute.damage : 0,
             bubble.transform,
-            bubble.stunDuration,
-            stunValue: dealDamage ? bubble.stunValue : 0);
+            bubble.attribute.stunDuration,
+            stunValue: dealDamage ? bubble.attribute.bossBreakValue : 0);
         if (dealDamage) selfDamageTimer = 0f;
     }
 }

@@ -10,14 +10,8 @@ public class YYF_WaterSpear : IEnemyAction
     //public Transform waterSpearPos_black;
     //public Transform waterSpearPos_white;
 
-    public int spearDamage = 10;
-    public float spearSpeed = 100f;
-    public float spear_stunDuration = 1f;
-
-    public int small_spearDamage = 5;
-    public float small_spearSpeed = 100f;
-    public float small_spear_stunDuration = 0.5f;
-    public float small_spear_stunValue = 10f;
+    public IProjectileBasicAttributes spearAttribute;
+    public IProjectileBasicAttributes smallSpearAttribute;
     private Spear spear;
     private Spear smallSpear1;
     private Spear smallSpear2;
@@ -57,7 +51,7 @@ public class YYF_WaterSpear : IEnemyAction
         Spear _spear; Spear _smallSpear1 = null; Spear _smallSpear2 = null;
         bool addition = false;
         if (factor == 1) { addition = true; }
-
+        print(factor + "  and  " + addition);
         Transform lauchPos = bossAI.center;
 
         //spawn spear
@@ -114,16 +108,20 @@ public class YYF_WaterSpear : IEnemyAction
 
         void SetUp(Spear spear)
         {
-            spear.SetUp(transform.right, this.gameObject, 0, _followTarget: true, _target: playerIDamagable, false, spearDamage, 0);
-            spear.collisionActive = false;
+            spear.SetUp(transform.right, this.gameObject).
+                SetSpeed(0).
+                SetDamage(0).
+                SetFollowTarget(playerIDamagable);
+            spear.collisionEnabled = false;
         }
     }
 
     public void ShootSpear(Spear spear)
     {
-        spear.collisionActive = true;
-        spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed, _stunValue: bossbreakValue);
-        spear.stunDuration = spear_stunDuration;
+        spear.collisionEnabled = true;
+        spear.SetUp(transform.right, this.gameObject).
+                SetAttributes(spearAttribute).
+                SetFollowTarget(playerIDamagable);
         GameObject burst = bossAI.selfPooler.SpawnFromPool("burst", bossAI.center.position);
         burst.transform.eulerAngles = spear.transform.eulerAngles;
     }
@@ -131,8 +129,9 @@ public class YYF_WaterSpear : IEnemyAction
     public void ShootSmallSpear(Spear spear)
     {
         spear.transform.SetParent(null);
-        spear.collisionActive = true;
-        spear.SetUp(transform.right, this.gameObject, 0, _followTarget: false, _target: playerIDamagable, true, spearDamage, spearSpeed, _stunValue: bossbreakValue);
-        spear.stunDuration = spear_stunDuration;
+        spear.collisionEnabled = true;
+        spear.SetUp(transform.right, this.gameObject).
+               SetAttributes(smallSpearAttribute).
+               SetFollowTarget(playerIDamagable);
     }
 }

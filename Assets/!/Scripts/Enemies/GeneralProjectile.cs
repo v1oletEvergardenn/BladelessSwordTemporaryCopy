@@ -34,7 +34,7 @@ public class GeneralProjectile : IProjectile
                 vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
                 gameManager.playerhealth.Repel(hitEffectSettings.repelForce, transform.right.x < 0 ? true : false);
             }
-            target.Damage(damage, transform, stunDuration, stunValue: stunValue);
+            target.Damage(attribute, transform);
             Hit();
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)
@@ -59,7 +59,7 @@ public class GeneralProjectile : IProjectile
         vfx.SpawnEffectWithEnum(hitEffect, transform.position, isRed);
         rb.velocity = Vector3.zero;
         rb.gravityScale = 0;
-        speed = 0f;
+        attribute.speed = 0f;
         collided = true;
         Invoke("Die", death_delay_time_after_hit);
     }

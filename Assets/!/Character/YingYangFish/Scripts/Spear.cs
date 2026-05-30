@@ -5,7 +5,6 @@ using UnityEngine;
 public class Spear : IProjectile
 {
     [HideInInspector] public bool facingRight;
-    [HideInInspector] public bool collisionActive = false;
 
     public override void Update()
     {
@@ -22,7 +21,7 @@ public class Spear : IProjectile
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, CalculateWantedRotation(target.GetHitPos()), rotationSpeed * Time.deltaTime);
             }//follow target
         }
-        rb.velocity = transform.right * speed / 10;
+        rb.velocity = transform.right * attribute.speed / 10;
         if (transform.right.x < 0) { facingRight = false; }
         else { facingRight = true; }
     }
@@ -43,7 +42,11 @@ public class Spear : IProjectile
 
     public override void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collisionActive) { return; }
+        if (canInterruptDelay && IsInDelay())
+        {
+            delayTimer = delay;
+        }
+        if (!collisionEnabled) { return; }
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
         if (target != null && !IsOwner(target.gameObject) && !collided)
         {
@@ -64,7 +67,7 @@ public class Spear : IProjectile
                     vfx.CameraShake(hitEffectSettings.cameraShakeForce.y);
                     vfx.SlowTimeForSeconds(0.1f, 0f);
                     vfx.SpawnHitEffect(false, GetPivot());
-                    target.Damage(damage, transform, stunDuration, stunValue: stunValue);
+                    target.Damage(attribute, transform);
                     target.Repel(150f, this.transform.right.x < 0 ? true : false);
                     Hit();
                 }
@@ -72,7 +75,7 @@ public class Spear : IProjectile
             else
             {
                 vfx.SpawnHitEffect(false, GetPivot());
-                target.Damage(damage, transform, stunDuration, stunValue: stunValue);
+                target.Damage(attribute, transform);
                 Hit();
             }
         }
@@ -100,7 +103,7 @@ public class Spear : IProjectile
 
     public override void Hit()
     {
-        if (!collisionActive) return;
+        if (!collisionEnabled) return;
         GetComponent<SpriteRenderer>().sprite = null;
         GetComponent<Animator>().Play("spear_hit");
         rb.velocity = Vector3.zero;

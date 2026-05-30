@@ -1,4 +1,7 @@
+using Codice.CM.Common;
 using EditorAttributes;
+using log4net.Util;
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -8,87 +11,54 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(Rigidbody2D))]
 public abstract class IProjectile : MonoBehaviour
 {
-    [Header("Attributes")] public float damage = 10;
-    public float speed;
-    [HideInInspector] public float originalSpeed;
-    public float rotationSpeed = 100f;
-    public float stunDuration = 0.3f;
-    public float lifeTime = 10f;
-    public float stunValue = 1;
-    public float delay = 0f;
-    public LayerMask stopLayer = 1 << 7 | 1 << 10 | 1 << 11 | 1 << 18;
-
     public bool showPivot;
-    [SerializeField, ShowField(nameof(showPivot))] private Vector3 pivotOffset;
-    [ShowField(nameof(showPivot))] public Color color = Color.red;
+    [ShowIf(nameof(showPivot))] public Vector3 pivotOffset;
+    [ShowIf(nameof(showPivot))] public Color color = Color.red;
+
+    [Header("Attributes")]
+    public IProjectileBasicAttributes attribute;
+
+    public LayerMask stopLayer = 1 << 7 | 1 << 10 | 1 << 11 | 1 << 18;
+    public float rotationSpeed = 100f;
+    public float lifeTime = 10f;
+    public float delay = 0f;
 
     public ProjectileHitEffectSettings hitEffectSettings;
 
-    [HideInInspector] public VFXManager vfx;
-    [HideInInspector] public GameManager gameManager;
+    [HideInInspector] public float originalSpeed;
     [HideInInspector] public GameObject owner;
     [HideInInspector] public bool followTarget;
     [HideInInspector] public IDamagable target;
-    [HideInInspector] public Rigidbody2D rb;
     [HideInInspector] public bool collided = false;
+    [HideInInspector] public bool boolTriggered = false;
     [HideInInspector] public float lifeTimer = 0f;
     [HideInInspector] public bool isHostileToPlayer;
     [HideInInspector] public bool isPerfect;
+    [HideInInspector] public bool canInterruptDelay = false;
+    [HideInInspector] public bool collisionEnabled = true;
+    [HideInInspector] public float delayTimer = 0;
+    // References to managers
 
-    private float delayTimer = 0;
+    [HideInInspector] public VFXManager vfx;
+    [HideInInspector] public Rigidbody2D rb;
+    [HideInInspector] public GameManager gameManager;
 
     public virtual void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         vfx = VFXManager.instance;
         gameManager = GameManager.instance;
-        originalSpeed = speed;
+        originalSpeed = attribute.speed;
     }
 
-    /// <summary>
-    /// Initializes or resets the projectile's attributes for reuse, including direction, owner, speed, target, and various optional behaviors.
-    /// This method allows flexible configuration of the projectile's movement, damage, targeting, and interaction logic,
-    /// making it suitable for pooling and dynamic setup at runtime.
-    /// </summary>
-    /// <param name="dir">The initial direction (in Euler angles) to orient the projectile.</param>
-    /// <param name="_owner">The GameObject that owns or fired the projectile (used to prevent self-collision).</param>
-    /// <param name="additionSpeed">Additional speed to add to the projectile's base speed (default: 0).</param>
-    /// <param name="_followTarget">If true, the projectile will continuously follow its target (default: false).</param>
-    /// <param name="_target">The target to follow or face, implementing IDamagable (default: null).</param>
-    /// <param name="_isHostileToPlayer">If true, the projectile is hostile to the player (default: true).</param>
-    /// <param name="_damage">Overrides the projectile's damage value if not zero (default: 0).</param>
-    /// <param name="_speed">Overrides the projectile's speed if not -1 (default: -1).</param>
-    /// <param name="gravityScale">Sets the Rigidbody2D's gravity scale (default: 0).</param>
-    /// <param name="_stunValue">Overrides the projectile's stun value if not zero (default: 0).</param>
-    public virtual void SetUp(Vector3 dir,
-        GameObject _owner,
-        float additionSpeed = 0f,
-        bool _followTarget = false,
-        IDamagable _target = null,
-        bool _isHostileToPlayer = true,
-        float _damage = 0,
-        float _speed = -1,
-        float gravityScale = 0,
-        float _stunValue = 0,
-        float _delay = 0f)
+    public virtual ProjectileBuilder SetUp(Vector3 direction, GameObject _owner)
     {
         ResetAttributes();
+        transform.eulerAngles = direction;
         owner = _owner;
-        followTarget = _followTarget;
-        target = _target;
-        isHostileToPlayer = _isHostileToPlayer;
         rb = GetComponent<Rigidbody2D>();
-        rb.gravityScale = gravityScale;
-        if (_stunValue != 0) { stunValue = _stunValue; }
-        if (_damage != 0) damage = _damage;
-        transform.eulerAngles = dir;// rotate to given direction
-        if (target != null) { transform.rotation = CalculateWantedRotation(target.GetHitPos()); } //rotate to face target
-        if (_speed != -1) { speed = _speed; originalSpeed = _speed; }
-        speed = originalSpeed + additionSpeed;
-        isPerfect = false;
-        lifeTimer = 0f;
-
-        delay = _delay;
+        rb.velocity = transform.right * attribute.speed / 10;
+        return new ProjectileBuilder(this);
     }
 
     public virtual void PerfectCounterAttack()
@@ -112,53 +82,77 @@ public abstract class IProjectile : MonoBehaviour
         owner = null;
         followTarget = false;
         target = null;
-        speed = originalSpeed;
+        attribute.speed = originalSpeed;
         collided = false;
         isHostileToPlayer = true;
+        delayTimer = 0f;
+        lifeTimer = 0f;
+        boolTriggered = false;
+        collisionEnabled = true;
     }
 
     public virtual void FixedUpdate()
     {
-        if (delayTimer < delay) { return; }
+        if (IsInDelay())
+        {
+            rb.velocity = Vector2.zero;
+            return;
+        }
+
         if (rb.gravityScale != 0)
         {
             transform.right = rb.velocity;
-        }//rotate the projectile direction following gravity
+        } //rotate the projectile direction following gravity
     }
 
     public virtual void Update()
     {
-        if (delayTimer < delay)
+        if (collided) { return; }
+
+        if (target != null && followTarget)
+        {
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                CalculateWantedRotation(target.GetHitPos()),
+                rotationSpeed * Time.deltaTime);
+        }
+
+        if (IsInDelay())
         {
             delayTimer += Time.deltaTime;
         }
+        else
+        {
+            if (!boolTriggered)
+            {
+                rb.velocity = transform.right * attribute.speed / 10;
+                boolTriggered = true;
+                collisionEnabled = true;
+            }
+        }
 
-        if (delayTimer < delay) { return; }
-        rb.velocity = transform.right * speed / 10;
-        if (collided) { return; }
         lifeTimer += Time.deltaTime;
         if (lifeTimer >= lifeTime)
         {
             Die();
         }
-        if (target != null)
-        {
-            if (followTarget)
-            {
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, CalculateWantedRotation(target.GetHitPos()), rotationSpeed * Time.deltaTime);
-            }//follow target
-        }
     }
 
     public virtual void OnTriggerEnter2D(Collider2D collision)
     {
+        // If canInterruptDelay is set and we're still in delay, cancel the delay on any collision
+        if (canInterruptDelay && IsInDelay())
+        {
+            delayTimer = delay;
+        }
+        if (!collisionEnabled) return;
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
         if (target != null && collision.gameObject != owner && !collided)
         {
             if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
             if (collision.gameObject == gameManager.player && collision.gameObject.layer == 14) { return; }
             vfx.SpawnHitEffect(false, GetPivot());
-            target.Damage(damage, this.transform, stunDuration, stunValue: stunValue);
+            target.Damage(attribute.damage, this.transform, attribute.stunDuration, bossBreakValue: attribute.bossBreakValue);
             this.gameObject.SetActive(false);
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0)
@@ -167,6 +161,8 @@ public abstract class IProjectile : MonoBehaviour
             collided = true;
         }
     }
+
+    public bool IsInDelay() => delay > 0f && delayTimer < delay;
 
     public Vector3 GetPivot()
     {
@@ -224,28 +220,127 @@ public abstract class IProjectile : MonoBehaviour
     }
 }
 
+public class ProjectileBuilder
+{
+    private readonly IProjectile _projectile;
+
+    public ProjectileBuilder(IProjectile projectile)
+    {
+        _projectile = projectile;
+    }
+
+    public ProjectileBuilder SetAttributes(IProjectileBasicAttributes attributes)
+    {
+        _projectile.attribute = attributes;
+        _projectile.originalSpeed = attributes.speed;
+        return this;
+    }
+
+    public ProjectileBuilder SetDamage(float damage)
+    {
+        _projectile.attribute.damage = damage;
+        return this;
+    }
+
+    public ProjectileBuilder SetSpeed(float speed)
+    {
+        _projectile.attribute.speed = speed;
+        _projectile.originalSpeed = speed;
+        return this;
+    }
+
+    public ProjectileBuilder SetStunDuration(float stunDuration)
+    {
+        _projectile.attribute.stunDuration = stunDuration;
+        return this;
+    }
+
+    public ProjectileBuilder SetBossBreakValue(float bossBreakValue)
+    {
+        _projectile.attribute.bossBreakValue = bossBreakValue;
+        return this;
+    }
+
+    public ProjectileBuilder SetAdditionalSpeed(float additionSpeed)
+    {
+        _projectile.attribute.speed = _projectile.originalSpeed + additionSpeed;
+        return this;
+    }
+
+    public ProjectileBuilder SetFollowTarget(IDamagable target)
+    {
+        if (target == null) return this;
+        _projectile.target = target;
+        _projectile.followTarget = true;
+        if (target != null) _projectile.transform.rotation = _projectile.CalculateWantedRotation(target.GetHitPos());
+        return this;
+    }
+
+    public ProjectileBuilder SetTarget(IDamagable target)
+    {
+        if (target == null) return this;
+        _projectile.target = target;
+        if (target != null) _projectile.transform.rotation = _projectile.CalculateWantedRotation(target.GetHitPos());
+        return this;
+    }
+
+    public ProjectileBuilder SetHostileToPlayer(bool hostile = true)
+    {
+        _projectile.isHostileToPlayer = hostile;
+        return this;
+    }
+
+    public ProjectileBuilder SetGravity(float gravityScale)
+    {
+        _projectile.rb.gravityScale = gravityScale;
+        return this;
+    }
+
+    public ProjectileBuilder SetDelay(float delay, bool canInterruptDelay)
+    {
+        _projectile.delay = delay;
+        _projectile.boolTriggered = false;
+        _projectile.canInterruptDelay = canInterruptDelay;
+        if (!canInterruptDelay)
+        {
+            _projectile.collisionEnabled = false;
+        }
+
+        return this;
+    }
+}
+
+[System.Serializable]
+public struct IProjectileBasicAttributes
+{
+    public float damage;
+    public float speed;
+    public float stunDuration;
+    public float bossBreakValue;
+}
+
 [System.Serializable]
 public struct ProjectileHitEffectSettings
 {
-    [TabGroup(nameof(RumbleSettings), nameof(TimeSettings), nameof(OtherSettings))]
+    [EditorAttributes.TabGroup(nameof(RumbleSettings), nameof(TimeSettings), nameof(OtherSettings))]
     [SerializeField] private Void groupHolder;
 
-    [VerticalGroup(nameof(rumbleDuration), nameof(frequency_norm), nameof(frequncy_perfect))]
+    [EditorAttributes.VerticalGroup(nameof(rumbleDuration), nameof(frequency_norm), nameof(frequncy_perfect))]
     [SerializeField, HideInInspector] private Void RumbleSettings;
 
     [HideInInspector][Range(0, 1f)] public float rumbleDuration;
-    [HideInInspector][MinMaxSlider(0, 1.5f)] public Vector2 frequency_norm;
-    [HideInInspector][MinMaxSlider(0, 1.5f)] public Vector2 frequncy_perfect;
+    [HideInInspector][EditorAttributes.MinMaxSlider(0, 1.5f)] public Vector2 frequency_norm;
+    [HideInInspector][EditorAttributes.MinMaxSlider(0, 1.5f)] public Vector2 frequncy_perfect;
 
-    [VerticalGroup(nameof(freezeTime), nameof(Time_scale))]
+    [EditorAttributes.VerticalGroup(nameof(freezeTime), nameof(Time_scale))]
     [SerializeField, HideInInspector] private Void TimeSettings;
 
     [HideInInspector][Range(0, 0.5f)] public float freezeTime;
     [HideInInspector][Range(0, 1f)] public float Time_scale;
 
-    [VerticalGroup(nameof(cameraShakeForce), nameof(repelForce))]
+    [EditorAttributes.VerticalGroup(nameof(cameraShakeForce), nameof(repelForce))]
     [SerializeField, HideInInspector] private Void OtherSettings;
 
     [HideInInspector][Range(0, 300f)] public float repelForce;
-    [HideInInspector][MinMaxSlider(0, 0.2f)] public Vector2 cameraShakeForce;
+    [HideInInspector][EditorAttributes.MinMaxSlider(0, 0.2f)] public Vector2 cameraShakeForce;
 }

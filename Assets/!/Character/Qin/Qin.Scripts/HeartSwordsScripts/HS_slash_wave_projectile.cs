@@ -98,7 +98,7 @@ public class HS_slash_wave_projectile : IProjectile
             if (attackTimer >= attackCD)
             {
                 vfx.SpawnEffectWithEnum(Hit_Effect.hs_hit, target.GetHitPos());
-                target.Damage(damage, transform, stunDuration, stunValue: stunValue);
+                target.Damage(attribute, transform);
                 attackTimer = 0f;
             }
         }

@@ -22,7 +22,6 @@ public abstract class IEnemyAction : MonoBehaviour
     [HideInInspector] public CharacterController2D playerController;
 
     [HideInInspector] public IEnemyController bossController;
-    public float bossbreakValue = 1;
 
     [HideInInspector] public bool proceedCall = false;
     public Coroutine act_routine;
@@ -176,7 +175,6 @@ public abstract class IEnemyAction : MonoBehaviour
         if (dealtDamage == 2)//counter attack
         {
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
-            bossController.DoBreak(bossbreakValue);
         }
         else if (dealtDamage == 1)//defend
         {

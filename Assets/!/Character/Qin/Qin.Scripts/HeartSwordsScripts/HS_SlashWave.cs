@@ -187,12 +187,11 @@ public class HS_SlashWave : IHeartSwordAbility
     public void LaunchSlash(bool large)
     {
         HS_slash_wave_projectile slash = selfPooler.SpawnFromPool("HS_slash_wave_" + (large ? "large" : "small"), playerAttack.counterAttackPoint.position).GetComponent<HS_slash_wave_projectile>();
-        slash.SetUp(playerAttack.pointerDirection,
-            playerAttack.gameObject,
-            _isHostileToPlayer: false,
-            _speed: (large ? large_slash_speed : small_slash_speed),
-            _damage: (large ? large_slash_damage : small_slash_damage),
-            _stunValue: (large ? large_slash_stun : small_slash_stun));
+        slash.SetUp(playerAttack.pointerDirection, playerAttack.gameObject).
+            SetHostileToPlayer(false).
+            SetSpeed(large ? large_slash_speed : small_slash_speed).
+            SetDamage(large ? large_slash_damage : small_slash_damage).
+            SetBossBreakValue(large ? large_slash_stun : small_slash_stun);
     }
 
     public override void EndAction()

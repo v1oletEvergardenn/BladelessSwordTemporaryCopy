@@ -256,15 +256,20 @@ public class PlayerAttack : MonoBehaviour
         {
             hSAbilitiesManager.ModifyHSPoint(0.5f);
             energy.ChangeEnergy(-energy.attack_energy_consumption);
-
-            projectile.SetUp(pointerDirection, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * basicAttackDamage);
+            projectile.SetUp(pointerDirection, this.gameObject).
+                SetHostileToPlayer(false).
+                SetDamage(projectile.attribute.damage * basicAttackDamage).
+                SetAdditionalSpeed(100);
             projectile.PerfectCounterAttack();
             SoundManager.PlaySound("perfect_attack");
         }
         else
         {
             hSAbilitiesManager.ModifyHSPoint(0.2f);
-            projectile.SetUp(pointerDirection, this.gameObject, 30, _isHostileToPlayer: false, _damage: projectile.damage * basicAttackDamage);
+            projectile.SetUp(pointerDirection, this.gameObject).
+                SetHostileToPlayer(false).
+                SetDamage(projectile.attribute.damage * basicAttackDamage).
+                SetAdditionalSpeed(30);
             projectile.NormalCounterAttack();
             SoundManager.PlaySound("normal_counter_attack");
         }
@@ -320,7 +325,7 @@ public class PlayerAttack : MonoBehaviour
         hSAbilitiesManager.ModifyHSPoint(0.5f);
         Vector3 v = new Vector3(0, 0, -90);
         SoundManager.PlaySound("normal_counter_attack");
-        projectile.SetUp(v, this.gameObject, 100, _isHostileToPlayer: false);
+        projectile.SetUp(v, this.gameObject).SetAdditionalSpeed(100).SetHostileToPlayer(false);
         energy.ChangeEnergy(4);
         projectile.PerfectCounterAttack();
     }

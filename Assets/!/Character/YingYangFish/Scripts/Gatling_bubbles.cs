@@ -36,29 +36,12 @@ public class Gatling_bubbles : IProjectile
         anim = GetComponent<Animator>();
     }
 
-    /// <summary>
-    /// Override SetUp to cancel tracking when counter-attacked.
-    /// Bullet will follow pointer direction and stop all tracking.
-    /// </summary>
-    public override void SetUp(Vector3 dir,
-        GameObject _owner,
-        float additionSpeed = 0f,
-        bool _followTarget = false,
-        IDamagable _target = null,
-        bool _isHostileToPlayer = true,
-        float _damage = 0,
-        float _speed = -1,
-        float gravityScale = 0,
-        float _stunValue = 0,
-        float _delay = 0f)
+    public override ProjectileBuilder SetUp(Vector3 direction, GameObject _owner)
     {
-        // Cancel tracking - go straight to shooting phase
         currentPhase = BulletPhase.Shooting;
         currentTurnSpeed = 0f;
         trackTarget = null;
-
-        // Call base setup - this handles direction, speed, owner, etc.
-        base.SetUp(dir, _owner, additionSpeed, false, null, _isHostileToPlayer, _damage, _speed, gravityScale, _stunValue);
+        return base.SetUp(direction, _owner);
     }
 
     /// <summary>
@@ -103,12 +86,12 @@ public class Gatling_bubbles : IProjectile
         currentTurnSpeed = 0f;
         maxTurnSpeed = _turnSpeed;
 
-        damage = _damage;
-        speed = _moveSpeed;
+        attribute.damage = _damage;
+        attribute.speed = _moveSpeed;
         moveSpeed = _moveSpeed;
         originalSpeed = _moveSpeed;
 
-        rb.velocity = transform.right * speed;
+        rb.velocity = transform.right * attribute.speed;
 
         isPerfect = false;
         lifeTimer = 0f;
@@ -177,13 +160,13 @@ public class Gatling_bubbles : IProjectile
         }
 
         // Move forward
-        rb.velocity = transform.right * speed;
+        rb.velocity = transform.right * attribute.speed;
     }
 
     private void UpdateShootingPhase()
     {
         // No turning - shoot straight in current direction
-        rb.velocity = transform.right * speed;
+        rb.velocity = transform.right * attribute.speed;
     }
 
     public override void OnTriggerEnter2D(Collider2D collision)
@@ -207,7 +190,7 @@ public class Gatling_bubbles : IProjectile
 
             if (collision.gameObject == gameManager.player) YingYangFish_AI.instance.gatling.Hit(this);
             else if (collision.gameObject == YingYangFish_AI.instance.gameObject) YingYangFish_AI.instance.gatling.HitSelf(this);
-            else target.Damage(damage, transform, stunDuration, stunValue: stunValue);
+            else target.Damage(attribute, transform);
         }
         else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)
         {
@@ -237,7 +220,7 @@ public class Gatling_bubbles : IProjectile
     {
         rb.velocity = Vector3.zero;
         rb.gravityScale = 0;
-        speed = 0f;
+        attribute.speed = 0f;
         collided = true;
         currentPhase = BulletPhase.Shooting;
         trackTarget = null;

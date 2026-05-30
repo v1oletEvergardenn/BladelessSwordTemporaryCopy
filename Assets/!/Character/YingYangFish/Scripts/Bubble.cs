@@ -57,14 +57,14 @@ public class Bubble : IProjectile
         anim.Play("explode");
         rb.velocity = Vector3.zero;
         rb.gravityScale = 0;
-        speed = 0f;
+        attribute.speed = 0f;
         collided = true;
 
         yield return new WaitForSeconds(0.05f);
 
         if (dmg != null)
         {
-            dmg.Damage(damage, transform, stunDuration, stunValue: stunValue);
+            dmg.Damage(attribute, transform);
         }
         yield return new WaitForSeconds(0.2f);
         gameObject.SetActive(false);

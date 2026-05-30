@@ -58,8 +58,15 @@ public class CameraFollow : MonoBehaviour
     {
         Vector3 _tempOffset = offset;
         if (!useOffset) { _tempOffset = Vector3.zero; }
-        camFollow.position = new Vector3(Mathf.SmoothDamp(camFollow.position.x,
-            player.transform.position.x + _tempOffset.x, ref xAmount, 0.1f),
+        if (float.IsNaN(camFollow.position.x) || float.IsNaN(xAmount))
+        {
+            Debug.LogWarning("[CameraFollow] NaN detected! Resetting camFollow position and velocity.");
+            camFollow.position = new Vector3(player.transform.position.x, camFollow.position.y, camFollow.position.z);
+            xAmount = 0f;
+        }
+
+        camFollow.position = new Vector3(
+            Mathf.SmoothDamp(camFollow.position.x, player.transform.position.x + _tempOffset.x, ref xAmount, 0.1f),
             player.transform.position.y + _tempOffset.y,
             camFollow.position.z);
 

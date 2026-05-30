@@ -16,11 +16,8 @@ public class YYF_BubbleTrap : IEnemyAction
     public float jumpHeight = 3f;
 
     [HeaderAttribute("Bubble Settings")]
-    public float bubbleDamage = 2;
+    public IProjectileBasicAttributes bubbleAttribute;
 
-    public float bubbleSpeed = 5f;
-    public float bubbleStunDuration = 0.5f;
-    public float bubbleStunValue = 0.5f;
     public float bubbleRange = 1.6f;
 
     public override void Start()
@@ -131,13 +128,10 @@ public class YYF_BubbleTrap : IEnemyAction
             {
                 Bubble bubble = bossAI.selfPooler.SpawnFromPool("bubble", spawnPositions[nextSpawnIndex], Quaternion.identity).GetComponent<Bubble>();
                 bubbles.Add(bubble);
-                bubble.SetUp(spawnEulers[nextSpawnIndex],
-                    transform.gameObject,
-                    _damage: bubbleDamage,
-                    _speed: bubbleSpeed,
-                    _stunValue: bubbleStunValue,
-                    _delay: delayAfterEmit);
-                bubble.stunDuration = bubbleStunDuration;
+
+                bubble.SetUp(spawnEulers[nextSpawnIndex], transform.gameObject).
+                    SetAttributes(bubbleAttribute).
+                    SetDelay(delayAfterEmit, true);
                 bubble.explodeRange = bubbleRange;
 
                 nextSpawnTime += spawnInterval;

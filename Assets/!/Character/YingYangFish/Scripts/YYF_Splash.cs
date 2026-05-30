@@ -13,8 +13,8 @@ public class YYF_Splash : IEnemyAction
     public Transform splashEffect_1;
     public Transform splashEffect_2;
     public float[] shootPositionX;
-    public float bulletSpeed = 150f;
-    public int damage = 2;
+
+    public IProjectileBasicAttributes bulletAttribute;
     public float gravityScale = 5f;
     private Coroutine co_facePlayer;
     public float hitRange = 3f;
@@ -230,12 +230,9 @@ public class YYF_Splash : IEnemyAction
             bossAI.waterLevel.position.y, 0));
         bulletEffect.transform.rotation = Quaternion.Euler(0, 0, 90);
 
-        bullet.SetUp(new Vector3(0, 0, 90),
-            this.gameObject,
-            _damage: damage,
-            _speed: bulletSpeed,
-            gravityScale: gravityScale,
-            _stunValue: bossbreakValue);
+        bullet.SetUp(new Vector3(0, 0, 90), this.gameObject).
+            SetAttributes(bulletAttribute).
+            SetGravity(gravityScale);
 
         IProjectile bullet2 = bossAI.selfPooler.SpawnFromPool("water_bullet",
            new Vector3(pos.x - shootPositionX[index],
@@ -247,12 +244,9 @@ public class YYF_Splash : IEnemyAction
             bossAI.waterLevel.position.y, 0));
         bulletEffect2.transform.rotation = Quaternion.Euler(0, 0, 90);
 
-        bullet2.SetUp(new Vector3(0, 0, 90),
-            this.gameObject,
-            _damage: damage,
-            _speed: bulletSpeed,
-            gravityScale: gravityScale,
-            _stunValue: bossbreakValue);
+        bullet2.SetUp(new Vector3(0, 0, 90), this.gameObject).
+             SetAttributes(bulletAttribute).
+             SetGravity(gravityScale);
     }
 
     public void SpawnIceThorn(Vector3 pos, int index)

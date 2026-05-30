@@ -11,8 +11,14 @@ public abstract class IDamagable : MonoBehaviour
     public bool consumeEnergyOnHit = true;
     [HideInInspector] public HashSet<SubDamageable> subDamagables = new HashSet<SubDamageable>();
 
-    public virtual int Damage(float damageAmount, Transform sender = null, float stunDuration = 0f, bool damageFlash = true, float stunValue = 0)
+    public virtual int Damage(float damageAmount, Transform sender = null, float stunDuration = 0f, bool damageFlash = true, float bossBreakValue = 0)
     {
+        return 0;
+    }
+
+    public virtual int Damage(IProjectileBasicAttributes attributes, Transform sender = null, bool damageFlash = true)
+    {
+        Damage(attributes.damage, sender, attributes.stunDuration, damageFlash, attributes.bossBreakValue);
         return 0;
     }
 
