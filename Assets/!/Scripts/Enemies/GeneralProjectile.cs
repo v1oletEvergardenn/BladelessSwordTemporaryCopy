@@ -20,8 +20,13 @@ public class GeneralProjectile : IProjectile
 
     public override void OnTriggerEnter2D(Collider2D collision)
     {
+        if (canInterruptDelay && IsInDelay())
+        {
+            delayTimer = delay;
+        }
+        if (!collisionEnabled) return;
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
-        if (target != null && collision.gameObject != owner && !collided)
+        if (target != null && !IsOwner(collision.gameObject) && !collided)
         {
             if (isHostileToPlayer && (collision.gameObject.layer == 13 || collision.gameObject.layer == 25)) { return; }
 
@@ -37,7 +42,7 @@ public class GeneralProjectile : IProjectile
             target.Damage(attribute, transform);
             Hit();
         }
-        else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)
+        else if (!IsOwner(collision.gameObject) && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)
         {
             Hit();
         }

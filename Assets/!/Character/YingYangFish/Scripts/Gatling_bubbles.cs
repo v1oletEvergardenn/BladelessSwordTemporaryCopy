@@ -55,8 +55,9 @@ public class Gatling_bubbles : IProjectile
     /// <param name="_moveSpeed">Movement speed</param>
     /// <param name="_turnSpeed">Max turn speed</param>
     /// <param name="_damage">Bullet damage</param>
+    /// <param name="_stunDuration">Stun duration</param>
     public void SetUpHeartSpread(Vector3 spawnPos, float spreadAngle, IDamagable _trackTarget,
-        GameObject _owner, float _moveSpeed, float _turnSpeed, float _damage)
+        GameObject _owner, float _turnSpeed, IProjectileBasicAttributes _attribute)
     {
         ResetAttributes();
         owner = _owner;
@@ -86,10 +87,9 @@ public class Gatling_bubbles : IProjectile
         currentTurnSpeed = 0f;
         maxTurnSpeed = _turnSpeed;
 
-        attribute.damage = _damage;
-        attribute.speed = _moveSpeed;
-        moveSpeed = _moveSpeed;
-        originalSpeed = _moveSpeed;
+        attribute = _attribute;
+        moveSpeed = _attribute.speed;
+        originalSpeed = _attribute.speed;
 
         rb.velocity = transform.right * attribute.speed;
 

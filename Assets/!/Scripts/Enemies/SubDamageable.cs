@@ -8,11 +8,6 @@ public class SubDamageable : IDamagable
     public DamageFlash flash;
     public bool takeRepel = false;
 
-    private void Start()
-    {
-        ParentDamageable.subDamagables.Add(this);
-    }
-
     public override int Damage(float damageAmount, Transform sender = null, float stunDuration = 0, bool damageFlash = true, float stunValue = 0)
     {
         flash.OnDamageFlash();

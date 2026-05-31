@@ -3,21 +3,24 @@ IDamagable, Project.Main
 MetaGuid:0856063c7b5566147affdc4bb245fde9
 
 # $JTbuR7yJykQv9FTW1rVJb5
-Position: $root:6
+Position: $root:5
 + [Sirenix.OdinInspector.FoldoutGroupAttribute]
 	GroupName = "Idamageble Setting"
 
 # getHitPosition
-Position: $JTbuR7yJykQv9FTW1rVJb5:0
-
-# color
 Position: $JTbuR7yJykQv9FTW1rVJb5:1
 
-# canBeHitWithoutHSAttack
+# color
 Position: $JTbuR7yJykQv9FTW1rVJb5:2
 
+# canBeHitWithoutHSAttack
+Position: $JTbuR7yJykQv9FTW1rVJb5:3
+
 # resetAttackCDOnHit
-Position: $JTbuR7yJykQv9FTW1rVJb5:4
+Position: $JTbuR7yJykQv9FTW1rVJb5:5
 
 # consumeEnergyOnHit
-Position: $JTbuR7yJykQv9FTW1rVJb5:3
+Position: $JTbuR7yJykQv9FTW1rVJb5:4
+
+# subDamagables
+Position: $JTbuR7yJykQv9FTW1rVJb5:0

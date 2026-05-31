@@ -30,7 +30,7 @@ public abstract class IProjectile : MonoBehaviour
     [HideInInspector] public bool followTarget;
     [HideInInspector] public IDamagable target;
     [HideInInspector] public bool collided = false;
-    [HideInInspector] public bool boolTriggered = false;
+    [HideInInspector] public bool delayTriggered = false;
     [HideInInspector] public float lifeTimer = 0f;
     [HideInInspector] public bool isHostileToPlayer;
     [HideInInspector] public bool isPerfect;
@@ -57,7 +57,7 @@ public abstract class IProjectile : MonoBehaviour
         transform.eulerAngles = direction;
         owner = _owner;
         rb = GetComponent<Rigidbody2D>();
-        rb.velocity = transform.right * attribute.speed / 10;
+        //rb.velocity = transform.right * attribute.speed / 10;
         return new ProjectileBuilder(this);
     }
 
@@ -86,8 +86,9 @@ public abstract class IProjectile : MonoBehaviour
         collided = false;
         isHostileToPlayer = true;
         delayTimer = 0f;
+        delay = 0f;
         lifeTimer = 0f;
-        boolTriggered = false;
+        delayTriggered = false;
         collisionEnabled = true;
     }
 
@@ -99,7 +100,7 @@ public abstract class IProjectile : MonoBehaviour
             return;
         }
 
-        if (rb.gravityScale != 0)
+        if (rb.gravityScale != 0 && delayTriggered)
         {
             transform.right = rb.velocity;
         } //rotate the projectile direction following gravity
@@ -123,10 +124,10 @@ public abstract class IProjectile : MonoBehaviour
         }
         else
         {
-            if (!boolTriggered)
+            if (!delayTriggered)
             {
                 rb.velocity = transform.right * attribute.speed / 10;
-                boolTriggered = true;
+                delayTriggered = true;
                 collisionEnabled = true;
             }
         }
@@ -147,7 +148,7 @@ public abstract class IProjectile : MonoBehaviour
         }
         if (!collisionEnabled) return;
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
-        if (target != null && collision.gameObject != owner && !collided)
+        if (target != null && !IsOwner(collision.gameObject) && !collided)
         {
             if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
             if (collision.gameObject == gameManager.player && collision.gameObject.layer == 14) { return; }
@@ -200,22 +201,25 @@ public abstract class IProjectile : MonoBehaviour
     public virtual bool IsOwner(GameObject obj)
     {
         if (obj == owner) return true;
-        if (obj.TryGetComponent<SubDamageable>(out SubDamageable idmg)) { if (idmg == null) return false; }
-        if (owner.TryGetComponent<IDamagable>(out IDamagable owner_idmg))
-        {
-            if (owner_idmg != null)
-            {
-                if (owner_idmg.subDamagables.Contains(idmg)) return true;
-            }
-        }
-        if (owner.TryGetComponent<SubDamageable>(out SubDamageable subIdmg))
-        {
-            if (subIdmg != null)
-            {
-                owner_idmg = subIdmg.ParentDamageable;
-                if (owner_idmg != null && owner_idmg.subDamagables.Contains(idmg)) return true;
-            }
-        }
+
+        // Resolve the root IDamagable from the owner.
+        // Check SubDamageable FIRST — SubDamageable also implements IDamagable,
+        // so checking IDamagable first would incorrectly treat a child as the root.
+        IDamagable rootOwner = null;
+        if (owner.TryGetComponent<SubDamageable>(out SubDamageable ownerSub))
+            rootOwner = ownerSub.ParentDamageable;
+        else if (owner.TryGetComponent<IDamagable>(out IDamagable ownerIdmg))
+            rootOwner = ownerIdmg;
+
+        if (rootOwner == null) return false;
+
+        // Check if obj is the root owner's GameObject (e.g. owner=B, obj=A)
+        if (rootOwner.gameObject == obj) return true;
+
+        // Check if obj is a sub-damageable that belongs to the root owner
+        if (obj.TryGetComponent<SubDamageable>(out SubDamageable objSub))
+            return rootOwner.subDamagables.Contains(objSub);
+
         return false;
     }
 }
@@ -299,7 +303,7 @@ public class ProjectileBuilder
     public ProjectileBuilder SetDelay(float delay, bool canInterruptDelay)
     {
         _projectile.delay = delay;
-        _projectile.boolTriggered = false;
+        _projectile.delayTriggered = false;
         _projectile.canInterruptDelay = canInterruptDelay;
         if (!canInterruptDelay)
         {

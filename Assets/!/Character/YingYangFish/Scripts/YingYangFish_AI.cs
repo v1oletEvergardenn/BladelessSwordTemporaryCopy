@@ -1025,24 +1025,27 @@ public class YYFActionEntry
             YYFActionType.Splash => ai.splash,
             _ => null
         };
-        int resolvedFactor;
+        int resolvedFactor = factor;
 
-        switch (fishTarget)
+        if (!UseFactorMode)
         {
-            case YYFFishTarget.Random:
-                resolvedFactor = ai.RandomFish();
-                lastResolvedFish = resolvedFactor;
-                break;
+            switch (fishTarget)
+            {
+                case YYFFishTarget.Random:
+                    resolvedFactor = ai.RandomFish();
+                    lastResolvedFish = resolvedFactor;
+                    break;
 
-            case YYFFishTarget.Opposite:
-                resolvedFactor = lastResolvedFish == 0 ? 1 : 0;
-                lastResolvedFish = resolvedFactor;
-                break;
+                case YYFFishTarget.Opposite:
+                    resolvedFactor = lastResolvedFish == 0 ? 1 : 0;
+                    lastResolvedFish = resolvedFactor;
+                    break;
 
-            default:
-                resolvedFactor = UseFactorMode ? factor : (int)fishTarget;
-                lastResolvedFish = resolvedFactor;
-                break;
+                default:
+                    resolvedFactor = UseFactorMode ? factor : (int)fishTarget;
+                    lastResolvedFish = resolvedFactor;
+                    break;
+            }
         }
 
         return new YYFActionCaller(action, resolvedFactor, delay);

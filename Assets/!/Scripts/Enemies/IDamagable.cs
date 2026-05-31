@@ -9,7 +9,7 @@ public abstract class IDamagable : MonoBehaviour
     public bool canBeHitWithoutHSAttack = false;
     public bool resetAttackCDOnHit = false;
     public bool consumeEnergyOnHit = true;
-    [HideInInspector] public HashSet<SubDamageable> subDamagables = new HashSet<SubDamageable>();
+    public List<SubDamageable> subDamagables = new List<SubDamageable>();
 
     public virtual int Damage(float damageAmount, Transform sender = null, float stunDuration = 0f, bool damageFlash = true, float bossBreakValue = 0)
     {

@@ -22,24 +22,26 @@ public class IceThorn : IDamagable
     {
     }
 
-    public IEnumerator Action(Vector2 pos)
+    public IEnumerator Action(Vector2 pos, float delay)
     {
-        canBeCounterAttacked = true;
-        canDealDamage = true;
+        canBeCounterAttacked = false;
+        canDealDamage = false;
         transform.position = pos;
 
         //move up animation
-        yield return new WaitForSeconds(0.125f);
+        yield return new WaitForSeconds(delay);
+        canBeCounterAttacked = true;
+        canDealDamage = true;
         //after move up, cancel counter attack.
         canBeCounterAttacked = false;
         yield return new WaitForSeconds(1.35f);
         canDealDamage = false;
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.5f);
         gameObject.SetActive(false);
         yield return null;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
         if (!canDealDamage) return;
         if (collision.gameObject.layer == 6 && collision.gameObject == player.gameObject)

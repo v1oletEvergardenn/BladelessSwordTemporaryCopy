@@ -14,11 +14,18 @@ public class YYF_Splash : IEnemyAction
     public Transform splashEffect_2;
     public float[] shootPositionX;
 
+    public float spawnDelay = 1f;
+
     public IProjectileBasicAttributes bulletAttribute;
     public float gravityScale = 5f;
     private Coroutine co_facePlayer;
     public float hitRange = 3f;
     public MeleeAttack splashAttack;
+    public MeleeAttack iceAttack;
+
+    private Coroutine co_spawnWaterBullet;
+
+    private Coroutine co_spawnWaterBullet2;
 
     public override void Start()
     {
@@ -30,6 +37,8 @@ public class YYF_Splash : IEnemyAction
     {
         base.CancelAct();
         if (co_facePlayer != null) StopCoroutine(co_facePlayer);
+        TryStopCoroutine(co_spawnWaterBullet);
+        TryStopCoroutine(co_spawnWaterBullet2);
     }
 
     public override IEnumerator Act_coroutine(float factor = 0)
@@ -103,13 +112,20 @@ public class YYF_Splash : IEnemyAction
                     .SetSpeedBased();
             }
 
-            StartCoroutine(ApplyAttackInCircle(1f, hitRange, origin, splashAttack));
+            StartCoroutine(ApplyAttackInCircle(0.3f, hitRange, origin, splashAttack));
 
             yield return new WaitForSeconds(0.3f);
 
             //spawn bullets
 
-            StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), isBlack));
+            if (isBlack)
+            {
+                co_spawnWaterBullet2 = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), isBlack));
+            }
+            else
+            {
+                co_spawnWaterBullet = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), isBlack));
+            }
 
             splashEffect.gameObject.SetActive(false);
 
@@ -175,11 +191,11 @@ public class YYF_Splash : IEnemyAction
                 .SetEase(Ease.OutSine)
                 .SetSpeedBased();
 
-            StartCoroutine(ApplyAttackInCircle(1f, hitRange, origin, splashAttack));
+            StartCoroutine(ApplyAttackInCircle(0.3f, hitRange, origin, splashAttack));
             yield return new WaitForSeconds(0.3f);
             //spawn bullets
-            StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), false));
-            StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), true, 0.1f));
+            co_spawnWaterBullet2 = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), false));
+            co_spawnWaterBullet = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), true, 0.1f));
             splashEffect_1.gameObject.SetActive(false);
 
             //move origin down water
@@ -213,21 +229,28 @@ public class YYF_Splash : IEnemyAction
         for (int i = 0; i < shootPositionX.Count() - (isBlack ? 1 : 0); i++)
         {
             if (isBlack) SpawnIceThorn(pos, i);
-            else SpawnWaterBullet(pos, i);
+            else StartCoroutine(SpawnWaterBullet(pos, i));
             yield return new WaitForSeconds(0.2f);
         }
     }
 
-    public void SpawnWaterBullet(Vector3 pos, int index)
+    public IEnumerator SpawnWaterBullet(Vector3 pos, int index)
     {
+        GameObject spawnEffect1 = bossAI.selfPooler.SpawnFromPool("water_bullet_spawn_effect",
+            bossAI.CreateWaterLevelYAxis(pos.x + shootPositionX[index]));
+
+        GameObject spawnEffect2 = bossAI.selfPooler.SpawnFromPool("water_bullet_spawn_effect",
+           bossAI.CreateWaterLevelYAxis(pos.x - shootPositionX[index]));
+        spawnEffect1.GetComponent<SelfDisactive>().SetNewDisActiveTime(spawnDelay);
+        spawnEffect2.GetComponent<SelfDisactive>().SetNewDisActiveTime(spawnDelay);
+        yield return new WaitForSeconds(spawnDelay);
         IProjectile bullet = bossAI.selfPooler.SpawnFromPool("water_bullet",
             new Vector3(pos.x + shootPositionX[index],
             bossAI.waterLevel.position.y + 1.5f, 0)).
             GetComponent<IProjectile>();
 
         GameObject bulletEffect = bossAI.selfPooler.SpawnFromPool("water_bullet_hit_effect",
-            new Vector3(pos.x + shootPositionX[index],
-            bossAI.waterLevel.position.y, 0));
+           bossAI.CreateWaterLevelYAxis(pos.x + shootPositionX[index]));
         bulletEffect.transform.rotation = Quaternion.Euler(0, 0, 90);
 
         bullet.SetUp(new Vector3(0, 0, 90), this.gameObject).
@@ -240,13 +263,14 @@ public class YYF_Splash : IEnemyAction
            GetComponent<IProjectile>();
 
         GameObject bulletEffect2 = bossAI.selfPooler.SpawnFromPool("water_bullet_hit_effect",
-            new Vector3(pos.x - shootPositionX[index],
-            bossAI.waterLevel.position.y, 0));
+           bossAI.CreateWaterLevelYAxis(pos.x - shootPositionX[index]));
         bulletEffect2.transform.rotation = Quaternion.Euler(0, 0, 90);
 
         bullet2.SetUp(new Vector3(0, 0, 90), this.gameObject).
              SetAttributes(bulletAttribute).
              SetGravity(gravityScale);
+
+        yield return null;
     }
 
     public void SpawnIceThorn(Vector3 pos, int index)
@@ -255,14 +279,16 @@ public class YYF_Splash : IEnemyAction
             new Vector3(pos.x + shootPositionX[index],
             bossAI.waterLevel.position.y, 0)).
             GetComponent<IceThorn>();
+        thorn.iceAttack = iceAttack;
         StartCoroutine(thorn.Action(new Vector3(pos.x + shootPositionX[index] - 2.5f,
-            bossAI.waterLevel.position.y, 0)));
+            bossAI.waterLevel.position.y, 0), spawnDelay));
         IceThorn thorn2 = bossAI.selfPooler.SpawnFromPool("ice_thorn",
            new Vector3(pos.x - shootPositionX[index],
            bossAI.waterLevel.position.y, 0)).
            GetComponent<IceThorn>();
+        thorn2.iceAttack = iceAttack;
         StartCoroutine(thorn2.Action(new Vector3(pos.x - shootPositionX[index] + 2.5f,
-            bossAI.waterLevel.position.y, 0)));
+            bossAI.waterLevel.position.y, 0), spawnDelay));
         return;
     }
 

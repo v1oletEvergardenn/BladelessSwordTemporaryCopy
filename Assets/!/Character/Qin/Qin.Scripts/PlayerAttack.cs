@@ -230,7 +230,7 @@ public class PlayerAttack : MonoBehaviour
                         float distance = Vector2.Distance(dmg.GetHitPos(), health.GetHitPos());
                         if (distance <= counterRadius)
                         {
-                            dmg.Damage(basicAttackDamage, this.transform, 0.1f, true, 0);
+                            dmg.Damage(basicAttackDamage, this.transform, 0);
                             hitIdamagables.Add(dmg);
                             CommonHitEffect(dmg);
                         }

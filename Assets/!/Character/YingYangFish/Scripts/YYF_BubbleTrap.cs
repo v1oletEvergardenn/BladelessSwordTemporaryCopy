@@ -48,23 +48,11 @@ public class YYF_BubbleTrap : IEnemyAction
         origin.eulerAngles = new Vector3(0, 0, 180);
 
         //move to player
-        float elpasedTime = 0f;
-        float duration = 0.5f;
-        Vector3 start = new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, origin.position.z);
         bool toleft = playerController.FacingRight;
-        bool isPlayerMoving = playerController.isRunning;
 
-        while (elpasedTime <= duration)
-        {
-            elpasedTime += Time.deltaTime;
-            Vector3 target = new Vector3(player.transform.position.x + (isPlayerMoving ? (toleft ? 5 : -5) : 0),
+        Vector3 target = new Vector3(player.transform.position.x,
                 bossAI.waterLevel.position.y + jumpHeight - jumpRadius, 0);
-            origin.position = Vector3.Lerp(start, target, elpasedTime / duration);
-            yield return null;
-        }
-
-        if (isPlayerMoving) origin.DOMove(new Vector3(player.transform.position.x + (toleft ? 5 : -5),
-                bossAI.waterLevel.position.y + jumpHeight - jumpRadius, 0), 0.3f);
+        origin.position = target;
 
         // rotate to angle
         float angle = 90; if (toleft) { angle = -90; origin.localScale = new Vector3(-1, 1, 1); }
@@ -75,9 +63,12 @@ public class YYF_BubbleTrap : IEnemyAction
         angle = 180;
         float currentZ = origin.eulerAngles.z;
         float delta = (toleft ? (angle - currentZ + 360f) : (angle - currentZ - 360f)) % 360f;
-        origin.DORotate(new Vector3(0, 0, delta), 120, RotateMode.WorldAxisAdd)
+
+        bool complete = false;
+        origin.DORotate(new Vector3(0, 0, delta), bossAI.fastRotateSpeed, RotateMode.WorldAxisAdd)
            .SetSpeedBased(true)
-           .SetEase(Ease.Linear);
+           .SetEase(Ease.Linear)
+           .OnComplete(() => complete = true);
 
         anim.Play("fast_down");
 
@@ -113,8 +104,8 @@ public class YYF_BubbleTrap : IEnemyAction
         }
 
         // spawn bubbles one by one at pre-calculated positions as the fish travels
-        elpasedTime = 0f;
-        duration = 1.5f;
+        float elpasedTime = 0f;
+        float duration = 1.2f;
         List<Bubble> bubbles = new List<Bubble>();
         int nextSpawnIndex = 0;
         float spawnInterval = duration / count;
@@ -140,7 +131,7 @@ public class YYF_BubbleTrap : IEnemyAction
 
             yield return null;
         }
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitUntil(() => complete);
         origin.localScale = new Vector3(1, 1, 1);
         bossAI.ResetFish(factor);
         yield return null;
