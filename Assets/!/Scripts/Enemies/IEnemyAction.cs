@@ -43,9 +43,9 @@ public abstract class IEnemyAction : MonoBehaviour
         proceedCall = false;
     }
 
-    public virtual void Act()
+    public virtual void Act(float factor = 0)
     {
-        act_routine = StartCoroutine(Act_coroutine());
+        act_routine = StartCoroutine(Act_coroutine(factor));
     }
 
     public virtual void CancelAct()
