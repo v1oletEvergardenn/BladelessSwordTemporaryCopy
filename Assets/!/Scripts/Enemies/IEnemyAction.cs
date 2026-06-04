@@ -1,10 +1,21 @@
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+
+[Serializable]
+public class FactorData
+{
+    [Tooltip("Time from attack start until it reaches the player")]
+    public float duration;
+
+    [Tooltip("If true, the Timeline clip duration is locked to this value and cannot be resized")]
+    public bool fixedDuration;
+}
 
 [Serializable]
 public abstract class IEnemyAction : MonoBehaviour
@@ -25,6 +36,12 @@ public abstract class IEnemyAction : MonoBehaviour
 
     [HideInInspector] public bool proceedCall = false;
     public Coroutine act_routine;
+
+    public bool fixedDuration = true;
+
+    public List<FactorData> factorData = new List<FactorData> { new FactorData { duration = 0.5f, fixedDuration = true } };
+
+    [HideInInspector] public int FactorCount => factorData != null ? factorData.Count : 0;
 
     public virtual void Start()
     {
@@ -68,6 +85,25 @@ public abstract class IEnemyAction : MonoBehaviour
     public virtual IEnumerator Act_coroutine(float factor = 0)
     {
         yield return null;
+    }
+
+    /// <summary>
+    /// Returns the expected total duration of this action in seconds.
+    /// Override in each action to match its actual coroutine length.
+    /// Used by BossActionClip to set the default and minimum clip duration in Timeline.
+    /// </summary>
+    public virtual double GetDuration(float factor = 0)
+    {
+        if (factorData == null || factorData.Count == 0) return 0.5;
+        int index = Mathf.Clamp((int)factor, 0, factorData.Count - 1);
+        return factorData[index].duration;
+    }
+
+    public virtual bool IsFixedDuration(float factor = 0)
+    {
+        if (factorData == null || factorData.Count == 0) return true;
+        int index = Mathf.Clamp((int)factor, 0, factorData.Count - 1);
+        return factorData[index].fixedDuration;
     }
 
     /// <summary>

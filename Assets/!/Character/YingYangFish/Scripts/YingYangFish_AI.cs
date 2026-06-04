@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Playables;
 using static UnityEngine.UI.Image;
 using Random = UnityEngine.Random;
 
@@ -67,9 +68,9 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField] public GameObject white_particle;
     [SerializeField] public Sprite black_tex;
     [SerializeField] public Sprite white_tex;
-    [SerializeField] public GameObject swimEffect;
     [SerializeField] public CameraLimit camLimit;
     [SerializeField] public GeneralEventInteraction interaction;
+    [SerializeField] public PlayableDirector secondPhaseDirector;
 
     #endregion GENERAL REFERENCES
 
@@ -298,22 +299,14 @@ public class YingYangFish_AI : IEnemyController
 
             //UI
             CharacterUIManager.ShowBlackEdge(true);
-
-            SetWhiteRotateSpeed(idleRotateSpeed / 3);
-            SetBlackRotateSpeed(idleRotateSpeed / 3);
             whiteAnim.Play("close_swim");
             blackAnim.Play("close_swim");
 
             //dive, move to center of map
-            yield return StartCoroutine(ChangeYPos(-6));
-            transform.DOMove(new Vector3(GetCenterXOfMap(), waterLevel.position.y - 6, 0), 1.8f);
-            yield return new WaitForSeconds(1.8f);
-            yield return StartCoroutine(ChangeYPos(2));// up
-
-            centerAnim.Play("center_break");
-            SoundManager.PlaySound("glass_break");
             secondPhase = true;
             EventInteract.SetActive(true);
+            yield return co_fishAppear = StartCoroutine(FishAppear(true));
+            StartCoroutine(secondPhaseAnim());
         }
     }
 
@@ -323,59 +316,8 @@ public class YingYangFish_AI : IEnemyController
         InputMaster.instance.DisableAllActions();
         GameManager.instance.isInPerformingState = true;
 
-        //event: player run to the left
-        yield return StartCoroutine(playerController.RunToPositionCoroutine(transform.position - new Vector3(2, 0, 0)));
-        playerController.FaceTarget(this.transform);
-        yield return new WaitForSeconds(0.5f);
+        PlaySecondPhaseTimeLine();
 
-        //speed up fish rotate speed
-        fastRotateSpeed *= 1.5f;
-        idleRotateSpeed *= 1.5f;
-        EventInteract.SetActive(false);
-
-        InputMaster.instance._attackLeftAction.Enable();
-        InputMaster.instance._attackRightAction.Enable();
-        InputMaster.instance._defendAction.Enable();
-        InputMaster.instance._attackDirectionAction.Enable();
-        CharacterController2D.instance.FaceTarget(this.transform);
-        StartCoroutine(ChangeYPos(4.5f));
-        centerAnim.Play("center_fade");
-
-        //circling
-        StartCoroutine(EmojiDuringCircling());
-        yield return StartCoroutine(Circling(3.5f));
-
-        StartCoroutine(Ultimate());
-
-        yield return null;
-    }
-
-    public IEnumerator Ultimate()
-    {
-        yield return null;
-        endCanvas.gameObject.SetActive(true);
-    }
-
-    public IEnumerator Circling(float duration)
-    {
-        center.GetComponent<SpriteRenderer>().sortingOrder = -1;
-        string whiteClip = "circling_down_pre";
-        string blackClip = "circling_up_pre";
-        if (whiteFish.position.y > blackFish.position.y)
-        {
-            whiteClip = "circling_up_pre";
-            blackClip = "circling_down_pre";
-        }
-        whiteAnim.Play(whiteClip);
-        blackAnim.Play(blackClip);
-
-        yield return new WaitForSeconds(duration);
-        whiteAnim.SetTrigger("circling_end"); blackAnim.SetTrigger("circling_end");
-        yield return new WaitForSeconds(0.3f);
-        center.GetComponent<SpriteRenderer>().sortingOrder = 1;
-        while (whiteAnim.GetCurrentAnimatorStateInfo(0).IsName("white_circling_down_end") ||
-            blackAnim.GetCurrentAnimatorStateInfo(0).IsName("black_circling_down_end"))
-        { yield return null; }
         yield return null;
     }
 
@@ -829,6 +771,11 @@ public class YingYangFish_AI : IEnemyController
         StartAction();
         co_act = StartCoroutine(Act());
         yield return null;
+    }
+
+    public void PlaySecondPhaseTimeLine()
+    {
+        secondPhaseDirector.Play();
     }
 
     public void SetNormalRotateSpeed()

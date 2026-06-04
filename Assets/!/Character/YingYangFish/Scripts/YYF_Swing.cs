@@ -212,7 +212,7 @@ public class YYF_Swing : IEnemyAction
             bossAI.whiteOrigin.DOMoveX(_x, 0.3f).SetEase(Ease.InQuint);
 
             //actual attack
-            yield return new WaitForSeconds(0.15f);
+            yield return new WaitForSeconds(0.2f);
             Vector3 dirToPlayer = player.transform.position - singleSwingEffect.transform.position;
             float angleToPlayer = Mathf.Atan2(dirToPlayer.y, dirToPlayer.x) * Mathf.Rad2Deg;
             singleSwingEffect.SetActive(false);
@@ -222,7 +222,7 @@ public class YYF_Swing : IEnemyAction
             singleSwingEffect.SetActive(true);
 
             StartCoroutine(ApplyAttackInCircle(swingAttackDuration, swingRange, whiteGFX, swingAttack));
-            yield return new WaitForSeconds(0.15f);
+            yield return new WaitForSeconds(0.2f);
             StartCoroutine(ApplyAttackInCollider(swingAttackDuration, blackGFX, ice_hitBox, swingAttack));
 
             yield return StartCoroutine(bossAI.StartMultipleCoroutines(new List<IEnumerator>{

@@ -290,6 +290,7 @@ public abstract class IEnemyController : IDamagable
     /// </summary>
     public virtual void ForceDie()
     {
+        canTakeDamage = true;
         Damage(maxHealth);
     }
 

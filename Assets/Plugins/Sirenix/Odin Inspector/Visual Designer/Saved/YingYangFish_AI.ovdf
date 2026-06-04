@@ -33,7 +33,7 @@ Position: $root:10
 	GroupName = "Action References"
 
 # $GvPXSRJi5Q7nNG4dcbS89A
-Position: $root:112
+Position: $root:110
 + [Sirenix.OdinInspector.TabGroupAttribute]
 	GroupName = "Actions"
 	VisibleIf = ""
@@ -153,12 +153,12 @@ Position: $PhNSuf7mSr9TmNdyVK1umo:6
 	TitleAlignment = Left
 
 # TEST
-Position: $root:111
+Position: $root:109
 + [Sirenix.OdinInspector.ShowIfAttribute]
 	Condition = "enableTest"
 
 # enableTest
-Position: $root:110
+Position: $root:108
 
 # centerStart1
 Position: $Lyuyu6Xpj1bh6izMVSuZkB:0
@@ -195,3 +195,9 @@ Position: $XgXKWcubhWyhnosQLfBiLi:1
 
 # bubbleTrapStart_lowHealth
 Position: $XgXKWcubhWyhnosQLfBiLi:2
+
+# secondPhaseDirector
+Position: $ATV51nBP1VnN5C6V2q7e56:6
+
+# PlaySecondPhaseTimeLine()
+Visibility: Shown
