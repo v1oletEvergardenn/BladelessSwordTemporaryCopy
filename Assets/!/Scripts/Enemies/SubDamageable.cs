@@ -19,4 +19,9 @@ public class SubDamageable : IDamagable
     {
         if (takeRepel) { base.Repel(force, left); }
     }
+
+    public void SetParent(IDamagable parent)
+    {
+        ParentDamageable = parent;
+    }
 }

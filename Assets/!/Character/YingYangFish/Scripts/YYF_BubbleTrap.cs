@@ -28,19 +28,15 @@ public class YYF_BubbleTrap : IEnemyAction
 
     public override IEnumerator Act_coroutine(float factor = 0)
     {
-        proceedCall = false;
-        //bool isBlack = true;
-        //if (bossAI.isBlackBusy) { isBlack = false; }
-        //bossAI.SetBusy(isBlack);
         bool isBlack = factor == 0 ? true : false;
+        YYF_fish YYFFish = bossAI.SpawnFish(isBlack);
+        Animator anim = YYFFish.anim;
+        Transform fish = YYFFish.fish;
+        Transform origin = YYFFish.transform;
+        Transform fishGFX = YYFFish.fishGFX;
 
-        Animator anim = isBlack ? bossAI.blackAnim : bossAI.whiteAnim;
-        Transform fish = isBlack ? bossAI.blackFish : bossAI.whiteFish;
-        Transform origin = isBlack ? bossAI.blackOrigin : bossAI.whiteOrigin;
-        Transform fishGFX = isBlack ? bossAI.blackFishGFX : bossAI.whiteFishGFX;
-
-        bossAI.ResetFishGFX(factor);
-        bossAI.ResetFish(factor);
+        bossAI.ResetFishGFX(YYFFish);
+        bossAI.ResetFish(YYFFish);
         // dive
         //yield return bossAI.co_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack, bossAI.IsPlayerLeft()));
         if (isBlack) { bossAI.SetBlackRotateSpeed(0); bossAI.black_rotateSpeed = 0; }
@@ -133,7 +129,7 @@ public class YYF_BubbleTrap : IEnemyAction
         }
         yield return new WaitUntil(() => complete);
         origin.localScale = new Vector3(1, 1, 1);
-        bossAI.ResetFish(factor);
+        YYFFish.gameObject.SetActive(false);
         yield return null;
     }
 }

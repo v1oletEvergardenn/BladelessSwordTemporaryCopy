@@ -43,17 +43,15 @@ public class YYF_Splash : IEnemyAction
 
     public override IEnumerator Act_coroutine(float factor = 0)
     {
-        proceedCall = false;
-
         //black fish or white fish
         if (factor == 0 || factor == 1)
         {
             bool isBlack = factor == 0 ? true : false;
-
-            Animator anim = isBlack ? bossAI.blackAnim : bossAI.whiteAnim;
-            Transform fish = isBlack ? bossAI.blackFish : bossAI.whiteFish;
-            Transform origin = isBlack ? bossAI.blackOrigin : bossAI.whiteOrigin;
-            Transform fishGFX = isBlack ? bossAI.blackFishGFX : bossAI.whiteFishGFX;
+            YYF_fish YYFFish = bossAI.SpawnFish(isBlack);
+            Animator anim = YYFFish.anim;
+            Transform fish = YYFFish.fish;
+            Transform origin = YYFFish.transform;
+            Transform fishGFX = YYFFish.fishGFX;
 
             Vector3 target = player.transform.position + new Vector3(0, 3, 0);
             bool toLeft = target.x < origin.position.x;
@@ -66,7 +64,7 @@ public class YYF_Splash : IEnemyAction
             //reset to initial
             origin.eulerAngles = Vector3.zero;
             fish.localPosition = new Vector3(0, 0, 0);
-            bossAI.ResetFishGFX(factor);
+            bossAI.ResetFishGFX(YYFFish);
             yield return new WaitForSeconds(0.3f);
 
             //jump out
@@ -141,9 +139,8 @@ public class YYF_Splash : IEnemyAction
             Transform origin = bossAI.fish_origin;
             bool toLeft = target.x < origin.position.x;
 
-            bossAI.ResetFish();
-            bossAI.ResetFishGFX();
-            bossAI.ResetFishOrigin();
+            YYF_fish black_YYFFish = bossAI.SpawnFish(true);
+            YYF_fish white_YYFFish = bossAI.SpawnFish(false);
 
             origin.position = new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, origin.position.z);
 
@@ -151,19 +148,19 @@ public class YYF_Splash : IEnemyAction
             if (toLeft) { origin.DOMove(new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0), 0.3f); }
             else { origin.DOMove(new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0), 0.3f); }
 
-            bossAI.whiteOrigin.Rotate(bossAI.Dir, -90);
-            bossAI.blackOrigin.Rotate(bossAI.Dir, 90);
+            white_YYFFish.transform.Rotate(bossAI.Dir, -90);
+            black_YYFFish.transform.Rotate(bossAI.Dir, 90);
             //reset to initial
             origin.eulerAngles = Vector3.zero;
-            bossAI.blackFish.localPosition = new Vector3(0, 0.3f, 0);
-            bossAI.whiteFish.localPosition = new Vector3(0, 0.3f, 0);
+            black_YYFFish.fish.localPosition = new Vector3(0, 0.3f, 0);
+            white_YYFFish.fish.localPosition = new Vector3(0, 0.3f, 0);
             yield return new WaitForSeconds(0.3f);
 
             //jump out
             float temp_x = toLeft ? player.transform.position.x + 2 : player.transform.position.x - 2;
             origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 10f, 0), 0.5f).SetEase(Ease.OutSine);
-            bossAI.blackAnim.Play("splash");
-            bossAI.whiteAnim.Play("splash");
+            black_YYFFish.anim.Play("splash");
+            white_YYFFish.anim.Play("splash");
 
             //keep rotating fishGFX
             Tween rotating = origin.DOLocalRotate(new Vector3(0, 0, -360f), 0.2f, RotateMode.FastBeyond360)

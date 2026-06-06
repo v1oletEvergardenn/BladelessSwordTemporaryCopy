@@ -40,19 +40,19 @@ public class YYF_Swing : IEnemyAction
 
     public override IEnumerator Act_coroutine(float factor = 0)
     {
-        proceedCall = false;
         if (factor == 0 || factor == 1)
         {
             bossAI.StopRotate(false);
+
             bool isBlack = factor == 0 ? true : false;
-            Animator anim = isBlack ? bossAI.blackAnim : bossAI.whiteAnim;
-            Transform fish = isBlack ? bossAI.blackFish : bossAI.whiteFish;
-            Transform origin = isBlack ? bossAI.blackOrigin : bossAI.whiteOrigin;
-            Transform fishGFX = isBlack ? bossAI.blackFishGFX : bossAI.whiteFishGFX;
+            YYF_fish YYFFish = bossAI.SpawnFish(isBlack);
+            Animator anim = YYFFish.anim;
+            Transform fish = YYFFish.fish;
+            Transform origin = YYFFish.transform;
+            Transform fishGFX = YYFFish.fishGFX;
 
             Vector3 target = player.transform.position + new Vector3(0, 3, 0);
             bool toLeft = target.x < origin.position.x;
-
             // move to appropriate x position
             origin.DOMove(new Vector3(target.x, bossAI.waterLevel.position.y - 6, 0), 0.1f);
 
@@ -89,7 +89,7 @@ public class YYF_Swing : IEnemyAction
 
                 //ice animation
                 swingEffect_ice.SetActive(false);
-                swingEffect_ice.transform.position = new Vector3(bossAI.blackFish.position.x, bossAI.waterLevel.position.y);
+                swingEffect_ice.transform.position = bossAI.CreateWaterLevelYAxis(fish.position.x);
                 swingEffect_ice.transform.eulerAngles = Vector3.zero;
                 if (toLeft) { swingEffect_ice.transform.localScale = new Vector3(-1, 1, 1); }
                 else { swingEffect_ice.transform.localScale = new Vector3(1, 1, 1); }
@@ -130,7 +130,7 @@ public class YYF_Swing : IEnemyAction
             }
 
             //return to water
-            yield return bossAI.co_return_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(isBlack));
+            yield return bossAI.co_return_singleFishDive = StartCoroutine(bossAI.IESingleFishDive(YYFFish));
             if (isBlack) swingEffect_ice.SetActive(false);
             else singleSwingEffect.SetActive(false);
             swing_outline.SetActive(false);
@@ -140,45 +140,35 @@ public class YYF_Swing : IEnemyAction
             swing_outline.transform.SetParent(transform);
             swing_outline.transform.localPosition = Vector3.zero;
 
-            Transform origin = bossAI.fish_origin;
+            YYF_fish black_YYFFish = bossAI.SpawnFish(true);
+            YYF_fish white_YYFFish = bossAI.SpawnFish(false);
 
             //reset to initial
-            origin.position = bossAI.blackOrigin.position;
-            bossAI.blackOrigin.localPosition = Vector3.zero;
-            bossAI.whiteOrigin.localPosition = Vector3.zero;
-            bossAI.blackFish.localPosition = new Vector3(0, 0.3f, 0);
-            bossAI.whiteFish.localPosition = new Vector3(0, 0.3f, 0);
-            bossAI.blackOrigin.eulerAngles = Vector3.zero;
-            bossAI.whiteOrigin.eulerAngles = Vector3.zero;
-            bossAI.whiteFishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.1f);
-            bossAI.whiteFishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.1f);
-            bossAI.blackFishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.1f);
-            bossAI.blackFishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.1f);
-            Transform whiteGFX = bossAI.whiteFishGFX;
-            Transform blackGFX = bossAI.blackFishGFX;
+            black_YYFFish.fish.localPosition = new Vector3(0, 0.3f, 0);
+            white_YYFFish.fish.localPosition = new Vector3(0, 0.3f, 0);
+            Transform whiteGFX = white_YYFFish.fishGFX;
+            Transform blackGFX = black_YYFFish.fishGFX;
 
             // move to appropriate x position
             Vector3 target = player.transform.position + new Vector3(0, 3, 0);
-            bool toLeft = target.x < origin.position.x;
-
-            origin.DOMove(new Vector3(target.x, bossAI.waterLevel.position.y - 6, 0), 0.1f);
+            bool toLeft = target.x < transform.position.x;
 
             // rotate to target position angle
             float angle = -90;
-            bossAI.whiteOrigin.Rotate(bossAI.Dir, angle);
-            bossAI.blackOrigin.Rotate(bossAI.Dir, 90);
+            white_YYFFish.transform.Rotate(bossAI.Dir, angle);
+            black_YYFFish.transform.Rotate(bossAI.Dir, 90);
             yield return new WaitForSeconds(0.1f);
 
             //out of the water
             float temp_x = toLeft ? player.transform.position.x - 4 : player.transform.position.x + 4;
-            bossAI.blackOrigin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 2.5f, 0), 0.5f).SetEase(Ease.OutSine);
-            bossAI.whiteOrigin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 4.5f, 0), 0.5f).SetEase(Ease.OutSine);
+            black_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 2.5f, 0), 0.5f).SetEase(Ease.OutSine);
+            white_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 4.5f, 0), 0.5f).SetEase(Ease.OutSine);
 
             //pre swing attack
-            bossAI.blackAnim.Play("swing");
-            bossAI.whiteAnim.Play("swing");
-            bossAI.blackFishGFX.DOLocalRotate(new Vector3(0, 0, -720), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutSine);
-            bossAI.whiteFishGFX.DOLocalRotate(new Vector3(0, 0, -720), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutSine);
+            black_YYFFish.anim.Play("swing");
+            white_YYFFish.anim.Play("swing");
+            black_YYFFish.fishGFX.DOLocalRotate(new Vector3(0, 0, -720), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutSine);
+            white_YYFFish.fishGFX.DOLocalRotate(new Vector3(0, 0, -720), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutSine);
 
             yield return new WaitForSeconds(0.35f);
             swing_outline.SetActive(false);
@@ -187,7 +177,7 @@ public class YYF_Swing : IEnemyAction
             swing_outline.SetActive(true);
 
             yield return new WaitForSeconds(0.2f);
-            toLeft = player.transform.position.x < bossAI.blackFish.transform.position.x;
+            toLeft = player.transform.position.x < black_YYFFish.fish.transform.position.x;
             //outline for ice
             swing_outline_ice.SetActive(false);
             swing_outline_ice.transform.position = blackGFX.position;
@@ -197,7 +187,7 @@ public class YYF_Swing : IEnemyAction
 
             //ice animation
             swingEffect_ice.SetActive(false);
-            swingEffect_ice.transform.position = new Vector3(bossAI.blackFish.position.x, bossAI.waterLevel.position.y);
+            swingEffect_ice.transform.position = new Vector3(black_YYFFish.fish.position.x, bossAI.waterLevel.position.y);
             swingEffect_ice.transform.eulerAngles = Vector3.zero;
             if (toLeft) { swingEffect_ice.transform.localScale = new Vector3(-1, 1, 1); }
             else { swingEffect_ice.transform.localScale = new Vector3(1, 1, 1); }
@@ -207,9 +197,9 @@ public class YYF_Swing : IEnemyAction
             StartCoroutine(ApplyAttackInCollider(swingAttackDuration, blackGFX, small_ice_hitBox, swingAttack));
 
             yield return new WaitForSeconds(0.05f);
-            float _x = bossAI.whiteOrigin.position.x + 5;
-            if (player.transform.position.x <= bossAI.whiteFish.position.x) { _x = bossAI.whiteFish.position.x - 5; }
-            bossAI.whiteOrigin.DOMoveX(_x, 0.3f).SetEase(Ease.InQuint);
+            float _x = white_YYFFish.transform.position.x + 5;
+            if (player.transform.position.x <= white_YYFFish.fish.position.x) { _x = white_YYFFish.fish.position.x - 5; }
+            white_YYFFish.transform.DOMoveX(_x, 0.3f).SetEase(Ease.InQuint);
 
             //actual attack
             yield return new WaitForSeconds(0.2f);
@@ -226,9 +216,11 @@ public class YYF_Swing : IEnemyAction
             StartCoroutine(ApplyAttackInCollider(swingAttackDuration, blackGFX, ice_hitBox, swingAttack));
 
             yield return StartCoroutine(bossAI.StartMultipleCoroutines(new List<IEnumerator>{
-               bossAI.IESingleFishDive(true),
-               bossAI.IESingleFishDive(false)
+               bossAI.IESingleFishDive(black_YYFFish),
+               bossAI.IESingleFishDive(white_YYFFish)
             }));
+            black_YYFFish.gameObject.SetActive(false);
+            white_YYFFish.gameObject.SetActive(false);
             swing_outline.SetActive(false);
             singleSwingEffect.SetActive(false);
             swingEffect_ice.SetActive(false);
