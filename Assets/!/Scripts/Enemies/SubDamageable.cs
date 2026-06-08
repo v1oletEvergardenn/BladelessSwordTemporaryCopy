@@ -23,5 +23,6 @@ public class SubDamageable : IDamagable
     public void SetParent(IDamagable parent)
     {
         ParentDamageable = parent;
+        parent.subDamagables.Add(this);
     }
 }

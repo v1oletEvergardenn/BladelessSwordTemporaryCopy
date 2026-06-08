@@ -41,8 +41,10 @@ public class YYF_Splash : IEnemyAction
         TryStopCoroutine(co_spawnWaterBullet2);
     }
 
-    public override IEnumerator Act_coroutine(float factor = 0)
+    public override IEnumerator Act_coroutine(float factor = 0, Transform _target = null)
     {
+        Transform trueTarget = _target != null ? _target : player.transform;
+
         //black fish or white fish
         if (factor == 0 || factor == 1)
         {
@@ -53,7 +55,7 @@ public class YYF_Splash : IEnemyAction
             Transform origin = YYFFish.transform;
             Transform fishGFX = YYFFish.fishGFX;
 
-            Vector3 target = player.transform.position + new Vector3(0, 3, 0);
+            Vector3 target = trueTarget.position + new Vector3(0, 3, 0);
             bool toLeft = target.x < origin.position.x;
             origin.position = new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, origin.position.z);
 
@@ -68,8 +70,8 @@ public class YYF_Splash : IEnemyAction
             yield return new WaitForSeconds(0.3f);
 
             //jump out
-            float temp_x = toLeft ? player.transform.position.x + 2 : player.transform.position.x - 2;
-            if (isBlack) temp_x = toLeft ? player.transform.position.x - 2 : player.transform.position.x + 2;
+            float temp_x = toLeft ? trueTarget.position.x + 2 : trueTarget.position.x - 2;
+            if (isBlack) temp_x = toLeft ? trueTarget.position.x - 2 : trueTarget.position.x + 2;
             origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 10f, 0), 0.5f).SetEase(Ease.OutSine);
             anim.Play("splash");
 
@@ -84,7 +86,7 @@ public class YYF_Splash : IEnemyAction
             //set splash effect position to fish GFX position
             splashEffect.position = fish.position;
             splashEffect.localPosition = new Vector3(1, 0, 0);
-            co_facePlayer = StartCoroutine(IEFaceSplashAtPlayer(splashEffect, fish, isBlack));
+            co_facePlayer = StartCoroutine(IEFaceSplashAtTarget(splashEffect, fish, isBlack, trueTarget));
             if (!isBlack) splashEffect.eulerAngles = new Vector3(0, 0, -90);
 
             //fade in to show splash effect
@@ -98,7 +100,7 @@ public class YYF_Splash : IEnemyAction
             //blackfish: be ready and dash to player.
             if (isBlack)
             {
-                origin.DOMove(new Vector3(player.transform.position.x, bossAI.waterLevel.position.y, 0), bossAI.fastSwimSpeed)
+                origin.DOMove(new Vector3(trueTarget.position.x, bossAI.waterLevel.position.y, 0), bossAI.fastSwimSpeed)
                     .SetEase(Ease.OutSine)
                     .SetSpeedBased();
             }
@@ -135,7 +137,7 @@ public class YYF_Splash : IEnemyAction
         }
         else if (factor == 2)//both fish
         {
-            Vector3 target = player.transform.position + new Vector3(0, 3, 0);
+            Vector3 target = trueTarget.position + new Vector3(0, 3, 0);
             Transform origin = bossAI.fish_origin;
             bool toLeft = target.x < origin.position.x;
 
@@ -157,7 +159,7 @@ public class YYF_Splash : IEnemyAction
             yield return new WaitForSeconds(0.3f);
 
             //jump out
-            float temp_x = toLeft ? player.transform.position.x + 2 : player.transform.position.x - 2;
+            float temp_x = toLeft ? trueTarget.position.x + 2 : trueTarget.position.x - 2;
             origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 10f, 0), 0.5f).SetEase(Ease.OutSine);
             black_YYFFish.anim.Play("splash");
             white_YYFFish.anim.Play("splash");
@@ -172,7 +174,7 @@ public class YYF_Splash : IEnemyAction
             //splashEffect.SetParent(origin);
             splashEffect_1.localPosition = new Vector3(2f, 0, 0);
 
-            co_facePlayer = StartCoroutine(IEFaceSplashAtPlayer(splashEffect_1, origin, true));
+            co_facePlayer = StartCoroutine(IEFaceSplashAtTarget(splashEffect_1, origin, true, trueTarget));
 
             //fade in to show splash effect
             splashEffect_1.gameObject.SetActive(true);
@@ -184,7 +186,7 @@ public class YYF_Splash : IEnemyAction
 
             //blackfish: be ready and dash to player.
 
-            origin.DOMove(new Vector3(player.transform.position.x, bossAI.waterLevel.position.y, 0), bossAI.fastSwimSpeed)
+            origin.DOMove(new Vector3(trueTarget.position.x, bossAI.waterLevel.position.y, 0), bossAI.fastSwimSpeed)
                 .SetEase(Ease.OutSine)
                 .SetSpeedBased();
 
@@ -208,13 +210,13 @@ public class YYF_Splash : IEnemyAction
         yield return null;
     }
 
-    private IEnumerator IEFaceSplashAtPlayer(Transform effect, Transform transform, bool face)
+    private IEnumerator IEFaceSplashAtTarget(Transform effect, Transform transform, bool face, Transform trueTarget)
     {
         float elapsedTime = 0f;
         while (elapsedTime < 2f)
         {
             effect.position = transform.position;
-            if (face && elapsedTime <= 1f) effect.eulerAngles = CalculateWantedEuler(player.transform.position, effect.position);
+            if (face && elapsedTime <= 1f) effect.eulerAngles = CalculateWantedEuler(trueTarget.position, effect.position);
             elapsedTime += Time.deltaTime;
             yield return null;
         }

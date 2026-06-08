@@ -38,8 +38,10 @@ public class YYF_Swing : IEnemyAction
         swing_outline.SetActive(false);
     }
 
-    public override IEnumerator Act_coroutine(float factor = 0)
+    public override IEnumerator Act_coroutine(float factor = 0, Transform _target = null)
     {
+        Transform trueTarget = _target != null ? _target : player.transform;
+
         if (factor == 0 || factor == 1)
         {
             bossAI.StopRotate(false);
@@ -51,16 +53,10 @@ public class YYF_Swing : IEnemyAction
             Transform origin = YYFFish.transform;
             Transform fishGFX = YYFFish.fishGFX;
 
-            Vector3 target = player.transform.position + new Vector3(0, 3, 0);
+            Vector3 target = trueTarget.position + new Vector3(0, 3, 0);
             bool toLeft = target.x < origin.position.x;
             // move to appropriate x position
             origin.DOMove(new Vector3(target.x, bossAI.waterLevel.position.y - 6, 0), 0.1f);
-
-            //reset to initial
-            origin.eulerAngles = Vector3.zero;
-            fish.localPosition = new Vector3(0, 1, 0);
-            fishGFX.DOLocalRotate(new Vector3(0, 0, 0), 0.1f);
-            fishGFX.DOLocalMove(new Vector3(0, 0, 0), 0.1f);
 
             // rotate to target position angle
             float angle = -90;
@@ -68,7 +64,7 @@ public class YYF_Swing : IEnemyAction
             yield return new WaitForSeconds(0.1f);
 
             //jump out
-            float temp_x = toLeft ? player.transform.position.x - 4 : player.transform.position.x + 4;
+            float temp_x = toLeft ? trueTarget.position.x - 4 : trueTarget.position.x + 4;
             origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + (isBlack ? 2.5f : 4.5f), 0), 0.5f).SetEase(Ease.OutSine);
 
             //pre swing attack
@@ -78,7 +74,7 @@ public class YYF_Swing : IEnemyAction
             if (isBlack)
             {
                 yield return new WaitForSeconds(0.55f);
-                toLeft = player.transform.position.x < fish.transform.position.x;
+                toLeft = trueTarget.position.x < fish.transform.position.x;
 
                 //outline for ice
                 swing_outline_ice.SetActive(false);
@@ -114,11 +110,11 @@ public class YYF_Swing : IEnemyAction
                 yield return new WaitForSeconds(0.3f);
 
                 float _x = origin.position.x + 5;
-                if (player.transform.position.x <= fish.position.x) { _x = fish.position.x - 5; }
+                if (trueTarget.position.x <= fish.position.x) { _x = fish.position.x - 5; }
                 origin.DOMoveX(_x, 0.3f).SetEase(Ease.InQuint);
 
                 yield return new WaitForSeconds(0.2f);
-                Vector3 dirToPlayer = player.transform.position - singleSwingEffect.transform.position;
+                Vector3 dirToPlayer = trueTarget.position - singleSwingEffect.transform.position;
                 float angleToPlayer = Mathf.Atan2(dirToPlayer.y, dirToPlayer.x) * Mathf.Rad2Deg;
                 singleSwingEffect.SetActive(false);
                 singleSwingEffect.transform.SetParent(fishGFX);
@@ -150,7 +146,7 @@ public class YYF_Swing : IEnemyAction
             Transform blackGFX = black_YYFFish.fishGFX;
 
             // move to appropriate x position
-            Vector3 target = player.transform.position + new Vector3(0, 3, 0);
+            Vector3 target = trueTarget.position + new Vector3(0, 3, 0);
             bool toLeft = target.x < transform.position.x;
 
             // rotate to target position angle
@@ -160,7 +156,7 @@ public class YYF_Swing : IEnemyAction
             yield return new WaitForSeconds(0.1f);
 
             //out of the water
-            float temp_x = toLeft ? player.transform.position.x - 4 : player.transform.position.x + 4;
+            float temp_x = toLeft ? trueTarget.position.x - 4 : trueTarget.position.x + 4;
             black_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 2.5f, 0), 0.5f).SetEase(Ease.OutSine);
             white_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 4.5f, 0), 0.5f).SetEase(Ease.OutSine);
 
@@ -177,7 +173,7 @@ public class YYF_Swing : IEnemyAction
             swing_outline.SetActive(true);
 
             yield return new WaitForSeconds(0.2f);
-            toLeft = player.transform.position.x < black_YYFFish.fish.transform.position.x;
+            toLeft = trueTarget.position.x < black_YYFFish.fish.transform.position.x;
             //outline for ice
             swing_outline_ice.SetActive(false);
             swing_outline_ice.transform.position = blackGFX.position;
@@ -198,12 +194,12 @@ public class YYF_Swing : IEnemyAction
 
             yield return new WaitForSeconds(0.05f);
             float _x = white_YYFFish.transform.position.x + 5;
-            if (player.transform.position.x <= white_YYFFish.fish.position.x) { _x = white_YYFFish.fish.position.x - 5; }
+            if (trueTarget.position.x <= white_YYFFish.fish.position.x) { _x = white_YYFFish.fish.position.x - 5; }
             white_YYFFish.transform.DOMoveX(_x, 0.3f).SetEase(Ease.InQuint);
 
             //actual attack
             yield return new WaitForSeconds(0.2f);
-            Vector3 dirToPlayer = player.transform.position - singleSwingEffect.transform.position;
+            Vector3 dirToPlayer = trueTarget.position - singleSwingEffect.transform.position;
             float angleToPlayer = Mathf.Atan2(dirToPlayer.y, dirToPlayer.x) * Mathf.Rad2Deg;
             singleSwingEffect.SetActive(false);
             singleSwingEffect.transform.SetParent(whiteGFX);

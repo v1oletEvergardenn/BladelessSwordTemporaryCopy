@@ -1,7 +1,8 @@
 using UnityEditor;
 using UnityEditor.Timeline;
-using UnityEngine.Timeline;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Timeline;
 
 [CustomTimelineEditor(typeof(BossActionClip))]
 public class BossActionClipEditor : ClipEditor
@@ -51,6 +52,8 @@ public class BossActionClipInspector : Editor
 {
     public override void OnInspectorGUI()
     {
+        serializedObject.Update(); // ADD
+
         var clip = (BossActionClip)target;
 
         // Draw factor as a clamped int field instead of free input
@@ -70,6 +73,12 @@ public class BossActionClipInspector : Editor
             EditorUtility.SetDirty(clip);
             TimelineEditor.Refresh(RefreshReason.ContentsModified);
         }
+
+        // ADD: draw ExposedReference<Transform> target
+        SerializedProperty targetProp = serializedObject.FindProperty("target");
+        EditorGUILayout.PropertyField(
+            targetProp,
+            new GUIContent("Target", "Per-clip exposed scene Transform target."));
 
         // Draw remaining fields (actionDuration) as read-only for clarity
         using (new EditorGUI.DisabledScope(true))
@@ -93,6 +102,8 @@ public class BossActionClipInspector : Editor
         {
             EditorGUILayout.HelpBox("Bind an IEnemyAction to this track's binding slot to enable auto-sync.", MessageType.Warning);
         }
+
+        serializedObject.ApplyModifiedProperties(); // ADD
     }
 
     private IEnemyAction FindBoundAction(BossActionClip clip)

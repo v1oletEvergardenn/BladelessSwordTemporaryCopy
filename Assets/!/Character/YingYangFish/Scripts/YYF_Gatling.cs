@@ -55,8 +55,10 @@ public class YYF_Gatling : IEnemyAction
         gatlingPos.gameObject.SetActive(false);
     }
 
-    public override IEnumerator Act_coroutine(float factor = 0)
+    public override IEnumerator Act_coroutine(float factor = 0, Transform _target = null)
     {
+        Transform trueTarget = _target != null ? _target : player.transform;
+
         Animator animator = gatlingPos.GetComponent<Animator>();
         animator.Play("gatling_pre");
         gatlingPos.gameObject.SetActive(true);
@@ -80,7 +82,7 @@ public class YYF_Gatling : IEnemyAction
                 // This creates the heart shape spread
                 float spreadAngle = Random.Range(-maxSpreadAngle, maxSpreadAngle);
 
-                ShootBulletHeartSpread(spawnPos, spreadAngle);
+                ShootBulletHeartSpread(spawnPos, spreadAngle, trueTarget);
                 shootTimer -= shootInterval;
             }
             yield return null;
@@ -91,7 +93,7 @@ public class YYF_Gatling : IEnemyAction
 
     private string[] bulletTags = { "gatling_bullet_1", "gatling_bullet_2", "gatling_bullet_3" };
 
-    private void ShootBulletHeartSpread(Vector3 spawnPos, float spreadAngle)
+    private void ShootBulletHeartSpread(Vector3 spawnPos, float spreadAngle, Transform target)
     {
         string selectedTag = bulletTags[Random.Range(0, bulletTags.Length)];
         Gatling_bubbles bullet = bossAI.selfPooler.SpawnFromPool(selectedTag, spawnPos, false).GetComponent<Gatling_bubbles>();
@@ -104,7 +106,7 @@ public class YYF_Gatling : IEnemyAction
         bullet.SetUpHeartSpread(
             spawnPos,
             spreadAngle,
-            playerIDamagable,
+            target,
             this.transform.gameObject,
             bulletTurnSpeed,
             bubbleAttributes

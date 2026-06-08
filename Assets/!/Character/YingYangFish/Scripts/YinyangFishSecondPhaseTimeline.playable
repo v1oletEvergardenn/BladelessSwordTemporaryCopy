@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
   m_EditorClassIdentifier: 
   factor: 1
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
   actionDuration: 0.949999988079071
---- !u!114 &-8353577887807630417
+--- !u!114 &-8164579748204366211
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -23,18 +26,87 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: Boss Action Track
-  m_EditorClassIdentifier: Project.Main::BossActionTrack
+  m_Script: {fileID: 11500000, guid: 84f0777ee7aedb5408e2497239908307, type: 3}
+  m_Name: Player Action Track
+  m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
   m_Locked: 0
   m_Muted: 0
   m_CustomPlayableFullTypename: 
   m_Curves: {fileID: 0}
-  m_Parent: {fileID: 2680011248431719272}
+  m_Parent: {fileID: 11400000}
   m_Children: []
-  m_Clips: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 0.95
+    m_ClipIn: 0
+    m_Asset: {fileID: -841226745200182289}
+    m_Duration: 2.416666666666667
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: -8164579748204366211}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: PlayerActionClip
   m_Markers:
     m_Objects: []
 --- !u!114 &-8154344192256035279
@@ -50,6 +122,9 @@ MonoBehaviour:
   m_Name: BossActionClip(Clone)(Clone)
   m_EditorClassIdentifier: 
   factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
   actionDuration: 0.5
 --- !u!114 &-6909995314700067012
 MonoBehaviour:
@@ -64,8 +139,11 @@ MonoBehaviour:
   m_Name: BossActionClip
   m_EditorClassIdentifier: 
   factor: 6
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
   actionDuration: 0.27000001072883606
---- !u!114 &-6426032646020231720
+--- !u!114 &-6800130656259656356
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -74,25 +152,42 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: Boss Action Track (1)
-  m_EditorClassIdentifier: Project.Main::BossActionTrack
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: bdd531f69614a5c47a6c83847bfd89ee
+    defaultValue: {fileID: 0}
+  actionDuration: 0.5
+--- !u!114 &-6619585367749958846
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33f5b869c8de2a144880137fa6f0933b, type: 3}
+  m_Name: Boss Action Track
+  m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
   m_Locked: 0
   m_Muted: 0
   m_CustomPlayableFullTypename: 
   m_Curves: {fileID: 0}
-  m_Parent: {fileID: -5879390548679769886}
+  m_Parent: {fileID: 2680011248431719272}
   m_Children: []
   m_Clips:
   - m_Version: 1
-    m_Start: 0.06666666666666667
+    m_Start: 0
     m_ClipIn: 0
-    m_Asset: {fileID: -6036562696418283000}
+    m_Asset: {fileID: 8060373499200692022}
     m_Duration: 0.5
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -6426032646020231720}
+    m_ParentTrack: {fileID: -6619585367749958846}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -157,6 +252,23 @@ MonoBehaviour:
     m_DisplayName: f0
   m_Markers:
     m_Objects: []
+--- !u!114 &-6510742555222938644
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 0.5
 --- !u!114 &-6036562696418283000
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -170,6 +282,9 @@ MonoBehaviour:
   m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)
   m_EditorClassIdentifier: 
   factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
   actionDuration: 0.5
 --- !u!114 &-5879390548679769886
 MonoBehaviour:
@@ -191,12 +306,12 @@ MonoBehaviour:
   m_Curves: {fileID: 0}
   m_Parent: {fileID: 2680011248431719272}
   m_Children:
-  - {fileID: -3943007556707948069}
-  - {fileID: -6426032646020231720}
+  - {fileID: 914814009356774327}
+  - {fileID: -61237745190122681}
   m_Clips: []
   m_Markers:
     m_Objects: []
---- !u!114 &-5370527720348121694
+--- !u!114 &-5738910136883853278
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -205,9 +320,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: Boss Action Track
-  m_EditorClassIdentifier: Project.Main::BossActionTrack
+  m_Script: {fileID: 11500000, guid: 33f5b869c8de2a144880137fa6f0933b, type: 3}
+  m_Name: Boss Action Track (2)
+  m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
   m_Locked: 0
@@ -216,14 +331,200 @@ MonoBehaviour:
   m_Curves: {fileID: 0}
   m_Parent: {fileID: 2680011248431719272}
   m_Children: []
+  m_Clips: []
+  m_Markers:
+    m_Objects: []
+--- !u!114 &-4983801429941000995
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 1.149999976158142
+--- !u!114 &-4220636150149574795
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip
+  m_EditorClassIdentifier: 
+  factor: 2
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 0.949999988079071
+--- !u!114 &-3702218743562886456
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 0.5
+--- !u!114 &-2993663817943859407
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33f5b869c8de2a144880137fa6f0933b, type: 3}
+  m_Name: Boss Action Track (1)
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 2680011248431719272}
+  m_Children: []
+  m_Clips: []
+  m_Markers:
+    m_Objects: []
+--- !u!114 &-2818816936492330386
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 1
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 0.949999988079071
+--- !u!114 &-2538733730440133632
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 0.5
+--- !u!114 &-1743525002368631025
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 0.5
+--- !u!114 &-841226745200182289
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 028877a917aafc3429bf44ef9957ce2c, type: 3}
+  m_Name: PlayerActionClip
+  m_EditorClassIdentifier: 
+  actionType: 2
+  useTargetTransform: 0
+  moveTarget:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  moveWorldPosition: {x: 0, y: 0, z: 0}
+  faceTargetAfterMove: 1
+  attackLeft: 1
+  consumeEnergy: 0
+--- !u!114 &-395133034629699062
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 0.5
+--- !u!114 &-61237745190122681
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33f5b869c8de2a144880137fa6f0933b, type: 3}
+  m_Name: Boss Action Track
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: -5879390548679769886}
+  m_Children: []
   m_Clips:
   - m_Version: 1
-    m_Start: 0.9833333333333333
+    m_Start: 0
     m_ClipIn: 0
-    m_Asset: {fileID: -2538733730440133632}
+    m_Asset: {fileID: -6800130656259656356}
     m_Duration: 0.5
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -5370527720348121694}
+    m_ParentTrack: {fileID: -61237745190122681}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -288,71 +589,6 @@ MonoBehaviour:
     m_DisplayName: f0
   m_Markers:
     m_Objects: []
---- !u!114 &-4220636150149574795
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
-  m_Name: BossActionClip
-  m_EditorClassIdentifier: 
-  factor: 2
-  actionDuration: 0.949999988079071
---- !u!114 &-3943007556707948069
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: Boss Action Track
-  m_EditorClassIdentifier: Project.Main::BossActionTrack
-  m_Version: 3
-  m_AnimClip: {fileID: 0}
-  m_Locked: 0
-  m_Muted: 0
-  m_CustomPlayableFullTypename: 
-  m_Curves: {fileID: 0}
-  m_Parent: {fileID: -5879390548679769886}
-  m_Children: []
-  m_Clips: []
-  m_Markers:
-    m_Objects: []
---- !u!114 &-2818816936492330386
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
-  m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
-  m_EditorClassIdentifier: 
-  factor: 1
-  actionDuration: 0.949999988079071
---- !u!114 &-2538733730440133632
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
-  m_Name: BossActionClip(Clone)(Clone)
-  m_EditorClassIdentifier: 
-  factor: 0
-  actionDuration: 0.5
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,242 +604,13 @@ MonoBehaviour:
   m_Version: 0
   m_Tracks:
   - {fileID: 2680011248431719272}
+  - {fileID: -8164579748204366211}
   m_FixedDuration: 4.86666671435
   m_EditorSettings:
     m_Framerate: 60
     m_ScenePreview: 1
   m_DurationMode: 0
   m_MarkerTrack: {fileID: 4627791056148026805}
---- !u!114 &77133396470572268
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: Boss Action Track (1)
-  m_EditorClassIdentifier: Project.Main::BossActionTrack
-  m_Version: 3
-  m_AnimClip: {fileID: 0}
-  m_Locked: 0
-  m_Muted: 0
-  m_CustomPlayableFullTypename: 
-  m_Curves: {fileID: 0}
-  m_Parent: {fileID: 2680011248431719272}
-  m_Children: []
-  m_Clips:
-  - m_Version: 1
-    m_Start: 0.23333333333333334
-    m_ClipIn: 0
-    m_Asset: {fileID: -4220636150149574795}
-    m_Duration: 0.949999988079071
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: 77133396470572268}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: 0
-    m_BlendOutDuration: 0
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 0
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 0
-    m_PreExtrapolationTime: 0
-    m_DisplayName: f2
-  - m_Version: 1
-    m_Start: 2.2666666666666666
-    m_ClipIn: 0
-    m_Asset: {fileID: -8631820253403897878}
-    m_Duration: 0.949999988079071
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: 77133396470572268}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: 0
-    m_BlendOutDuration: 0
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 0
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 0
-    m_PreExtrapolationTime: 0
-    m_DisplayName: f1
-  - m_Version: 1
-    m_Start: 4.616666666666666
-    m_ClipIn: 0
-    m_Asset: {fileID: 5237601006701897272}
-    m_Duration: 0.949999988079071
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: 77133396470572268}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: 0
-    m_BlendOutDuration: 0
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 0
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 0
-    m_PreExtrapolationTime: 0
-    m_DisplayName: f1
-  m_Markers:
-    m_Objects: []
 --- !u!114 &700551988788906356
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -617,7 +624,33 @@ MonoBehaviour:
   m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
   m_EditorClassIdentifier: 
   factor: 1
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
   actionDuration: 0.949999988079071
+--- !u!114 &914814009356774327
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33f5b869c8de2a144880137fa6f0933b, type: 3}
+  m_Name: Boss Action Track (2)
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: -5879390548679769886}
+  m_Children: []
+  m_Clips: []
+  m_Markers:
+    m_Objects: []
 --- !u!114 &2680011248431719272
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -639,14 +672,13 @@ MonoBehaviour:
   m_Parent: {fileID: 11400000}
   m_Children:
   - {fileID: -5879390548679769886}
-  - {fileID: -5370527720348121694}
-  - {fileID: 77133396470572268}
-  - {fileID: 2914531613257194200}
-  - {fileID: -8353577887807630417}
+  - {fileID: -6619585367749958846}
+  - {fileID: -2993663817943859407}
+  - {fileID: -5738910136883853278}
   m_Clips: []
   m_Markers:
     m_Objects: []
---- !u!114 &2914531613257194200
+--- !u!114 &3589628442409754586
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -655,158 +687,31 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: Boss Action Track (2)
-  m_EditorClassIdentifier: Project.Main::BossActionTrack
-  m_Version: 3
-  m_AnimClip: {fileID: 0}
-  m_Locked: 0
-  m_Muted: 0
-  m_CustomPlayableFullTypename: 
-  m_Curves: {fileID: 0}
-  m_Parent: {fileID: 2680011248431719272}
-  m_Children: []
-  m_Clips:
-  - m_Version: 1
-    m_Start: 0.7666666666666667
-    m_ClipIn: 0
-    m_Asset: {fileID: -2818816936492330386}
-    m_Duration: 0.949999988079071
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: 2914531613257194200}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: 0
-    m_BlendOutDuration: 0
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 0
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 0
-    m_PreExtrapolationTime: 0
-    m_DisplayName: f1
-  - m_Version: 1
-    m_Start: 3.2166666547457377
-    m_ClipIn: 0
-    m_Asset: {fileID: 700551988788906356}
-    m_Duration: 0.949999988079071
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: 2914531613257194200}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: 0
-    m_BlendOutDuration: 0
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 0
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 0
-    m_PreExtrapolationTime: 0
-    m_DisplayName: f1
-  m_Markers:
-    m_Objects: []
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 1.149999976158142
+--- !u!114 &4282327106234267714
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 0.5
 --- !u!114 &4627791056148026805
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -830,6 +735,23 @@ MonoBehaviour:
   m_Clips: []
   m_Markers:
     m_Objects: []
+--- !u!114 &5015484288869791379
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 0.5
 --- !u!114 &5237601006701897272
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -842,5 +764,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
   m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
   m_EditorClassIdentifier: 
-  factor: 1
-  actionDuration: 0.949999988079071
+  factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 0.5
+--- !u!114 &7411544256895692519
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  actionDuration: 0.5
+--- !u!114 &8060373499200692022
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ab2bcc5fe22a34289db7ec8d814152, type: 3}
+  m_Name: BossActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  factor: 0
+  target:
+    exposedName: e727c25ad352c2e4fb395b75889f51d6
+    defaultValue: {fileID: 0}
+  actionDuration: 0.5

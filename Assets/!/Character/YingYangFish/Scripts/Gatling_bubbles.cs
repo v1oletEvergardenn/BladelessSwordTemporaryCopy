@@ -25,7 +25,7 @@ public class Gatling_bubbles : IProjectile
 
     private BulletPhase currentPhase = BulletPhase.Turning;
 
-    private IDamagable trackTarget;
+    private Transform trackTarget;
     private float currentTurnSpeed = 0f;       // Ramps up for smooth turning
     private float maxTurnSpeed;
     private int turnDirection = 1;             // 1 = counter-clockwise, -1 = clockwise
@@ -44,6 +44,12 @@ public class Gatling_bubbles : IProjectile
         return base.SetUp(direction, _owner);
     }
 
+    public void SetUpHeartSpread(Vector3 spawnPos, float spreadAngle, IDamagable _trackTarget,
+        GameObject _owner, float _turnSpeed, IProjectileBasicAttributes _attribute)
+    {
+        SetUpHeartSpread(spawnPos, spreadAngle, _trackTarget.transform, _owner, _turnSpeed, _attribute);
+    }
+
     /// <summary>
     /// Sets up the bullet with heart-shape behavior.
     /// Bullet launches backwards, turns slowly toward player, then flies straight.
@@ -56,7 +62,7 @@ public class Gatling_bubbles : IProjectile
     /// <param name="_turnSpeed">Max turn speed</param>
     /// <param name="_damage">Bullet damage</param>
     /// <param name="_stunDuration">Stun duration</param>
-    public void SetUpHeartSpread(Vector3 spawnPos, float spreadAngle, IDamagable _trackTarget,
+    public void SetUpHeartSpread(Vector3 spawnPos, float spreadAngle, Transform _trackTarget,
         GameObject _owner, float _turnSpeed, IProjectileBasicAttributes _attribute)
     {
         ResetAttributes();
@@ -68,7 +74,9 @@ public class Gatling_bubbles : IProjectile
         trackTarget = _trackTarget;
 
         // Calculate backward direction (away from player)
-        Vector3 toPlayer = _trackTarget.GetHitPos() - spawnPos;
+
+        Vector3 toPlayer = GetTargetHitPosition(_trackTarget) - spawnPos;
+
         float angleToPlayer = Mathf.Atan2(toPlayer.y, toPlayer.x) * Mathf.Rad2Deg;
         float backwardAngle = angleToPlayer + 180f; // Opposite of player direction
 
@@ -133,7 +141,7 @@ public class Gatling_bubbles : IProjectile
         currentTurnSpeed = Mathf.MoveTowards(currentTurnSpeed, maxTurnSpeed, turnAcceleration * Time.deltaTime);
 
         // Calculate angle to player
-        Quaternion targetRotation = CalculateWantedRotation(trackTarget.GetHitPos());
+        Quaternion targetRotation = CalculateWantedRotation(GetTargetHitPosition(trackTarget));
         float angleToTarget = Quaternion.Angle(transform.rotation, targetRotation);
 
         // Check if we're aimed at the player

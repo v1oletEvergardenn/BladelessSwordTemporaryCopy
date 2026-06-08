@@ -58,9 +58,9 @@ public abstract class IEnemyAction : MonoBehaviour
         playerController = CharacterController2D.instance;
     }
 
-    public virtual void Act(float factor = 0)
+    public virtual void Act(float factor = 0, Transform _target = null)
     {
-        act_routine = StartCoroutine(Act_coroutine(factor));
+        act_routine = StartCoroutine(Act_coroutine(factor, _target));
     }
 
     public virtual void CancelAct()
@@ -80,7 +80,7 @@ public abstract class IEnemyAction : MonoBehaviour
         return true;
     }
 
-    public virtual IEnumerator Act_coroutine(float factor = 0)
+    public virtual IEnumerator Act_coroutine(float factor = 0, Transform _target = null)
     {
         yield return null;
     }

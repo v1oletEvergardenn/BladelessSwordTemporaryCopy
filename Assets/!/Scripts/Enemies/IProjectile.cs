@@ -1,6 +1,5 @@
 using Codice.CM.Common;
 using EditorAttributes;
-using log4net.Util;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,7 +27,7 @@ public abstract class IProjectile : MonoBehaviour
     [HideInInspector] public float originalSpeed;
     [HideInInspector] public GameObject owner;
     [HideInInspector] public bool followTarget;
-    [HideInInspector] public IDamagable target;
+    [HideInInspector] public Transform target;
     [HideInInspector] public bool collided = false;
     [HideInInspector] public bool delayTriggered = false;
     [HideInInspector] public float lifeTimer = 0f;
@@ -114,7 +113,7 @@ public abstract class IProjectile : MonoBehaviour
         {
             transform.rotation = Quaternion.RotateTowards(
                 transform.rotation,
-                CalculateWantedRotation(target.GetHitPos()),
+                CalculateWantedRotation(GetTargetHitPosition(target)),
                 rotationSpeed * Time.deltaTime);
         }
 
@@ -222,6 +221,16 @@ public abstract class IProjectile : MonoBehaviour
 
         return false;
     }
+
+    public Vector3 GetTargetHitPosition(Transform target)
+    {
+        Vector3 Pos = target.position;
+        if (target.TryGetComponent<IDamagable>(out var damagable))
+        {
+            Pos = damagable.GetHitPos();
+        }
+        return Pos;
+    }
 }
 
 public class ProjectileBuilder
@@ -274,17 +283,34 @@ public class ProjectileBuilder
     public ProjectileBuilder SetFollowTarget(IDamagable target)
     {
         if (target == null) return this;
-        _projectile.target = target;
+        _projectile.target = target.transform;
         _projectile.followTarget = true;
         if (target != null) _projectile.transform.rotation = _projectile.CalculateWantedRotation(target.GetHitPos());
+        return this;
+    }
+
+    public ProjectileBuilder SetFollowTarget(Transform target)
+    {
+        if (target == null) return this;
+        _projectile.target = target;
+        _projectile.followTarget = true;
+        if (target != null) _projectile.transform.rotation = _projectile.CalculateWantedRotation(_projectile.GetTargetHitPosition(target));
         return this;
     }
 
     public ProjectileBuilder SetTarget(IDamagable target)
     {
         if (target == null) return this;
-        _projectile.target = target;
+        _projectile.target = target.transform;
         if (target != null) _projectile.transform.rotation = _projectile.CalculateWantedRotation(target.GetHitPos());
+        return this;
+    }
+
+    public ProjectileBuilder SetTarget(Transform target)
+    {
+        if (target == null) return this;
+        _projectile.target = target;
+        _projectile.transform.rotation = _projectile.CalculateWantedRotation(target.position);
         return this;
     }
 

@@ -18,7 +18,7 @@ public class Spear : IProjectile
         {
             if (followTarget)
             {
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, CalculateWantedRotation(target.GetHitPos()), rotationSpeed * Time.deltaTime);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, CalculateWantedRotation(GetTargetHitPosition(target)), rotationSpeed * Time.deltaTime);
             }//follow target
         }
         rb.velocity = transform.right * attribute.speed / 10;

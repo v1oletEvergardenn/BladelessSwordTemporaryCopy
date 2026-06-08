@@ -46,12 +46,13 @@ public class YYF_WaterSpear : IEnemyAction
     /// </summary>
     /// <param name="factor"></param>
     /// <returns></returns>
-    public override IEnumerator Act_coroutine(float factor = 0)
+    public override IEnumerator Act_coroutine(float factor = 0, Transform _target = null)
     {
+        Transform trueTarget = _target != null ? _target : player.transform;
+
         Spear _spear; Spear _smallSpear1 = null; Spear _smallSpear2 = null;
         bool addition = false;
         if (factor == 1) { addition = true; }
-        print(factor + "  and  " + addition);
         Transform lauchPos = bossAI.center;
 
         //spawn spear
@@ -59,7 +60,7 @@ public class YYF_WaterSpear : IEnemyAction
 
         //set spear
         spear = _spear;
-        SetUp(_spear);
+        SetUp(_spear, trueTarget);
 
         //wait for launch
         yield return new WaitForSeconds(0.5f);
@@ -70,7 +71,7 @@ public class YYF_WaterSpear : IEnemyAction
             _smallSpear1 = bossAI.selfPooler.SpawnFromPool("small_water_spear", lauchPos.position + new Vector3(0, 1, 0)).GetComponent<Spear>();
             _smallSpear2 = bossAI.selfPooler.SpawnFromPool("small_water_spear", lauchPos.position + new Vector3(0, -1, 0)).GetComponent<Spear>();
             _smallSpear1.transform.localScale = Vector3.one; _smallSpear2.transform.localScale = new Vector3(1, -1, 1);
-            SetUp(_smallSpear1); SetUp(_smallSpear2);
+            SetUp(_smallSpear1, trueTarget); SetUp(_smallSpear2, trueTarget);
             _smallSpear1.transform.SetParent(_spear.transform, true);
             _smallSpear2.transform.SetParent(_spear.transform, true);
             smallSpear1 = _smallSpear1; smallSpear2 = _smallSpear2;
@@ -96,42 +97,42 @@ public class YYF_WaterSpear : IEnemyAction
         //launch spear
         if (addition)
         {
-            ShootSmallSpear(_smallSpear1); smallSpear1 = null;
+            ShootSmallSpear(_smallSpear1, trueTarget); smallSpear1 = null;
             yield return new WaitForSeconds(0.2f);
-            ShootSmallSpear(_smallSpear2); smallSpear2 = null;
+            ShootSmallSpear(_smallSpear2, trueTarget); smallSpear2 = null;
             yield return new WaitForSeconds(0.5f);
         }
 
-        ShootSpear(_spear); spear = null;
+        ShootSpear(_spear, trueTarget); spear = null;
 
         yield return null;
 
-        void SetUp(Spear spear)
+        void SetUp(Spear spear, Transform target)
         {
             spear.SetUp(transform.right, this.gameObject).
                 SetSpeed(0).
                 SetDamage(0).
-                SetFollowTarget(playerIDamagable);
+                SetFollowTarget(target);
             spear.collisionEnabled = false;
         }
     }
 
-    public void ShootSpear(Spear spear)
+    public void ShootSpear(Spear spear, Transform target)
     {
         spear.collisionEnabled = true;
         spear.SetUp(transform.right, this.gameObject).
                 SetAttributes(spearAttribute).
-                SetFollowTarget(playerIDamagable);
+                SetFollowTarget(target);
         GameObject burst = bossAI.selfPooler.SpawnFromPool("burst", bossAI.center.position);
         burst.transform.eulerAngles = spear.transform.eulerAngles;
     }
 
-    public void ShootSmallSpear(Spear spear)
+    public void ShootSmallSpear(Spear spear, Transform target)
     {
         spear.transform.SetParent(null);
         spear.collisionEnabled = true;
         spear.SetUp(transform.right, this.gameObject).
                SetAttributes(smallSpearAttribute).
-               SetFollowTarget(playerIDamagable);
+               SetFollowTarget(target);
     }
 }

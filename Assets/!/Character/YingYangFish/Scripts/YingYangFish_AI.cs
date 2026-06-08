@@ -152,7 +152,6 @@ public class YingYangFish_AI : IEnemyController
         Animator anim = fishOrigin.anim;
         Transform fishGFX = fishOrigin.fishGFX;
         Transform origin = fishOrigin.transform;
-        bool isBlack = fishOrigin.isBlack;
 
         yield return co_sprintToAngle = StartCoroutine(IESprintToAngle(fishOrigin, angle));
 
@@ -197,6 +196,8 @@ public class YingYangFish_AI : IEnemyController
 
         origin.localScale = new Vector3(1, 1, 1);
         origin.eulerAngles = new Vector3(0, 0, 0);
+
+        fishOrigin.gameObject.SetActive(false);
     }
 
     public override void CancelAllAction()
@@ -239,7 +240,7 @@ public class YingYangFish_AI : IEnemyController
             //dive, move to center of map
             secondPhase = true;
             EventInteract.SetActive(true);
-            yield return co_fishAppear = StartCoroutine(FishAppear(true));
+            yield return co_fishAppear = StartCoroutine(FishAppear());
             StartCoroutine(secondPhaseAnim());
         }
     }
@@ -255,7 +256,7 @@ public class YingYangFish_AI : IEnemyController
         yield return null;
     }
 
-    public IEnumerator FishAppear(bool dive)
+    public IEnumerator FishAppear()
     {
         bool opposite = RandomFishBool();
 
@@ -271,6 +272,12 @@ public class YingYangFish_AI : IEnemyController
         Animator whiteAnim = newWhiteFish.anim;
         Transform whiteFishGFX = newWhiteFish.fishGFX;
         Transform whiteOrigin = newWhiteFish.transform;
+
+        ResetFishCompletely(newBlackFish);
+        ResetFishCompletely(newWhiteFish);
+
+        ResetFishNearCenterWithDistance(newBlackFish);
+        ResetFishNearCenterWithDistance(newWhiteFish);
 
         //logic
         blackFishGFX.localPosition = new Vector3(-5, 0, 0);
@@ -302,15 +309,13 @@ public class YingYangFish_AI : IEnemyController
         blackFish.DOLocalRotate(new Vector3(0, 0, -20), 0.5f);
         whiteFish.DOLocalRotate(new Vector3(0, 0, -20), 0.5f);
         yield return new WaitForSeconds(0.5f);
-        if (dive)
-        {
-            //sprint to angle
-            yield return co_multiCoroutine = StartCoroutine(StartMultipleCoroutines(new List<IEnumerator> {
+
+        //sprint to angle
+        yield return co_multiCoroutine = StartCoroutine(StartMultipleCoroutines(new List<IEnumerator> {
                 IESprintToAngleAndDive(newBlackFish, Random.Range(200f,300f)),
                 IESprintToAngleAndDive(newWhiteFish,  Random.Range(200f,300f))
             }));
-            // dive
-        }
+        // dive
 
         //disappear
         newBlackFish.gameObject.SetActive(false);
@@ -319,12 +324,13 @@ public class YingYangFish_AI : IEnemyController
 
     public YYF_fish SpawnFish(bool isBlack)
     {
+        Vector3 spawnPos = new Vector3(0, waterLevel.position.y - 6, 0);
         YYF_fish fish = selfPooler.SpawnFromPool(isBlack ? "blackFish" : "whiteFish",
-            new Vector3(0, waterLevel.position.y - 6, 0),
-            Quaternion.identity).GetComponent<YYF_fish>();
+            spawnPos, Quaternion.identity).GetComponent<YYF_fish>();
         fish.transform.SetParent(fish_origin, true);
         fish.SetDamageableParent(this);
         ResetFishCompletely(fish);
+        fish.transform.position = spawnPos;
         return fish;
     }
 
@@ -359,6 +365,12 @@ public class YingYangFish_AI : IEnemyController
     public void ResetFish(YYF_fish fish)
     {
         fish.fish.localEulerAngles = Vector3.zero;
+        fish.fish.localPosition = new Vector3(0, 0, 0);
+    }
+
+    public void ResetFishNearCenterWithDistance(YYF_fish fish)
+    {
+        fish.fish.localEulerAngles = Vector3.zero;
         fish.fish.localPosition = new Vector3(0, 3.5f, 0);
     }
 
@@ -384,7 +396,7 @@ public class YingYangFish_AI : IEnemyController
                 yield return co_multiActions = StartCoroutine(StartMultipleActions(list));
             }
             StartAction();
-            yield return co_fishAppear = StartCoroutine(FishAppear(true));
+            yield return co_fishAppear = StartCoroutine(FishAppear());
         }
     }
 
@@ -529,7 +541,7 @@ public class YingYangFish_AI : IEnemyController
         yield return new WaitForSeconds(2f);
 
         //fish appear
-        yield return co_fishAppear = StartCoroutine(FishAppear(true));
+        yield return co_fishAppear = StartCoroutine(FishAppear());
 
         IN_COMBAT = true;
         HealthUI.SetActive(true);
@@ -635,7 +647,7 @@ public class YingYangFish_AI : IEnemyController
         VFXManager.instance.UnBulletTime();
         isBossBreaking = false;
 
-        yield return co_fishAppear = StartCoroutine(FishAppear(true));
+        yield return co_fishAppear = StartCoroutine(FishAppear());
         canTakeDamage = false;
         StartAction();
         co_act = StartCoroutine(Act());

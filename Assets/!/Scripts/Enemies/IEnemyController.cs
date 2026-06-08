@@ -11,7 +11,7 @@ using UnityEngine.U2D;
 using UnityEngine.UI;
 using Void = EditorAttributes.Void;
 
-[RequireComponent(typeof(DamageFlash), typeof(Rigidbody2D), typeof(IEnemyActionIdle))]
+[RequireComponent(typeof(DamageFlash), typeof(Rigidbody2D))]
 public abstract class IEnemyController : IDamagable
 {
     #region HEALTH

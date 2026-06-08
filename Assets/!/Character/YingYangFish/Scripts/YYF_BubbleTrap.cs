@@ -26,8 +26,10 @@ public class YYF_BubbleTrap : IEnemyAction
         bossAI = GetComponent<YingYangFish_AI>();
     }
 
-    public override IEnumerator Act_coroutine(float factor = 0)
+    public override IEnumerator Act_coroutine(float factor = 0, Transform _target = null)
     {
+        Transform trueTarget = _target != null ? _target : player.transform;
+
         bool isBlack = factor == 0 ? true : false;
         YYF_fish YYFFish = bossAI.SpawnFish(isBlack);
         Animator anim = YYFFish.anim;
@@ -46,9 +48,9 @@ public class YYF_BubbleTrap : IEnemyAction
         //move to player
         bool toleft = playerController.FacingRight;
 
-        Vector3 target = new Vector3(player.transform.position.x,
-                bossAI.waterLevel.position.y + jumpHeight - jumpRadius, 0);
-        origin.position = target;
+        origin.position = new Vector3(trueTarget.position.x,
+                bossAI.waterLevel.position.y + jumpHeight - jumpRadius,
+                0); ;
 
         // rotate to angle
         float angle = 90; if (toleft) { angle = -90; origin.localScale = new Vector3(-1, 1, 1); }
