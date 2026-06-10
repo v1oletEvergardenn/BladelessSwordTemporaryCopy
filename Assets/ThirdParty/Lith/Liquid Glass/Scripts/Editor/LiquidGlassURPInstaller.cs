@@ -1,8 +1,8 @@
 #if LLG_USE_URP
+
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -15,7 +15,7 @@ namespace Lith.LiquidGlass
         static LiquidGlassURPInstaller()
         {
             EditorApplication.delayCall += TryInstall;
-            EditorSceneManager.sceneOpened += (scene, mode) => TryInstall();
+            EditorApplication.hierarchyChanged += TryInstall;
         }
 
         private static void TryInstall()
@@ -35,7 +35,7 @@ namespace Lith.LiquidGlass
             if (RendererHasFeature(rendererData)) return;
 
             if (LiquidGlassEditorSettings.instance.urpAsked) return;
-            
+
             bool add = EditorUtility.DisplayDialog(
                 "LiquidGlass (URP)",
                 "LiquidGlass effect can be added automatically as a ScriptableRendererFeature to your active URP renderer.\n\nDo you want to add it now?",
@@ -149,4 +149,5 @@ namespace Lith.LiquidGlass
         }
     }
 }
+
 #endif

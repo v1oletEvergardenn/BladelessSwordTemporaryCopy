@@ -1,11 +1,6 @@
-using Codice.CM.Common;
 using EditorAttributes;
 using Sirenix.OdinInspector;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public abstract class IProjectile : MonoBehaviour

@@ -221,6 +221,8 @@ public class YingYangFish_AI : IEnemyController
         fish_origin.DOKill();
         center.DOKill();
         SetNormalRotateSpeed();
+        selfPooler.SetPoolDisactive("whiteFish");
+        selfPooler.SetPoolDisactive("blackFish");
     }
 
     public IEnumerator Pre_SecondPhase()

@@ -1,11 +1,9 @@
 using EditorAttributes;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static Codice.Client.BaseCommands.Import.Commit;
 
 public class ItemSelectionUI : UIChildNavigate
 {

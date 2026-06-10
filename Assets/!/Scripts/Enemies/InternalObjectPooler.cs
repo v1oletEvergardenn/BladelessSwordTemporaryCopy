@@ -93,4 +93,25 @@ public class InternalObjectPooler : MonoBehaviour
             }
         }
     }
+
+    public void SetPoolDisactive(string tag)
+    {
+        if (poolDictionary == null || string.IsNullOrEmpty(tag))
+        {
+            return;
+        }
+
+        if (!poolDictionary.ContainsKey(tag))
+        {
+            return;
+        }
+
+        foreach (var obj in poolDictionary[tag])
+        {
+            if (obj != null && obj.activeSelf)
+            {
+                obj.SetActive(false);
+            }
+        }
+    }
 }

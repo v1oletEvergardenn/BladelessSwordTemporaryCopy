@@ -1,6 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+
+#if UNITY_EDITOR
+
 using UnityEditor;
+
+#endif
+
 using UnityEngine;
 
 public enum EffectType
@@ -135,12 +141,14 @@ public abstract class Item : ScriptableObject
 
     public void ResetID()
     {
+#if UNITY_EDITOR
         const string LastItemIDKey = "ItemSystem_LastItemID";
         int lastID = EditorPrefs.GetInt(LastItemIDKey, 1);
         itemID = lastID++;
         EditorPrefs.SetInt(LastItemIDKey, lastID);
         EditorUtility.SetDirty(this);
         AssetDatabase.SaveAssets();
+#endif
     }
 
     public void ApplyEffects(List<ItemEffect> effects)

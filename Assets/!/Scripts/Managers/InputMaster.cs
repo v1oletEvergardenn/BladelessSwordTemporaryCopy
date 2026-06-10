@@ -1,10 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static ControllerInput;
-using System;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static ControllerInput;
 
 public class InputMaster : MonoBehaviour
 {
@@ -108,7 +109,18 @@ public class InputMaster : MonoBehaviour
     private void Start()
     {
         gameManager = GameManager.instance;
-        SwitchToUIAction();
+
+        string sceneName = SceneManager.GetActiveScene().name;
+        bool isMenuScene = sceneName == "MainMenu" || sceneName == "PreLoad";
+
+        if (isMenuScene)
+        {
+            SwitchToUIAction();
+        }
+        else
+        {
+            SwitchToGameplayAction();
+        }
     }
 
     private void Update()

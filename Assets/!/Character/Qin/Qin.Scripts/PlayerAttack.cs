@@ -249,6 +249,7 @@ public class PlayerAttack : MonoBehaviour
 
     public void CounterAttack(IProjectile projectile, bool isPerfect)
     {
+        if (!projectile.collisionEnabled) return;
         //if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
         attackTimer = attackGap;
         canDefend = true;
@@ -256,6 +257,7 @@ public class PlayerAttack : MonoBehaviour
         {
             hSAbilitiesManager.ModifyHSPoint(0.5f);
             energy.ChangeEnergy(-energy.attack_energy_consumption);
+
             projectile.SetUp(pointerDirection, this.gameObject).
                 SetHostileToPlayer(false).
                 SetDamage(projectile.attribute.damage * basicAttackDamage).

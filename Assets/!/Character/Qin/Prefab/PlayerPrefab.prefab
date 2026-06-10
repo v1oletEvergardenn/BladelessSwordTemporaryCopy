@@ -2053,6 +2053,7 @@ MonoBehaviour:
   canBeHitWithoutHSAttack: 0
   resetAttackCDOnHit: 0
   consumeEnergyOnHit: 1
+  subDamagables: []
   anim_bool: {fileID: 1670082175976385656}
   anim: {fileID: 5610019840959657370}
   maxHealth: 3e+11
@@ -5502,7 +5503,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4359119002216937665
 Transform:
   m_ObjectHideFlags: 0

@@ -8,7 +8,6 @@ using Unity.VisualScripting;
 using System.Data;
 using UnityEngine.SceneManagement;
 using System;
-using Mobsoft.PixelStyleWaterShader;
 using static UnityEngine.EventSystems.EventTrigger;
 using Void = EditorAttributes.Void;
 using Doublsb.Dialog;
