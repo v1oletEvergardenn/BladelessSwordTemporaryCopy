@@ -49,7 +49,6 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     [HideProperty] public GameManager gameManager;
     [HideProperty] public Energy energy;
     [HideProperty] public Rigidbody2D rb;
-    [HideProperty] public AnimSetBool animSet;
     [HideProperty] public InputPlayer inputPlayer;
     [HideProperty] public InputMaster inputMaster;
     [HideProperty] public Health health;
@@ -68,7 +67,6 @@ public abstract class IHeartSwordAbility : MonoBehaviour
         inputPlayer = InputPlayer.instance;
         inputMaster = InputMaster.instance;
         playerAttack = PlayerAttack.instance;
-        animSet = AnimSetBool.instance;
         health = Health.instance;
         energy = Energy.instance;
         hSAbilityManager = HeartSwordAbilities.instance;

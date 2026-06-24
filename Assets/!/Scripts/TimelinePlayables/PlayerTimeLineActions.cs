@@ -1,63 +1,103 @@
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public enum PlayerTimelineActionType
 {
-    None = 0,
-    MoveTo = 1,
+    MoveTo = 0,
+    Jump = 1,
     Attack = 2,
-    Jump = 3
-}
-
-public interface IPlayerTimelineActions
-{
-    void MoveTo(Vector3 worldPosition, bool faceTarget);
-
-    void Attack(bool attackLeft, bool consumeEnergy);
-
-    void Jump();
+    Defend = 3,
+    SwordTeleport = 4,
+    Repel = 5,
 }
 
 [DisallowMultipleComponent]
-public class PlayerTimelineActions : MonoBehaviour, IPlayerTimelineActions
+public class PlayerTimeLineActions : MonoBehaviour
 {
-    public static PlayerTimelineActions instance;
+    public static PlayerTimeLineActions instance;
 
-    [SerializeField] private PlayerAttack playerAttack;
-    [SerializeField] private CharacterController2D controller;
+    [HideInInspector] public PlayerAttack playerAttack;
+    [HideInInspector] public CharacterController2D controller;
+    [HideInInspector] public Health playerHealth;
+    [HideInInspector] public Energy playerEnergy;
+    [HideInInspector] public InputPlayer inputPlayer;
+    [HideInInspector] public Animator anim;
 
     private void Awake()
     {
         if (instance == null)
             instance = this;
-
-        if (playerAttack == null)
-            playerAttack = GetComponent<PlayerAttack>();
-
-        if (controller == null)
-            controller = GetComponent<CharacterController2D>();
     }
 
-    public void MoveTo(Vector3 worldPosition, bool faceTarget)
+    private void Start()
     {
-        if (controller == null)
-            return;
-
-        controller.RunToPosition(worldPosition, null, faceTarget);
+        AssignRef();
     }
 
-    public void Attack(bool attackLeft, bool consumeEnergy)
+    // move
+    public void MoveTo(Vector3 worldPosition)
     {
-        if (playerAttack == null)
-            return;
-
-        playerAttack.Attack(attackLeft, consumeEnergy);
+        AssignRef();
+        controller.RunToPosition(worldPosition);
     }
 
+    public void MoveTo(Transform worldPosition)
+    {
+        AssignRef();
+        controller.RunToPosition(worldPosition.position);
+    }
+
+    //jump
     public void Jump()
     {
+        AssignRef();
         if (controller == null)
             return;
 
         controller.Jump();
+    }
+
+    //attack
+    public void Attack(bool attackLeft)
+    {
+        AssignRef();
+        playerAttack.Attack(attackLeft, false);
+    }
+
+    //defend
+
+    public void Defend(float duration)
+    {
+        playerAttack.isDefending = true;
+        //playerAttack.animSet.Anim_Defend(0);
+        anim.Play("defend");
+
+        playerAttack.OnDefend();
+    }
+
+    public void EndDefend()
+    {
+        //playerAttack.animSet.Anim_Defend(1);
+        anim.SetBool("isCombat", true);
+        playerAttack.combatTimer = 2;
+        if (controller.isFalling) { anim.Play("fall_combat"); }
+        else if (controller.isJumping) { anim.Play("jump_combat"); }
+        else { anim.Play("idle_combat"); }
+        playerAttack.isDefending = false;
+    }
+
+    //sword teleport
+
+    //repel
+
+    //Utility
+    public void AssignRef()
+    {
+        if (playerAttack == null) playerAttack = PlayerAttack.instance;
+        if (controller == null) controller = CharacterController2D.instance;
+        if (inputPlayer == null) inputPlayer = InputPlayer.instance;
+        if (playerHealth == null) playerHealth = Health.instance;
+        if (playerEnergy == null) playerEnergy = Energy.instance;
+        if (anim == null) anim = PlayerAttack.instance.anim;
     }
 }

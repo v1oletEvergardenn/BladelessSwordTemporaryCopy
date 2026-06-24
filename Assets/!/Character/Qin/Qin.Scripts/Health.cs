@@ -10,7 +10,6 @@ using UnityEngine.UI;
 public class Health : IDamagable
 {
     public static Health instance;
-    public AnimSetBool anim_bool;
     public Animator anim;
     private PlayerAttack playerAttack;
     private CharacterController2D controller;
@@ -60,17 +59,6 @@ public class Health : IDamagable
     private void Update()
     {
         healthPercentage = currentHealth / maxHealth;
-        if (stunned)
-        {
-            if (stun_timer > 0) { stun_timer -= Time.unscaledDeltaTime; }
-            else
-            {
-                stunned = false;
-                anim_bool.Anim_Hit(1);
-
-                if (!isDead) { anim.SetTrigger("stun_after"); }
-            }
-        }
     }
 
     public void DamageDirectly(int damageAmount)
@@ -124,14 +112,14 @@ public class Health : IDamagable
             currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
             if (stun_duration != 0)
             {
-                anim_bool.Anim_Attack(2);
+                playerAttack.EndAttack();
                 Stun(stun_duration, sender);
             }
         }
 
         if (currentHealth <= 0)
         {
-            anim_bool.Anim_Attack(2);
+            playerAttack.EndAttack();
             isDead = true;
             controller.isRunningToTarget = false;
             GetComponent<Rigidbody2D>().velocity = Vector2.zero;
@@ -198,7 +186,8 @@ public class Health : IDamagable
     {
         transform.position = revivePosition;
         currentHealth = maxHealth;
-        anim_bool.Anim_Attack(1);
+        ActionLock.ClearAll();
+        stunned = false;
         isDead = false;
         GetComponent<Rigidbody2D>().isKinematic = false;
     }
@@ -213,8 +202,8 @@ public class Health : IDamagable
         playerAttack.EndDefend();
         hsManager.CancelAllAbilities();
         stunned = true;
-        stun_timer = duration;
-        anim_bool.Anim_Hit(0);
+        //anim_bool.Anim_Hit(0);
+        ActionLock.Add("stunned", Lock.All, duration, onUnlocked: () => { Debug.Log("Stun unlocked"); stunned = false; });
 
         bool damageFromBehind = false;//determines the animation
         if (sender != null)

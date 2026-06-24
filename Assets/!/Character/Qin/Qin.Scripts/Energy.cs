@@ -155,6 +155,7 @@ public class Energy : MonoBehaviour
             playerAttack.anim.SetBool("storm", false);
             playerAttack.isOnStorm = false;
             playerAttack.isPreparingStorm = false;
+            ActionLock.Remove("StormPreparing");
             playerAttack.prepareStormTimer = 0f;
             VFXManager.instance.FailedToDoAction();
             return false;

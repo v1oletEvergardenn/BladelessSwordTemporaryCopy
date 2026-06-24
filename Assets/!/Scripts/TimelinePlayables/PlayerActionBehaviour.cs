@@ -27,7 +27,7 @@ public class PlayerActionBehaviour : PlayableBehaviour
 
         _started = true;
 
-        PlayerTimelineActions handler = PlayerTimelineActions.instance;
+        PlayerTimeLineActions handler = PlayerTimeLineActions.instance;
         if (handler == null)
             return;
 
@@ -35,11 +35,11 @@ public class PlayerActionBehaviour : PlayableBehaviour
         {
             case PlayerTimelineActionType.MoveTo:
                 Vector3 targetPosition = hasResolvedTarget ? resolvedTargetPosition : moveWorldPosition;
-                handler.MoveTo(targetPosition, faceTargetAfterMove);
+                handler.MoveTo(targetPosition);
                 break;
 
             case PlayerTimelineActionType.Attack:
-                handler.Attack(attackLeft, consumeEnergy);
+                handler.Attack(attackLeft);
                 break;
 
             case PlayerTimelineActionType.Jump:

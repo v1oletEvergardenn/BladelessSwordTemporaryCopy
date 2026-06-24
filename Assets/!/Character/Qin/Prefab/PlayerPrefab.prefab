@@ -1664,7 +1664,7 @@ SpriteRenderer:
   m_Size: {x: 1.28, y: 1.28}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &2366159078848200479
@@ -1903,11 +1903,6 @@ MonoBehaviour:
   teleportCheckLayer:
     serializedVersion: 2
     m_Bits: 330880
-  canFlip: 1
-  canMove: 1
-  canJump: 1
-  canDoubleJump: 1
-  canTeleport: 1
 --- !u!114 &7709544273781666982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1966,11 +1961,8 @@ MonoBehaviour:
   isAimingRightStick: 0
   isInCombat: 0
   isDefending: 0
-  canDefend: 1
-  canAttack: 1
   isCounterAttacking: 0
   isAttackingLeft: 1
-  canStorm: 1
   isOnStorm: 0
   isPreparingStorm: 0
   showCounterAttackRange: 0
@@ -2054,7 +2046,6 @@ MonoBehaviour:
   resetAttackCDOnHit: 0
   consumeEnergyOnHit: 1
   subDamagables: []
-  anim_bool: {fileID: 1670082175976385656}
   anim: {fileID: 5610019840959657370}
   maxHealth: 3e+11
   currentHealth: 0
@@ -2648,7 +2639,6 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   energy: {fileID: 0}
   rb: {fileID: 0}
-  animSet: {fileID: 0}
   inputPlayer: {fileID: 0}
   inputMaster: {fileID: 0}
   health: {fileID: 0}
@@ -3934,7 +3924,6 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   energy: {fileID: 0}
   rb: {fileID: 0}
-  animSet: {fileID: 0}
   inputPlayer: {fileID: 0}
   inputMaster: {fileID: 0}
   health: {fileID: 0}
@@ -4825,7 +4814,6 @@ GameObject:
   - component: {fileID: 8697933507540174883}
   - component: {fileID: 512692318975722012}
   - component: {fileID: 5610019840959657370}
-  - component: {fileID: 1670082175976385656}
   m_Layer: 0
   m_Name: player_GFX
   m_TagString: Untagged
@@ -4921,23 +4909,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1670082175976385656
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7362464617387580390}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce6b72c411b1716499e2a14bae591047, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  controller: {fileID: 2754981768461782020}
-  bladeAnim: {fileID: 0}
-  playerAttack: {fileID: 8173309371137226772}
-  player: {fileID: 2423474427461210019}
-  rb: {fileID: 8484378856517362717}
 --- !u!1 &7438504306941148889
 GameObject:
   m_ObjectHideFlags: 0
@@ -5232,7 +5203,6 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   energy: {fileID: 0}
   rb: {fileID: 0}
-  animSet: {fileID: 0}
   inputPlayer: {fileID: 0}
   inputMaster: {fileID: 0}
   health: {fileID: 0}

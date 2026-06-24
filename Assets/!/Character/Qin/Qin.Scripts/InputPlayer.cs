@@ -210,6 +210,7 @@ public class InputPlayer : MonoBehaviour
                 anim.SetBool("storm", false);
                 playerAttack.OnStorm();
                 playerAttack.isPreparingStorm = false;
+                ActionLock.Remove("StormPreparing");
             }
         }
     }
@@ -239,6 +240,7 @@ public class InputPlayer : MonoBehaviour
         else
         {
             controller.input_floating = false;
+            ActionLock.Remove("floating");
         }
     }
 
@@ -297,6 +299,7 @@ public class InputPlayer : MonoBehaviour
             {
                 playerAttack.isPreparingStorm = true;
                 playerAttack.prepareStormTimer = 0f;
+                ActionLock.Add("StormPreparing", Lock.Defend | Lock.SwordJump | Lock.SwordTeleport);
             }
         }
         else if (!rightPressed && leftJustPressed)
@@ -307,6 +310,7 @@ public class InputPlayer : MonoBehaviour
             {
                 playerAttack.isPreparingStorm = true;
                 playerAttack.prepareStormTimer = 0f;
+                ActionLock.Add("StormPreparing", Lock.Defend | Lock.SwordJump | Lock.SwordTeleport);
             }
         }
     }
@@ -338,7 +342,7 @@ public class InputPlayer : MonoBehaviour
 
     private void HandleDefendInput()
     {
-        if (learnedDefend && inputMaster._defendAction.WasPressedThisFrame() && !playerAttack.isPreparingStorm)
+        if (learnedDefend && inputMaster._defendAction.WasPressedThisFrame())
         {
             playerAttack.OnDefend();
         }
@@ -542,6 +546,7 @@ public class InputPlayer : MonoBehaviour
         DisableFloat();
         anim.SetBool("storm", false);
         playerAttack.isPreparingStorm = false;
+        ActionLock.Remove("StormPreparing");
     }
 
     #endregion Utility

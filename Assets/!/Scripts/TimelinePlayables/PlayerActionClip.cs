@@ -7,7 +7,7 @@ using UnityEngine.Timeline;
 public class PlayerActionClip : PlayableAsset, ITimelineClipAsset
 {
     [Header("Action")]
-    public PlayerTimelineActionType actionType = PlayerTimelineActionType.None;
+    public PlayerTimelineActionType actionType;
 
     [Header("Move To")]
     public bool useTargetTransform = false;

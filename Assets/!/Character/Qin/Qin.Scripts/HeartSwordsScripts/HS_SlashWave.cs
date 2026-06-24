@@ -63,7 +63,7 @@ public class HS_SlashWave : IHeartSwordAbility
             || inputMaster._attackRightAction.WasReleasedThisFrame())
             && !attacked)
         {
-            animSet.Anim_Move(0);
+            ;
             playerAttack.combatTimer = 5f;
             attacked = true;
             co_ability = StartCoroutine(OriginalAct());
@@ -86,13 +86,13 @@ public class HS_SlashWave : IHeartSwordAbility
         hsHitTargets.Clear();
         holdTimer = 0f;
         isPerforming = true;
-
+        ActionLock.AddExcept("HS_slashWave", Lock.Mobility | Lock.Attack);
         return true;
     }
 
     public override IEnumerator OriginalAct()
     {
-        playerAttack.canDefend = false;
+        //hitStunBlock = actionGate.Block(PlayerAction.Move | PlayerAction.Attack | PlayerAction.Defend | PlayerAction.Storm);
         if (largeSlash)
         {
             Attack();
@@ -125,7 +125,6 @@ public class HS_SlashWave : IHeartSwordAbility
         if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(0.16f);
         else yield return new WaitForSeconds(0.16f);
         EndAction();
-        animSet.Anim_Move(1);
     }
 
     #endregion Original Ability Performance
@@ -134,8 +133,7 @@ public class HS_SlashWave : IHeartSwordAbility
 
     public override bool FirstBranchAbilityPerformance(bool isLeft)
     {
-        if (!playerAttack.canAttack) return false;
-        if (controller.isFloating) return false;
+        if (!playerAttack.CanAttack()) return false;
         if (health.stunned) return false;
         if (CheckAnyPerformingAbility()) return false;
         if (playerAttack.attackTimer < playerAttack.attackGap) return false;
@@ -149,8 +147,7 @@ public class HS_SlashWave : IHeartSwordAbility
 
     public override bool SecondBranchAbilityPerformance(bool isLeft)
     {
-        if (!playerAttack.canAttack) return false;
-        if (controller.isFloating) return false;
+        if (!playerAttack.CanAttack()) return false;
         if (health.stunned) return false;
         if (CheckAnyPerformingAbility()) return false;
         if (playerAttack.attackTimer < playerAttack.attackGap) return false;
@@ -178,7 +175,7 @@ public class HS_SlashWave : IHeartSwordAbility
 
     public void Attack()
     {
-        playerAttack.canAttack = true;
+        //playerAttack.canAttack = true;
         playerAttack.attackTimer = playerAttack.attackGap + 0.5f;
         bool isLeft = playerAttack.pointerDirection.z > 90f && playerAttack.pointerDirection.z < 270f;
         playerAttack.Attack(isLeft, false);
@@ -200,6 +197,7 @@ public class HS_SlashWave : IHeartSwordAbility
         isPerforming = false;
         hsHitEffectPlayed = false;
         attacked = false;
+        ActionLock.Remove("HS_slashWave");
     }
 
     #endregion Utility Methods

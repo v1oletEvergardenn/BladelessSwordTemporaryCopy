@@ -104,11 +104,20 @@ public class CharacterController2D : MonoBehaviour
 
     #region State Flags
 
-    [HideInInspector] public bool canFlip = true;
-    [HideInInspector] public bool canMove = true;
-    [HideInInspector] public bool canJump = true;
-    [HideInInspector] public bool canDoubleJump = true;
-    [HideInInspector] public bool canTeleport = true;
+    public bool CanFlip()
+    { return ActionLock.Can(Lock.Flip); }
+
+    public bool CanMove()
+    { return ActionLock.Can(Lock.Move); }
+
+    public bool CanJump()
+    { return ActionLock.Can(Lock.Jump); }
+
+    public bool CanDoubleJump()
+    { return ActionLock.Can(Lock.SwordJump); }
+
+    public bool CanTeleport()
+    { return ActionLock.Can(Lock.SwordTeleport); }
 
     #endregion State Flags
 
@@ -132,7 +141,6 @@ public class CharacterController2D : MonoBehaviour
         _fallSpeedYDampingChangeThreshold = CameraManager.instance._fallSpeedYDampingChangeThreshold;
         inputPlayer = InputPlayer.instance;
         gravity = rb.gravityScale;
-        canFlip = canMove = canJump = canDoubleJump = true;
     }
 
     private void Update()
@@ -163,7 +171,7 @@ public class CharacterController2D : MonoBehaviour
 
     public void Move(float move)
     {
-        if (!canMove)
+        if (!CanMove())
         {
             SetRunningState(false);
             rb.velocity = Vector3.SmoothDamp(
@@ -248,7 +256,7 @@ public class CharacterController2D : MonoBehaviour
             return;
 
         isGrounded = true;
-        canDoubleJump = true;
+        ActionLock.Remove("doubleJumping");
         floatTriggered = false;
         var state = anim.GetCurrentAnimatorStateInfo(0);
 
@@ -262,9 +270,9 @@ public class CharacterController2D : MonoBehaviour
 
     private bool Float()
     {
-        if (!canJump) return false;
+        if (!CanJump() || !CanDoubleJump()) return false;
 
-        if (input_floating && !isGrounded && isFalling && canDoubleJump && !playerAttack.isPreparingStorm && !playerAttack.isDefending)
+        if (input_floating && !isGrounded && isFalling)
         {
             if (!floatTriggered)
             {
@@ -280,6 +288,7 @@ public class CharacterController2D : MonoBehaviour
                 Gamepad.current.SetMotorSpeeds(floatingRumblingSpeed.x, 0);
                 resetRumbleJump = true;
             }
+            ActionLock.Add("floating", Lock.Defend | Lock.Attack);
             return true;
         }
         else
@@ -289,6 +298,7 @@ public class CharacterController2D : MonoBehaviour
                 Gamepad.current.SetMotorSpeeds(0f, 0f);
                 resetRumbleJump = false;
             }
+            ActionLock.Remove("floating");
             return false;
         }
     }
@@ -301,7 +311,7 @@ public class CharacterController2D : MonoBehaviour
 
     public void Jump()
     {
-        if (!canJump || coyoteTimer <= 0f) return;
+        if (!CanJump() || coyoteTimer <= 0f) return;
 
         coyoteTimer = 0f;
         isGrounded = false;
@@ -321,14 +331,14 @@ public class CharacterController2D : MonoBehaviour
 
     public void DoubleJump(float holdTime)
     {
-        if (!canDoubleJump || isGrounded) return;
+        if (!CanDoubleJump() || isGrounded) return;
         if (!energy.DoubleJumpConsume()) return;
         float x = rb.velocity.x;
         float strength = Mathf.Lerp(MinDoubleJumpForceMultiplier, DoubleJumpForceMultiplier, holdTime / DoubleJumpForceTime);
 
         SoundManager.PlaySound("sword_jump");
         rb.velocity = new Vector2(x, m_JumpForce * strength);
-        canDoubleJump = false;
+        ActionLock.Add("doubleJumping", Lock.SwordJump);
         isFloating = false;
         isFalling = false;
         isJumping = true;
@@ -337,7 +347,7 @@ public class CharacterController2D : MonoBehaviour
         bool hit = playerAttack.JumpAttack();
         if (hit)
         {
-            canDoubleJump = true;
+            ActionLock.Remove("doubleJumping");
             floatTriggered = false;
         }
     }
@@ -348,7 +358,7 @@ public class CharacterController2D : MonoBehaviour
 
     public void Flip(bool ignoreCamFollowFlip = false)
     {
-        if (!canFlip) return;
+        if (!CanFlip()) return;
 
         if (playerAttack.attackTimer <= playerAttack.attackAnimationTime)
         {
@@ -399,6 +409,7 @@ public class CharacterController2D : MonoBehaviour
 
     public void SwordTeleport()
     {
+        if (!CanTeleport()) return;
         if (teleportTimer <= teleportCD || !energy.TeleportConsume()) return;
         teleportTimer = 0f;
         teleported = false;
@@ -448,7 +459,7 @@ public class CharacterController2D : MonoBehaviour
             Flip();
 
         gameObject.layer = 14; //player_dash
-        AnimSetBool.instance.Anim_Teleport(0);
+        ActionLock.AddExcept("swordTeleport", Lock.SwordTeleport);
         if (isFalling) anim.Play("tele_pre_fall");
         else if (isJumping) anim.Play("tele_pre_jump");
         else anim.Play("tele_pre_idle");
@@ -468,8 +479,6 @@ public class CharacterController2D : MonoBehaviour
 
     public IEnumerator TeleportCoroutine(bool right)
     {
-        if (!canTeleport) yield break;
-
         if (playerAttack.isAimingRightStick)
         {
             if (inputPlayer.rightPointLeft == FacingRight) Flip();
@@ -480,7 +489,7 @@ public class CharacterController2D : MonoBehaviour
         }
 
         gameObject.layer = 14; //player_dash
-        AnimSetBool.instance.Anim_Teleport(0);
+        ActionLock.AddExcept("swordTeleport", Lock.SwordTeleport);
         if (isFalling) anim.Play("tele_pre_fall");
         else if (isJumping) anim.Play("tele_pre_jump");
         else anim.Play("tele_pre_idle");
@@ -517,8 +526,7 @@ public class CharacterController2D : MonoBehaviour
             offset_x = FacingRight ? -hit_horizontal.distance - 0.1f : hit_horizontal.distance + 0.1f;
         }
         rb.velocity = Vector3.zero;
-
-        AnimSetBool.instance.Anim_Teleport(1);
+        ActionLock.Remove("swordTeleport");
         teleportTimer = 0f;
         TeleportSword.SetActive(false);
         anim.SetBool("isCombat", true);

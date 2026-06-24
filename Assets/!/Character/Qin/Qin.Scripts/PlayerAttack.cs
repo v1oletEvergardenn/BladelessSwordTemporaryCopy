@@ -1,12 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEngine;
-using Cinemachine;
-using static Cinemachine.CinemachineOrbitalTransposer;
 using EditorAttributes;
-using UnityEngine.UI;
-using UnityEngine.Playables;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class PlayerAttack : MonoBehaviour
 {
@@ -18,8 +14,10 @@ public class PlayerAttack : MonoBehaviour
     private GameManager gameManager;
     private Energy energy;
     private Rigidbody2D rb;
-    private AnimSetBool animSet;
+
+    //private AnimSetBool animSet;
     private InputPlayer inputPlayer;
+
     private IDamagable health;
     private InternalObjectPooler selfPooler;
     private HeartSwordAbilities hSAbilitiesManager;
@@ -33,13 +31,19 @@ public class PlayerAttack : MonoBehaviour
     [HideInInspector] public bool isAimingRightStick;
     [HideInInspector] public bool isInCombat;
     [HideInInspector] public bool isDefending;
-    [HideInInspector] public bool canDefend = true;
-    [HideInInspector] public bool canAttack;
     [HideInInspector] public bool isCounterAttacking;
     [HideInInspector] public bool isAttackingLeft = true;
-    [HideInInspector] public bool canStorm = true;
     [HideInInspector] public bool isOnStorm = false;
     [HideInInspector] public bool isPreparingStorm = false;
+
+    public bool CanAttack()
+    { return ActionLock.Can(Lock.Attack); }
+
+    public bool CanDefend()
+    { return ActionLock.Can(Lock.Defend); }
+
+    public bool CanStorm()
+    { return ActionLock.Can(Lock.Storm); }
 
     #endregion State Flags
 
@@ -56,7 +60,7 @@ public class PlayerAttack : MonoBehaviour
     [FoldoutGroup("Attack Variables", nameof(basicAttackDamage), nameof(CounterAttackRadius), nameof(jumpCounterAttackRadius),
         nameof(jumpAttackPoint), nameof(counterAttackPoint), nameof(counterAttackCheckDuration),
         nameof(perfectCounterAttackCheckDuration), nameof(attackGap), nameof(commonHitEffect))]
-    [SerializeField] private Void attackGroupHold;
+    [SerializeField] private EditorAttributes.Void attackGroupHold;
 
     [SerializeField, HideInInspector] public int basicAttackDamage = 1;
     [SerializeField, HideInInspector, Range(0f, 3f)] private float CounterAttackRadius;
@@ -83,7 +87,7 @@ public class PlayerAttack : MonoBehaviour
 
     [FoldoutGroup("Storm Variables", nameof(storm), nameof(prepareStormTime), nameof(stormDuration),
         nameof(storm_radius), nameof(repelLayer), nameof(repelForce), nameof(stormEffectPos))]
-    [SerializeField] private Void barrierGroupHold;
+    [SerializeField] private EditorAttributes.Void barrierGroupHold;
 
     [SerializeField, HideInInspector] private GameObject storm;
     [SerializeField, HideInInspector, Range(0f, 2f)] private float prepareStormTime = 1f;
@@ -112,7 +116,6 @@ public class PlayerAttack : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         vfx = VFXManager.instance;
         gameManager = GameManager.instance;
-        animSet = GetComponentInChildren<AnimSetBool>();
         health = GetComponent<Health>();
         energy = GetComponent<Energy>();
         selfPooler = GetComponentInChildren<InternalObjectPooler>();
@@ -137,7 +140,10 @@ public class PlayerAttack : MonoBehaviour
         }
         else { prepareStormTimer = 0f; stormReady = false; }
 
-        if (isPreparingStorm && prepareStormTimer >= prepareStormTime && !stormReady) { stormReady = true; SoundManager.PlaySound("defend_block2"); vfx.SpawnSlashEffect(stormEffectPos.position); }
+        if (isPreparingStorm && prepareStormTimer >= prepareStormTime && !stormReady)
+        {
+            stormReady = true; SoundManager.PlaySound("defend_block2"); vfx.SpawnSlashEffect(stormEffectPos.position);
+        }
         if (combatTimer <= 0) { anim.SetBool("isCombat", false); isInCombat = false; combatTimer = 0; }
         if (comboTimer >= 0.67f) { attackIndex = 2; }
 
@@ -153,10 +159,7 @@ public class PlayerAttack : MonoBehaviour
 
     public bool Attack(bool attackLeft, bool consumeEnergy = true)
     {
-        // Guard clauses for attack eligibility
-
-        if (!canAttack) return false;
-        if (controller.isFloating) return false;
+        if (!CanAttack()) return false;
         if (attackTimer < attackGap) return false;
         if (consumeEnergy) if (!energy.AttackConsume()) { return false; }
         normalAttacking = true;
@@ -252,7 +255,7 @@ public class PlayerAttack : MonoBehaviour
         if (!projectile.collisionEnabled) return;
         //if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
         attackTimer = attackGap;
-        canDefend = true;
+
         if (isPerfect)
         {
             hSAbilitiesManager.ModifyHSPoint(0.5f);
@@ -285,7 +288,6 @@ public class PlayerAttack : MonoBehaviour
         SoundManager.PlaySound("metal_hit" + i);
         energy.PerfectCounterAttackRestore();
         isCounterAttacking = false;
-        canDefend = true;
         attackTimer = 3f;
     }
 
@@ -338,12 +340,13 @@ public class PlayerAttack : MonoBehaviour
 
     public void OnDefend()
     {
-        if (canDefend && !controller.isFloating)
+        if (CanDefend())
         {
             if (!energy.DefendConsume()) { return; }
             if (!isDefending) { QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.defend); }
             isDefending = true;
-            animSet.Anim_Defend(0);
+            //animSet.Anim_Defend(0);
+            ActionLock.Add("onDefend", Lock.Move | Lock.Attack | Lock.Jump | Lock.SwordTeleport | Lock.SwordJump);
             anim.Play("defend");
         }
     }
@@ -351,7 +354,8 @@ public class PlayerAttack : MonoBehaviour
     public void EndDefend()
     {
         if (!isDefending) return;
-        animSet.Anim_Defend(1);
+        //animSet.Anim_Defend(1);
+        ActionLock.Remove("onDefend");
         anim.SetBool("isCombat", true);
         combatTimer = 2;
         if (controller.isFalling) { anim.Play("fall_combat"); }
@@ -366,7 +370,7 @@ public class PlayerAttack : MonoBehaviour
 
     public void OnStorm()
     {
-        if (canStorm && !isOnStorm)
+        if (CanStorm() && !isOnStorm)
         {
             if (stormReady)
             {
@@ -408,11 +412,11 @@ public class PlayerAttack : MonoBehaviour
 
     public void EndStorm()
     {
-        if (controller.isJumping)
-        {
-            rb.isKinematic = false;
-            controller.canMove = true;
-        }
+        //if (controller.isJumping)
+        //{
+        //    rb.isKinematic = false;
+        //    controller.canMove = true;
+        //}
         storm.transform.SetParent(this.transform, false);
         storm.transform.localPosition = originalStormPos;
         storm.SetActive(false);

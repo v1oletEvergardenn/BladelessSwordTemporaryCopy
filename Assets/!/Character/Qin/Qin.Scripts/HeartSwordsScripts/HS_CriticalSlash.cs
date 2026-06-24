@@ -28,10 +28,9 @@ public class HS_CriticalSlash : IHeartSwordAbility
         if (controller.FacingRight == isLeft) { controller.Flip(); }
         hSAbilityManager.ModifyHSPoint(-GetCurrentAttribute().HS_Cost);
 
-        print("performing original ability");
-
         inputPlayer.DisableAllActions();
-        animSet.Anim_Hit(0);
+
+        ActionLock.Add("HS_CriticalSlash", Lock.All);
         controller.canSwitchNormalAnim = false;
         hsHitEffectPlayed = false;
         playerAttack.combatTimer = 5f;
@@ -63,7 +62,6 @@ public class HS_CriticalSlash : IHeartSwordAbility
         else yield return new WaitForSeconds(actionDuration - 2.76f - playerAttack.counterAttackCheckDuration);
 
         EndAction();
-        animSet.Anim_Hit(1);
     }
 
     #endregion Original Ability Performance
@@ -72,8 +70,7 @@ public class HS_CriticalSlash : IHeartSwordAbility
 
     public override bool FirstBranchAbilityPerformance(bool isLeft)
     {
-        if (!playerAttack.canAttack) return false;
-        if (controller.isFloating) return false;
+        if (!playerAttack.CanAttack()) return false;
         if (health.stunned) return false;
         if (CheckAnyPerformingAbility()) return false;
         if (playerAttack.attackTimer < playerAttack.attackGap) return false;
@@ -87,8 +84,7 @@ public class HS_CriticalSlash : IHeartSwordAbility
 
     public override bool SecondBranchAbilityPerformance(bool isLeft)
     {
-        if (!playerAttack.canAttack) return false;
-        if (controller.isFloating) return false;
+        if (!playerAttack.CanAttack()) return false;
         if (health.stunned) return false;
         if (CheckAnyPerformingAbility()) return false;
         if (playerAttack.attackTimer < playerAttack.attackGap) return false;
@@ -120,6 +116,7 @@ public class HS_CriticalSlash : IHeartSwordAbility
         isPerforming = false;
         hitBox.enabled = false;
         hsHitEffectPlayed = false;
+        ActionLock.Remove("HS_CriticalSlash");
     }
 
     #endregion Utility Methods

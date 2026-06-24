@@ -34,8 +34,7 @@ public class HS_CounterAttack : IHeartSwordAbility
 
     public override bool OriginalAbilityPerformance(bool isLeft)
     {
-        if (!playerAttack.canAttack) return false;
-        if (controller.isFloating) return false;
+        if (!playerAttack.CanAttack()) return false;
         if (health.stunned) return false;
         if (CheckAnyPerformingAbility()) return false;
         if (playerAttack.attackTimer < playerAttack.attackGap) return false;
@@ -88,8 +87,7 @@ public class HS_CounterAttack : IHeartSwordAbility
 
     public override bool FirstBranchAbilityPerformance(bool isLeft)
     {
-        if (!playerAttack.canAttack) return false;
-        if (controller.isFloating) return false;
+        if (!playerAttack.CanAttack()) return false;
         if (health.stunned) return false;
         if (CheckAnyPerformingAbility()) return false;
         if (playerAttack.attackTimer < playerAttack.attackGap) return false;
@@ -103,8 +101,7 @@ public class HS_CounterAttack : IHeartSwordAbility
 
     public override bool SecondBranchAbilityPerformance(bool isLeft)
     {
-        if (!playerAttack.canAttack) return false;
-        if (controller.isFloating) return false;
+        if (!playerAttack.CanAttack()) return false;
         if (health.stunned) return false;
         if (CheckAnyPerformingAbility()) return false;
         if (playerAttack.attackTimer < playerAttack.attackGap) return false;
@@ -186,14 +183,14 @@ public class HS_CounterAttack : IHeartSwordAbility
         vfx.SpawnHeartSwordHitEffect(damagable.GetHitPos());
 
         damagable.Damage(attackEffect.damage, this.transform, 0, bossBreakValue: attackEffect.breakAmount);
-        playerAttack.canDefend = true;
+        //playerAttack.canDefend = true;
     }
 
     public override void HS_counterAttack(IProjectile projectile)
     {
         //if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
         playerAttack.attackTimer = playerAttack.attackGap + 0.5f;
-        playerAttack.canDefend = true;
+        //playerAttack.canDefend = true;
 
         energy.ChangeEnergy(-energy.attack_energy_consumption);
         //projectile.SetUp(playerAttack.pointerDirection, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * playerAttack.basicAttackDamage);
