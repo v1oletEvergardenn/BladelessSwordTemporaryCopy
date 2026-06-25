@@ -659,6 +659,17 @@ public class YingYangFish_AI : IEnemyController
     public void PlaySecondPhaseTimeLine()
     {
         secondPhaseDirector.Play();
+        camLimit.UpdateLimit();
+        EventInteract.SetActive(false);
+        // center interact and flowing upward animation
+        leftBoundary.gameObject.SetActive(true);
+        rightBoundary.gameObject.SetActive(true);
+        center.localPosition = Vector3.zero;
+        co_fishAppear = StartCoroutine(FishAppear());
+        IN_COMBAT = true;
+        HealthUI.SetActive(true);
+
+        DEAD = true;
     }
 
     public void SetNormalRotateSpeed()
@@ -674,27 +685,6 @@ public class YingYangFish_AI : IEnemyController
         if (!smooth) { black_rotateSpeed = 0; white_rotateSpeed = 0; }
     }
 
-    //public void SetBlackBusy() => isBlackBusy = true;
-
-    //public void SetWhiteBusy() => isWhiteBusy = true;
-
-    //public void SetBlackNotBusy() => isBlackBusy = false;
-
-    //public void SetWhiteNotBusy() => isWhiteBusy = false;
-
-    //public void SetNotBusy(bool isBlack)
-    //{
-    //    if (isBlack) { SetBlackNotBusy(); }
-    //    else { SetWhiteNotBusy(); }
-    //}
-
-    //public void SetBusy(bool isBlack)
-    //{
-    //    if (isBlack) { SetBlackBusy(); }
-    //    else { SetWhiteBusy(); }
-    //}
-
-    //Target Rotate Speed
     public void SetFishRotateSpeed(bool isBlack, float speed, bool smooth = true)
     {
         if (isBlack)

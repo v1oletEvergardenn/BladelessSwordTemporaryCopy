@@ -3,12 +3,8 @@ using static UnityEngine.EventSystems.EventTrigger;
 
 public enum PlayerTimelineActionType
 {
-    MoveTo = 0,
-    Jump = 1,
-    Attack = 2,
-    Defend = 3,
-    SwordTeleport = 4,
-    Repel = 5,
+    MoveTo,
+    Repel
 }
 
 [DisallowMultipleComponent]
@@ -47,50 +43,14 @@ public class PlayerTimeLineActions : MonoBehaviour
         controller.RunToPosition(worldPosition.position);
     }
 
-    //jump
-    public void Jump()
+    // repel (target-based)
+    public void RepelTo(Vector3 worldPosition)
     {
         AssignRef();
-        if (controller == null)
-            return;
-
-        controller.Jump();
+        playerHealth.RepelToPosition(worldPosition);
     }
 
-    //attack
-    public void Attack(bool attackLeft)
-    {
-        AssignRef();
-        playerAttack.Attack(attackLeft, false);
-    }
-
-    //defend
-
-    public void Defend(float duration)
-    {
-        playerAttack.isDefending = true;
-        //playerAttack.animSet.Anim_Defend(0);
-        anim.Play("defend");
-
-        playerAttack.OnDefend();
-    }
-
-    public void EndDefend()
-    {
-        //playerAttack.animSet.Anim_Defend(1);
-        anim.SetBool("isCombat", true);
-        playerAttack.combatTimer = 2;
-        if (controller.isFalling) { anim.Play("fall_combat"); }
-        else if (controller.isJumping) { anim.Play("jump_combat"); }
-        else { anim.Play("idle_combat"); }
-        playerAttack.isDefending = false;
-    }
-
-    //sword teleport
-
-    //repel
-
-    //Utility
+    // Utility
     public void AssignRef()
     {
         if (playerAttack == null) playerAttack = PlayerAttack.instance;

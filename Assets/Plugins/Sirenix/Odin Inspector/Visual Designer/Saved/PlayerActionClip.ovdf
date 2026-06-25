@@ -1,0 +1,46 @@
+OVDF v1.1
+PlayerActionClip, Project.Main
+MetaGuid:028877a917aafc3429bf44ef9957ce2c
+
+# $SUDMk18hYzkpxVJ8q1YSoB
+Position: $root:18
++ [Sirenix.OdinInspector.TitleGroupAttribute]
+	GroupName = "Actions"
+	Indent = True
+	BoldTitle = True
+	HorizontalLine = True
+	Alignment = Left
+
+# $VNDUaKpTqArmq2xCxFBBT4
+Position: $root:17
++ [Sirenix.OdinInspector.TitleGroupAttribute]
+	GroupName = "Gizmos"
+	Indent = True
+	Subtitle = ""
+	Alignment = Left
+
+# showMoveTargetGizmo
+Position: $VNDUaKpTqArmq2xCxFBBT4:0
+- [UnityEngine.HeaderAttribute]
+
+# moveTargetGizmoColor
+Position: $VNDUaKpTqArmq2xCxFBBT4:2
++ [Sirenix.OdinInspector.PropertySpaceAttribute]
+	SpaceBefore = 0
+	SpaceAfter = 6
+
+# actionType
+Position: $SUDMk18hYzkpxVJ8q1YSoB:0
+- [UnityEngine.HeaderAttribute]
+
+# useTargetTransform
+Position: $SUDMk18hYzkpxVJ8q1YSoB:1
+- [UnityEngine.HeaderAttribute]
+
+# moveTarget
+Position: $SUDMk18hYzkpxVJ8q1YSoB:2
++ [Sirenix.OdinInspector.DrawWithUnityAttribute]
+	PreferImGUI = True
+
+# moveWorldTargetGizmoLabel
+Position: $VNDUaKpTqArmq2xCxFBBT4:1

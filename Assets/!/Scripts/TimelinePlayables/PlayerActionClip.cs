@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -6,20 +7,28 @@ using UnityEngine.Timeline;
 [Serializable]
 public class PlayerActionClip : PlayableAsset, ITimelineClipAsset
 {
+    [Header("Target Gizmo")]
+    [ShowIf(nameof(UsesTarget))]
+    public bool showMoveTargetGizmo = true;
+
+    [ShowIf(nameof(ShowGizmoColorField))]
+    public Color moveTargetGizmoColor = Color.cyan;
+
+    [ShowIf(nameof(ShowWorldTargetLabelField))]
+    public string moveWorldTargetGizmoLabel = "Target";
+
     [Header("Action")]
     public PlayerTimelineActionType actionType;
 
-    [Header("Move To")]
+    [Header("Target")]
+    [ShowIf(nameof(ShowUseTargetTransformField))]
     public bool useTargetTransform = false;
 
+    [ShowIf(nameof(ShowTargetTransformField))]
     public ExposedReference<Transform> moveTarget;
+
+    [HideInInspector]
     public Vector3 moveWorldPosition;
-    public bool faceTargetAfterMove = true;
-
-    [Header("Attack")]
-    public bool attackLeft = true;
-
-    public bool consumeEnergy = false;
 
     public ClipCaps clipCaps => ClipCaps.None;
 
@@ -29,23 +38,28 @@ public class PlayerActionClip : PlayableAsset, ITimelineClipAsset
         PlayerActionBehaviour behaviour = playable.GetBehaviour();
 
         behaviour.actionType = actionType;
-        behaviour.moveWorldPosition = moveWorldPosition;
-        behaviour.faceTargetAfterMove = faceTargetAfterMove;
-        behaviour.attackLeft = attackLeft;
-        behaviour.consumeEnergy = consumeEnergy;
 
-        if (useTargetTransform)
-        {
-            Transform resolvedTarget = moveTarget.Resolve(graph.GetResolver());
-            behaviour.hasResolvedTarget = resolvedTarget != null;
-            behaviour.resolvedTargetPosition = resolvedTarget != null ? resolvedTarget.position : default;
-        }
-        else
-        {
-            behaviour.hasResolvedTarget = false;
-            behaviour.resolvedTargetPosition = default;
-        }
+        bool canUseTransformTarget = actionType == PlayerTimelineActionType.MoveTo && useTargetTransform;
+        Transform targetTransform = canUseTransformTarget ? moveTarget.Resolve(graph.GetResolver()) : null;
+        behaviour.targetPosition = targetTransform != null ? targetTransform.position : moveWorldPosition;
 
         return playable;
     }
+
+    private bool UsesTarget =>
+        actionType == PlayerTimelineActionType.MoveTo ||
+        actionType == PlayerTimelineActionType.Repel;
+
+    private bool ShowUseTargetTransformField =>
+        actionType == PlayerTimelineActionType.MoveTo;
+
+    private bool ShowTargetTransformField =>
+        actionType == PlayerTimelineActionType.MoveTo && useTargetTransform;
+
+    private bool ShowGizmoColorField =>
+        UsesTarget && showMoveTargetGizmo;
+
+    private bool ShowWorldTargetLabelField =>
+        UsesTarget && showMoveTargetGizmo &&
+        (actionType == PlayerTimelineActionType.Repel || (actionType == PlayerTimelineActionType.MoveTo && !useTargetTransform));
 }

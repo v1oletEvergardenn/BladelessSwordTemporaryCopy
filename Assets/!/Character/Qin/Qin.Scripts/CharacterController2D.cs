@@ -419,15 +419,13 @@ public class CharacterController2D : MonoBehaviour
 
     public IEnumerator RunToPositionCoroutine(Vector3 target, Action callBack = null, bool faceTarget = true)
     {
-        bool originalEnabled = InputMaster.instance._defendAction.enabled;
-        InputMaster.instance._defendAction.Disable();
+        ActionLock.Add("RunningToPosition", Lock.Defend | Lock.SwordTeleport);
         runToLeft = runToTarget.x < transform.position.x;
         inputPlayer.leftPointLeft = runToLeft;
         isRunningToTarget = true;
         runToTarget = target;
         yield return new WaitUntil(() => !isRunningToTarget);
-        if (originalEnabled)
-            InputMaster.instance._defendAction.Enable();
+        ActionLock.Remove("RunningToPosition");
         yield return null;
         if (faceTarget)
             FaceTarget(target);

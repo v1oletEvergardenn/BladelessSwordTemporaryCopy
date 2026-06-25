@@ -203,7 +203,8 @@ public class Health : IDamagable
         hsManager.CancelAllAbilities();
         stunned = true;
         //anim_bool.Anim_Hit(0);
-        ActionLock.Add("stunned", Lock.All, duration, onUnlocked: () => { Debug.Log("Stun unlocked"); stunned = false; });
+        print(sender + " dealt " + duration + "s of stun");
+        ActionLock.Add("stunned", Lock.All, duration, onUnlocked: () => { anim.SetTrigger("stun_after"); stunned = false; });
 
         bool damageFromBehind = false;//determines the animation
         if (sender != null)
@@ -223,11 +224,6 @@ public class Health : IDamagable
     public override void Repel(float force, bool left)
     {
         if (GameManager.instance.isInPerformingState) { return; }
-        GetComponent<Rigidbody2D>().AddForce((left ? Vector3.left : Vector3.right) * force, ForceMode2D.Impulse);
-    }
-
-    public void ForceRepel(float force, bool left)
-    {
         GetComponent<Rigidbody2D>().AddForce((left ? Vector3.left : Vector3.right) * force, ForceMode2D.Impulse);
     }
 

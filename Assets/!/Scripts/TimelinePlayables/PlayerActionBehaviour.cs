@@ -8,16 +8,10 @@ using UnityEngine.Playables;
 public class PlayerActionBehaviour : PlayableBehaviour
 {
     public PlayerTimelineActionType actionType;
-
-    public bool hasResolvedTarget;
-    public Vector3 resolvedTargetPosition;
-    public Vector3 moveWorldPosition;
-    public bool faceTargetAfterMove;
-
-    public bool attackLeft;
-    public bool consumeEnergy;
-
     private bool _started;
+
+    [Header("Target (Move / Repel)")]
+    public Vector3 targetPosition;
 
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
     {
@@ -34,16 +28,11 @@ public class PlayerActionBehaviour : PlayableBehaviour
         switch (actionType)
         {
             case PlayerTimelineActionType.MoveTo:
-                Vector3 targetPosition = hasResolvedTarget ? resolvedTargetPosition : moveWorldPosition;
                 handler.MoveTo(targetPosition);
                 break;
 
-            case PlayerTimelineActionType.Attack:
-                handler.Attack(attackLeft);
-                break;
-
-            case PlayerTimelineActionType.Jump:
-                handler.Jump();
+            case PlayerTimelineActionType.Repel:
+                handler.RepelTo(targetPosition);
                 break;
         }
     }
