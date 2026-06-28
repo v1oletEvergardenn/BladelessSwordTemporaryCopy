@@ -40,30 +40,33 @@ public class YYF_Splash : IEnemyAction
     public override IEnumerator Act_coroutine(float factor = 0, Transform _target = null)
     {
         Transform trueTarget = _target != null ? _target : player.transform;
-
+        //factor = 3 & factor = 4: no spawning bullets and ice thorn, only splash attack
         //black fish or white fish
-        if (factor == 0 || factor == 1)
+        if (factor == 0 || factor == 1 || factor == 3 || factor == 4)
         {
-            bool isBlack = factor == 0 ? true : false;
+            bool isBlack = true;
+            if (factor == 1 || factor == 4) { isBlack = false; }
             YYF_fish YYFFish = bossAI.SpawnFish(isBlack);
             Animator anim = YYFFish.anim;
             Transform fish = YYFFish.fish;
             Transform origin = YYFFish.transform;
             Transform fishGFX = YYFFish.fishGFX;
 
+            bool spawningBullets = true;
+            if (factor == 3 || factor == 4) spawningBullets = false;
+
             Vector3 target = trueTarget.position + new Vector3(0, 3, 0);
             bool toLeft = target.x < origin.position.x;
             origin.position = new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, origin.position.z);
 
             //before jump out
-            if (toLeft) { origin.DOMove(new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0), 0.3f); }
-            else { origin.DOMove(new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0), 0.3f); }
+            if (toLeft) { origin.DOMove(new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0), 0.1f); }
+            else { origin.DOMove(new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0), 0.1f); }
 
             //reset to initial
             origin.eulerAngles = Vector3.zero;
             fish.localPosition = new Vector3(0, 0, 0);
             bossAI.ResetFishGFX(YYFFish);
-            yield return new WaitForSeconds(0.3f);
 
             //jump out
             float temp_x = toLeft ? trueTarget.position.x + 2 : trueTarget.position.x - 2;
@@ -112,15 +115,18 @@ public class YYF_Splash : IEnemyAction
 
             yield return new WaitForSeconds(0.3f);
 
-            //spawn bullets
+            if (spawningBullets)
+            {
+                //spawn bullets
 
-            if (isBlack)
-            {
-                co_spawnWaterBullet2 = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), isBlack));
-            }
-            else
-            {
-                co_spawnWaterBullet = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), isBlack));
+                if (isBlack)
+                {
+                    co_spawnWaterBullet2 = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), isBlack));
+                }
+                else
+                {
+                    co_spawnWaterBullet = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(origin.position), isBlack));
+                }
             }
 
             splashEffect.gameObject.SetActive(false);
@@ -132,8 +138,10 @@ public class YYF_Splash : IEnemyAction
             origin.DOMove(new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, 0f), 0.05f).SetEase(Ease.Linear);
             YYFFish.gameObject.SetActive(false);
         }
-        else if (factor == 2)//both fish
+        else if (factor == 2 || factor == 5)//both fish
         {
+            bool spawningBullets = true;
+            if (factor == 5) spawningBullets = false;
             Vector3 target = trueTarget.position + new Vector3(0, 3, 0);
 
             YYF_fish black_YYFFish = bossAI.SpawnFish(true);
@@ -203,8 +211,12 @@ public class YYF_Splash : IEnemyAction
             StartCoroutine(ApplyAttackInCircle(0.3f, hitRange, white_YYFFish.transform, splashAttack));
             yield return new WaitForSeconds(0.3f);
             //spawn bullets
-            co_spawnWaterBullet2 = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(white_YYFFish.transform.position), false));
-            co_spawnWaterBullet = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(white_YYFFish.transform.position), true, 0.1f));
+            if (spawningBullets)
+            {
+                co_spawnWaterBullet2 = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(white_YYFFish.transform.position), false));
+                co_spawnWaterBullet = StartCoroutine(IESpawnBullet(bossAI.CreateWaterLevelYAxis(white_YYFFish.transform.position), true, 0.1f));
+            }
+
             splashEffect_1.gameObject.SetActive(false);
 
             //move origin down water
@@ -220,7 +232,6 @@ public class YYF_Splash : IEnemyAction
         }
 
         yield return new WaitForSeconds(0.1f);
-        anim.Play("swim_up");
         splashEffect_1.gameObject.SetActive(false);
         yield return null;
     }

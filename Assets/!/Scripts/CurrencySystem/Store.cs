@@ -15,6 +15,7 @@ public class Store : MonoBehaviour
     {
         InputMaster.SwitchToUIAction();
         CharacterController2D.instance.RunToPosition(transform.position + new Vector3(1, 0, 0),
+            false,
             () =>
             {
                 CharacterController2D.instance.FaceTarget(transform);

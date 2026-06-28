@@ -47,7 +47,6 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField] public Transform waterLevel;
     [SerializeField] public GameObject EventInteract;
     [SerializeField] public CameraLimit camLimit;
-    [SerializeField] public GeneralEventInteraction interaction;
     [SerializeField] public PlayableDirector secondPhaseDirector;
 
     [HideInInspector] public bool secondPhase;
@@ -223,39 +222,6 @@ public class YingYangFish_AI : IEnemyController
         SetNormalRotateSpeed();
         selfPooler.SetPoolDisactive("whiteFish");
         selfPooler.SetPoolDisactive("blackFish");
-    }
-
-    public IEnumerator Pre_SecondPhase()
-    {
-        if (!secondPhase)
-        {
-            DEAD = true;
-
-            //clear
-            actionList.Clear();
-            CancelAllAction();
-            selfPooler.SetPoolDisactive();
-
-            //UI
-            CharacterUIManager.ShowBlackEdge(true);
-
-            //dive, move to center of map
-            secondPhase = true;
-            EventInteract.SetActive(true);
-            yield return co_fishAppear = StartCoroutine(FishAppear());
-            StartCoroutine(secondPhaseAnim());
-        }
-    }
-
-    public IEnumerator secondPhaseAnim()
-    {
-        //disable player's actions
-        InputMaster.instance.DisableAllActions();
-        GameManager.instance.isInPerformingState = true;
-
-        PlaySecondPhaseTimeLine();
-
-        yield return null;
     }
 
     public IEnumerator FishAppear()
@@ -522,7 +488,6 @@ public class YingYangFish_AI : IEnemyController
     {
         // center interact and flowing upward animation
         Vector3 pos = new Vector3(center.position.x, 0, 0);
-        interaction.transform.localPosition = Vector3.zero;
         leftBoundary.gameObject.SetActive(true);
         rightBoundary.gameObject.SetActive(true);
         float timer = 0f;
@@ -614,8 +579,47 @@ public class YingYangFish_AI : IEnemyController
         }
         else
         {
-            StartCoroutine(secondPhaseAnim());
+            InputMaster.instance.DisableAllActions();
+            InputMaster.instance._attackDirectionAction.Enable();
+            InputMaster.instance._attackLeftAction.Enable();
+            InputMaster.instance._attackRightAction.Enable();
+            InputMaster.instance._defendAction.Enable();
+            GameManager.instance.isInPerformingState = true;
+            playerController.RunToPosition(center.position - new Vector3(2, 0, 0), true, () => { StartCoroutine(secondPhaseAnim()); });
         }
+    }
+
+    public IEnumerator Pre_SecondPhase()
+    {
+        if (!secondPhase)
+        {
+            DEAD = true;
+            secondPhase = true;
+            //clear
+            actionList.Clear();
+            CancelAllAction();
+            selfPooler.SetPoolDisactive();
+
+            centerAnim.SetBool("secondPhase", true);
+            CharacterUIManager.ShowBlackEdge(true);
+            yield return new WaitForSeconds(2f);
+            centerAnim.Play("center_break");
+            yield return new WaitForSeconds(0.5f);
+            center.DOLocalMove(new Vector3(0, -8.4f, 0), 0.5f).SetEase(Ease.InSine);
+            yield return new WaitForSeconds(0.5f);
+            //UI
+            EventInteract.SetActive(true);
+        }
+    }
+
+    public IEnumerator secondPhaseAnim()
+    {
+        //disable player's actions
+        centerAnim.Play("center_fade");
+        PlaySecondPhaseTimeLine();
+        center.DOLocalMove(Vector3.zero, 2.5f).SetEase(Ease.InOutSine);
+        yield return new WaitForSeconds(1f);
+        Health.instance.RepelToPosition(new Vector3(-37, 0, 0));
     }
 
     public override IEnumerator BossBreak()
@@ -664,11 +668,8 @@ public class YingYangFish_AI : IEnemyController
         // center interact and flowing upward animation
         leftBoundary.gameObject.SetActive(true);
         rightBoundary.gameObject.SetActive(true);
-        center.localPosition = Vector3.zero;
-        co_fishAppear = StartCoroutine(FishAppear());
         IN_COMBAT = true;
         HealthUI.SetActive(true);
-
         DEAD = true;
     }
 

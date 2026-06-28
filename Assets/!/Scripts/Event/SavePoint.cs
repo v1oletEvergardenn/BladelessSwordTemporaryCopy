@@ -56,7 +56,7 @@ public class SavePoint : IDamagable
     public void OpenMenu()
     {
         MenuManager.instance.OpenSavePointCanvas();
-        CharacterController2D.instance.RunToPosition(transform.position.x + 1f, null);
+        CharacterController2D.instance.RunToPosition(transform.position.x + 1f, false, null);
         CameraManager.SwitchCamera(cam);
     }
 

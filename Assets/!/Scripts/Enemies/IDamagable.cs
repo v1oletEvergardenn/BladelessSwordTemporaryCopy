@@ -57,7 +57,7 @@ public abstract class IDamagable : MonoBehaviour
             rb.velocity = Vector2.zero;
             rb.DOKill();
             rb.DOMove(targetPosition, 30)
-                .SetEase(Ease.OutSine)
+                .SetEase(Ease.OutQuint)
                 .SetSpeedBased(true)
                 .SetUpdate(UpdateType.Fixed);
         }
@@ -70,8 +70,8 @@ public abstract class IDamagable : MonoBehaviour
         {
             rb.velocity = Vector2.zero;
             rb.DOKill();
-            rb.DOMove(targetPosition, 30)
-                .SetEase(Ease.OutSine)
+            rb.DOMove(new Vector3(targetPosition.x, transform.position.y, 0), 15)
+                .SetEase(Ease.OutQuint)
                 .SetSpeedBased(true)
                 .SetUpdate(UpdateType.Fixed);
         }
@@ -84,8 +84,8 @@ public abstract class IDamagable : MonoBehaviour
         {
             rb.velocity = Vector2.zero;
             rb.DOKill();
-            rb.DOMove(targetPosition.position, 1000)
-                .SetEase(Ease.OutSine)
+            rb.DOMove(new Vector3(targetPosition.position.x, transform.position.y, 0), 15)
+                .SetEase(Ease.OutQuint)
                 .SetSpeedBased(true)
                 .SetUpdate(UpdateType.Fixed);
         }

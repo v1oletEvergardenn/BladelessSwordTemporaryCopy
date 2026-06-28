@@ -1,5 +1,4 @@
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public enum PlayerTimelineActionType
 {
@@ -31,16 +30,24 @@ public class PlayerTimeLineActions : MonoBehaviour
     }
 
     // move
-    public void MoveTo(Vector3 worldPosition)
+    public void MoveTo(Vector3 worldPosition, bool isRun)
     {
         AssignRef();
-        controller.RunToPosition(worldPosition);
+        if (isRun)
+        {
+            controller.RunToPosition(worldPosition);
+        }
+        else
+        {
+            controller.WalkToPosition(worldPosition);
+        }
     }
 
-    public void MoveTo(Transform worldPosition)
+    public void MoveTo(Transform worldPosition, bool isRun)
     {
         AssignRef();
-        controller.RunToPosition(worldPosition.position);
+        if (isRun) controller.RunToPosition(worldPosition.position);
+        else controller.WalkToPosition(worldPosition.position);
     }
 
     // repel (target-based)

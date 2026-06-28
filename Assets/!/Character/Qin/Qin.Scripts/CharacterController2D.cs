@@ -44,18 +44,20 @@ public class CharacterController2D : MonoBehaviour
     #region Movement Variables
 
     [Title("Variables", 15)]
-    [FoldoutGroup("Movement Variables", nameof(FacingRight), nameof(m_AirControl), nameof(m_MovementSmoothing), nameof(runSpeed), nameof(airRunSpeed))]
+    [FoldoutGroup("Movement Variables", nameof(FacingRight), nameof(m_AirControl), nameof(m_MovementSmoothing), nameof(useRunningSpeed), nameof(runSpeed), nameof(walkSpeed), nameof(airRunSpeed))]
     [SerializeField] private Void movementGroupHold;
 
     [HideInInspector] public bool m_AirControl = false;
     [SerializeField, HideInInspector, Range(0, .3f)] private float m_MovementSmoothing = .05f;
     [SerializeField, HideInInspector] public bool FacingRight = true;
     [HideInInspector] public bool camFollowDirection = false;
-    [SerializeField, HideInInspector] private float runSpeed = 5f;
+    [SerializeField, HideInInspector] private bool useRunningSpeed = true;
+    [SerializeField, HideInInspector] private float runSpeed = 10f;
+    [SerializeField, HideInInspector] private float walkSpeed = 3f;
     [SerializeField, HideInInspector] private float airRunSpeed = 5f;
     private Vector3 m_Velocity = Vector3.zero;
 
-    [HideInInspector] public bool isRunningToTarget = false;
+    [HideInInspector] public bool isRunningToTarget { get; private set; } = false;
     [HideInInspector] public Vector3 runToTarget;
     [HideInInspector] public float gravity;
     private bool runToLeft = false;
@@ -141,6 +143,7 @@ public class CharacterController2D : MonoBehaviour
         _fallSpeedYDampingChangeThreshold = CameraManager.instance._fallSpeedYDampingChangeThreshold;
         inputPlayer = InputPlayer.instance;
         gravity = rb.gravityScale;
+        useRunningSpeed = true;
     }
 
     private void Update()
@@ -170,6 +173,9 @@ public class CharacterController2D : MonoBehaviour
     private bool hasTriggeredMoveAction = false;
 
     public void Move(float move)
+    { Move(move, GetSpeed()); }
+
+    public void Move(float move, float speed)
     {
         if (!CanMove())
         {
@@ -188,25 +194,18 @@ public class CharacterController2D : MonoBehaviour
 
         if (!(isGrounded || m_AirControl))
             return;
-
-        float speed = runSpeed;
         bool moving = move != 0;
         SetRunningState(moving);
 
-        // Only trigger OnAction once per movement session
-        if (moving)
+        // Quest trigger for player movement
+        if (moving || !hasTriggeredMoveAction)
         {
-            if (!hasTriggeredMoveAction)
-            {
-                QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.Move);
-                hasTriggeredMoveAction = true;
-            }
+            QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.Move);
+            hasTriggeredMoveAction = true;
         }
-        else
-        {
-            hasTriggeredMoveAction = false; // Reset when player stops moving
-        }
+        else hasTriggeredMoveAction = false; // Reset when player stops moving
 
+        //Air check
         if (!isGrounded && m_AirControl)
         {
             speed = isFloating ? 0f : airRunSpeed;
@@ -235,12 +234,21 @@ public class CharacterController2D : MonoBehaviour
     {
         float dir = runToLeft ? -1 : 1;
         if (runToTarget.x < transform.position.x == runToLeft)
-            Move(dir);
+            Move(dir, GetSpeed());
         else
         {
-            Move(0);
-            isRunningToTarget = false;
+            Move(0, GetSpeed());
+            SetIsRunningToTarget(false);
         }
+    }
+
+    public float GetSpeed() => useRunningSpeed ? runSpeed : walkSpeed;
+
+    public void SetIsRunningToTarget(bool value)
+    {
+        isRunningToTarget = value;
+        if (value) { inputPlayer.movementInputUpdateLock.Remove("RunningToTarget"); }
+        else { inputPlayer.movementInputUpdateLock.Add("RunningToTarget"); }
     }
 
     private void GroundCheck()
@@ -359,7 +367,6 @@ public class CharacterController2D : MonoBehaviour
     public void Flip(bool ignoreCamFollowFlip = false)
     {
         if (!CanFlip()) return;
-
         if (playerAttack.attackTimer <= playerAttack.attackAnimationTime)
         {
             if (playerAttack.isAttackingLeft != FacingRight) return;
@@ -401,6 +408,14 @@ public class CharacterController2D : MonoBehaviour
         }
     }
 
+    public void Face(bool right)
+    {
+        if (FacingRight != right)
+        {
+            Flip();
+        }
+    }
+
     #endregion Flipping & Facing
 
     #region Teleportation
@@ -417,29 +432,69 @@ public class CharacterController2D : MonoBehaviour
         co_teleport = StartCoroutine(TeleportCoroutine(FacingRight));
     }
 
-    public IEnumerator RunToPositionCoroutine(Vector3 target, Action callBack = null, bool faceTarget = true)
+    public IEnumerator RunToPositionCoroutine(Vector3 target, bool faceRight, Action callBack = null)
     {
         ActionLock.Add("RunningToPosition", Lock.Defend | Lock.SwordTeleport);
         runToLeft = runToTarget.x < transform.position.x;
         inputPlayer.leftPointLeft = runToLeft;
-        isRunningToTarget = true;
+        SetIsRunningToTarget(true);
+        runToTarget = target;
+
+        yield return new WaitUntil(() => !isRunningToTarget);
+        ActionLock.Remove("RunningToPosition");
+        yield return null;
+        Face(faceRight);
+        callBack?.Invoke();
+    }
+
+    public IEnumerator WalkToPositionCoroutine(Vector3 target, bool faceRight, Action callBack = null)
+    {
+        ActionLock.Add("RunningToPosition", Lock.Defend | Lock.SwordTeleport);
+        runToLeft = runToTarget.x < transform.position.x;
+        inputPlayer.leftPointLeft = runToLeft;
+        SetIsRunningToTarget(true);
         runToTarget = target;
         yield return new WaitUntil(() => !isRunningToTarget);
         ActionLock.Remove("RunningToPosition");
         yield return null;
-        if (faceTarget)
-            FaceTarget(target);
+        Face(faceRight);
         callBack?.Invoke();
     }
 
-    public void RunToPosition(Vector3 target, Action callBack = null, bool faceTarget = true)
+    public void RunToPosition(Vector3 target, bool faceRight, Action callBack = null)
     {
-        StartCoroutine(RunToPositionCoroutine(target, callBack, faceTarget));
+        SetRunning(true);
+        StartCoroutine(RunToPositionCoroutine(target, faceRight, callBack));
     }
 
-    public void RunToPosition(float x, Action callBack = null, bool faceTarget = true)
+    public void RunToPosition(Vector3 target, Action callBack = null)
     {
-        RunToPosition(new Vector3(x, transform.position.y, 0), callBack, faceTarget);
+        SetRunning(true);
+        StartCoroutine(RunToPositionCoroutine(target, FacingRight, callBack));
+    }
+
+    public void RunToPosition(float x, bool faceRight, Action callBack = null)
+    {
+        SetRunning(true);
+        RunToPosition(new Vector3(x, transform.position.y, 0), faceRight, callBack);
+    }
+
+    public void WalkToPosition(Vector3 target, bool faceRight, Action callBack = null)
+    {
+        SetRunning(false);
+        StartCoroutine(RunToPositionCoroutine(target, faceRight, callBack));
+    }
+
+    public void WalkToPosition(Vector3 target, Action callBack = null)
+    {
+        SetRunning(false);
+        StartCoroutine(RunToPositionCoroutine(target, FacingRight, callBack));
+    }
+
+    public void WalkToPosition(float x, bool faceRight, Action callBack = null)
+    {
+        SetRunning(false);
+        RunToPosition(new Vector3(x, transform.position.y, 0), faceRight, callBack);
     }
 
     public void DesignatedPositionTeleport(Vector3 pos)
@@ -447,6 +502,8 @@ public class CharacterController2D : MonoBehaviour
         teleported = false;
         StartCoroutine(DesignatedTeleport(pos));
     }
+
+    public void SetRunning(bool run) => useRunningSpeed = run;
 
     public IEnumerator DesignatedTeleport(Vector3 pos)
     {
@@ -574,7 +631,7 @@ public class CharacterController2D : MonoBehaviour
             coyoteTimer -= VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
     }
 
-    private void SetRunningState(bool running)
+    public void SetRunningState(bool running)
     {
         anim.SetBool("isRunning", running);
         isRunning = running;
@@ -635,12 +692,12 @@ public class CharacterController2D : MonoBehaviour
         }
     }
 
-    private void HandleGroundedAnimationTransitions(AnimatorStateInfo state, bool isRunning)
+    public void HandleGroundedAnimationTransitions(AnimatorStateInfo state, bool isRunning)
     {
         float duration = state.normalizedTime;
         if (isRunning)
         {
-            if (IsAttackRunState(state) && playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
+            if (IsAttackRunState(state) && playerAttack.isAttackingLeft == FacingRight)
             {
                 if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
                     anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
@@ -649,7 +706,7 @@ public class CharacterController2D : MonoBehaviour
                 else
                     anim.Play(anim.GetBool("storm") ? "storm_pre_run" : "run_combat");
             }
-            else if (IsHSAttackRunState(state) && playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
+            else if (IsHSAttackRunState(state) && playerAttack.isAttackingLeft == FacingRight)
             {
                 if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
                     anim.Play("HS_attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
@@ -705,7 +762,7 @@ public class CharacterController2D : MonoBehaviour
         {
             if (isRunning)
             {
-                if (playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
+                if (playerAttack.isAttackingLeft == FacingRight)
                 {
                     if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
                         anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
@@ -724,7 +781,7 @@ public class CharacterController2D : MonoBehaviour
         {
             if (isRunning)
             {
-                if (playerAttack.isAttackingLeft != inputPlayer.leftPointLeft)
+                if (playerAttack.isAttackingLeft == FacingRight)
                 {
                     if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
                         anim.Play("HS_attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
@@ -782,7 +839,7 @@ public class CharacterController2D : MonoBehaviour
         return false;
     }
 
-    private void HandleFlipping(float move)
+    public void HandleFlipping(float move)
     {
         if (isRunningToTarget)
         {
@@ -796,12 +853,12 @@ public class CharacterController2D : MonoBehaviour
         }
         else if (playerAttack.isCounterAttacking)
         {
-            if (playerAttack.isAttackingLeft == FacingRight) Flip();
+            if (playerAttack.isAttackingLeft == FacingRight) { Flip(); print(1); }
         }
         else
         {
-            if (move > 0 && !FacingRight) Flip();
-            else if (move < 0 && FacingRight) Flip();
+            if (move > 0 && !FacingRight) { Flip(); print(1); }
+            else if (move < 0 && FacingRight) { Flip(); print(1); }
         }
     }
 

@@ -244,6 +244,8 @@ public class InputPlayer : MonoBehaviour
         }
     }
 
+    public BoolLock movementInputUpdateLock = new BoolLock();
+
     private void UpdateMovementInput()
     {
         float x = moveDir.x;
@@ -252,7 +254,7 @@ public class InputPlayer : MonoBehaviour
         //if (Mathf.Abs(moveDir.magnitude) < 0.7f) x = 0f;
         horizontalMove = (x <= 0 ? -1 : 1);
         if (moveDir.x == 0) horizontalMove = 0;
-        if (learnedMovement && !controller.isRunningToTarget)
+        if (learnedMovement && !movementInputUpdateLock.Check())
         {
             controller.Move(horizontalMove);
         }

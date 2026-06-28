@@ -3,20 +3,12 @@ PlayerActionClip, Project.Main
 MetaGuid:028877a917aafc3429bf44ef9957ce2c
 
 # $SUDMk18hYzkpxVJ8q1YSoB
-Position: $root:18
+Position: $root:10
 + [Sirenix.OdinInspector.TitleGroupAttribute]
 	GroupName = "Actions"
 	Indent = True
 	BoldTitle = True
 	HorizontalLine = True
-	Alignment = Left
-
-# $VNDUaKpTqArmq2xCxFBBT4
-Position: $root:17
-+ [Sirenix.OdinInspector.TitleGroupAttribute]
-	GroupName = "Gizmos"
-	Indent = True
-	Subtitle = ""
 	Alignment = Left
 
 # showMoveTargetGizmo
@@ -44,3 +36,28 @@ Position: $SUDMk18hYzkpxVJ8q1YSoB:2
 
 # moveWorldTargetGizmoLabel
 Position: $VNDUaKpTqArmq2xCxFBBT4:1
+
+# useRunSpeed
+Position: $SUDMk18hYzkpxVJ8q1YSoB:2
+
+# moveTimingMode
+Position: $SUDMk18hYzkpxVJ8q1YSoB:1
+
+# moveSpeed
+Position: $SUDMk18hYzkpxVJ8q1YSoB:3
+
+# useStartTransform
+Position: $SUDMk18hYzkpxVJ8q1YSoB:4
+- [UnityEngine.HeaderAttribute]
+
+# startTarget
+Position: $SUDMk18hYzkpxVJ8q1YSoB:6
+
+# useEndTransform
+Position: $SUDMk18hYzkpxVJ8q1YSoB:5
+
+# endTarget
+Position: $SUDMk18hYzkpxVJ8q1YSoB:7
+
+# moveMode
+Position: $SUDMk18hYzkpxVJ8q1YSoB:1
