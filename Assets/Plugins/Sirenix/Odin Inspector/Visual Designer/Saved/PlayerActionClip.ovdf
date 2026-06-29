@@ -3,7 +3,7 @@ PlayerActionClip, Project.Main
 MetaGuid:028877a917aafc3429bf44ef9957ce2c
 
 # $SUDMk18hYzkpxVJ8q1YSoB
-Position: $root:10
+Position: $root:7
 + [Sirenix.OdinInspector.TitleGroupAttribute]
 	GroupName = "Actions"
 	Indent = True
@@ -44,20 +44,32 @@ Position: $SUDMk18hYzkpxVJ8q1YSoB:2
 Position: $SUDMk18hYzkpxVJ8q1YSoB:1
 
 # moveSpeed
-Position: $SUDMk18hYzkpxVJ8q1YSoB:3
+Position: $SUDMk18hYzkpxVJ8q1YSoB:2
+- [UnityEngine.MinAttribute]
 
 # useStartTransform
-Position: $SUDMk18hYzkpxVJ8q1YSoB:4
+Position: $SUDMk18hYzkpxVJ8q1YSoB:3
 - [UnityEngine.HeaderAttribute]
 
 # startTarget
-Position: $SUDMk18hYzkpxVJ8q1YSoB:6
-
-# useEndTransform
 Position: $SUDMk18hYzkpxVJ8q1YSoB:5
 
+# useEndTransform
+Position: $SUDMk18hYzkpxVJ8q1YSoB:4
+
 # endTarget
-Position: $SUDMk18hYzkpxVJ8q1YSoB:7
+Position: $SUDMk18hYzkpxVJ8q1YSoB:6
 
 # moveMode
 Position: $SUDMk18hYzkpxVJ8q1YSoB:1
+
+# speedOption
+Position: $SUDMk18hYzkpxVJ8q1YSoB:8
++ [Sirenix.OdinInspector.EnumToggleButtonsAttribute]
+
+# useStartPosition
+Position: $SUDMk18hYzkpxVJ8q1YSoB:7
+
+# customSpeed
+Position: $SUDMk18hYzkpxVJ8q1YSoB:9
+- [UnityEngine.MinAttribute]

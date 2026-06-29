@@ -15,6 +15,7 @@ public class Energy : MonoBehaviour
     public float energyPercentage;
     public MicroBar energyBar;
 
+    public bool InfiniteEnergy = false;
     public Transform failedToDoActionSymbol;
 
     [Header("RestoreEnergy")][Range(0, 5)] public float restore_pre_second;
@@ -50,6 +51,17 @@ public class Energy : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            InfiniteEnergy = !InfiniteEnergy;
+        }
+
+        if (InfiniteEnergy)
+        {
+            currentEnergy = maxEnergy;
+            return;
+        }
+
         restoreTimer += Time.unscaledDeltaTime;
         energyPercentage = (float)currentEnergy / maxEnergy;
         if (controller.isFloating) { FloatingConsume(); }

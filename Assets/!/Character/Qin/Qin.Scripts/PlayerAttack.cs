@@ -71,7 +71,7 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField, HideInInspector, Range(0f, 0.2f)] public float perfectCounterAttackCheckDuration;
     [SerializeField, HideInInspector, Range(0f, 1f)] public float attackGap; //CD of attack
     [SerializeField, HideInInspector] public ProjectileHitEffectSettings commonHitEffect;
-    [HideInInspector] public float attackTimer = 0f;//CD timer of attack
+    public float attackTimer = 0f;//CD timer of attack
     [HideInInspector] public float counterAttackCheckTimer = 0f;
     [HideInInspector] public float attackAnimationTime = 0.35f;
 
@@ -195,7 +195,16 @@ public class PlayerAttack : MonoBehaviour
         if (controller.isFalling)
             return $"attack_fall_{indexStr}";
         if (controller.isRunning)
-            return $"attack_run_{indexStr}";
+        {
+            if (controller.FacingRight == isAttackingLeft)
+            {
+                return $"attack_back_{indexStr}";
+            }
+            else
+            {
+                return $"attack_run_{indexStr}";
+            }
+        }
         return $"attack_idle_{indexStr}";
     }
 

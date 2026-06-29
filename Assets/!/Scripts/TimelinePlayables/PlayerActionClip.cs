@@ -1,14 +1,22 @@
-using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.Serialization;
 using UnityEngine.Timeline;
+using Sirenix.OdinInspector;
 
 public enum PlayerMoveExecutionMode
 {
     TimelineFixedDuration,
     TimelineFixedSpeed,
-    LegacyRunToPosition
+    RunToPosition
+}
+
+public enum PlayerMoveSpeedOption
+{
+    RunSpeed,
+    WalkSpeed,
+    CustomSpeed
 }
 
 [Serializable]
@@ -17,8 +25,18 @@ public class PlayerActionClip : PlayableAsset, ITimelineClipAsset
     [Header("Action")]
     public PlayerTimelineActionType actionType;
 
-    [ShowIf(nameof(ShowUseRunSpeedField))]
-    public bool useRunSpeed = false;
+    [ShowIf(nameof(IsRunToPositionMove))]
+    [FormerlySerializedAs("legacySpeedOption")]
+    public PlayerMoveSpeedOption speedOption = PlayerMoveSpeedOption.RunSpeed;
+
+    [ShowIf(nameof(ShowCustomSpeedField))]
+    [FormerlySerializedAs("legacyCustomSpeed")]
+    [Min(0.01f)]
+    public float customSpeed = 3f;
+
+    [ShowIf(nameof(IsRunToPositionMove))]
+    [FormerlySerializedAs("useLegacyStartPosition")]
+    public bool useStartPosition = false;
 
     [ShowIf(nameof(IsMoveAction))]
     public PlayerMoveExecutionMode moveMode = PlayerMoveExecutionMode.TimelineFixedDuration;
@@ -26,6 +44,13 @@ public class PlayerActionClip : PlayableAsset, ITimelineClipAsset
     [ShowIf(nameof(ShowMoveSpeedField))]
     [Min(0.01f)]
     public float moveSpeed = 3f;
+
+    [Header("Repel")]
+    [ShowIf(nameof(IsRepelAction))]
+    public bool useRepelGizmoPosition = true;
+
+    [ShowIf(nameof(ShowRepelDistanceField))]
+    public float repelDistance = 2f;
 
     [Header("Path")]
     [ShowIf(nameof(ShowUseStartTransformField))]
@@ -56,7 +81,11 @@ public class PlayerActionClip : PlayableAsset, ITimelineClipAsset
         behaviour.actionType = actionType;
         behaviour.moveMode = moveMode;
         behaviour.useTimelineMotion = IsTimelineMove;
-        behaviour.useRunSpeed = moveMode == PlayerMoveExecutionMode.LegacyRunToPosition && useRunSpeed;
+        behaviour.speedOption = speedOption;
+        behaviour.customSpeed = customSpeed;
+        behaviour.useStartPosition = IsRunToPositionMove && useStartPosition;
+        behaviour.useRepelGizmoPosition = IsRepelAction && useRepelGizmoPosition;
+        behaviour.repelDistance = repelDistance;
 
         Transform resolvedStart = IsTimelineMove && useStartTransform ? startTarget.Resolve(graph.GetResolver()) : null;
         Transform resolvedEnd = useEndTransform ? endTarget.Resolve(graph.GetResolver()) : null;
@@ -70,14 +99,23 @@ public class PlayerActionClip : PlayableAsset, ITimelineClipAsset
     private bool IsMoveAction =>
         actionType == PlayerTimelineActionType.MoveTo;
 
-    private bool IsTimelineMove =>
-        IsMoveAction && moveMode != PlayerMoveExecutionMode.LegacyRunToPosition;
+    private bool IsRepelAction =>
+        actionType == PlayerTimelineActionType.Repel;
 
-    private bool ShowUseRunSpeedField =>
-        IsMoveAction && moveMode == PlayerMoveExecutionMode.LegacyRunToPosition;
+    private bool IsTimelineMove =>
+        IsMoveAction && moveMode != PlayerMoveExecutionMode.RunToPosition;
+
+    private bool IsRunToPositionMove =>
+        IsMoveAction && moveMode == PlayerMoveExecutionMode.RunToPosition;
+
+    private bool ShowCustomSpeedField =>
+        IsRunToPositionMove && speedOption == PlayerMoveSpeedOption.CustomSpeed;
 
     private bool ShowMoveSpeedField =>
         IsMoveAction && moveMode == PlayerMoveExecutionMode.TimelineFixedSpeed;
+
+    private bool ShowRepelDistanceField =>
+        IsRepelAction && !useRepelGizmoPosition;
 
     private bool ShowUseStartTransformField =>
         IsTimelineMove;

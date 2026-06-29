@@ -232,23 +232,41 @@ public class CharacterController2D : MonoBehaviour
 
     public void CheckRunToPos()
     {
-        float dir = runToLeft ? -1 : 1;
-        if (runToTarget.x < transform.position.x == runToLeft)
-            Move(dir, GetSpeed());
-        else
+        float deltaX = runToTarget.x - transform.position.x;
+        const float stopDistance = 0.05f;
+
+        if (Mathf.Abs(deltaX) <= stopDistance)
         {
-            Move(0, GetSpeed());
+            Move(0f, GetSpeed());
+            rb.velocity = new Vector2(0f, rb.velocity.y);
             SetIsRunningToTarget(false);
+            return;
         }
+
+        float dir = Mathf.Sign(deltaX);
+        runToLeft = dir < 0f;
+        inputPlayer.leftPointLeft = runToLeft;
+        Move(dir, GetSpeed());
     }
 
     public float GetSpeed() => useRunningSpeed ? runSpeed : walkSpeed;
 
+    public float GetRunSpeed() => runSpeed;
+
+    public float GetWalkSpeed() => walkSpeed;
+
     public void SetIsRunningToTarget(bool value)
     {
         isRunningToTarget = value;
-        if (value) { inputPlayer.movementInputUpdateLock.Remove("RunningToTarget"); }
-        else { inputPlayer.movementInputUpdateLock.Add("RunningToTarget"); }
+
+        if (value)
+        {
+            inputPlayer.movementInputUpdateLock.Add("RunningToTarget");
+        }
+        else
+        {
+            inputPlayer.movementInputUpdateLock.Remove("RunningToTarget");
+        }
     }
 
     private void GroundCheck()
@@ -364,32 +382,6 @@ public class CharacterController2D : MonoBehaviour
 
     #region Flipping & Facing
 
-    public void Flip(bool ignoreCamFollowFlip = false)
-    {
-        if (!CanFlip()) return;
-        if (playerAttack.attackTimer <= playerAttack.attackAnimationTime)
-        {
-            if (playerAttack.isAttackingLeft != FacingRight) return;
-        }
-        else
-        {
-            var state = anim.GetCurrentAnimatorStateInfo(0);
-            if (state.IsName("attack_back_" + playerAttack.attackIndex) ||
-                state.IsName("HS_attack_back_" + playerAttack.attackIndex))
-                return;
-        }
-
-        FacingRight = !FacingRight;
-        transform.Rotate(new Vector3(0, 1, 0), 180);
-        playerAttack.counterAttackPoint.Rotate(new Vector3(1, 0, 0), 180);
-
-        if (!ignoreCamFollowFlip && camFollowDirection != FacingRight)
-        {
-            camFollowDirection = !camFollowDirection;
-            camFollow.CallTurn();
-        }
-    }
-
     public void FaceTarget(Transform target)
     {
         if ((target.position.x <= transform.position.x && FacingRight) ||
@@ -435,10 +427,11 @@ public class CharacterController2D : MonoBehaviour
     public IEnumerator RunToPositionCoroutine(Vector3 target, bool faceRight, Action callBack = null)
     {
         ActionLock.Add("RunningToPosition", Lock.Defend | Lock.SwordTeleport);
+
+        runToTarget = target;
         runToLeft = runToTarget.x < transform.position.x;
         inputPlayer.leftPointLeft = runToLeft;
         SetIsRunningToTarget(true);
-        runToTarget = target;
 
         yield return new WaitUntil(() => !isRunningToTarget);
         ActionLock.Remove("RunningToPosition");
@@ -450,10 +443,12 @@ public class CharacterController2D : MonoBehaviour
     public IEnumerator WalkToPositionCoroutine(Vector3 target, bool faceRight, Action callBack = null)
     {
         ActionLock.Add("RunningToPosition", Lock.Defend | Lock.SwordTeleport);
+
+        runToTarget = target;
         runToLeft = runToTarget.x < transform.position.x;
         inputPlayer.leftPointLeft = runToLeft;
         SetIsRunningToTarget(true);
-        runToTarget = target;
+
         yield return new WaitUntil(() => !isRunningToTarget);
         ActionLock.Remove("RunningToPosition");
         yield return null;
@@ -482,19 +477,19 @@ public class CharacterController2D : MonoBehaviour
     public void WalkToPosition(Vector3 target, bool faceRight, Action callBack = null)
     {
         SetRunning(false);
-        StartCoroutine(RunToPositionCoroutine(target, faceRight, callBack));
+        StartCoroutine(WalkToPositionCoroutine(target, faceRight, callBack));
     }
 
     public void WalkToPosition(Vector3 target, Action callBack = null)
     {
         SetRunning(false);
-        StartCoroutine(RunToPositionCoroutine(target, FacingRight, callBack));
+        StartCoroutine(WalkToPositionCoroutine(target, FacingRight, callBack));
     }
 
     public void WalkToPosition(float x, bool faceRight, Action callBack = null)
     {
         SetRunning(false);
-        RunToPosition(new Vector3(x, transform.position.y, 0), faceRight, callBack);
+        WalkToPosition(new Vector3(x, transform.position.y, 0), faceRight, callBack);
     }
 
     public void DesignatedPositionTeleport(Vector3 pos)
@@ -841,24 +836,75 @@ public class CharacterController2D : MonoBehaviour
 
     public void HandleFlipping(float move)
     {
-        if (isRunningToTarget)
+        if (playerAttack.isCounterAttacking)
         {
-            if (playerAttack.isCounterAttacking && playerAttack.isAttackingLeft == FacingRight)
-                Flip();
-            else if (!playerAttack.isCounterAttacking)
+            if (isRunning)
             {
-                if (move > 0 && !FacingRight) Flip();
-                else if (move < 0 && FacingRight) Flip();
+                bool isFlipping = false;
+                if (move > 0 && !FacingRight) { isFlipping = true; }
+                else if (move < 0 && FacingRight) { isFlipping = true; }
+                if (isFlipping)
+                {
+                    var state = anim.GetCurrentAnimatorStateInfo(0);
+                    float duration = state.normalizedTime;
+                    if (IsAttackRunState(state) && playerAttack.isAttackingLeft == (move > 0))
+                    {
+                        if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
+                            anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
+                        else if (playerAttack.attackIndex == 2)
+                            anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration);
+                        else
+                            anim.Play(anim.GetBool("storm") ? "storm_pre_run" : "run_combat");
+                    }
+                    ForceFlip();
+                }
+                if (isFlipping) Flip();
             }
-        }
-        else if (playerAttack.isCounterAttacking)
-        {
-            if (playerAttack.isAttackingLeft == FacingRight) { Flip(); print(1); }
+            else
+            {
+                if (playerAttack.isAttackingLeft == FacingRight) { Flip(); }
+            }
         }
         else
         {
-            if (move > 0 && !FacingRight) { Flip(); print(1); }
-            else if (move < 0 && FacingRight) { Flip(); print(1); }
+            if (move > 0 && !FacingRight) { Flip(); }
+            else if (move < 0 && FacingRight) { Flip(); }
+        }
+    }
+
+    public void Flip(bool ignoreCamFollowFlip = false)
+    {
+        if (!CanFlip()) return;
+        //if (playerAttack.attackTimer <= playerAttack.attackAnimationTime)
+        //{
+        //    return;
+        //}
+        var state = anim.GetCurrentAnimatorStateInfo(0);
+        if ((state.IsName("attack_back_" + playerAttack.attackIndex) ||
+            state.IsName("HS_attack_back_" + playerAttack.attackIndex)) &&
+            playerAttack.isAttackingLeft == FacingRight)
+            return;
+        FacingRight = !FacingRight;
+        transform.Rotate(new Vector3(0, 1, 0), 180);
+        playerAttack.counterAttackPoint.Rotate(new Vector3(1, 0, 0), 180);
+
+        if (!ignoreCamFollowFlip && camFollowDirection != FacingRight)
+        {
+            camFollowDirection = !camFollowDirection;
+            camFollow.CallTurn();
+        }
+    }
+
+    public void ForceFlip()
+    {
+        FacingRight = !FacingRight;
+        transform.Rotate(new Vector3(0, 1, 0), 180);
+        playerAttack.counterAttackPoint.Rotate(new Vector3(1, 0, 0), 180);
+
+        if (camFollowDirection != FacingRight)
+        {
+            camFollowDirection = !camFollowDirection;
+            camFollow.CallTurn();
         }
     }
 

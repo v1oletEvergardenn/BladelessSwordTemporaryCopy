@@ -1880,7 +1880,6 @@ MonoBehaviour:
   runSpeed: 10
   walkSpeed: 5
   airRunSpeed: 9
-  isRunningToTarget: 0
   runToTarget: {x: 0, y: 0, z: 0}
   gravity: 0
   canSwitchNormalAnim: 1
@@ -2019,6 +2018,7 @@ MonoBehaviour:
   currentEnergy: 0
   energyPercentage: 0
   energyBar: {fileID: 5517391247417461896}
+  InfiniteEnergy: 1
   failedToDoActionSymbol: {fileID: 4883222905879133524}
   restore_pre_second: 2.5
   restoreCDafterConsume: 1

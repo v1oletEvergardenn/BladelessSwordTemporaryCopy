@@ -7,9 +7,13 @@ using UnityEngine.Playables;
 public class PlayerActionBehaviour : PlayableBehaviour
 {
     public PlayerTimelineActionType actionType;
-    public bool useRunSpeed;
     public bool useTimelineMotion;
     public PlayerMoveExecutionMode moveMode;
+    public PlayerMoveSpeedOption speedOption;
+    public float customSpeed;
+    public bool useStartPosition;
+    public bool useRepelGizmoPosition;
+    public float repelDistance;
 
     [Header("Move Path")]
     public Vector3 startPosition;
@@ -27,15 +31,27 @@ public class PlayerActionBehaviour : PlayableBehaviour
 
         if (actionType == PlayerTimelineActionType.MoveTo)
         {
-            if (moveMode == PlayerMoveExecutionMode.LegacyRunToPosition)
+            if (moveMode == PlayerMoveExecutionMode.RunToPosition)
             {
                 if (!Application.isPlaying || _triggered)
                     return;
 
                 _triggered = true;
+                ResolvePlayerContext();
+
+                if (useStartPosition && _playerTransform != null)
+                    _playerTransform.position = new Vector3(startPosition.x, _playerTransform.position.y, _playerTransform.position.z);
+
                 PlayerTimeLineActions handler = PlayerTimeLineActions.instance;
-                if (handler != null)
-                    handler.MoveTo(endPosition, useRunSpeed);
+                if (handler == null)
+                    return;
+
+                if (speedOption == PlayerMoveSpeedOption.WalkSpeed)
+                    handler.MoveTo(endPosition, false);
+                else if (speedOption == PlayerMoveSpeedOption.CustomSpeed)
+                    handler.MoveTo(endPosition, customSpeed);
+                else
+                    handler.MoveTo(endPosition, true);
 
                 return;
             }
@@ -52,9 +68,8 @@ public class PlayerActionBehaviour : PlayableBehaviour
                     : 1f;
 
                 float sampledX = Mathf.Lerp(startPosition.x, endPosition.x, t);
+                float dir = startPosition.x >= endPosition.x ? -1f : 1f;
 
-                float dir = 1f;
-                if (startPosition.x >= endPosition.x) dir = -1f;
                 InputPlayer.instance.movementInputUpdateLock.Add("isTimelineMoving");
                 if (Application.isPlaying && _controller != null)
                     _controller.Move(dir, 0);
@@ -75,7 +90,12 @@ public class PlayerActionBehaviour : PlayableBehaviour
             return;
 
         if (actionType == PlayerTimelineActionType.Repel)
-            actions.RepelTo(endPosition);
+        {
+            if (useRepelGizmoPosition)
+                actions.RepelTo(endPosition);
+            else
+                actions.RepelByDistance(repelDistance);
+        }
     }
 
     public override void OnBehaviourPause(Playable playable, FrameData info)

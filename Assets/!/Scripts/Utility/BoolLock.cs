@@ -32,6 +32,7 @@ public sealed class BoolLock
 
     public void Remove(string lockName)
     {
+        UnityEngine.Debug.Log("removed");
         if (string.IsNullOrEmpty(lockName)) return;
         _namedLocks.Remove(lockName);
     }
@@ -39,6 +40,15 @@ public sealed class BoolLock
     public void Clear()
     {
         _namedLocks.Clear();
+    }
+
+    public void Debug()
+    {
+        foreach (var kvp in _namedLocks)
+        {
+            UnityEngine.Debug.Log($"Lock: {kvp.Key}, Version: {kvp.Value}");
+        }
+        if (_namedLocks.Count == 0) { UnityEngine.Debug.Log("No locks present."); }
     }
 
     private void Remove(string lockName, int tokenVersion)

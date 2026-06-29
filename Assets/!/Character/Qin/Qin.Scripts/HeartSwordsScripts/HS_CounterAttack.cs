@@ -61,7 +61,14 @@ public class HS_CounterAttack : IHeartSwordAbility
             if (controller.isFalling)
                 return $"HS_attack_fall_{indexStr}";
             if (controller.isRunning)
-                return $"HS_attack_run_{indexStr}";
+                if (controller.FacingRight == playerAttack.isAttackingLeft)
+                {
+                    return $"HS_attack_back_{indexStr}";
+                }
+                else
+                {
+                    return $"HS_attack_run_{indexStr}";
+                }
             return $"HS_attack_idle_{indexStr}";
         }
     }

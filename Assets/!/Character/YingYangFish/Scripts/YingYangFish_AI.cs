@@ -298,6 +298,7 @@ public class YingYangFish_AI : IEnemyController
         fish.transform.SetParent(fish_origin, true);
         fish.SetDamageableParent(this);
         ResetFishCompletely(fish);
+        CameraFollow.instance.targets.Add(fish.transform);
         fish.transform.position = spawnPos;
         return fish;
     }
@@ -665,6 +666,7 @@ public class YingYangFish_AI : IEnemyController
         secondPhaseDirector.Play();
         camLimit.UpdateLimit();
         EventInteract.SetActive(false);
+        GameManager.instance.isInPerformingState = true;
         // center interact and flowing upward animation
         leftBoundary.gameObject.SetActive(true);
         rightBoundary.gameObject.SetActive(true);

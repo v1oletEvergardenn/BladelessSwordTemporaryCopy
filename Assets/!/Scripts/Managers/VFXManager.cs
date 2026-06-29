@@ -171,6 +171,7 @@ public class VFXManager : MonoBehaviour
     /// <param name="timeSpeed">Time scale to set during the effect.</param>
     public void SlowTimeForSeconds(float duration, float timeSpeed)
     {
+        if (gameManager.isInPerformingState) return;
         StartCoroutine(IESlowTime(duration, timeSpeed));
     }
 
