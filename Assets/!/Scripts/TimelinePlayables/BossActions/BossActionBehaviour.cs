@@ -10,6 +10,7 @@ public class BossActionBehaviour : PlayableBehaviour
     public float factor;
     public bool targetPlayer;
     public bool useTargetTransform;
+    public bool attackFromLeft;
     public Transform target;
     public Vector3 targetWorldPosition;
 
@@ -30,6 +31,7 @@ public class BossActionBehaviour : PlayableBehaviour
         if (info.effectiveWeight <= 0f) return;
 
         _started = true;
+        _action.SetAttackDirection(attackFromLeft);
         _action.Act(factor, ResolveTarget());
     }
 

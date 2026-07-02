@@ -31,6 +31,8 @@ public class CameraFollow : MonoBehaviour
     private Vector3 velocity;
     private float xAmount;
     public bool activate = false;
+    [Range(0.1f, 1f)] public float cameraPositionSmoothTime = 0.2f;
+    [Range(0.1f, 10f)] public float cameraOrthoSmoothTime = 0.2f;
 
     private float normalOrthoSize = 4f;
 
@@ -66,7 +68,7 @@ public class CameraFollow : MonoBehaviour
         }
 
         camFollow.position = new Vector3(
-            Mathf.SmoothDamp(camFollow.position.x, player.transform.position.x + _tempOffset.x, ref xAmount, 0.1f),
+            Mathf.SmoothDamp(camFollow.position.x, player.transform.position.x + _tempOffset.x, ref xAmount, cameraPositionSmoothTime),
             player.transform.position.y + _tempOffset.y,
             camFollow.position.z);
 
@@ -103,35 +105,42 @@ public class CameraFollow : MonoBehaviour
         }
         center = bound.center;
         _bound = bound;
-        //get the center of targeted follow objects.
 
         if (targets.Count != 0)
         {
             float screenAspect = (float)Screen.width / (float)Screen.height;
-            float camHeight = limitCam.m_Lens.OrthographicSize * 2;
-            float camWidth = 2.0f * limitCam.m_Lens.OrthographicSize * screenAspect;
-            float orthoSize_width = ((bound.size.x + 3) / 2) / screenAspect;
-            float orthoSize_height = (bound.size.y + 3) / 2;
-            targetZoom = MathF.Max(orthoSize_width, orthoSize_height);
+            float orthoSize_width = ((bound.size.x + 3f) / 2f) / screenAspect;
+            float orthoSize_height = (bound.size.y + 3f) / 2f;
 
-            limitCam.m_Lens.OrthographicSize = Mathf.Lerp(limitCam.m_Lens.OrthographicSize, targetZoom, Time.unscaledDeltaTime * 5);
-            //currentLimit.x = Mathf.Lerp(minLimit.x, maxLimit.x, Mathf.InverseLerp(minZoom, targetZoom, limitCam.m_Lens.OrthographicSize));
-            //currentLimit.y = Mathf.Lerp(minLimit.y, maxLimit.y, Mathf.InverseLerp(minZoom, targetZoom, limitCam.m_Lens.OrthographicSize));
+            targetZoom = Mathf.Max(minZoom, MathF.Max(orthoSize_width, orthoSize_height));
+            limitCam.m_Lens.OrthographicSize = Mathf.Lerp(limitCam.m_Lens.OrthographicSize, targetZoom, Time.unscaledDeltaTime * cameraOrthoSmoothTime);
         }
         else
         {
-            limitCam.m_Lens.OrthographicSize = normalOrthoSize;
-            //currentLimit = maxLimit;
+            limitCam.m_Lens.OrthographicSize = Mathf.Max(minZoom, normalOrthoSize);
         }
-        //float x = Mathf.Clamp(center.x, transform.position.x - currentLimit.x / 2, transform.position.x + currentLimit.x / 2);
-        //float y = Mathf.Clamp(center.y, transform.position.y - currentLimit.y / 2, transform.position.y + currentLimit.y / 2);
-        //update the orthographic size based on the distance of the targets.(bound)
 
         Vector3 tempOffset = offset;
         if (!useOffset) { tempOffset = Vector3.zero; }
         float y = center.y + tempOffset.y;
         if (y <= y_limit_low) { y = y_limit_low; }
-        limitCamFollow.position = Vector3.SmoothDamp(limitCamFollow.position, new Vector3(center.x + tempOffset.x, y, limitCamFollow.position.z), ref velocity, 0.1f);
+        limitCamFollow.position = Vector3.SmoothDamp(limitCamFollow.position, new Vector3(center.x + tempOffset.x, y, limitCamFollow.position.z), ref velocity, cameraPositionSmoothTime);
+    }
+
+    public static void AddTarget(Transform target)
+    {
+        if (!instance.targets.Contains(target))
+        {
+            instance.targets.Add(target);
+        }
+    }
+
+    public static void RemoveTarget(Transform target)
+    {
+        if (instance.targets.Contains(target))
+        {
+            instance.targets.Remove(target);
+        }
     }
 
     public void CallTurn()

@@ -33,7 +33,7 @@ Position: $root:10
 	GroupName = "Action References"
 
 # $GvPXSRJi5Q7nNG4dcbS89A
-Position: $root:110
+Position: $root:105
 + [Sirenix.OdinInspector.TabGroupAttribute]
 	GroupName = "Actions"
 	VisibleIf = ""
@@ -98,7 +98,7 @@ Position: $ATV51nBP1VnN5C6V2q7e56:0
 Position: $ATV51nBP1VnN5C6V2q7e56:1
 
 # endCanvas
-Position: $ATV51nBP1VnN5C6V2q7e56:2
+Position: $ATV51nBP1VnN5C6V2q7e56:1
 
 # black_particle
 Position: $UJcujQCcu5653ayWkZCqPr:3
@@ -107,10 +107,10 @@ Position: $UJcujQCcu5653ayWkZCqPr:3
 Position: $8KswrTpMtEVCifFr7D548S:3
 
 # waterLevel
-Position: $ATV51nBP1VnN5C6V2q7e56:3
+Position: $ATV51nBP1VnN5C6V2q7e56:2
 
 # EventInteract
-Position: $ATV51nBP1VnN5C6V2q7e56:4
+Position: $ATV51nBP1VnN5C6V2q7e56:3
 
 # white_tex
 Position: $8KswrTpMtEVCifFr7D548S:4
@@ -153,12 +153,12 @@ Position: $PhNSuf7mSr9TmNdyVK1umo:6
 	TitleAlignment = Left
 
 # TEST
-Position: $root:109
+Position: $root:104
 + [Sirenix.OdinInspector.ShowIfAttribute]
 	Condition = "enableTest"
 
 # enableTest
-Position: $root:108
+Position: $root:103
 
 # centerStart1
 Position: $Lyuyu6Xpj1bh6izMVSuZkB:0
@@ -197,7 +197,13 @@ Position: $XgXKWcubhWyhnosQLfBiLi:1
 Position: $XgXKWcubhWyhnosQLfBiLi:2
 
 # secondPhaseDirector
-Position: $ATV51nBP1VnN5C6V2q7e56:6
+Position: $ATV51nBP1VnN5C6V2q7e56:4
 
 # PlaySecondPhaseTimeLine()
 Visibility: Shown
+
+# center_pivot1
+Position: $ATV51nBP1VnN5C6V2q7e56:5
+
+# center_pivot2
+Position: $ATV51nBP1VnN5C6V2q7e56:6

@@ -48,6 +48,7 @@ public class YYF_WaterSpear : IEnemyAction
     /// <returns></returns>
     public override IEnumerator Act_coroutine(float factor = 0, Transform _target = null)
     {
+        bossAI.SetCenterCameraFollow(true);
         Transform trueTarget = _target != null ? _target : player.transform;
 
         Spear _spear; Spear _smallSpear1 = null; Spear _smallSpear2 = null;
@@ -105,6 +106,7 @@ public class YYF_WaterSpear : IEnemyAction
 
         ShootSpear(_spear, trueTarget); spear = null;
 
+        if (GameManager.instance.isInPerformingState) bossAI.SetCenterCameraFollow(false);
         yield return null;
 
         void SetUp(Spear spear, Transform target)

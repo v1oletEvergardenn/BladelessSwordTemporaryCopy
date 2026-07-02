@@ -48,6 +48,8 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField] public GameObject EventInteract;
     [SerializeField] public CameraLimit camLimit;
     [SerializeField] public PlayableDirector secondPhaseDirector;
+    [SerializeField] private Transform center_pivot1;
+    [SerializeField] private Transform center_pivot2;
 
     [HideInInspector] public bool secondPhase;
 
@@ -296,9 +298,10 @@ public class YingYangFish_AI : IEnemyController
         YYF_fish fish = selfPooler.SpawnFromPool(isBlack ? "blackFish" : "whiteFish",
             spawnPos, Quaternion.identity).GetComponent<YYF_fish>();
         fish.transform.SetParent(fish_origin, true);
+        fish.fish.GetComponent<FishCameraFollowCondition>().waterLevel = waterLevel;
         fish.SetDamageableParent(this);
         ResetFishCompletely(fish);
-        CameraFollow.instance.targets.Add(fish.transform);
+        CameraFollow.AddTarget(fish.fish);
         fish.transform.position = spawnPos;
         return fish;
     }
@@ -663,13 +666,23 @@ public class YingYangFish_AI : IEnemyController
 
     public void PlaySecondPhaseTimeLine()
     {
+        //Timeline start
         secondPhaseDirector.Play();
+
+        //update camera follow
         camLimit.UpdateLimit();
-        EventInteract.SetActive(false);
-        GameManager.instance.isInPerformingState = true;
+
         // center interact and flowing upward animation
         leftBoundary.gameObject.SetActive(true);
         rightBoundary.gameObject.SetActive(true);
+
+        //center animation
+        center.DOLocalMove(Vector3.zero, 2f).SetEase(Ease.InOutSine).OnComplete(() => { SetCenterCameraFollow(false); });
+        centerAnim.Play("center_rumbling");
+
+        //states
+        EventInteract.SetActive(false);
+        GameManager.instance.isInPerformingState = true;
         IN_COMBAT = true;
         HealthUI.SetActive(true);
         DEAD = true;
@@ -744,6 +757,14 @@ public class YingYangFish_AI : IEnemyController
     public Vector3 CreateWaterLevelYAxis(Transform target)
     {
         return new Vector3(target.position.x, waterLevel.position.y, 0);
+    }
+
+    public void SetCenterCameraFollow(bool result)
+    {
+        center_pivot1.gameObject.SetActive(result);
+        center_pivot2.gameObject.SetActive(result);
+        if (result) CameraFollow.AddTarget(center);
+        else CameraFollow.RemoveTarget(center);
     }
 }
 

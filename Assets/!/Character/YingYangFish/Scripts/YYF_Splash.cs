@@ -56,12 +56,11 @@ public class YYF_Splash : IEnemyAction
             if (factor == 3 || factor == 4) spawningBullets = false;
 
             Vector3 target = trueTarget.position + new Vector3(0, 3, 0);
-            bool toLeft = target.x < origin.position.x;
+            bool toLeft = GameManager.instance.isInPerformingState ? !isBlack : GetAttackDirection();
             origin.position = new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, origin.position.z);
 
             //before jump out
-            if (toLeft) { origin.DOMove(new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0), 0.1f); }
-            else { origin.DOMove(new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0), 0.1f); }
+            origin.position = new Vector3(target.x + (toLeft ? 2f : -2f), bossAI.waterLevel.position.y - 7f, 0);
 
             //reset to initial
             origin.eulerAngles = Vector3.zero;
@@ -147,20 +146,19 @@ public class YYF_Splash : IEnemyAction
             YYF_fish black_YYFFish = bossAI.SpawnFish(true);
             YYF_fish white_YYFFish = bossAI.SpawnFish(false);
 
-            bool toLeft = target.x < transform.position.x;
-
+            bool toLeft = GetAttackDirection();
             //origin.position = new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, origin.position.z);
 
             //before jump out
             if (toLeft)
             {
-                white_YYFFish.transform.position = new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0);
-                black_YYFFish.transform.position = new Vector3(target.x + 2, bossAI.waterLevel.position.y - 6, 0);
+                white_YYFFish.transform.position = new Vector3(target.x + 2, bossAI.waterLevel.position.y - 7, 0);
+                black_YYFFish.transform.position = new Vector3(target.x + 2, bossAI.waterLevel.position.y - 7, 0);
             }
             else
             {
-                white_YYFFish.transform.position = new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0);
-                black_YYFFish.transform.position = new Vector3(target.x - 2, bossAI.waterLevel.position.y - 6, 0);
+                white_YYFFish.transform.position = new Vector3(target.x - 2, bossAI.waterLevel.position.y - 7, 0);
+                black_YYFFish.transform.position = new Vector3(target.x - 2, bossAI.waterLevel.position.y - 7, 0);
             }
 
             white_YYFFish.fish.transform.Rotate(bossAI.Dir, -90);
@@ -233,6 +231,7 @@ public class YYF_Splash : IEnemyAction
 
         yield return new WaitForSeconds(0.1f);
         splashEffect_1.gameObject.SetActive(false);
+        attackDirectionSet = false;
         yield return null;
     }
 

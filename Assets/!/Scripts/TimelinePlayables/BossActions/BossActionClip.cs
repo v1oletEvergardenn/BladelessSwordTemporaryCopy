@@ -25,6 +25,8 @@ public class BossActionClip : PlayableAsset, ITimelineClipAsset
     [Header("Target")]
     public bool targetPlayer = true;
 
+    [SerializeField] public bool attackFromLeft = true;
+
     [ShowIf(nameof(ShowUseTargetTransformField))]
     public bool useTargetTransform = false;
 
@@ -44,6 +46,7 @@ public class BossActionClip : PlayableAsset, ITimelineClipAsset
 
         behaviour.factor = factor;
         behaviour.targetPlayer = targetPlayer;
+        behaviour.attackFromLeft = attackFromLeft;
         behaviour.useTargetTransform = useTargetTransform;
         behaviour.targetWorldPosition = targetWorldPosition;
         behaviour.target = target.Resolve(graph.GetResolver());

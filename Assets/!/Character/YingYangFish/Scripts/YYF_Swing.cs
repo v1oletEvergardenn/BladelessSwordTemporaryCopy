@@ -52,9 +52,11 @@ public class YYF_Swing : IEnemyAction
             Transform fish = YYFFish.fish;
             Transform origin = YYFFish.transform;
             Transform fishGFX = YYFFish.fishGFX;
+            fish.localPosition = new Vector3(0, 0f, 0);
 
             Vector3 target = trueTarget.position + new Vector3(0, 3, 0);
-            bool toLeft = target.x < origin.position.x;
+
+            bool toLeft = GameManager.instance.isInPerformingState ? !isBlack : GetAttackDirection();
             // move to appropriate x position
             origin.DOMove(new Vector3(target.x, bossAI.waterLevel.position.y - 6, 0), 0.1f);
 
@@ -64,7 +66,7 @@ public class YYF_Swing : IEnemyAction
             yield return new WaitForSeconds(0.1f);
 
             //jump out
-            float temp_x = toLeft ? trueTarget.position.x - 4 : trueTarget.position.x + 4;
+            float temp_x = toLeft ? trueTarget.position.x + 4 : trueTarget.position.x - 4;
             origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + (isBlack ? 2.5f : 4.5f), 0), 0.5f).SetEase(Ease.OutSine);
 
             //pre swing attack
@@ -147,7 +149,7 @@ public class YYF_Swing : IEnemyAction
 
             // move to appropriate x position
             Vector3 target = trueTarget.position + new Vector3(0, 3, 0);
-            bool toLeft = target.x < transform.position.x;
+            bool toLeft = GetAttackDirection();
 
             // rotate to target position angle
             float angle = -90;
@@ -221,7 +223,7 @@ public class YYF_Swing : IEnemyAction
             singleSwingEffect.SetActive(false);
             swingEffect_ice.SetActive(false);
         }
-
+        attackDirectionSet = false;
         yield return null;
     }
 

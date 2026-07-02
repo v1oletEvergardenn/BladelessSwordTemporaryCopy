@@ -63,8 +63,18 @@ public abstract class IEnemyAction : MonoBehaviour
         act_routine = StartCoroutine(Act_coroutine(factor, _target));
     }
 
+    [HideInInspector] public bool attackDirectionSet = false;
+    [HideInInspector] public bool attackFromLeft = true;
+
+    public void SetAttackDirection(bool fromLeft)
+    {
+        attackDirectionSet = true;
+        attackFromLeft = fromLeft;
+    }
+
     public virtual void CancelAct()
     {
+        attackDirectionSet = false;
         TryStopCoroutine(act_routine);
         StopAllCachedCoroutines();
 
@@ -230,6 +240,11 @@ public abstract class IEnemyAction : MonoBehaviour
     public void TryStopCoroutine(Coroutine i)
     {
         if (i != null) { StopCoroutine(i); }
+    }
+
+    public bool GetAttackDirection()
+    {
+        return attackDirectionSet ? !attackFromLeft : UnityEngine.Random.Range(0, 2f) == 0;
     }
 
     /// <summary>

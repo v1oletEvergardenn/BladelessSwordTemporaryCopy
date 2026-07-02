@@ -46,7 +46,7 @@ public class YYF_BubbleTrap : IEnemyAction
         origin.eulerAngles = new Vector3(0, 0, 180);
 
         //move to player
-        bool toleft = playerController.FacingRight;
+        bool toleft = GameManager.instance.isInPerformingState ? isBlack : GetAttackDirection();
 
         origin.position = new Vector3(trueTarget.position.x,
                 bossAI.waterLevel.position.y + jumpHeight - jumpRadius,
@@ -131,6 +131,7 @@ public class YYF_BubbleTrap : IEnemyAction
         }
         yield return new WaitUntil(() => complete);
         origin.localScale = new Vector3(1, 1, 1);
+        attackDirectionSet = false;
         YYFFish.gameObject.SetActive(false);
         yield return null;
     }

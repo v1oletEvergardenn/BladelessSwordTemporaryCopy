@@ -119,6 +119,7 @@ public class BossActionClipInspector : Editor
             EditorUtility.SetDirty(clip);
         }
 
+        SerializedProperty attackFromLeftProp = serializedObject.FindProperty("attackFromLeft");
         SerializedProperty targetPlayerProp = serializedObject.FindProperty("targetPlayer");
         SerializedProperty useTargetTransformProp = serializedObject.FindProperty("useTargetTransform");
         SerializedProperty targetProp = serializedObject.FindProperty("target");
@@ -126,6 +127,9 @@ public class BossActionClipInspector : Editor
         SerializedProperty showTargetGizmoProp = serializedObject.FindProperty("showTargetGizmo");
         SerializedProperty targetGizmoColorProp = serializedObject.FindProperty("targetGizmoColor");
         SerializedProperty targetWorldGizmoLabelProp = serializedObject.FindProperty("targetWorldGizmoLabel");
+
+        EditorGUILayout.Space();
+        EditorGUILayout.PropertyField(attackFromLeftProp, new GUIContent("Attack From Left"));
 
         EditorGUILayout.PropertyField(targetPlayerProp, new GUIContent("Target Player"));
 

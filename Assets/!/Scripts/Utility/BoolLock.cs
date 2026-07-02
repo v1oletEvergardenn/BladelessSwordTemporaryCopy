@@ -32,7 +32,6 @@ public sealed class BoolLock
 
     public void Remove(string lockName)
     {
-        UnityEngine.Debug.Log("removed");
         if (string.IsNullOrEmpty(lockName)) return;
         _namedLocks.Remove(lockName);
     }

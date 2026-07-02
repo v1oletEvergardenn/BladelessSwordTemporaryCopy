@@ -17,6 +17,8 @@ public class CameraLimit : MonoBehaviour
     public float y_limit_low;
     public bool DEBUG = false;
     public bool collideToTrigger = true;
+    [Range(0.1f, 1f)] public float cameraPositionSmoothTime = 0.2f;
+    [Range(0.1f, 10f)] public float cameraOrthoSmoothTime = 0.2f;
 
     /// <summary>
     /// once touched the collision, update the camera zoom on Player, change the limit variable to this.
@@ -27,6 +29,8 @@ public class CameraLimit : MonoBehaviour
         CameraFollow camZoom = CameraFollow.instance;
         cam.GetComponent<CameraRegister>().SwitchThisCam();
         camZoom.limitCam = cam;
+        camZoom.cameraPositionSmoothTime = cameraPositionSmoothTime;
+        camZoom.cameraOrthoSmoothTime = cameraOrthoSmoothTime;
         camZoom.activate = true;
         camZoom.minZoom = minZoom;
         camZoom.targets = new List<Transform>(targets);

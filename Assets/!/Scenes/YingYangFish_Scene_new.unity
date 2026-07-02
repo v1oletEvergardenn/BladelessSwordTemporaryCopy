@@ -255,7 +255,7 @@ Transform:
   m_GameObject: {fileID: 72450240}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.8944798, y: -4.62, z: 0}
+  m_LocalPosition: {x: -0.0027997494, y: -4.62, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -501,151 +501,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!21 &279698469
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: water2d/waterg
-  m_Shader: {fileID: -6465566751694194690, guid: 13326eeed13ec4b498f4eb0770b38c60, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 2800000, guid: d1508e1dc42abb745b24c8891a614d2a, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _alphaTexture:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _belowWaterTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _colorGradient:
-        m_Texture: {fileID: 853031717}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _distortion_tex:
-        m_Texture: {fileID: 2800000, guid: 63a3a961b343e5341a13f8efb4988815, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _simTex:
-        m_Texture: {fileID: 2800000, guid: bfbb641b863c3bd4d9ace5d8296da606, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _sun_strips:
-        m_Texture: {fileID: 2800000, guid: 02b9ccfabe688644ebd37eb70cbe2341, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _surfaceTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_Lightmaps:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_LightmapsInd:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_ShadowMasks:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _belowWaterTexAlpha: 0
-    - _belowWaterTexDistortionStrength: 0
-    - _cheapWater: 0
-    - _color_type: 1
-    - _depthFromObstructors: 0
-    - _depthMlp: 0
-    - _distortionFPRH: 0
-    - _edgeIgnoreTransparency: 0
-    - _edgeSize: 0
-    - _enableFalloff: 1
-    - _enable_nor: 0
-    - _enable_obs: 1
-    - _enable_pl: 1
-    - _enable_ref: 1
-    - _enable_rm: 0
-    - _enable_scrolling: 0
-    - _enable_sim: 0
-    - _enable_td: 0
-    - _falloffStart: 0.252
-    - _falloffStrength: 0.37
-    - _foam_alpha: 0.002
-    - _foam_density: 0.149
-    - _foam_size: 4.15
-    - _lighting: 1
-    - _mobileWater: 0
-    - _normStr: 1
-    - _num_of_pixels: 2560
-    - _obstruction_alpha: 0.62
-    - _obstruction_width: 0.06
-    - _pixel_perfect: 1
-    - _raymarchFalloffEnd: 0
-    - _raymarchFalloffStart: 0
-    - _raymarchSteps: 0
-    - _reflectionY: 0.36462045
-    - _rm_type2: 0
-    - _scrStrength: 0.51
-    - _strips_alpha: 0.483
-    - _strips_density: 1.64
-    - _strips_scrolling_speed: 0
-    - _strips_size: 1.28
-    - _strips_speed: 3.18
-    - _surfaceAlpha: 1
-    - _surfaceTexAlpha: 0
-    - _tilemapMode: 0
-    - _useFoamSpeedForST: 0
-    - _usePerspective: 1
-    m_Colors:
-    - _belowWaterTexUV: {r: 0, g: 0, b: 1, a: 1}
-    - _color: {r: 0.028969381, g: 0.11097851, b: 0.1981132, a: 1}
-    - _deep_color: {r: 0.03991634, g: 0.10141881, b: 0.122641504, a: 1}
-    - _deep_minmax: {r: 0.29, g: 0.99, b: 0, a: 0}
-    - _distortion_color: {r: 0, g: 0, b: 0, a: 1}
-    - _distortion_minmax: {r: 0, g: 0, b: 0, a: 0}
-    - _distortion_speed: {r: 0.03, g: 0.03, b: 0, a: 0}
-    - _distortion_strength: {r: 0.02, g: 0.01, b: 0, a: 0}
-    - _distortion_tiling: {r: 1, g: 1, b: 0, a: 0}
-    - _edgeColor: {r: 1, g: 1, b: 1, a: 1}
-    - _foam_color: {r: 0.745105, g: 0.9811321, b: 0.94565207, a: 0}
-    - _foam_speed: {r: 0.98, g: 0, b: 0, a: 0}
-    - _obs_transform: {r: 0.8, g: 0.8, b: 0.1, a: 0.1}
-    - _obstruction_color: {r: 1, g: 1, b: 1, a: 0}
-    - _perspective: {r: 0.05, g: 2, b: 0, a: 0}
-    - _perspective2: {r: -2, g: 7.04, b: 0, a: 0}
-    - _playerPosition: {r: 0, g: 0, b: 0, a: 0}
-    - _refTexRes: {r: 1024, g: 1024, b: 0, a: 0}
-    - _ref_transform: {r: 1, g: 0.6666666, b: 0, a: 0.16666667}
-    - _reflectionsColor: {r: 0.9339623, g: 0.9339623, b: 0.9339623, a: 1}
-    - _simFoamColor: {r: 1, g: 1, b: 1, a: 1}
-    - _simMinMaxWavesHeightFoam: {r: 0.2, g: 0.6, b: 0, a: 0}
-    - _simUvs: {r: 0, g: 0, b: 1, a: 1}
-    - _simWorldBounds: {r: 0, g: 0, b: 1, a: 0}
-    - _surfaceTexSpeed: {r: 0, g: 0, b: 0, a: 0}
-    - _surfaceTexTiling: {r: 0, g: 0, b: 0, a: 0}
-    - _surfaceTexUV: {r: 0, g: 0, b: 1, a: 1}
-    - _tiling: {r: 1, g: 1.5, b: 0, a: 0}
-  m_BuildTextureStacks: []
 --- !u!1 &287570332
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,6 +576,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 287570332}
   m_CullTransparentMesh: 1
+--- !u!1 &379161253 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1082584436462663379, guid: 92df36f15c8fb0b43a4303b0db2087c3, type: 3}
+  m_PrefabInstance: {fileID: 6128871377477975479}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &400035510
 GameObject:
   m_ObjectHideFlags: 0
@@ -906,8 +766,8 @@ RenderTexture:
   m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
   serializedVersion: 5
-  m_Width: 1515
-  m_Height: 852
+  m_Width: 1250
+  m_Height: 702
   m_AntiAliasing: 1
   m_MipCount: -1
   m_DepthStencilFormat: 93
@@ -1212,62 +1072,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 12.263687, y: 4.2551966}
   m_EdgeRadius: 0
---- !u!21 &476789408
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: bokeh blur
-  m_Shader: {fileID: -6465566751694194690, guid: cdc4d123c2923ef419308dc1041672ed, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex2:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_Lightmaps:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_LightmapsInd:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_ShadowMasks:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _area: 0.01
-    - _falloffE: 1
-    - _falloffP: 0
-    - _falloffS: 0
-    - _falloffU: 0
-    - _gamma: 10.5
-    - _hardness: 0.6
-    - _quality: 12
-    - _ratio: 1.85
-    m_Colors: []
-  m_BuildTextureStacks: []
 --- !u!1 &489652143
 GameObject:
   m_ObjectHideFlags: 0
@@ -1434,7 +1238,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 6
+  orthographic size: 7
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -1459,7 +1263,7 @@ Transform:
   m_GameObject: {fileID: 489652143}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -46.329998, y: -2.9099903, z: -10}
+  m_LocalPosition: {x: -12.55, y: -0.24999022, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1622,7 +1426,7 @@ Transform:
   m_GameObject: {fileID: 518364895}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -46.329998, y: 0.09000969, z: -10}
+  m_LocalPosition: {x: -12.55, y: 3.2500098, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1656,8 +1460,8 @@ MonoBehaviour:
     scale: {x: 1, y: 1.5}
     reflectionLayerIdx: -1
     copyMainBackground: 0
-    lastOrtographicSize: 9
-    lastAspectRatio: 1.1847507
+    lastOrtographicSize: 10.5
+    lastAspectRatio: 1.1862396
   _run: 1
   startupQF: 1
   pivotDetectionAlphaTreshold: 0
@@ -1736,7 +1540,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 9
+  orthographic size: 10.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1752,6 +1556,62 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!21 &527306426
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: bokeh blur
+  m_Shader: {fileID: -6465566751694194690, guid: cdc4d123c2923ef419308dc1041672ed, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _area: 0.01
+    - _falloffE: 1
+    - _falloffP: 0
+    - _falloffS: 0
+    - _falloffU: 0
+    - _gamma: 10.5
+    - _hardness: 0.6
+    - _quality: 12
+    - _ratio: 1.85
+    m_Colors: []
+  m_BuildTextureStacks: []
 --- !u!1 &566212258
 GameObject:
   m_ObjectHideFlags: 0
@@ -1863,8 +1723,8 @@ RenderTexture:
   m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
   serializedVersion: 5
-  m_Width: 1212
-  m_Height: 682
+  m_Width: 1000
+  m_Height: 562
   m_AntiAliasing: 1
   m_MipCount: -1
   m_DepthStencilFormat: 93
@@ -2000,7 +1860,7 @@ Transform:
   m_GameObject: {fileID: 809423396}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -46.329998, y: -2.9099903, z: -10}
+  m_LocalPosition: {x: -12.55, y: -0.24999022, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2034,8 +1894,8 @@ MonoBehaviour:
     scale: {x: 1, y: 1}
     reflectionLayerIdx: -1
     copyMainBackground: 0
-    lastOrtographicSize: 6
-    lastAspectRatio: 1.7771261
+    lastOrtographicSize: 7
+    lastAspectRatio: 1.7793595
   _run: 0
 --- !u!20 &809423399
 Camera:
@@ -2072,7 +1932,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 6
+  orthographic size: 7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2088,7 +1948,7 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!84 &842097685
+--- !u!84 &848420906
 RenderTexture:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2102,8 +1962,8 @@ RenderTexture:
   m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
   serializedVersion: 5
-  m_Width: 757
-  m_Height: 426
+  m_Width: 625
+  m_Height: 351
   m_AntiAliasing: 1
   m_MipCount: -1
   m_DepthStencilFormat: 0
@@ -2126,54 +1986,6 @@ RenderTexture:
   m_Dimension: 2
   m_VolumeDepth: 1
   m_ShadowSamplingMode: 2
---- !u!28 &853031717
-Texture2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 2
-  m_Width: 128
-  m_Height: 1
-  m_CompleteImageSize: 512
-  m_MipsStripped: 0
-  m_TextureFormat: 5
-  m_MipCount: 1
-  m_IsReadable: 1
-  m_IsPreProcessed: 0
-  m_IgnoreMipmapLimit: 0
-  m_MipmapLimitGroupName: 
-  m_StreamingMipmaps: 0
-  m_StreamingMipmapsPriority: 0
-  m_VTOnly: 0
-  m_AlphaIsTransparency: 0
-  m_ImageCount: 1
-  m_TextureDimension: 2
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 0
-    m_WrapV: 0
-    m_WrapW: 0
-  m_LightmapFormat: 0
-  m_ColorSpace: 1
-  m_PlatformBlob: 
-  image data: 512
-  _typelessdata: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-  m_StreamData:
-    serializedVersion: 2
-    offset: 0
-    size: 0
-    path: 
 --- !u!1 &938115556
 GameObject:
   m_ObjectHideFlags: 0
@@ -2295,6 +2107,12 @@ PlayableDirector:
     value: {fileID: 8413555527777443949}
   - key: {fileID: 3249075430787213810, guid: 79cfbc9b1cc96b04ca5648fd54ab2cc0, type: 2}
     value: {fileID: 3034280267432393977}
+  - key: {fileID: 4608676206791785311, guid: 79cfbc9b1cc96b04ca5648fd54ab2cc0, type: 2}
+    value: {fileID: 8413555527777443949}
+  - key: {fileID: -2920888315288139223, guid: 79cfbc9b1cc96b04ca5648fd54ab2cc0, type: 2}
+    value: {fileID: 8413555527777443949}
+  - key: {fileID: -4113862770457092186, guid: 79cfbc9b1cc96b04ca5648fd54ab2cc0, type: 2}
+    value: {fileID: 8413555527777443949}
   m_ExposedReferences:
     m_References:
     - e938fcc03ce904249948b95a773d3f6b: {fileID: 1769208549}
@@ -2465,8 +2283,8 @@ RenderTexture:
   m_DownscaleFallback: 0
   m_IsAlphaChannelOptional: 0
   serializedVersion: 5
-  m_Width: 1212
-  m_Height: 1023
+  m_Width: 1000
+  m_Height: 843
   m_AntiAliasing: 1
   m_MipCount: -1
   m_DepthStencilFormat: 93
@@ -2489,6 +2307,54 @@ RenderTexture:
   m_Dimension: 2
   m_VolumeDepth: 1
   m_ShadowSamplingMode: 2
+--- !u!28 &991697712
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 2
+  m_Width: 128
+  m_Height: 1
+  m_CompleteImageSize: 512
+  m_MipsStripped: 0
+  m_TextureFormat: 5
+  m_MipCount: 1
+  m_IsReadable: 1
+  m_IsPreProcessed: 0
+  m_IgnoreMipmapLimit: 0
+  m_MipmapLimitGroupName: 
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_VTOnly: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 0
+    m_WrapV: 0
+    m_WrapW: 0
+  m_LightmapFormat: 0
+  m_ColorSpace: 1
+  m_PlatformBlob: 
+  image data: 512
+  _typelessdata: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
 --- !u!1 &1012066089
 GameObject:
   m_ObjectHideFlags: 0
@@ -2584,6 +2450,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d712a72483ba9114a89a92e2f5bec550, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!84 &1026763949
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 5
+  m_Width: 625
+  m_Height: 351
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 0
+  m_ColorFormat: 52
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 0
+    m_WrapV: 0
+    m_WrapW: 0
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &1054728966
 GameObject:
   m_ObjectHideFlags: 3
@@ -2698,7 +2602,7 @@ Transform:
   m_GameObject: {fileID: 1061579632}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -14.802259, y: -4.59, z: 0}
+  m_LocalPosition: {x: -10.681101, y: -4.59, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2783,7 +2687,7 @@ Transform:
   m_GameObject: {fileID: 1088971785}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -28.94146, y: 32.124302, z: 23.9}
+  m_LocalPosition: {x: -16.7131, y: 32.842503, z: 23.9}
   m_LocalScale: {x: 135.83572, y: 92.40525, z: 147.8484}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4305,7 +4209,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 279698469}
+  - {fileID: 1987445371}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5255,8 +5159,8 @@ MonoBehaviour:
       falloffStrength:
         _value: 0.521
   customWaterMaterial: 0
-  _mat: {fileID: 279698469}
-  _matb: {fileID: 476789408}
+  _mat: {fileID: 1987445371}
+  _matb: {fileID: 527306426}
   _sr: {fileID: 1614109046}
 --- !u!1 &1644589559
 GameObject:
@@ -5745,7 +5649,7 @@ Transform:
   m_GameObject: {fileID: 1792654316}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -49.791004, y: -2.9099903, z: 0}
+  m_LocalPosition: {x: -16.11235, y: -0.24999022, z: 0}
   m_LocalScale: {x: 160.76, y: 160.76, z: 160.76}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -6060,44 +5964,151 @@ Transform:
   - {fileID: 2482228914752522592}
   m_Father: {fileID: 7187489779914395442}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!84 &1934338772
-RenderTexture:
+--- !u!21 &1987445371
+Material:
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 5
-  m_Width: 757
-  m_Height: 426
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 0
-  m_ColorFormat: 52
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 0
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 0
-    m_WrapV: 0
-    m_WrapW: 0
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
+  m_Name: water2d/waterg
+  m_Shader: {fileID: -6465566751694194690, guid: 13326eeed13ec4b498f4eb0770b38c60, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: d1508e1dc42abb745b24c8891a614d2a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _alphaTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _belowWaterTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _colorGradient:
+        m_Texture: {fileID: 991697712}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _distortion_tex:
+        m_Texture: {fileID: 2800000, guid: 63a3a961b343e5341a13f8efb4988815, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _simTex:
+        m_Texture: {fileID: 2800000, guid: bfbb641b863c3bd4d9ace5d8296da606, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _sun_strips:
+        m_Texture: {fileID: 2800000, guid: 02b9ccfabe688644ebd37eb70cbe2341, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _surfaceTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _belowWaterTexAlpha: 0
+    - _belowWaterTexDistortionStrength: 0
+    - _cheapWater: 0
+    - _color_type: 1
+    - _depthFromObstructors: 0
+    - _depthMlp: 0
+    - _distortionFPRH: 0
+    - _edgeIgnoreTransparency: 0
+    - _edgeSize: 0
+    - _enableFalloff: 1
+    - _enable_nor: 0
+    - _enable_obs: 1
+    - _enable_pl: 1
+    - _enable_ref: 1
+    - _enable_rm: 0
+    - _enable_scrolling: 0
+    - _enable_sim: 0
+    - _enable_td: 0
+    - _falloffStart: 0.252
+    - _falloffStrength: 0.37
+    - _foam_alpha: 0.002
+    - _foam_density: 0.149
+    - _foam_size: 4.15
+    - _lighting: 1
+    - _mobileWater: 0
+    - _normStr: 1
+    - _num_of_pixels: 2560
+    - _obstruction_alpha: 0.62
+    - _obstruction_width: 0.06
+    - _pixel_perfect: 1
+    - _raymarchFalloffEnd: 0
+    - _raymarchFalloffStart: 0
+    - _raymarchSteps: 0
+    - _reflectionY: 0.19396034
+    - _rm_type2: 0
+    - _scrStrength: 0.51
+    - _strips_alpha: 0.483
+    - _strips_density: 1.64
+    - _strips_scrolling_speed: 0
+    - _strips_size: 1.28
+    - _strips_speed: 3.18
+    - _surfaceAlpha: 1
+    - _surfaceTexAlpha: 0
+    - _tilemapMode: 0
+    - _useFoamSpeedForST: 0
+    - _usePerspective: 1
+    m_Colors:
+    - _belowWaterTexUV: {r: 0, g: 0, b: 1, a: 1}
+    - _color: {r: 0.028969381, g: 0.11097851, b: 0.1981132, a: 1}
+    - _deep_color: {r: 0.03991634, g: 0.10141881, b: 0.122641504, a: 1}
+    - _deep_minmax: {r: 0.29, g: 0.99, b: 0, a: 0}
+    - _distortion_color: {r: 0, g: 0, b: 0, a: 1}
+    - _distortion_minmax: {r: 0, g: 0, b: 0, a: 0}
+    - _distortion_speed: {r: 0.03, g: 0.03, b: 0, a: 0}
+    - _distortion_strength: {r: 0.02, g: 0.01, b: 0, a: 0}
+    - _distortion_tiling: {r: 1, g: 1, b: 0, a: 0}
+    - _edgeColor: {r: 1, g: 1, b: 1, a: 1}
+    - _foam_color: {r: 0.745105, g: 0.9811321, b: 0.94565207, a: 0}
+    - _foam_speed: {r: 0.98, g: 0, b: 0, a: 0}
+    - _obs_transform: {r: 0.8, g: 0.8, b: 0.1, a: 0.1}
+    - _obstruction_color: {r: 1, g: 1, b: 1, a: 0}
+    - _perspective: {r: 0.05, g: 2, b: 0, a: 0}
+    - _perspective2: {r: -2, g: 7.04, b: 0, a: 0}
+    - _playerPosition: {r: 0, g: 0, b: 0, a: 0}
+    - _refTexRes: {r: 1024, g: 1024, b: 0, a: 0}
+    - _ref_transform: {r: 1, g: 0.6666666, b: 0, a: 0.16666667}
+    - _reflectionsColor: {r: 0.9339623, g: 0.9339623, b: 0.9339623, a: 1}
+    - _simFoamColor: {r: 1, g: 1, b: 1, a: 1}
+    - _simMinMaxWavesHeightFoam: {r: 0.2, g: 0.6, b: 0, a: 0}
+    - _simUvs: {r: 0, g: 0, b: 1, a: 1}
+    - _simWorldBounds: {r: 0, g: 0, b: 1, a: 0}
+    - _surfaceTexSpeed: {r: 0, g: 0, b: 0, a: 0}
+    - _surfaceTexTiling: {r: 0, g: 0, b: 0, a: 0}
+    - _surfaceTexUV: {r: 0, g: 0, b: 1, a: 1}
+    - _tiling: {r: 1, g: 1.5, b: 0, a: 0}
+  m_BuildTextureStacks: []
 --- !u!1 &1990082189
 GameObject:
   m_ObjectHideFlags: 0
@@ -6231,7 +6242,7 @@ Transform:
   m_GameObject: {fileID: 2083361553}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -46.329998, y: -2.9099903, z: -10}
+  m_LocalPosition: {x: -12.55, y: -0.24999022, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6265,8 +6276,8 @@ MonoBehaviour:
     scale: {x: 1.25, y: 1.25}
     reflectionLayerIdx: 22
     copyMainBackground: 0
-    lastOrtographicSize: 7.5
-    lastAspectRatio: 1.7771261
+    lastOrtographicSize: 8.75
+    lastAspectRatio: 1.7793595
   _run: 1
   overrideMainCamera:
     _value: 0
@@ -6281,8 +6292,8 @@ MonoBehaviour:
   uvShader: {fileID: 0}
   jfMaterial: {fileID: 0}
   uvMaterial: {fileID: 0}
-  jfRenderTexture1: {fileID: 842097685}
-  jfRenderTexture2: {fileID: 1934338772}
+  jfRenderTexture1: {fileID: 848420906}
+  jfRenderTexture2: {fileID: 1026763949}
   genSDF: 0
 --- !u!20 &2083361556
 Camera:
@@ -6319,7 +6330,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 7.5
+  orthographic size: 8.75
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -7358,6 +7369,8 @@ MonoBehaviour:
     fixedDuration: 1
   - duration: 2.8
     fixedDuration: 1
+  attackDirectionSet: 0
+  attackFromLeft: 1
   spearAttribute:
     damage: 5
     speed: 1250
@@ -7469,6 +7482,8 @@ MonoBehaviour:
   EventInteract: {fileID: 1662727779174334095}
   camLimit: {fileID: 2056086573822258795}
   secondPhaseDirector: {fileID: 967213673}
+  center_pivot1: {fileID: 7710381064218181370}
+  center_pivot2: {fileID: 7857136212398450296}
   secondPhase: 0
   waterSpear: {fileID: 1446637085026556517}
   swing: {fileID: 3034280267432393977}
@@ -7911,13 +7926,15 @@ MonoBehaviour:
   - {fileID: 7710381064218181370}
   - {fileID: 7857136212398450296}
   cam: {fileID: 2379142043268338016}
-  minZoom: 1
+  minZoom: 7
   col: {fileID: 6037230632536646017}
   CancelOffset: 1
   includePlayer: 1
   y_limit_low: -5.88
   DEBUG: 1
   collideToTrigger: 0
+  cameraPositionSmoothTime: 0.2
+  cameraOrthoSmoothTime: 3.22
 --- !u!224 &2222223961515129315
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7965,7 +7982,7 @@ Transform:
   m_GameObject: {fileID: 4279614356980144665}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -45.5, y: -4.100006, z: 0}
+  m_LocalPosition: {x: -79.84, y: -4.100006, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7993,7 +8010,7 @@ MonoBehaviour:
   m_Follow: {fileID: 0}
   m_Lens:
     FieldOfView: 60
-    OrthographicSize: 6
+    OrthographicSize: 7
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -8063,6 +8080,8 @@ MonoBehaviour:
   factorData:
   - duration: 0.5
     fixedDuration: 1
+  attackDirectionSet: 0
+  attackFromLeft: 1
   bubbleCount: 12
   arcSpreadAngle: 160
   delayAfterEmit: 2
@@ -8134,6 +8153,8 @@ MonoBehaviour:
   factorData:
   - duration: 0.5
     fixedDuration: 1
+  attackDirectionSet: 0
+  attackFromLeft: 1
   gatlingPos: {fileID: 56597711}
   bubbleAttributes:
     damage: 0.15
@@ -8180,6 +8201,8 @@ MonoBehaviour:
     fixedDuration: 1
   - duration: 0.95
     fixedDuration: 0
+  attackDirectionSet: 0
+  attackFromLeft: 1
   showRange: 0
   singleSwingEffect: {fileID: 1341142613}
   swingEffect_ice: {fileID: 1284858366}
@@ -8369,6 +8392,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 149538491128978951, guid: 92df36f15c8fb0b43a4303b0db2087c3, type: 3}
   m_PrefabInstance: {fileID: 6128871377477975479}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3542921769504064693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379161253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 227a017bf7a23d348945355026117d45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  waterLevel: {fileID: 1103139445474968713}
 --- !u!114 &3593431474702058418
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -8596,7 +8632,7 @@ GameObject:
   m_Layer: 18
   m_Name: left_boundary
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -9321,10 +9357,14 @@ PrefabInstance:
       propertyPath: ParentDamageable
       value: 
       objectReference: {fileID: 1659688839713831618}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2382700246095984631, guid: 92df36f15c8fb0b43a4303b0db2087c3, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1082584436462663379, guid: 92df36f15c8fb0b43a4303b0db2087c3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3542921769504064693}
   m_SourcePrefab: {fileID: 100100000, guid: 92df36f15c8fb0b43a4303b0db2087c3, type: 3}
 --- !u!114 &6136828498887070693
 MonoBehaviour:
@@ -9558,7 +9598,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -14.616504, y: 16.612366}
+  m_Offset: {x: 0.09097099, y: 16.612366}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -9569,7 +9609,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 12.4310055, y: 35.9198}
+  m_Size: {x: 9.697475, y: 35.9198}
   m_EdgeRadius: 0
 --- !u!4 &7187489779914395442
 Transform:
@@ -9771,7 +9811,7 @@ Transform:
   m_GameObject: {fileID: 4677788826260464355}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -46.92, y: -5.92, z: -10}
+  m_LocalPosition: {x: -13.14, y: -3.26, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9975,6 +10015,8 @@ MonoBehaviour:
     fixedDuration: 1
   - duration: 1.3
     fixedDuration: 1
+  attackDirectionSet: 0
+  attackFromLeft: 1
   splashEffect_1: {fileID: 1271058139}
   splashEffect_2: {fileID: 244842807}
   shootPositionX:
