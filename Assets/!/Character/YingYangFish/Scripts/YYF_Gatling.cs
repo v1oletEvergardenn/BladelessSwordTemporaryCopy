@@ -38,8 +38,8 @@ public class YYF_Gatling : IEnemyAction
 
     private void Update()
     {
-        damageTimer += Time.deltaTime;
-        selfDamageTimer += Time.deltaTime;
+        damageTimer += TimeScaleManager.EnemyDt;
+        selfDamageTimer += TimeScaleManager.EnemyDt;
     }
 
     public override void CancelAct()
@@ -51,7 +51,7 @@ public class YYF_Gatling : IEnemyAction
     public IEnumerator CenterEnd()
     {
         if (gatlingPos.gameObject.activeInHierarchy) gatlingPos.GetComponent<Animator>().Play("end");
-        yield return new WaitForSeconds(0.5f);
+        yield return WaitForEnemy(0.5f);
         gatlingPos.gameObject.SetActive(false);
     }
 
@@ -65,12 +65,12 @@ public class YYF_Gatling : IEnemyAction
 
         float elapsed = 0f;
         float shootTimer = 0f;
-        yield return new WaitForSeconds(0.5f);
+        yield return WaitForEnemy(0.5f);
 
         while (elapsed < shootDuration)
         {
-            elapsed += Time.deltaTime;
-            shootTimer += Time.deltaTime;
+            elapsed += TimeScaleManager.EnemyDt;
+            shootTimer += TimeScaleManager.EnemyDt;
 
             while (shootTimer >= shootInterval)
             {

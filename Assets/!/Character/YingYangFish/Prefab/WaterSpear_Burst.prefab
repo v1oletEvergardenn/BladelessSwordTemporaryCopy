@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 9192927763911063794}
   - component: {fileID: 6242471232221607772}
   - component: {fileID: 2081741608960296624}
+  - component: {fileID: -7057087710390768459}
   m_Layer: 0
   m_Name: WaterSpear_Burst
   m_TagString: Untagged
@@ -106,3 +107,17 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-7057087710390768459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8115029539855558898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 4
+  useUnscaledUpdateMode: 1

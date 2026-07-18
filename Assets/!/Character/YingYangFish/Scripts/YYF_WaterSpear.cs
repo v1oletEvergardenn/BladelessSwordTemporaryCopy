@@ -11,7 +11,9 @@ public class YYF_WaterSpear : IEnemyAction
     //public Transform waterSpearPos_white;
 
     public IProjectileBasicAttributes spearAttribute;
+    public ProjectileHit spearHit;
     public IProjectileBasicAttributes smallSpearAttribute;
+    public ProjectileHit smallSpearHit;
     private Spear spear;
     private Spear smallSpear1;
     private Spear smallSpear2;
@@ -64,7 +66,7 @@ public class YYF_WaterSpear : IEnemyAction
         SetUp(_spear, trueTarget);
 
         //wait for launch
-        yield return new WaitForSeconds(0.5f);
+        yield return WaitForEnemy(0.5f);
 
         //spawn small spears if need
         if (addition)
@@ -78,30 +80,30 @@ public class YYF_WaterSpear : IEnemyAction
             smallSpear1 = _smallSpear1; smallSpear2 = _smallSpear2;
         }
 
-        yield return new WaitForSeconds(1.55f);
+        yield return WaitForEnemy(1.55f);
 
         if (addition)
         {
             bossAI.selfPooler.SpawnFromPool("ringEffect", bossAI.center.position, true);
-            yield return new WaitForSeconds(0.2f);
+            yield return WaitForEnemy(0.2f);
             bossAI.selfPooler.SpawnFromPool("ringEffect", bossAI.center.position, true);
-            yield return new WaitForSeconds(0.5f);
+            yield return WaitForEnemy(0.5f);
             bossAI.selfPooler.SpawnFromPool("ringEffect", bossAI.center.position, true);
-            yield return new WaitForSeconds(0.05f);
+            yield return WaitForEnemy(0.05f);
         }
         else
         {
             bossAI.selfPooler.SpawnFromPool("ringEffect", bossAI.center.position, true);
-            yield return new WaitForSeconds(0.75f);
+            yield return WaitForEnemy(0.75f);
         }
 
         //launch spear
         if (addition)
         {
             ShootSmallSpear(_smallSpear1, trueTarget); smallSpear1 = null;
-            yield return new WaitForSeconds(0.2f);
+            yield return WaitForEnemy(0.2f);
             ShootSmallSpear(_smallSpear2, trueTarget); smallSpear2 = null;
-            yield return new WaitForSeconds(0.5f);
+            yield return WaitForEnemy(0.5f);
         }
 
         ShootSpear(_spear, trueTarget); spear = null;
@@ -122,9 +124,12 @@ public class YYF_WaterSpear : IEnemyAction
     public void ShootSpear(Spear spear, Transform target)
     {
         spear.collisionEnabled = true;
+
         spear.SetUp(transform.right, this.gameObject).
                 SetAttributes(spearAttribute).
-                SetFollowTarget(target);
+                SetFollowTarget(target).
+                SetHitEffect(spearHit);
+
         GameObject burst = bossAI.selfPooler.SpawnFromPool("burst", bossAI.center.position);
         burst.transform.eulerAngles = spear.transform.eulerAngles;
     }
@@ -135,6 +140,7 @@ public class YYF_WaterSpear : IEnemyAction
         spear.collisionEnabled = true;
         spear.SetUp(transform.right, this.gameObject).
                SetAttributes(smallSpearAttribute).
-               SetFollowTarget(target);
+               SetFollowTarget(target).
+               SetHitEffect(smallSpearHit);
     }
 }

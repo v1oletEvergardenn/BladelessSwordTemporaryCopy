@@ -47,58 +47,58 @@ public class PlayerAttack : MonoBehaviour
 
     #endregion State Flags
 
-    #region Debug/Editor Flags
-
-    public bool showCounterAttackRange;
-    public bool showJumpAttackRange;
-    public bool showBarrierRange;
-
-    #endregion Debug/Editor Flags
-
     #region Attack Variables
 
-    [FoldoutGroup("Attack Variables", nameof(basicAttackDamage), nameof(CounterAttackRadius), nameof(jumpCounterAttackRadius),
-        nameof(jumpAttackPoint), nameof(counterAttackPoint), nameof(counterAttackCheckDuration),
-        nameof(perfectCounterAttackCheckDuration), nameof(attackGap), nameof(commonHitEffect))]
-    [SerializeField] private EditorAttributes.Void attackGroupHold;
+    public bool DebugAttack;
+    public int basicAttackDamage = 1;
 
-    [SerializeField, HideInInspector] public int basicAttackDamage = 1;
-    [SerializeField, HideInInspector, Range(0f, 3f)] private float CounterAttackRadius;
-    [SerializeField, HideInInspector, Range(0f, 2f)] private float jumpCounterAttackRadius;
-    [SerializeField, HideInInspector] public Transform jumpAttackPoint;
-    [SerializeField, HideInInspector] public Transform counterAttackPoint;
-    [SerializeField, HideInInspector, Range(0f, 0.3f)] public float counterAttackCheckDuration;
-    [SerializeField, HideInInspector, Range(0f, 0.2f)] public float perfectCounterAttackCheckDuration;
-    [SerializeField, HideInInspector, Range(0f, 1f)] public float attackGap; //CD of attack
-    [SerializeField, HideInInspector] public ProjectileHitEffectSettings commonHitEffect;
-    public float attackTimer = 0f;//CD timer of attack
-    [HideInInspector] public float counterAttackCheckTimer = 0f;
-    [HideInInspector] public float attackAnimationTime = 0.35f;
-
+    public Transform counterAttackPoint;
+    public ProjectileHit NormalCounterAttackEffect;
+    public ProjectileHit PerfectCounterAttackEffect;
     public Vector3 pointerDirection;
     public int attackIndex = 2;
-    [HideInInspector] public float combatTimer;
+    public Vector3 counterAttackPointOriginalLocalPos;
+    [SerializeField, Range(0f, 3f)] private float CounterAttackRadius;
+
+    [Range(0f, 0.3f)] public float counterAttackCheckDuration;
+    [Range(0f, 0.2f)] public float perfectCounterAttackCheckDuration;
+    [Range(0f, 1f)] public float attackGap; //CD of attack
+
+    private CircleCollider2D counterAttackCollider;
+
+    private Vector2 counterAttackColliderOriginalOffset;
+    private readonly List<Collider2D> counterAttackResults = new List<Collider2D>();
     private float comboTimer;
-    private bool normalAttacking = false;
+
+    [HideInInspector] public float attackTimer = 0f;//CD timer of attack
+    [HideInInspector] public float counterAttackCheckTimer = 0f;
+    [HideInInspector] public float attackAnimationTime = 0.35f;
+    [HideInInspector] public float combatTimer;
 
     #endregion Attack Variables
 
+    #region JumpAttack Variables
+
+    public bool DebugJumpAttack;
+    public Transform jumpAttackPoint;
+    [SerializeField, Range(0f, 2f)] private float jumpCounterAttackRadius;
+
+    #endregion JumpAttack Variables
+
     #region Storm Variables
 
-    [FoldoutGroup("Storm Variables", nameof(storm), nameof(prepareStormTime), nameof(stormDuration),
-        nameof(storm_radius), nameof(repelLayer), nameof(repelForce), nameof(stormEffectPos))]
-    [SerializeField] private EditorAttributes.Void barrierGroupHold;
-
-    [SerializeField, HideInInspector] private GameObject storm;
-    [SerializeField, HideInInspector, Range(0f, 2f)] private float prepareStormTime = 1f;
-    [SerializeField, HideInInspector, Range(0f, 2f)] private float stormDuration = 0.5f;
-    [SerializeField, HideInInspector, Range(0f, 2f)] public float storm_radius = 1.1f;
-    [SerializeField, HideInInspector] private LayerMask repelLayer;
-    [SerializeField, HideInInspector, Range(0f, 300f)] private float repelForce = 100;
-    [HideInInspector] public bool stormReady = false;
-    [HideInInspector] public float prepareStormTimer = 0f;
-    private Vector3 originalStormPos;
+    public bool DebugStorm;
+    public bool stormReady = false;
+    public float prepareStormTimer = 0f;
     public Transform stormEffectPos;
+    [Range(0f, 2f)] public float storm_radius = 1.1f;
+    [SerializeField] private GameObject storm;
+    [SerializeField, Range(0f, 2f)] private float prepareStormTime = 1f;
+    [SerializeField, Range(0f, 2f)] private float stormDuration = 0.5f;
+    [SerializeField] private LayerMask repelLayer;
+    [SerializeField, Range(0f, 300f)] private float repelForce = 100;
+
+    private Vector3 originalStormPos;
 
     #endregion Storm Variables
 
@@ -121,21 +121,32 @@ public class PlayerAttack : MonoBehaviour
         selfPooler = GetComponentInChildren<InternalObjectPooler>();
         hSAbilitiesManager = HeartSwordAbilities.instance;
         originalStormPos = storm.transform.localPosition;
-
+        counterAttackCollider = GetCounterAttackPoint().GetComponent<CircleCollider2D>();
         attackIndex = 2;//max index, so that next loop will start from initial
+
+        if (counterAttackCollider != null)
+        {
+            counterAttackColliderOriginalOffset = counterAttackCollider.offset;
+            counterAttackCollider.isTrigger = true;
+            counterAttackCollider.enabled = false;
+        }
+    }
+
+    private Transform GetCounterAttackPoint()
+    {
+        return counterAttackPoint;
     }
 
     private void Update()
     {
-        bool isInBulletTime = VFXManager.isInBulletTime;
-        attackTimer += isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
-        counterAttackCheckTimer += isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
-        combatTimer -= isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
-        comboTimer += isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
+        attackTimer += TimeScaleManager.Delta(TimeChannel.Player);
+        counterAttackCheckTimer += TimeScaleManager.Delta(TimeChannel.Player);
+        combatTimer -= TimeScaleManager.Delta(TimeChannel.Player);
+        comboTimer += TimeScaleManager.Delta(TimeChannel.Player);
 
         if (isPreparingStorm)
         {
-            prepareStormTimer += isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            prepareStormTimer += TimeScaleManager.Delta(TimeChannel.Player);
             if (prepareStormTimer >= 0.2f) { anim.SetBool("storm", true); }
         }
         else { prepareStormTimer = 0f; stormReady = false; }
@@ -147,8 +158,10 @@ public class PlayerAttack : MonoBehaviour
         if (combatTimer <= 0) { anim.SetBool("isCombat", false); isInCombat = false; combatTimer = 0; }
         if (comboTimer >= 0.67f) { attackIndex = 2; }
 
-        if (counterAttackCheckTimer <= counterAttackCheckDuration) { if (normalAttacking) CheckCounterAttack(); }
-        else { isCounterAttacking = false; normalAttacking = false; }
+        UpdateCounterAttackColliderState();
+
+        if (counterAttackCheckTimer <= counterAttackCheckDuration) { CheckCounterAttack(); }
+        else { isCounterAttacking = false; }
 
         if (isOnStorm) StormCounterAttack();
     }
@@ -162,7 +175,6 @@ public class PlayerAttack : MonoBehaviour
         if (!CanAttack()) return false;
         if (attackTimer < attackGap) return false;
         if (consumeEnergy) if (!energy.AttackConsume()) { return false; }
-        normalAttacking = true;
         InitializeAttack(attackLeft);
         if (attackLeft) { QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.leftCounterAttack); }
         else { QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.rightCounterAttack); }
@@ -185,6 +197,8 @@ public class PlayerAttack : MonoBehaviour
         combatTimer = 2f;
         comboTimer = 0f;
         hitIdamagables.Clear();
+        UpdateAttackPointPosition();
+        UpdateCounterAttackColliderState();
     }
 
     private string GetAttackAnimName()
@@ -212,20 +226,25 @@ public class PlayerAttack : MonoBehaviour
 
     public void CheckCounterAttack()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(counterAttackPoint.position, CounterAttackRadius + 2);
-        float counterRadius = CounterAttackRadius + counterAttackPoint.localPosition.x;
-        // Gather projectiles and damagables, and find closest of each
-        foreach (Collider2D collider in colliders)
+        UpdateAttackPointPosition();
+
+        float counterRadius = CounterAttackRadius + Mathf.Abs(counterAttackPoint.localPosition.x);
+        counterAttackResults.Clear();
+        counterAttackCollider.radius = CounterAttackRadius;
+        Physics2D.OverlapCollider(counterAttackCollider, new ContactFilter2D().NoFilter(), counterAttackResults);
+
+        foreach (Collider2D collider in counterAttackResults)
         {
-            if (collider.gameObject == this.gameObject) continue;
+            if (collider == null) continue;
+            if (collider.gameObject == this.gameObject || collider.transform.IsChildOf(transform)) continue;
 
             if (collider.TryGetComponent<IProjectile>(out IProjectile proj))
             {
                 if (proj.isHostileToPlayer && !proj.collided)
                 {
-                    if (!IsInCounterDirection(proj.GetPivot())) continue;
-                    float dist = Vector2.Distance(proj.GetPivot(), counterAttackPoint.position);
-                    if (dist <= counterRadius)// if normal attack
+                    if (!IsInCounterDirection(proj.GetHitPos())) continue;
+                    float dist = Vector2.Distance(proj.GetHitPos(), counterAttackPoint.position);
+                    if (dist <= counterRadius)
                     {
                         if (counterAttackCheckTimer <= perfectCounterAttackCheckDuration) CounterAttack(proj, true);
                         else if (counterAttackCheckTimer <= counterAttackCheckDuration) CounterAttack(proj, false);
@@ -239,24 +258,38 @@ public class PlayerAttack : MonoBehaviour
                 {
                     if (dmg.canBeHitWithoutHSAttack)
                     {
-                        float distance = Vector2.Distance(dmg.GetHitPos(), health.GetHitPos());
+                        float distance = Vector2.Distance(dmg.GetHitPos(), counterAttackPoint.position);
                         if (distance <= counterRadius)
                         {
                             dmg.Damage(basicAttackDamage, this.transform, 0);
                             hitIdamagables.Add(dmg);
-                            CommonHitEffect(dmg);
+                            HitEffect(dmg, true);
                         }
                     }
                 }
             }
         }
-        // Helper: checks if a target is in the correct direction for counter
+
         bool IsInCounterDirection(Vector3 targetPos)
         {
-            if (controller.FacingRight && targetPos.x <= transform.position.x) return false;
-            if (!controller.FacingRight && targetPos.x >= transform.position.x) return false;
+            if (isAttackingLeft && targetPos.x >= transform.position.x) return false;
+            if (!isAttackingLeft && targetPos.x <= transform.position.x) return false;
             return true;
         }
+    }
+
+    private void UpdateAttackPointPosition()
+    {
+        float x = isAttackingLeft ? -counterAttackPointOriginalLocalPos.x : counterAttackPointOriginalLocalPos.x;
+        float y = counterAttackPointOriginalLocalPos.y;
+        counterAttackPoint.position = transform.position + new Vector3(x, y, 0);
+    }
+
+    private void UpdateCounterAttackColliderState()
+    {
+        if (counterAttackCollider == null) return;
+        bool active = isCounterAttacking && counterAttackCheckTimer <= counterAttackCheckDuration;
+        counterAttackCollider.enabled = active;
     }
 
     public void CounterAttack(IProjectile projectile, bool isPerfect)
@@ -264,26 +297,30 @@ public class PlayerAttack : MonoBehaviour
         if (!projectile.collisionEnabled) return;
         //if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
         attackTimer = attackGap;
-
+        HitEffect(projectile, true);
         if (isPerfect)
         {
             hSAbilitiesManager.ModifyHSPoint(0.5f);
             energy.ChangeEnergy(-energy.attack_energy_consumption);
 
+            projectile.hitEffect.Repel(ProjectileHitResult.Perfect, projectile, health);
             projectile.SetUp(pointerDirection, this.gameObject).
                 SetHostileToPlayer(false).
                 SetDamage(projectile.attribute.damage * basicAttackDamage).
                 SetAdditionalSpeed(100);
             projectile.PerfectCounterAttack();
+
             SoundManager.PlaySound("perfect_attack");
         }
         else
         {
             hSAbilitiesManager.ModifyHSPoint(0.2f);
+            projectile.hitEffect.Repel(ProjectileHitResult.Normal, projectile, health);
             projectile.SetUp(pointerDirection, this.gameObject).
                 SetHostileToPlayer(false).
                 SetDamage(projectile.attribute.damage * basicAttackDamage).
                 SetAdditionalSpeed(30);
+
             projectile.NormalCounterAttack();
             SoundManager.PlaySound("normal_counter_attack");
         }
@@ -298,21 +335,47 @@ public class PlayerAttack : MonoBehaviour
         energy.PerfectCounterAttackRestore();
         isCounterAttacking = false;
         attackTimer = 3f;
+        UpdateCounterAttackColliderState();
     }
 
-    public void CommonHitEffect(IDamagable dmg)
+    public void HitEffect(IDamagable dmg, bool isPerfect)
     {
         if (dmg.resetAttackCDOnHit) attackTimer = attackGap;
         if (!dmg.consumeEnergyOnHit) energy.PerfectCounterAttackRestore();
-        vfx.RumblePulse(commonHitEffect.frequncy_perfect.x, commonHitEffect.frequncy_perfect.y, commonHitEffect.rumbleDuration);
-        vfx.CameraShake(commonHitEffect.cameraShakeForce.y);
-        vfx.SpawnHitEffect(true, dmg.GetHitPos());
-        SoundManager.PlaySound("perfect_attack");
+        if (isPerfect)
+        {
+            PerfectCounterAttackEffect.CameraShake(ProjectileHitResult.Perfect);
+            PerfectCounterAttackEffect.RumblePulse(ProjectileHitResult.Perfect);
+            vfx.SpawnHitEffect(true, dmg.GetHitPos());
+            SoundManager.PlaySound("perfect_attack");
+        }
+        else
+        {
+            PerfectCounterAttackEffect.CameraShake(ProjectileHitResult.Normal);
+            PerfectCounterAttackEffect.RumblePulse(ProjectileHitResult.Normal);
+        }
+    }
+
+    public void HitEffect(IProjectile projectile, bool isPerfect)
+    {
+        if (isPerfect)
+        {
+            PerfectCounterAttackEffect.CameraShake(ProjectileHitResult.Perfect);
+            PerfectCounterAttackEffect.RumblePulse(ProjectileHitResult.Perfect);
+            vfx.SpawnHitEffect(true, projectile.GetHitPos());
+            SoundManager.PlaySound("perfect_attack");
+        }
+        else
+        {
+            PerfectCounterAttackEffect.CameraShake(ProjectileHitResult.Normal);
+            PerfectCounterAttackEffect.RumblePulse(ProjectileHitResult.Normal);
+        }
     }
 
     public void EndAttack()
     {
         isCounterAttacking = false;
+        UpdateCounterAttackColliderState();
     }
 
     public bool JumpAttack()
@@ -325,7 +388,7 @@ public class PlayerAttack : MonoBehaviour
             {
                 if (i != null && i.isHostileToPlayer && !i.collided)
                 {
-                    float distance = Vector3.Distance(i.GetPivot(), jumpAttackPoint.position);
+                    float distance = Vector3.Distance(i.GetHitPos(), jumpAttackPoint.position);
                     if (distance <= jumpCounterAttackRadius) { JumpCounterAttack(i); hit = true; }
                 }
             }
@@ -358,6 +421,13 @@ public class PlayerAttack : MonoBehaviour
             ActionLock.Add("onDefend", Lock.Move | Lock.Attack | Lock.Jump | Lock.SwordTeleport | Lock.SwordJump);
             anim.Play("defend");
         }
+    }
+
+    public void DefendHit()
+    {
+        int i = Random.Range(1, 3);
+        SoundManager.PlaySound("defend_block" + i);
+        anim.Play("defend_hit");
     }
 
     public void EndDefend()
@@ -438,15 +508,15 @@ public class PlayerAttack : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (showCounterAttackRange)
+        if (DebugAttack)
         {
-            Gizmos.DrawWireSphere(counterAttackPoint.position, CounterAttackRadius);
+            Gizmos.DrawWireSphere(transform.position + counterAttackPointOriginalLocalPos, CounterAttackRadius);
         }
-        if (showJumpAttackRange)
+        if (DebugJumpAttack)
         {
             Gizmos.DrawWireSphere(jumpAttackPoint.position, jumpCounterAttackRadius);
         }
-        if (showBarrierRange)
+        if (DebugStorm)
         {
             Gizmos.DrawWireSphere(storm.transform.position, storm_radius);
         }

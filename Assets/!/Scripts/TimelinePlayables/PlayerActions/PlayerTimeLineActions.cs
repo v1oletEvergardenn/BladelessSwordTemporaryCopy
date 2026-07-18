@@ -114,7 +114,7 @@ public class PlayerTimeLineActions : MonoBehaviour
     public void RepelByDistance(float distance)
     {
         AssignRef();
-        playerHealth.RepelInDistance(distance);
+        playerHealth.RepelWithoutDirection(distance);
     }
 
     public void AssignRef()

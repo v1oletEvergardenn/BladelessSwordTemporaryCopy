@@ -7,6 +7,14 @@ using UnityEngine.InputSystem.XR;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+public enum MeleeAttackResult
+{
+    DamagedSuccessfully = 0,
+    Defended = 1,
+    Countered = 2,
+    Dashed = 4
+}
+
 public class Health : IDamagable
 {
     public static Health instance;
@@ -146,29 +154,37 @@ public class Health : IDamagable
     /// </summary>
     /// <param name="attackPos"></param>
     /// <param name="damageAmount"></param>
-    /// <param name="freezeTime"></param>
+    /// <param name="stunTime"></param>
     /// <returns>
     ///  0: damaged successfully
     /// 1: target is defending,
     /// 2: target is countering,
     /// 4: target is immune,</returns>
-    public int DamageFromMeleeAttack(Transform attackPos, float damageAmount, float freezeTime = 0f, bool canCounterAttack = true)
+    public MeleeAttackResult DamageFromMeleeAttack(Transform attackPos, float damageAmount, float stunTime = 0f, bool canCounterAttack = true)
     {
-        if (this.transform.gameObject.layer == 14) { return 4; }
-        if ((attackPos.position.x < transform.position.x && !controller.FacingRight)
-            || (attackPos.position.x > transform.position.x && controller.FacingRight))
+        if (this.transform.gameObject.layer == 14) { return MeleeAttackResult.Dashed; }
+
+        bool damageFromLeft = attackPos.position.x < transform.position.x;
+
+        if (playerAttack.isDefending &&
+            !controller.FacingRight == damageFromLeft)
         {
-            if (playerAttack.isDefending)
-            {
-                int i = Random.Range(1, 3);
-                SoundManager.PlaySound("defend_block" + i);
-                anim.Play("defend_hit");
-                return 1;
-            }
-            if (canCounterAttack && playerAttack.isCounterAttacking) { playerAttack.CounterMeleeAttack(); return 2; }
+            playerAttack.DefendHit(); return MeleeAttackResult.Defended;
         }
-        DamageDirectlyWithStun(damageAmount, freezeTime);
-        return 0;
+        else if (canCounterAttack &&
+            playerAttack.isCounterAttacking &&
+            playerAttack.isAttackingLeft == damageFromLeft)
+        {
+            playerAttack.CounterMeleeAttack(); return MeleeAttackResult.Countered;
+        }
+
+        DamageDirectlyWithStun(damageAmount, stunTime);
+        return MeleeAttackResult.DamagedSuccessfully;
+    }
+
+    public MeleeAttackResult DamageFromMeleeAttack(Transform attackPos, MeleeAttack melee, bool canCounterAttack = true)
+    {
+        return DamageFromMeleeAttack(attackPos, melee.damage, melee.freezeTime, canCounterAttack);
     }
 
     public void OnDeath()
@@ -199,11 +215,12 @@ public class Health : IDamagable
 
     public void Stun(float duration, Transform sender)
     {
+        if (GameManager.instance.isInPerformingState) { return; }
+
         playerAttack.EndDefend();
         hsManager.CancelAllAbilities();
         stunned = true;
         //anim_bool.Anim_Hit(0);
-        print(sender + " dealt " + duration + "s of stun");
         ActionLock.Add("stunned", Lock.All, duration, onUnlocked: () => { anim.SetTrigger("stun_after"); stunned = false; });
 
         bool damageFromBehind = false;//determines the animation
@@ -221,10 +238,10 @@ public class Health : IDamagable
         else { anim.Play("hit"); }
     }
 
-    public override void Repel(float force, bool left)
+    public override void Repel(float distance, bool left)
     {
         if (GameManager.instance.isInPerformingState) { return; }
-        GetComponent<Rigidbody2D>().AddForce((left ? Vector3.left : Vector3.right) * force, ForceMode2D.Impulse);
+        base.Repel(distance, left);
     }
 
     public float GetCurrentHealth()

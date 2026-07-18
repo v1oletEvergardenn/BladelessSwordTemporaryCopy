@@ -9,7 +9,7 @@ public class Spear : IProjectile
     public override void Update()
     {
         if (collided) { return; }
-        lifeTimer += Time.deltaTime;
+        lifeTimer += TimeScaleManager.ProjDt;
         if (lifeTimer >= lifeTime)
         {
             Die();
@@ -18,72 +18,28 @@ public class Spear : IProjectile
         {
             if (followTarget)
             {
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, CalculateWantedRotation(GetTargetHitPosition(target)), rotationSpeed * Time.deltaTime);
+                transform.rotation =
+                    Quaternion.RotateTowards
+                    (transform.rotation,
+                    CalculateWantedRotation(GetTargetHitPosition(target)),
+                    rotationSpeed * TimeScaleManager.ProjDt);
             }//follow target
         }
-        rb.velocity = transform.right * attribute.speed / 10;
+        rb.velocity = transform.right * attribute.speed / 10 * TimeScaleManager.ProjScale;
         if (transform.right.x < 0) { facingRight = false; }
         else { facingRight = true; }
     }
 
     public override void PerfectCounterAttack()
     {
-        vfx.RumblePulse(hitEffectSettings.frequncy_perfect, hitEffectSettings.rumbleDuration);
-        vfx.CameraShake(hitEffectSettings.cameraShakeForce.y);
-        vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
-        isPerfect = true;
+        hitEffect.AllEffects(ProjectileHitResult.Perfect);
         vfx.SpawnHitEffect(true, gameManager.player.GetComponent<PlayerAttack>().counterAttackPoint.position);
+        isPerfect = true;
     }
 
     public override void NormalCounterAttack()
     {
         PerfectCounterAttack();
-    }
-
-    public override void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (canInterruptDelay && IsInDelay())
-        {
-            delayTimer = delay;
-        }
-        if (!collisionEnabled) { return; }
-        IDamagable target = collision.gameObject.GetComponent<IDamagable>();
-        if (target != null && !IsOwner(target.gameObject) && !collided)
-        {
-            if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
-            if (collision.gameObject == gameManager.player)
-            {
-                if (collision.gameObject.layer == 14) { return; }
-                if ((gameManager.player.GetComponent<PlayerAttack>().isCounterAttacking &&
-                    gameManager.player.GetComponent<CharacterController2D>().FacingRight != facingRight)
-                    || gameManager.player.GetComponent<PlayerAttack>().isOnStorm)
-                {
-                    target.Repel(hitEffectSettings.repelForce, this.transform.right.x < 0 ? true : false);
-                    gameManager.player.GetComponent<PlayerAttack>().CounterAttack(this, true);
-                }
-                else
-                {
-                    vfx.RumblePulse(hitEffectSettings.frequency_norm, hitEffectSettings.rumbleDuration);
-                    vfx.CameraShake(hitEffectSettings.cameraShakeForce.y);
-                    vfx.SlowTimeForSeconds(0.1f, 0f);
-                    vfx.SpawnHitEffect(false, GetPivot());
-                    target.Damage(attribute, transform);
-                    target.Repel(150f, this.transform.right.x < 0 ? true : false);
-                    Hit();
-                }
-            }
-            else
-            {
-                vfx.SpawnHitEffect(false, GetPivot());
-                target.Damage(attribute, transform);
-                Hit();
-            }
-        }
-        else if (collision.gameObject != owner &&
-            (stopLayer.value & (1 << collision.gameObject.layer)) > 0)
-        {
-            Hit();
-        }
     }
 
     public override void Die()

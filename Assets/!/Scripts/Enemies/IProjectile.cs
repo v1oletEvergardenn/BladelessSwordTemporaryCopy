@@ -1,5 +1,5 @@
-using EditorAttributes;
 using Sirenix.OdinInspector;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -17,7 +17,7 @@ public abstract class IProjectile : MonoBehaviour
     public float lifeTime = 10f;
     public float delay = 0f;
 
-    public ProjectileHitEffectSettings hitEffectSettings;
+    public ProjectileHit hitEffect;
 
     [HideInInspector] public float originalSpeed;
     [HideInInspector] public GameObject owner;
@@ -51,24 +51,19 @@ public abstract class IProjectile : MonoBehaviour
         transform.eulerAngles = direction;
         owner = _owner;
         rb = GetComponent<Rigidbody2D>();
-        //rb.velocity = transform.right * attribute.speed / 10;
         return new ProjectileBuilder(this);
     }
 
     public virtual void PerfectCounterAttack()
     {
-        vfx.RumblePulse(hitEffectSettings.frequncy_perfect.x, hitEffectSettings.frequncy_perfect.y, hitEffectSettings.rumbleDuration);
-        vfx.CameraShake(hitEffectSettings.cameraShakeForce.y);
+        hitEffect.AllEffects(ProjectileHitResult.Perfect);
         isPerfect = true;
-        vfx.SpawnHitEffect(true, GetPivot());
     }
 
     public virtual void NormalCounterAttack()
     {
-        vfx.RumblePulse(hitEffectSettings.frequency_norm.x, hitEffectSettings.frequency_norm.y, hitEffectSettings.rumbleDuration);
-        vfx.CameraShake(hitEffectSettings.cameraShakeForce.x);
+        hitEffect.AllEffects(ProjectileHitResult.Normal);
         isPerfect = false;
-        vfx.SpawnHitEffect(false, GetPivot());
     }
 
     public void ResetAttributes()
@@ -104,29 +99,31 @@ public abstract class IProjectile : MonoBehaviour
     {
         if (collided) { return; }
 
+        float dt = TimeScaleManager.Delta(TimeChannel.Projectile);
+
         if (target != null && followTarget)
         {
             transform.rotation = Quaternion.RotateTowards(
                 transform.rotation,
                 CalculateWantedRotation(GetTargetHitPosition(target)),
-                rotationSpeed * Time.deltaTime);
+                rotationSpeed * dt);
         }
 
         if (IsInDelay())
         {
-            delayTimer += Time.deltaTime;
+            delayTimer += dt;
         }
         else
         {
             if (!delayTriggered)
             {
-                rb.velocity = transform.right * attribute.speed / 10;
+                rb.velocity = transform.right * attribute.speed / 10 * TimeScaleManager.ProjScale;
                 delayTriggered = true;
                 collisionEnabled = true;
             }
         }
 
-        lifeTimer += Time.deltaTime;
+        lifeTimer += dt;
         if (lifeTimer >= lifeTime)
         {
             Die();
@@ -135,31 +132,75 @@ public abstract class IProjectile : MonoBehaviour
 
     public virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        // If canInterruptDelay is set and we're still in delay, cancel the delay on any collision
-        if (canInterruptDelay && IsInDelay())
+        CheckCollision(collision);
+    }
+
+    public void CheckHitPlayer(IDamagable target)
+    {
+        //get counterAttacked;
+        if ((gameManager.player.GetComponent<PlayerAttack>().isCounterAttacking &&
+                    gameManager.player.GetComponent<PlayerAttack>().isAttackingLeft == IsFacingRight())
+                    || gameManager.player.GetComponent<PlayerAttack>().isOnStorm)
         {
-            delayTimer = delay;
+            hitEffect.Repel(ProjectileHitResult.Perfect, this, target);
+            gameManager.player.GetComponent<PlayerAttack>().CounterAttack(this, true);
         }
+        else//hit Player, damage and repel
+        {
+            hitEffect.AllEffectsWithRepel(ProjectileHitResult.Hit, this, target);
+            vfx.SpawnHitEffect(false, GetHitPos());
+            target.Damage(attribute, transform);
+            Hit();
+        }
+    }
+
+    public void CheckCollision(Collider2D collision)
+    {
+        // If canInterruptDelay is set and we're still in delay, cancel the delay on any collision
+        if (canInterruptDelay && IsInDelay()) delayTimer = delay;
         if (!collisionEnabled) return;
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
+
         if (target != null && !IsOwner(collision.gameObject) && !collided)
         {
-            if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
-            if (collision.gameObject == gameManager.player && collision.gameObject.layer == 14) { return; }
-            vfx.SpawnHitEffect(false, GetPivot());
-            target.Damage(attribute.damage, this.transform, attribute.stunDuration, bossBreakValue: attribute.bossBreakValue);
-            this.gameObject.SetActive(false);
+            //check if the target is hostile to the projectile
+            if (CheckHostile(collision.gameObject)) { return; }
+            // hit player
+            else if (collision.gameObject == gameManager.player)
+            {
+                if (target.gameObject.layer == 14) { return; }
+                if (!isHostileToPlayer) { return; }
+                CheckHitPlayer(target);
+            }
+            // hit other things
+            else
+            {
+                vfx.SpawnHitEffect(false, GetHitPos());
+                target.Damage(attribute, transform);
+                Hit();
+            }
         }
-        else if (collision.gameObject != owner && (stopLayer.value & (1 << collision.gameObject.layer)) > 0)
+        //hit ground or wall
+        else if (collision.gameObject != owner &&
+            (stopLayer.value & (1 << collision.gameObject.layer)) > 0)
         {
             Die();
             collided = true;
         }
     }
 
+    public void CheckCollisionHS(Collider2D collision)
+    {
+        IProjectile proj = collision.gameObject.GetComponent<IProjectile>();
+        if (proj != null && proj.isHostileToPlayer && !collided)
+        {
+            proj.HitByHSAttack();
+        }
+    }
+
     public bool IsInDelay() => delay > 0f && delayTimer < delay;
 
-    public Vector3 GetPivot()
+    public Vector3 GetHitPos()
     {
         return transform.position + transform.right * pivotOffset.x + transform.up * pivotOffset.y;
     }
@@ -188,8 +229,8 @@ public abstract class IProjectile : MonoBehaviour
     {
         if (!showPivot) return;
         Gizmos.color = color;
-        Gizmos.DrawLine(this.transform.position, GetPivot());
-        Gizmos.DrawWireSphere(GetPivot(), 0.05f);
+        Gizmos.DrawLine(this.transform.position, GetHitPos());
+        Gizmos.DrawWireSphere(GetHitPos(), 0.05f);
     }
 
     public virtual bool IsOwner(GameObject obj)
@@ -226,6 +267,18 @@ public abstract class IProjectile : MonoBehaviour
         }
         return Pos;
     }
+
+    public bool IsFacingRight()
+    {
+        return transform.right.x >= 0;
+    }
+
+    public IEnumerator WaitForProj(float i)
+    {
+        yield return TimeScaleManager.WaitForChannelSeconds(i, TimeChannel.Projectile);
+    }
+
+    public bool CheckHostile(GameObject target) => isHostileToPlayer && (target.layer == 13 || target.layer == 25);
 }
 
 public class ProjectileBuilder
@@ -272,6 +325,12 @@ public class ProjectileBuilder
     public ProjectileBuilder SetAdditionalSpeed(float additionSpeed)
     {
         _projectile.attribute.speed = _projectile.originalSpeed + additionSpeed;
+        return this;
+    }
+
+    public ProjectileBuilder SetHitEffect(ProjectileHit hitEffect)
+    {
+        _projectile.hitEffect = hitEffect;
         return this;
     }
 
@@ -344,28 +403,281 @@ public struct IProjectileBasicAttributes
     public float bossBreakValue;
 }
 
-[System.Serializable]
-public struct ProjectileHitEffectSettings
+public enum ProjectileHitResult
 {
-    [EditorAttributes.TabGroup(nameof(RumbleSettings), nameof(TimeSettings), nameof(OtherSettings))]
-    [SerializeField] private Void groupHolder;
+    Hit,
+    Perfect,
+    Normal
+}
 
-    [EditorAttributes.VerticalGroup(nameof(rumbleDuration), nameof(frequency_norm), nameof(frequncy_perfect))]
-    [SerializeField, HideInInspector] private Void RumbleSettings;
+[System.Serializable]
+public class ProjectileHit
+{
+    [LabelText("Copy Perfect"), OnValueChanged(nameof(OnCopyPerfectForHitChanged))]
+    public bool copyPerfectForHit;
 
-    [HideInInspector][Range(0, 1f)] public float rumbleDuration;
-    [HideInInspector][EditorAttributes.MinMaxSlider(0, 1.5f)] public Vector2 frequency_norm;
-    [HideInInspector][EditorAttributes.MinMaxSlider(0, 1.5f)] public Vector2 frequncy_perfect;
+    [LabelText("Copy Normal"), OnValueChanged(nameof(OnCopyNormalForHitChanged))]
+    public bool copyNormalForHit;
 
-    [EditorAttributes.VerticalGroup(nameof(freezeTime), nameof(Time_scale))]
-    [SerializeField, HideInInspector] private Void TimeSettings;
+    [DisableIf(nameof(IsHitCopied)), OnValueChanged(nameof(OnHitValuesChanged))]
+    public Vector2 frequency_hit = new Vector2(0.1f, 0.3f);
 
-    [HideInInspector][Range(0, 0.5f)] public float freezeTime;
-    [HideInInspector][Range(0, 1f)] public float Time_scale;
+    [DisableIf(nameof(IsHitCopied)), Range(0, 1f), OnValueChanged(nameof(OnHitValuesChanged))] public float rumbleDuration_hit = 0.1f;
+    [DisableIf(nameof(IsHitCopied)), Range(0, 0.5f), OnValueChanged(nameof(OnHitValuesChanged))] public float hitFreezeDuration_hit = 0.1f;
+    [DisableIf(nameof(IsHitCopied)), Range(0, 20f), OnValueChanged(nameof(OnHitValuesChanged))] public float repel_hit = 3f;
+    [DisableIf(nameof(IsHitCopied)), OnValueChanged(nameof(OnHitValuesChanged))] public Vector2 cameraShakeForce_hit = new Vector2(0.05f, 0.1f);
 
-    [EditorAttributes.VerticalGroup(nameof(cameraShakeForce), nameof(repelForce))]
-    [SerializeField, HideInInspector] private Void OtherSettings;
+    [LabelText("Copy Hit"), OnValueChanged(nameof(OnCopyHitForPerfectChanged))]
+    public bool copyHitForPerfect;
 
-    [HideInInspector][Range(0, 300f)] public float repelForce;
-    [HideInInspector][EditorAttributes.MinMaxSlider(0, 0.2f)] public Vector2 cameraShakeForce;
+    [LabelText("Copy Normal"), OnValueChanged(nameof(OnCopyNormalForPerfectChanged))]
+    public bool copyNormalForPerfect;
+
+    [DisableIf(nameof(IsPerfectCopied)), OnValueChanged(nameof(OnPerfectValuesChanged))]
+    public Vector2 frequency_perfect = new Vector2(0.1f, 0.3f);
+
+    [DisableIf(nameof(IsPerfectCopied)), Range(0, 1f), OnValueChanged(nameof(OnPerfectValuesChanged))] public float rumbleDuration_perfect = 0.1f;
+    [DisableIf(nameof(IsPerfectCopied)), Range(0, 0.5f), OnValueChanged(nameof(OnPerfectValuesChanged))] public float hitFreezeDuration_perfect = 0.1f;
+    [DisableIf(nameof(IsPerfectCopied)), Range(0, 20f), OnValueChanged(nameof(OnPerfectValuesChanged))] public float repel_perfect = 3f;
+    [DisableIf(nameof(IsPerfectCopied)), OnValueChanged(nameof(OnPerfectValuesChanged))] public Vector2 cameraShakeForce_perfect = new Vector2(0.05f, 0.1f);
+
+    [LabelText("Copy Hit"), OnValueChanged(nameof(OnCopyHitForNormalChanged))]
+    public bool copyHitForNormal;
+
+    [LabelText("Copy Perfect"), OnValueChanged(nameof(OnCopyPerfectForNormalChanged))]
+    public bool copyPerfectForNormal;
+
+    [DisableIf(nameof(IsNormalCopied)), OnValueChanged(nameof(OnNormalValuesChanged))]
+    public Vector2 frequency_normal = new Vector2(0.1f, 0.3f);
+
+    [DisableIf(nameof(IsNormalCopied)), Range(0, 1f), OnValueChanged(nameof(OnNormalValuesChanged))] public float rumbleDuration_normal = 0.1f;
+    [DisableIf(nameof(IsNormalCopied)), Range(0, 0.5f), OnValueChanged(nameof(OnNormalValuesChanged))] public float hitFreezeDuration_normal = 0.1f;
+    [DisableIf(nameof(IsNormalCopied)), Range(0, 20f), OnValueChanged(nameof(OnNormalValuesChanged))] public float repel_normal = 3f;
+    [DisableIf(nameof(IsNormalCopied)), OnValueChanged(nameof(OnNormalValuesChanged))] public Vector2 cameraShakeForce_normal = new Vector2(0.05f, 0.1f);
+
+    private bool _isSyncing;
+    private bool IsHitCopied => copyPerfectForHit || copyNormalForHit;
+    private bool IsPerfectCopied => copyHitForPerfect || copyNormalForPerfect;
+    private bool IsNormalCopied => copyHitForNormal || copyPerfectForNormal;
+
+    private void OnCopyPerfectForHitChanged()
+    {
+        if (copyPerfectForHit) copyNormalForHit = false;
+        SyncAllCopies();
+    }
+
+    private void OnCopyNormalForHitChanged()
+    {
+        if (copyNormalForHit) copyPerfectForHit = false;
+        SyncAllCopies();
+    }
+
+    private void OnCopyHitForPerfectChanged()
+    {
+        if (copyHitForPerfect) copyNormalForPerfect = false;
+        SyncAllCopies();
+    }
+
+    private void OnCopyNormalForPerfectChanged()
+    {
+        if (copyNormalForPerfect) copyHitForPerfect = false;
+        SyncAllCopies();
+    }
+
+    private void OnCopyHitForNormalChanged()
+    {
+        if (copyHitForNormal) copyPerfectForNormal = false;
+        SyncAllCopies();
+    }
+
+    private void OnCopyPerfectForNormalChanged()
+    {
+        if (copyPerfectForNormal) copyHitForNormal = false;
+        SyncAllCopies();
+    }
+
+    private void OnHitValuesChanged()
+    {
+        if (_isSyncing) return;
+        _isSyncing = true;
+        if (copyHitForPerfect) CopyHitToPerfect();
+        if (copyHitForNormal) CopyHitToNormal();
+        _isSyncing = false;
+    }
+
+    private void OnPerfectValuesChanged()
+    {
+        if (_isSyncing) return;
+        _isSyncing = true;
+        if (copyPerfectForHit) CopyPerfectToHit();
+        if (copyPerfectForNormal) CopyPerfectToNormal();
+        _isSyncing = false;
+    }
+
+    private void OnNormalValuesChanged()
+    {
+        if (_isSyncing) return;
+        _isSyncing = true;
+        if (copyNormalForHit) CopyNormalToHit();
+        if (copyNormalForPerfect) CopyNormalToPerfect();
+        _isSyncing = false;
+    }
+
+    private void SyncAllCopies()
+    {
+        if (_isSyncing) return;
+        _isSyncing = true;
+
+        if (copyPerfectForHit) CopyPerfectToHit();
+        else if (copyNormalForHit) CopyNormalToHit();
+
+        if (copyHitForPerfect) CopyHitToPerfect();
+        else if (copyNormalForPerfect) CopyNormalToPerfect();
+
+        if (copyHitForNormal) CopyHitToNormal();
+        else if (copyPerfectForNormal) CopyPerfectToNormal();
+
+        _isSyncing = false;
+    }
+
+    private void CopyPerfectToHit()
+    {
+        frequency_hit = frequency_perfect;
+        rumbleDuration_hit = rumbleDuration_perfect;
+        hitFreezeDuration_hit = hitFreezeDuration_perfect;
+        repel_hit = repel_perfect;
+        cameraShakeForce_hit = cameraShakeForce_perfect;
+    }
+
+    private void CopyNormalToHit()
+    {
+        frequency_hit = frequency_normal;
+        rumbleDuration_hit = rumbleDuration_normal;
+        hitFreezeDuration_hit = hitFreezeDuration_normal;
+        repel_hit = repel_normal;
+        cameraShakeForce_hit = cameraShakeForce_normal;
+    }
+
+    private void CopyHitToPerfect()
+    {
+        frequency_perfect = frequency_hit;
+        rumbleDuration_perfect = rumbleDuration_hit;
+        hitFreezeDuration_perfect = hitFreezeDuration_hit;
+        repel_perfect = repel_hit;
+        cameraShakeForce_perfect = cameraShakeForce_hit;
+    }
+
+    private void CopyNormalToPerfect()
+    {
+        frequency_perfect = frequency_normal;
+        rumbleDuration_perfect = rumbleDuration_normal;
+        hitFreezeDuration_perfect = hitFreezeDuration_normal;
+        repel_perfect = repel_normal;
+        cameraShakeForce_perfect = cameraShakeForce_normal;
+    }
+
+    private void CopyHitToNormal()
+    {
+        frequency_normal = frequency_hit;
+        rumbleDuration_normal = rumbleDuration_hit;
+        hitFreezeDuration_normal = hitFreezeDuration_hit;
+        repel_normal = repel_hit;
+        cameraShakeForce_normal = cameraShakeForce_hit;
+    }
+
+    private void CopyPerfectToNormal()
+    {
+        frequency_normal = frequency_perfect;
+        rumbleDuration_normal = rumbleDuration_perfect;
+        hitFreezeDuration_normal = hitFreezeDuration_perfect;
+        repel_normal = repel_perfect;
+        cameraShakeForce_normal = cameraShakeForce_perfect;
+    }
+
+    public void CameraShake(ProjectileHitResult result)
+    {
+        switch (result)
+        {
+            case ProjectileHitResult.Hit:
+                VFXManager.instance.CameraShake(cameraShakeForce_hit.x);
+                break;
+
+            case ProjectileHitResult.Perfect:
+                VFXManager.instance.CameraShake(cameraShakeForce_perfect.x);
+                break;
+
+            case ProjectileHitResult.Normal:
+                VFXManager.instance.CameraShake(cameraShakeForce_normal.x);
+                break;
+        }
+    }
+
+    public void RumblePulse(ProjectileHitResult result)
+    {
+        switch (result)
+        {
+            case ProjectileHitResult.Hit:
+                VFXManager.instance.RumblePulse(frequency_hit.x, frequency_hit.y, rumbleDuration_hit);
+                break;
+
+            case ProjectileHitResult.Perfect:
+                VFXManager.instance.RumblePulse(frequency_perfect.x, frequency_perfect.y, rumbleDuration_perfect);
+                break;
+
+            case ProjectileHitResult.Normal:
+                VFXManager.instance.RumblePulse(frequency_normal.x, frequency_normal.y, rumbleDuration_normal);
+                break;
+        }
+    }
+
+    public void HitFreeze(ProjectileHitResult result)
+    {
+        switch (result)
+        {
+            case ProjectileHitResult.Hit:
+                TimeScaleManager.HitFreeze(hitFreezeDuration_hit);
+                break;
+
+            case ProjectileHitResult.Perfect:
+                TimeScaleManager.HitFreeze(hitFreezeDuration_perfect);
+                break;
+
+            case ProjectileHitResult.Normal:
+                TimeScaleManager.HitFreeze(hitFreezeDuration_normal);
+                break;
+        }
+    }
+
+    public void Repel(ProjectileHitResult result, IProjectile sender, IDamagable target)
+    {
+        switch (result)
+        {
+            case ProjectileHitResult.Hit:
+                target.Repel(repel_hit, sender.transform.right.x < 0);
+                break;
+
+            case ProjectileHitResult.Perfect:
+                target.Repel(repel_perfect, sender.transform.right.x < 0);
+                break;
+
+            case ProjectileHitResult.Normal:
+                target.Repel(repel_normal, sender.transform.right.x < 0);
+                break;
+        }
+    }
+
+    public void AllEffects(ProjectileHitResult result)
+    {
+        CameraShake(result);
+        RumblePulse(result);
+        HitFreeze(result);
+    }
+
+    public void AllEffectsWithRepel(ProjectileHitResult result, IProjectile sender, IDamagable target)
+    {
+        CameraShake(result);
+        RumblePulse(result);
+        HitFreeze(result);
+        Repel(result, sender, target);
+    }
 }

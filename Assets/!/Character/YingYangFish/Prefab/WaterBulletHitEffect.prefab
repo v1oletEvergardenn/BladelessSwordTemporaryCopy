@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6692933393548737657}
   - component: {fileID: 6310591867164524967}
   - component: {fileID: -1981556926967058769}
+  - component: {fileID: 4527635034016402157}
   m_Layer: 0
   m_Name: WaterBulletHitEffect
   m_TagString: Untagged
@@ -94,7 +95,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1996219957
-  m_SortingLayer: 2
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: -7457969877871575307, guid: 7f343dbc7069d20478013e17899bff80, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -120,3 +121,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   disactiveTime: 0.5
+  useAnim: 0
+  endAnimName: end
+  animTime: 0
+--- !u!114 &4527635034016402157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7066560957551522811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 4
+  useUnscaledUpdateMode: 1

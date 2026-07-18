@@ -180,9 +180,11 @@ public class CameraManager : MonoBehaviour
         cameras.Remove(camera);
     }
 
+    private Coroutine co_yLerp;
+
     public void LerpYDamping(bool isPlayerFalling)
     {
-        StartCoroutine(LerpYAction(isPlayerFalling));
+        co_yLerp = StartCoroutine(LerpYAction(isPlayerFalling));
     }
 
     private IEnumerator LerpYAction(bool isPlayerFalling)
@@ -205,7 +207,7 @@ public class CameraManager : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime < _fallYPanTime)
         {
-            elapsedTime += Time.deltaTime;
+            elapsedTime += TimeScaleManager.PlayerDt;
             float lerpedPanAmount = Mathf.Lerp(startDampAmount, endDampAmount, (elapsedTime / _fallYPanTime));
             _framingTransposer.m_YDamping = lerpedPanAmount;
 

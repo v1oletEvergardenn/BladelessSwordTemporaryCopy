@@ -18,14 +18,15 @@ public class HS_CounterAttack : IHeartSwordAbility
 
     public void Update()
     {
-        timer += Time.deltaTime;
+        timer += TimeScaleManager.PlayerDt;
         if (!isEquipped) return;
         if (!isActive) return;
     }
 
     public void OnDrawGizmosSelected()
     {
-        Gizmos.DrawWireSphere(counterAttackPos.position, HS_attack_radius);
+        if (DebugMode)
+            Gizmos.DrawWireSphere(counterAttackPos.position, HS_attack_radius);
     }
 
     #endregion Unity Lifecycle
@@ -81,7 +82,7 @@ public class HS_CounterAttack : IHeartSwordAbility
         yield return null;
         while (timer < playerAttack.counterAttackCheckDuration)
         {
-            timer += VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            timer += TimeScaleManager.Delta(TimeChannel.Player);
             CheckHSCounterAttack(null);
             yield return null;
         }
@@ -147,8 +148,8 @@ public class HS_CounterAttack : IHeartSwordAbility
             {
                 if (proj.isHostileToPlayer && !proj.collided)
                 {
-                    if (!IsInCounterDirection(proj.GetPivot())) continue;
-                    float dist = Vector2.Distance(proj.GetPivot(), health.GetHitPos());
+                    if (!IsInCounterDirection(proj.GetHitPos())) continue;
+                    float dist = Vector2.Distance(proj.GetHitPos(), health.GetHitPos());
                     if (dist <= hsCheckDistance) HS_counterAttack(proj);//if hs attack
                 }
             }

@@ -112,7 +112,9 @@ public class SavingMenu : MonoBehaviour
     {
         _lastSelected = eventData.selectedObject.GetComponent<Selectable>();
         // Handle select event
-        moveUPTween = eventData.selectedObject.GetComponent<RectTransform>().DOAnchorPosY(initialYPos + moveAmount, 0.2f);
+        moveUPTween = eventData.selectedObject.GetComponent<RectTransform>().
+            DOAnchorPosY(initialYPos + moveAmount, 0.2f).
+            SetTimeDt(this, TimeChannel.UI);
         Material mat = eventData.selectedObject.GetComponentInChildren<Image>().material;
         float current = mat.GetFloat("_GlobalBlurPercent");
         DOTween.Kill(mat); // Optional: kill any previous tweens on this material
@@ -129,7 +131,10 @@ public class SavingMenu : MonoBehaviour
         if (WarningSystem.IsWarningActive)
             return; // Suppress deselect logic if warning is active
         // Handle deselect event
-        moveDOWNTween = eventData.selectedObject.GetComponent<RectTransform>().DOAnchorPosY(initialYPos, 0.2f);
+        moveDOWNTween = eventData.selectedObject.
+            GetComponent<RectTransform>().
+            DOAnchorPosY(initialYPos, 0.2f).
+            SetTimeDt(this, TimeChannel.UI);
         Material mat = eventData.selectedObject.GetComponentInChildren<Image>().material;
         float current = mat.GetFloat("_GlobalBlurPercent");
         DOTween.Kill(mat); // Optional: kill any previous tweens on this material
@@ -311,7 +316,7 @@ public class SavingMenu : MonoBehaviour
     private IEnumerator CreateNewGame(int slot)
     {
         SlotOnClick(slot);
-        yield return new WaitForSeconds(0.4f);
+        yield return TimeScaleManager.WaitForChannelSeconds(0.4f, TimeChannel.UI);
         yield return StartCoroutine(MenuManager.Fade(true));
         Debug.Log($"Creating new game in slot {slot}.");
         SaveSystem.SetCurrentSaveSlot(slot);
@@ -327,7 +332,7 @@ public class SavingMenu : MonoBehaviour
     public IEnumerator LoadGame(int slot)
     {
         SlotOnClick(slot);
-        yield return new WaitForSeconds(0.4f);
+        yield return TimeScaleManager.WaitForChannelSeconds(0.4f, TimeChannel.UI);
         yield return StartCoroutine(MenuManager.Fade(true));
         SaveSystem.Load(slot);
         yield return StartCoroutine(MenuManager.Fade(false));
@@ -341,7 +346,7 @@ public class SavingMenu : MonoBehaviour
 
         // Sequence for press animation: down fast, then up slow
         DOTween.Sequence()
-             .Append(rt.DOAnchorPosY(pressedY, 0.1f).SetEase(Ease.InQuad))
-             .Append(rt.DOAnchorPosY(targetY, 0.2f).SetEase(Ease.OutQuad));
+             .Append(rt.DOAnchorPosY(pressedY, 0.1f).SetEase(Ease.InQuad).SetTimeDt(this, TimeChannel.UI))
+             .Append(rt.DOAnchorPosY(targetY, 0.2f).SetEase(Ease.OutQuad).SetTimeDt(this, TimeChannel.UI));
     }
 }

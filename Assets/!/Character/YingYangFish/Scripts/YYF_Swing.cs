@@ -58,24 +58,27 @@ public class YYF_Swing : IEnemyAction
 
             bool toLeft = GameManager.instance.isInPerformingState ? !isBlack : GetAttackDirection();
             // move to appropriate x position
-            origin.DOMove(new Vector3(target.x, bossAI.waterLevel.position.y - 6, 0), 0.1f);
+            origin.DOMove(new Vector3(target.x, bossAI.waterLevel.position.y - 6, 0), 0.1f).SetTimeDt(this, TimeChannel.Enemy);
 
             // rotate to target position angle
             float angle = -90;
             origin.Rotate(bossAI.Dir, angle);
-            yield return new WaitForSeconds(0.1f);
+            yield return WaitForEnemy(0.1f);
 
             //jump out
             float temp_x = toLeft ? trueTarget.position.x + 4 : trueTarget.position.x - 4;
-            origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + (isBlack ? 2.5f : 4.5f), 0), 0.5f).SetEase(Ease.OutSine);
+            origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + (isBlack ? 2.5f : 4.5f), 0), 0.5f)
+                .SetEase(Ease.OutSine)
+                .SetTimeDt(this, TimeChannel.Enemy);
 
             //pre swing attack
             anim.Play("swing");
-            fishGFX.DOLocalRotate(new Vector3(0, 0, -720), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutSine);
+            fishGFX.DOLocalRotate(new Vector3(0, 0, -720), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutSine)
+                .SetTimeDt(this, TimeChannel.Enemy);
 
             if (isBlack)
             {
-                yield return new WaitForSeconds(0.55f);
+                yield return WaitForEnemy(0.55f);
                 toLeft = trueTarget.position.x < fish.transform.position.x;
 
                 //outline for ice
@@ -93,29 +96,30 @@ public class YYF_Swing : IEnemyAction
                 else { swingEffect_ice.transform.localScale = new Vector3(1, 1, 1); }
                 swingEffect_ice.SetActive(true);
 
-                yield return new WaitForSeconds(0.05f);
+                yield return WaitForEnemy(0.05f);
                 StartCoroutine(ApplyAttackInCollider(swingAttackDuration, fishGFX, small_ice_hitBox, swingAttack));
 
                 // actual attack
-                yield return new WaitForSeconds(0.45f);
+                yield return WaitForEnemy(0.45f);
                 StartCoroutine(ApplyAttackInCollider(swingAttackDuration, fishGFX, ice_hitBox, swingAttack));
             }
             else
             {
-                yield return new WaitForSeconds(0.35f);
+                yield return WaitForEnemy(0.35f);
                 swing_outline.SetActive(false);
                 swing_outline.transform.SetParent(fishGFX);
                 swing_outline.transform.position = fishGFX.position;
                 swing_outline.SetActive(true);
 
                 //swing attack movement
-                yield return new WaitForSeconds(0.3f);
+                yield return WaitForEnemy(0.3f);
 
                 float _x = origin.position.x + 5;
                 if (trueTarget.position.x <= fish.position.x) { _x = fish.position.x - 5; }
-                origin.DOMoveX(_x, 0.3f).SetEase(Ease.InQuint);
+                origin.DOMoveX(_x, 0.3f).SetEase(Ease.InQuint)
+                      .SetTimeDt(this, TimeChannel.Enemy);
 
-                yield return new WaitForSeconds(0.2f);
+                yield return WaitForEnemy(0.2f);
                 Vector3 dirToPlayer = trueTarget.position - singleSwingEffect.transform.position;
                 float angleToPlayer = Mathf.Atan2(dirToPlayer.y, dirToPlayer.x) * Mathf.Rad2Deg;
                 singleSwingEffect.SetActive(false);
@@ -155,26 +159,34 @@ public class YYF_Swing : IEnemyAction
             float angle = -90;
             white_YYFFish.transform.Rotate(bossAI.Dir, angle);
             black_YYFFish.transform.Rotate(bossAI.Dir, 90);
-            yield return new WaitForSeconds(0.1f);
+            yield return WaitForEnemy(0.1f);
 
             //out of the water
             float temp_x = toLeft ? trueTarget.position.x - 4 : trueTarget.position.x + 4;
-            black_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 2.5f, 0), 0.5f).SetEase(Ease.OutSine);
-            white_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 4.5f, 0), 0.5f).SetEase(Ease.OutSine);
+            black_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 2.5f, 0), 0.5f)
+                .SetEase(Ease.OutSine)
+                .SetTimeDt(this, TimeChannel.Enemy);
+            white_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 4.5f, 0), 0.5f)
+                .SetEase(Ease.OutSine)
+                .SetTimeDt(this, TimeChannel.Enemy);
 
             //pre swing attack
             black_YYFFish.anim.Play("swing");
             white_YYFFish.anim.Play("swing");
-            black_YYFFish.fishGFX.DOLocalRotate(new Vector3(0, 0, -720), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutSine);
-            white_YYFFish.fishGFX.DOLocalRotate(new Vector3(0, 0, -720), 0.6f, RotateMode.FastBeyond360).SetEase(Ease.OutSine);
+            black_YYFFish.fishGFX.DOLocalRotate(new Vector3(0, 0, -720), 0.6f, RotateMode.FastBeyond360).
+                SetEase(Ease.OutSine)
+                .SetTimeDt(this, TimeChannel.Enemy);
+            white_YYFFish.fishGFX.DOLocalRotate(new Vector3(0, 0, -720), 0.6f, RotateMode.FastBeyond360).
+                SetEase(Ease.OutSine)
+                .SetTimeDt(this, TimeChannel.Enemy);
 
-            yield return new WaitForSeconds(0.35f);
+            yield return WaitForEnemy(0.35f);
             swing_outline.SetActive(false);
             swing_outline.transform.SetParent(whiteGFX);
             swing_outline.transform.position = whiteGFX.position;
             swing_outline.SetActive(true);
 
-            yield return new WaitForSeconds(0.2f);
+            yield return WaitForEnemy(0.2f);
             toLeft = trueTarget.position.x < black_YYFFish.fish.transform.position.x;
             //outline for ice
             swing_outline_ice.SetActive(false);
@@ -191,16 +203,16 @@ public class YYF_Swing : IEnemyAction
             else { swingEffect_ice.transform.localScale = new Vector3(1, 1, 1); }
             swingEffect_ice.SetActive(true);
 
-            yield return new WaitForSeconds(0.05f);
+            yield return WaitForEnemy(0.05f);
             StartCoroutine(ApplyAttackInCollider(swingAttackDuration, blackGFX, small_ice_hitBox, swingAttack));
 
-            yield return new WaitForSeconds(0.05f);
+            yield return WaitForEnemy(0.05f);
             float _x = white_YYFFish.transform.position.x + 5;
             if (trueTarget.position.x <= white_YYFFish.fish.position.x) { _x = white_YYFFish.fish.position.x - 5; }
-            white_YYFFish.transform.DOMoveX(_x, 0.3f).SetEase(Ease.InQuint);
+            white_YYFFish.transform.DOMoveX(_x, 0.3f).SetEase(Ease.InQuint).SetTimeDt(this, TimeChannel.Enemy);
 
             //actual attack
-            yield return new WaitForSeconds(0.2f);
+            yield return WaitForEnemy(0.2f);
             Vector3 dirToPlayer = trueTarget.position - singleSwingEffect.transform.position;
             float angleToPlayer = Mathf.Atan2(dirToPlayer.y, dirToPlayer.x) * Mathf.Rad2Deg;
             singleSwingEffect.SetActive(false);
@@ -210,7 +222,7 @@ public class YYF_Swing : IEnemyAction
             singleSwingEffect.SetActive(true);
 
             StartCoroutine(ApplyAttackInCircle(swingAttackDuration, swingRange, whiteGFX, swingAttack));
-            yield return new WaitForSeconds(0.2f);
+            yield return WaitForEnemy(0.2f);
             StartCoroutine(ApplyAttackInCollider(swingAttackDuration, blackGFX, ice_hitBox, swingAttack));
 
             yield return StartCoroutine(bossAI.StartMultipleCoroutines(new List<IEnumerator>{
@@ -242,20 +254,20 @@ public class YYF_Swing : IEnemyAction
     /// <param name="offset">The offset to apply to the attack position.</param>
     public override void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default)
     {
-        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.breakAmount);
+        MeleeAttackResult dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.breakAmount);
         bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
 
-        if (dealtDamage == 2)//counter attack
+        if (dealtDamage == MeleeAttackResult.Countered)//counter attack
         {
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
             bossAI.DoBreak(bossbreakValue);
             //counter attack feedback
         }
-        else if (dealtDamage == 1)//defend
+        else if (dealtDamage == MeleeAttackResult.Defended)//defend
         {
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
         }
-        else if (dealtDamage == 0)//dealtDamage
+        else if (dealtDamage == MeleeAttackResult.DamagedSuccessfully)//dealtDamage
         {
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
         }

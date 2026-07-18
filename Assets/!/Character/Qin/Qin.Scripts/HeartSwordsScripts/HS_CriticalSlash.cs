@@ -48,18 +48,18 @@ public class HS_CriticalSlash : IHeartSwordAbility
         anim.Play("idle");
         yield return null;
         anim.Play("HS_critical_slash");
-        if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(2.76f);
-        else yield return new WaitForSeconds(2.76f);
+        yield return TimeScaleManager.WaitForChannelSeconds(2.76f, TimeChannel.Player);
         hitBox.enabled = true;
         playerAttack.isCounterAttacking = true;
         while (timer < playerAttack.counterAttackCheckDuration)
         {
-            timer += VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            timer += TimeScaleManager.Delta(TimeChannel.Player);
             CheckHSCounterAttack(hitBox);
             yield return null;
         }
-        if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(actionDuration - 2.76f - playerAttack.counterAttackCheckDuration);
-        else yield return new WaitForSeconds(actionDuration - 2.76f - playerAttack.counterAttackCheckDuration);
+        yield return TimeScaleManager.WaitForChannelSeconds(
+            actionDuration - 2.76f - playerAttack.counterAttackCheckDuration,
+            TimeChannel.Player);
 
         EndAction();
     }

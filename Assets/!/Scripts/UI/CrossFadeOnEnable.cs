@@ -16,6 +16,6 @@ public class CrossFadeOnEnable : MonoBehaviour
         tempColor.a = 0;
         GetComponent<Image>().color = tempColor;
 
-        GetComponent<Image>().DOFade(alpha, duration);
+        GetComponent<Image>().DOFade(alpha, duration).SetTimeDt(this, TimeChannel.UI);
     }
 }

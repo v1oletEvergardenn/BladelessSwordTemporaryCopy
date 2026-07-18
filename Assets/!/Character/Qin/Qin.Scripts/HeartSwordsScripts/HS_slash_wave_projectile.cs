@@ -9,10 +9,8 @@ public class HS_slash_wave_projectile : IProjectile
     public Collider2D stopCollider;
     public Collider2D damageCollider;
     private Animator anim;
-    private ContactFilter2D stopFilter = new ContactFilter2D();
 
-    private float attackCD = 0.5f;
-    private float attackTimer = 0f;
+    private ContactFilter2D stopFilter = new ContactFilter2D();
 
     public bool showBox = false;
     public Vector2 boxSize = new Vector2(1f, 1f); // Set to your desired size
@@ -29,7 +27,6 @@ public class HS_slash_wave_projectile : IProjectile
     public override void Update()
     {
         base.Update();
-        attackTimer += Time.deltaTime;
         CheckStopLayerCollision();
     }
 
@@ -73,35 +70,8 @@ public class HS_slash_wave_projectile : IProjectile
 
     public override void OnTriggerEnter2D(Collider2D col)
     {
-        IDamagable target = col.gameObject.GetComponent<IDamagable>();
-        IProjectile proj = col.gameObject.GetComponent<IProjectile>();
-
-        if (proj != null && proj.isHostileToPlayer && !collided)
-        {
-            proj.HitByHSAttack();
-        }
-
-        if (target != null && col.gameObject != owner && !collided)
-        {
-            if (isHostileToPlayer && col.gameObject.layer == 13) { return; }
-
-            if (col.gameObject == gameManager.player)
-            {
-                if (col.gameObject.layer == 14) { return; }
-                if (!isHostileToPlayer) { return; }
-
-                vfx.RumblePulse(hitEffectSettings.frequency_norm, hitEffectSettings.rumbleDuration);
-                vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
-                gameManager.playerhealth.Repel(hitEffectSettings.repelForce, transform.right.x < 0 ? true : false);
-            }
-
-            if (attackTimer >= attackCD)
-            {
-                vfx.SpawnEffectWithEnum(Hit_Effect.hs_hit, target.GetHitPos());
-                target.Damage(attribute, transform);
-                attackTimer = 0f;
-            }
-        }
+        CheckCollisionHS(col);
+        CheckCollision(col);
     }
 
     public override void OnDrawGizmosSelected()

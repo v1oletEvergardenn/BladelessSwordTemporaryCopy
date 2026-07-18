@@ -29,14 +29,14 @@ public class IceThorn : IDamagable
         transform.position = pos;
 
         //move up animation
-        yield return new WaitForSeconds(delay);
+        yield return TimeScaleManager.WaitForChannelSeconds(delay, TimeChannel.Enemy);
         canBeCounterAttacked = true;
         canDealDamage = true;
         //after move up, cancel counter attack.
         canBeCounterAttacked = false;
-        yield return new WaitForSeconds(1.35f);
+        yield return TimeScaleManager.WaitForChannelSeconds(1.35f, TimeChannel.Enemy);
         canDealDamage = false;
-        yield return new WaitForSeconds(0.5f);
+        yield return TimeScaleManager.WaitForChannelSeconds(0.5f, TimeChannel.Enemy);
         gameObject.SetActive(false);
         yield return null;
     }
@@ -64,21 +64,21 @@ public class IceThorn : IDamagable
     public void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default, bool canCounterAttack = true)
     {
         VFXManager vfx = VFXManager.instance;
-        int dealtDamage = player.DamageFromMeleeAttack(attackPos, melee.damage, melee.breakAmount, canCounterAttack);
+        MeleeAttackResult dealtDamage = player.DamageFromMeleeAttack(attackPos, melee.damage, melee.breakAmount, canCounterAttack);
         bool left = player.GetHitPos().x < attackPos.position.x ? true : false;
 
-        if (dealtDamage == 2)//counter attack
+        if (dealtDamage == MeleeAttackResult.Countered)//counter attack
         {
             vfx.MeleeAttackEffect(melee, player, left);
             GFX.GetComponent<Animator>().Play("hit");
             canDealDamage = false;
             canBeCounterAttacked = false;
         }
-        else if (dealtDamage == 1)//defend
+        else if (dealtDamage == MeleeAttackResult.Defended)//defend
         {
             vfx.MeleeAttackEffect(melee, player, left);
         }
-        else if (dealtDamage == 0)//dealtDamage
+        else if (dealtDamage == MeleeAttackResult.DamagedSuccessfully)//dealtDamage
         {
             vfx.MeleeAttackEffect(melee, player, left);
             canDealDamage = false;

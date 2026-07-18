@@ -28,7 +28,7 @@ public class WaterFall : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        gapTimer += Time.deltaTime;
+        gapTimer += TimeScaleManager.GameplayDt;
         if (gapTimer >= gapTime)
         {
             gapTimer = 0;

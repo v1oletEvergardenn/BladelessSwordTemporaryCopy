@@ -129,7 +129,7 @@ public abstract class IEnemyAction : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime <= duration)
         {
-            elapsedTime += Time.deltaTime;
+            elapsedTime += TimeScaleManager.EnemyDt;
             Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPos.position + offset, range);
             foreach (Collider2D collider in colliders)
             {
@@ -173,7 +173,7 @@ public abstract class IEnemyAction : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime <= duration)
         {
-            elapsedTime += Time.deltaTime;
+            elapsedTime += TimeScaleManager.EnemyDt;
             List<Collider2D> results = new List<Collider2D>();
             Physics2D.OverlapCollider(attack_collider, new ContactFilter2D().NoFilter(), results);
             foreach (Collider2D collider in results)
@@ -213,18 +213,18 @@ public abstract class IEnemyAction : MonoBehaviour
 
     public virtual void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default)
     {
-        int dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.breakAmount);
+        MeleeAttackResult dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee);
         bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
 
-        if (dealtDamage == 2)//counter attack
+        if (dealtDamage == MeleeAttackResult.Countered)//counter attack
         {
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
         }
-        else if (dealtDamage == 1)//defend
+        else if (dealtDamage == MeleeAttackResult.Defended)//defend
         {
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
         }
-        else if (dealtDamage == 0)//dealtDamage
+        else if (dealtDamage == MeleeAttackResult.DamagedSuccessfully)//dealtDamage
         {
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
         }
@@ -318,6 +318,11 @@ public abstract class IEnemyAction : MonoBehaviour
         routineCache?.Invoke(c);
         yield return c;
         onDone?.Invoke();
+    }
+
+    public IEnumerator WaitForEnemy(float i)
+    {
+        yield return TimeScaleManager.WaitForChannelSeconds(i, TimeChannel.Enemy);
     }
 }
 

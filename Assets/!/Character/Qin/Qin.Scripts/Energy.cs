@@ -72,7 +72,7 @@ public class Energy : MonoBehaviour
 
         if (restoreTimer >= restoreTime)
         {
-            ChangeEnergy(-restore_pre_second * Time.deltaTime);
+            ChangeEnergy(-restore_pre_second * TimeScaleManager.PlayerDt);
         }
     }
 
@@ -154,7 +154,7 @@ public class Energy : MonoBehaviour
             VFXManager.instance.FailedToDoAction();
             return false;
         }
-        ChangeEnergy(float_consume_pre_second * Time.deltaTime);
+        ChangeEnergy(float_consume_pre_second * TimeScaleManager.PlayerDt);
         restoreTime = restoreCDafterConsume;
         restoreTimer = 0f;
         return true;
@@ -172,7 +172,7 @@ public class Energy : MonoBehaviour
             VFXManager.instance.FailedToDoAction();
             return false;
         }
-        ChangeEnergy(storm_consume_pre_second * Time.deltaTime);
+        ChangeEnergy(storm_consume_pre_second * TimeScaleManager.PlayerDt);
         restoreTime = restoreCDafterConsume;
         restoreTimer = 0f;
         return true;
@@ -186,7 +186,7 @@ public class Energy : MonoBehaviour
             VFXManager.instance.FailedToDoAction();
             return false;
         }
-        ChangeEnergy(defend_consume_pre_second * Time.deltaTime);
+        ChangeEnergy(defend_consume_pre_second * TimeScaleManager.PlayerDt);
         restoreTime = restoreCDafterConsume;
         restoreTimer = 0f;
         return true;

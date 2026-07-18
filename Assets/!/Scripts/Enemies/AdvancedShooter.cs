@@ -42,11 +42,13 @@ public abstract class AdvancedShooter : MonoBehaviour
         }
     }
 
+    private float enemyDt = TimeScaleManager.EnemyDt;
+
     public virtual void Update()
     {
         if (!isShooting && canShoot)
         {
-            CDtimer += Time.deltaTime;
+            CDtimer += enemyDt;
             if (CDtimer >= roundCD)
             {
                 StartCoroutine(IEShoot());
@@ -88,7 +90,7 @@ public abstract class AdvancedShooter : MonoBehaviour
         isShooting = true;
         for (int i = 0; i < bulletAmountInOneRound; i++)
         {
-            yield return new WaitForSeconds(bulletCDInOneRound);
+            yield return TimeScaleManager.WaitForChannelSeconds(bulletCDInOneRound, TimeChannel.Enemy);
             Shoot();
         }
         isShooting = false;

@@ -10,6 +10,6 @@ public class SelfMoving : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        transform.position += direction.normalized * Speed * Time.deltaTime;
+        transform.position += direction.normalized * Speed * TimeScaleManager.GameplayDt;
     }
 }

@@ -186,7 +186,7 @@ public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
     {
         // Gather all images
         List<Image> images = new List<Image> { p1, p2, p3, branch1, branch2 };
-        yield return new WaitForSeconds(0.8f);
+        yield return TimeScaleManager.WaitForChannelSeconds(0.8f, TimeChannel.UI);
 
         if (ability.IsUnlocked())
         {
@@ -209,7 +209,7 @@ public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
             StartCoroutine(FadeUI(0.5f, images[i], true));
         }
 
-        yield return new WaitForSeconds(0.3f);
+        yield return TimeScaleManager.WaitForChannelSeconds(0.3f, TimeChannel.UI);
         yield return StartCoroutine(ConnectLinesUICoroutine(0, false));
         yield return StartCoroutine(ConnectLinesUICoroutine(1, false));
         yield return StartCoroutine(ConnectLinesUICoroutine(2, false));
@@ -244,7 +244,7 @@ public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
             StartCoroutine(FadeUI(0.3f, lineObj.GetComponent<Image>(), false));
         }
 
-        yield return new WaitForSeconds(0.3f);
+        yield return TimeScaleManager.WaitForChannelSeconds(0.3f, TimeChannel.UI);
         for (int i = 0; i < images.Count; i++)
         {
             SetColor(images[i].material, normalColor_transparent);
@@ -266,7 +266,7 @@ public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
         float duration = 0.1f;
         while (elapsed < duration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += TimeScaleManager.UIDt;
             float t = Mathf.Clamp01(elapsed / duration);
             line.fillAmount = Mathf.Lerp(0, 1f, t);
             SetColor(line.material, col);
@@ -279,7 +279,7 @@ public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
             duration = 0.2f;
             while (elapsed < duration)
             {
-                elapsed += Time.deltaTime;
+                elapsed += TimeScaleManager.UIDt;
                 float t = Mathf.Clamp01(elapsed / duration);
                 SetColor(images[index].material, Color.Lerp(normalColor_opaque, upgradedColor_opaque, t));
                 SetGlowStrength(images[index].material, Mathf.Lerp(0f, 2f, t));
@@ -295,7 +295,7 @@ public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += TimeScaleManager.UIDt;
             float t = Mathf.Clamp01(elapsed / duration);
 
             Color c = image.color;
@@ -312,7 +312,7 @@ public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += TimeScaleManager.UIDt;
             float t = Mathf.Clamp01(elapsed / duration);
 
             Color c = text.color;
@@ -497,7 +497,8 @@ public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
             x => SetGlowStrength(mat, x),
             8f,
             0.3f
-        ).SetEase(Ease.OutQuad);
+        ).SetEase(Ease.OutQuad)
+        .SetTimeDt(this, TimeChannel.UI);
     }
 
     public override void OnDeselect(BaseEventData eventData)
@@ -524,7 +525,8 @@ public class HSAbilityUpgradeUI : UIChildNavigate, IBackToLastMenu
             x => SetGlowStrength(mat, x),
             glowStrength,
             0.3f
-        ).SetEase(Ease.OutQuad);
+        ).SetEase(Ease.OutQuad)
+        .SetTimeDt(this, TimeChannel.UI);
     }
 
     public void GoBack()

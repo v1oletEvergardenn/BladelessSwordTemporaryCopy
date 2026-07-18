@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3122216159488886555}
   - component: {fileID: -5266926120695446517}
   - component: {fileID: 6094663060255116326}
+  - component: {fileID: 1897122873567503840}
   m_Layer: 8
   m_Name: gutling_bullet_2
   m_TagString: Untagged
@@ -208,14 +209,28 @@ MonoBehaviour:
   rotationSpeed: 100
   lifeTime: 10
   delay: 0
-  hitEffectSettings:
-    rumbleDuration: 0.129
-    frequency_norm: {x: 0.18096516, y: 0.3297587}
-    frequncy_perfect: {x: 0.5308311, y: 0.6756032}
-    freezeTime: 0
-    Time_scale: 1
-    repelForce: 10
-    cameraShakeForce: {x: 0.023592494, y: 0.048729107}
+  hitEffect:
+    copyPerfectForHit: 0
+    copyNormalForHit: 0
+    frequency_hit: {x: 0, y: 0}
+    rumbleDuration_hit: 0
+    hitFreezeDuration_hit: 0
+    repel_hit: 0
+    cameraShakeForce_hit: {x: 0, y: 0}
+    copyHitForPerfect: 0
+    copyNormalForPerfect: 0
+    frequency_perfect: {x: 0, y: 0}
+    rumbleDuration_perfect: 0
+    hitFreezeDuration_perfect: 0
+    repel_perfect: 0
+    cameraShakeForce_perfect: {x: 0, y: 0}
+    copyHitForNormal: 0
+    copyPerfectForNormal: 0
+    frequency_normal: {x: 0, y: 0}
+    rumbleDuration_normal: 0
+    hitFreezeDuration_normal: 0
+    repel_normal: 0
+    cameraShakeForce_normal: {x: 0, y: 0}
   originalSpeed: 0
   owner: {fileID: 0}
   followTarget: 0
@@ -233,7 +248,6 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   anim_after_hit: hit
   death_delay_time_after_hit: 0.3
-  hitEffect: 0
   counterAttackedColor:
     serializedVersion: 2
     key0: {r: 0.8820755, g: 0.93727416, b: 1, a: 1}
@@ -412,3 +426,17 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &1897122873567503840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7187525758913874729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 4
+  useUnscaledUpdateMode: 1

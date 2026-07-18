@@ -66,8 +66,8 @@ public class YYF_BubbleTrap : IEnemyAction
         origin.DORotate(new Vector3(0, 0, delta), bossAI.fastRotateSpeed, RotateMode.WorldAxisAdd)
            .SetSpeedBased(true)
            .SetEase(Ease.Linear)
-           .OnComplete(() => complete = true);
-
+           .OnComplete(() => complete = true)
+           .SetTimeDt(this, TimeChannel.Enemy);
         anim.Play("fast_down");
 
         // pre-calculate spawn positions symmetrically across the top arc
@@ -111,7 +111,7 @@ public class YYF_BubbleTrap : IEnemyAction
 
         while (elpasedTime <= duration)
         {
-            elpasedTime += Time.deltaTime;
+            elpasedTime += TimeScaleManager.EnemyDt;
 
             if (nextSpawnIndex < count && elpasedTime >= nextSpawnTime)
             {

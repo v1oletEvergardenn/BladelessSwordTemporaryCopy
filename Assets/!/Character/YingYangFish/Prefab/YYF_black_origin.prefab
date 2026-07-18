@@ -63,7 +63,7 @@ GameObject:
   - component: {fileID: 2950014804866450445}
   - component: {fileID: 8507695194217083267}
   - component: {fileID: 4085279312616422868}
-  - component: {fileID: 2382700246095984631}
+  - component: {fileID: 1468606676762604981}
   m_Layer: 13
   m_Name: black_fish
   m_TagString: Untagged
@@ -183,7 +183,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &2382700246095984631
+--- !u!114 &1468606676762604981
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -208,6 +208,7 @@ GameObject:
   - component: {fileID: 6619113877427162529}
   - component: {fileID: 9097997836694298991}
   - component: {fileID: 4807921714848611360}
+  - component: {fileID: 8582973069397378544}
   m_Layer: 13
   m_Name: black_fishGFX
   m_TagString: Untagged
@@ -357,3 +358,17 @@ MonoBehaviour:
   act6:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8582973069397378544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6400053801455511445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 3
+  useUnscaledUpdateMode: 1

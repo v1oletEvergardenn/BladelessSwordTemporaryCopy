@@ -161,6 +161,7 @@ GameObject:
   - component: {fileID: 400717511710199410}
   - component: {fileID: 4177132842036022604}
   - component: {fileID: 5028362027837075978}
+  - component: {fileID: 6376651744000326108}
   m_Layer: 9
   m_Name: sword
   m_TagString: Untagged
@@ -256,6 +257,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6376651744000326108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 144948170022431457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 2
+  useUnscaledUpdateMode: 1
 --- !u!1 &210786019708222904
 GameObject:
   m_ObjectHideFlags: 0
@@ -374,6 +389,7 @@ GameObject:
   - component: {fileID: 544394104205416327}
   - component: {fileID: 5334423013883774219}
   - component: {fileID: 3446230061297048233}
+  - component: {fileID: 2708220063565492959}
   m_Layer: 5
   m_Name: botBlackEdge
   m_TagString: Untagged
@@ -459,6 +475,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2708220063565492959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 450518064373026995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 6
+  useUnscaledUpdateMode: 1
 --- !u!1 &457321590592313211
 GameObject:
   m_ObjectHideFlags: 0
@@ -468,7 +498,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 155352411894619182}
-  m_Layer: 6
+  - component: {fileID: 2108459607920574836}
+  m_Layer: 27
   m_Name: counterAttackPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -484,12 +515,47 @@ Transform:
   m_GameObject: {fileID: 457321590592313211}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.706, y: 1.263, z: 0}
+  m_LocalPosition: {x: -7.25, y: -3.12, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7516998643966569166}
+  m_Father: {fileID: 2959508685687309300}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &2108459607920574836
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457321590592313211}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 1.88
 --- !u!1 &518107451012263208
 GameObject:
   m_ObjectHideFlags: 0
@@ -502,6 +568,7 @@ GameObject:
   - component: {fileID: 1094891360991400391}
   - component: {fileID: 7854755112260071819}
   - component: {fileID: 463459975972058119}
+  - component: {fileID: 3843916844161918142}
   m_Layer: 12
   m_Name: storm
   m_TagString: Untagged
@@ -612,6 +679,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3843916844161918142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518107451012263208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 2
+  useUnscaledUpdateMode: 1
 --- !u!1 &576466739246088197
 GameObject:
   m_ObjectHideFlags: 0
@@ -1966,42 +2047,79 @@ MonoBehaviour:
   isAttackingLeft: 1
   isOnStorm: 0
   isPreparingStorm: 0
-  showCounterAttackRange: 0
-  showJumpAttackRange: 0
-  showBarrierRange: 0
+  DebugAttack: 1
   basicAttackDamage: 1
-  CounterAttackRadius: 1.88
-  jumpCounterAttackRadius: 1.921
-  jumpAttackPoint: {fileID: 4616512505539447402}
   counterAttackPoint: {fileID: 155352411894619182}
+  NormalCounterAttackEffect:
+    copyPerfectForHit: 0
+    copyNormalForHit: 0
+    frequency_hit: {x: 0, y: 0}
+    rumbleDuration_hit: 0
+    hitFreezeDuration_hit: 0
+    repel_hit: 0
+    cameraShakeForce_hit: {x: 0, y: 0}
+    copyHitForPerfect: 0
+    copyNormalForPerfect: 0
+    frequency_perfect: {x: 0, y: 0}
+    rumbleDuration_perfect: 0
+    hitFreezeDuration_perfect: 0
+    repel_perfect: 0
+    cameraShakeForce_perfect: {x: 0, y: 0}
+    copyHitForNormal: 0
+    copyPerfectForNormal: 0
+    frequency_normal: {x: 0, y: 0}
+    rumbleDuration_normal: 0
+    hitFreezeDuration_normal: 0
+    repel_normal: 0
+    cameraShakeForce_normal: {x: 0, y: 0}
+  PerfectCounterAttackEffect:
+    copyPerfectForHit: 0
+    copyNormalForHit: 0
+    frequency_hit: {x: 0, y: 0}
+    rumbleDuration_hit: 0
+    hitFreezeDuration_hit: 0
+    repel_hit: 0
+    cameraShakeForce_hit: {x: 0, y: 0}
+    copyHitForPerfect: 0
+    copyNormalForPerfect: 0
+    frequency_perfect: {x: 0, y: 0}
+    rumbleDuration_perfect: 0
+    hitFreezeDuration_perfect: 0
+    repel_perfect: 0
+    cameraShakeForce_perfect: {x: 0, y: 0}
+    copyHitForNormal: 0
+    copyPerfectForNormal: 0
+    frequency_normal: {x: 0, y: 0}
+    rumbleDuration_normal: 0
+    hitFreezeDuration_normal: 0
+    repel_normal: 0
+    cameraShakeForce_normal: {x: 0, y: 0}
+  pointerDirection: {x: 0, y: 0, z: 0}
+  attackIndex: 1
+  counterAttackPointOriginalLocalPos: {x: 0.75, y: 1.24, z: 0}
+  CounterAttackRadius: 1.88
   counterAttackCheckDuration: 0.177
   perfectCounterAttackCheckDuration: 0.04
   attackGap: 0.36
-  commonHitEffect:
-    rumbleDuration: 0
-    frequency_norm: {x: 0, y: 0}
-    frequncy_perfect: {x: 0, y: 0}
-    freezeTime: 0
-    Time_scale: 0
-    repelForce: 0
-    cameraShakeForce: {x: 0, y: 0}
   attackTimer: 0
   counterAttackCheckTimer: 0
   attackAnimationTime: 0.35
-  pointerDirection: {x: 0, y: 0, z: 0}
-  attackIndex: 1
   combatTimer: 0
+  DebugJumpAttack: 0
+  jumpAttackPoint: {fileID: 4616512505539447402}
+  jumpCounterAttackRadius: 1.921
+  DebugStorm: 0
+  stormReady: 0
+  prepareStormTimer: 0
+  stormEffectPos: {fileID: 2894046781769637870}
+  storm_radius: 2
   storm: {fileID: 518107451012263208}
   prepareStormTime: 1.2
   stormDuration: 0.5
-  storm_radius: 2
   repelLayer:
     serializedVersion: 2
     m_Bits: 8192
   repelForce: 200
-  stormReady: 0
-  prepareStormTimer: 0
-  stormEffectPos: {fileID: 2894046781769637870}
 --- !u!114 &3320675107380407050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2286,6 +2404,8 @@ MonoBehaviour:
   targetZoom: 0
   y_limit_low: 0
   activate: 0
+  cameraPositionSmoothTime: 0.2
+  cameraOrthoSmoothTime: 0.2
 --- !u!1 &3632477486540431086
 GameObject:
   m_ObjectHideFlags: 0
@@ -2571,7 +2691,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 155352411894619182}
   - {fileID: 4616512505539447402}
   - {fileID: 8055884147262978598}
   - {fileID: 8317527310965156217}
@@ -2627,6 +2746,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5b433b12834f7148942c5b138403e14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugMode: 0
   commonAttribute: {fileID: 11400000, guid: 8ed998852960ace4587a29aa97ea295c, type: 2}
   branch1Attribute: {fileID: 0}
   branch2Attribute: {fileID: 0}
@@ -2875,6 +2995,7 @@ Transform:
   m_Children:
   - {fileID: 7841713816629260198}
   - {fileID: 8754287798563476833}
+  - {fileID: 155352411894619182}
   - {fileID: 1977391573695511326}
   - {fileID: 1427273179467112029}
   - {fileID: 6550604400399710803}
@@ -3912,6 +4033,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5017fa166a56874ca32be7ed8b53961, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugMode: 0
   commonAttribute: {fileID: 11400000, guid: 645b4d8a2c674644983d036e199d5cf9, type: 2}
   branch1Attribute: {fileID: 11400000, guid: 7893d02e8c58f4e4a921d4fe5aad2428, type: 2}
   branch2Attribute: {fileID: 11400000, guid: b12a06da6a96693418e75d555cf23bec, type: 2}
@@ -4389,6 +4511,7 @@ GameObject:
   - component: {fileID: 7942421603339101131}
   - component: {fileID: 4758266897395386118}
   - component: {fileID: 4822324090982896027}
+  - component: {fileID: 6796975128917537732}
   m_Layer: 5
   m_Name: topBlackEdge
   m_TagString: Untagged
@@ -4474,6 +4597,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6796975128917537732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7097020358684563108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 6
+  useUnscaledUpdateMode: 1
 --- !u!1 &7141731201377197809
 GameObject:
   m_ObjectHideFlags: 0
@@ -4485,6 +4622,7 @@ GameObject:
   - component: {fileID: 1848380555655042989}
   - component: {fileID: 8800305985083121865}
   - component: {fileID: 8409464861545523512}
+  - component: {fileID: 4835427467867046211}
   m_Layer: 12
   m_Name: stormback
   m_TagString: Untagged
@@ -4580,6 +4718,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4835427467867046211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7141731201377197809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 2
+  useUnscaledUpdateMode: 1
 --- !u!1 &7227493593596450887
 GameObject:
   m_ObjectHideFlags: 0
@@ -4816,6 +4968,7 @@ GameObject:
   - component: {fileID: 8697933507540174883}
   - component: {fileID: 512692318975722012}
   - component: {fileID: 5610019840959657370}
+  - component: {fileID: 5611083301725539748}
   m_Layer: 0
   m_Name: player_GFX
   m_TagString: Untagged
@@ -4911,6 +5064,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5611083301725539748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7362464617387580390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 2
+  useUnscaledUpdateMode: 1
 --- !u!1 &7438504306941148889
 GameObject:
   m_ObjectHideFlags: 0
@@ -5191,6 +5358,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af6e1c58c9019d7449db829f355d74d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugMode: 0
   commonAttribute: {fileID: 11400000, guid: 9b6def557c93f8f4c87ff35d47f826f6, type: 2}
   branch1Attribute: {fileID: 0}
   branch2Attribute: {fileID: 0}

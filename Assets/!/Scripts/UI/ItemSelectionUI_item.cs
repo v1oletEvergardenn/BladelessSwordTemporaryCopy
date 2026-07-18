@@ -14,13 +14,13 @@ public class ItemSelectionUI_item : MonoBehaviour, IBackToLastMenu
     public void OnSelect()
     {
         selectedImage.rectTransform.DOComplete();
-        selectedImage.rectTransform.DOAnchorPosY(-20f, 0.4f).SetEase(Ease.OutQuad);
+        selectedImage.rectTransform.DOAnchorPosY(-20f, 0.4f).SetEase(Ease.OutQuad).SetTimeDt(this, TimeChannel.UI);
     }
 
     public void OnDeselect()
     {
         selectedImage.rectTransform.DOComplete();
-        selectedImage.rectTransform.DOAnchorPosY(0f, 0.4f).SetEase(Ease.OutQuad);
+        selectedImage.rectTransform.DOAnchorPosY(0f, 0.4f).SetEase(Ease.OutQuad).SetTimeDt(this, TimeChannel.UI);
     }
 
     public void GoBack()

@@ -103,9 +103,12 @@ MonoBehaviour:
   canBeHitWithoutHSAttack: 0
   resetAttackCDOnHit: 0
   consumeEnergyOnHit: 1
+  subDamagables: []
+  canBeCounterAttacked: 1
+  canDealDamage: 0
   iceAttack:
     damage: 2
-    stun: 0.105
+    breakAmount: 0
     freezeTime: 0.053
     repel: 400
     rumble: {x: 0.33580822, y: 0.53183156}
@@ -123,6 +126,7 @@ GameObject:
   - component: {fileID: 7799549411787395963}
   - component: {fileID: 4373039392195704926}
   - component: {fileID: 7540915736441752204}
+  - component: {fileID: 1564521607021527983}
   m_Layer: 25
   m_Name: GFX
   m_TagString: Untagged
@@ -218,3 +222,17 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1564521607021527983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7422864548388621918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 3
+  useUnscaledUpdateMode: 1

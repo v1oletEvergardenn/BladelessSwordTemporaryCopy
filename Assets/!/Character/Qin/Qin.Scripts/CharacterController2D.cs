@@ -142,7 +142,10 @@ public class CharacterController2D : MonoBehaviour
     {
         _fallSpeedYDampingChangeThreshold = CameraManager.instance._fallSpeedYDampingChangeThreshold;
         inputPlayer = InputPlayer.instance;
+
         gravity = rb.gravityScale;
+        rb.gravityScale = 0f; // disable Unity gravity, use channel gravity below
+
         useRunningSpeed = true;
     }
 
@@ -150,7 +153,7 @@ public class CharacterController2D : MonoBehaviour
     {
         UpdateCoyoteTimer();
         isFloating = Float();
-        teleportTimer += VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
+        teleportTimer += TimeScaleManager.PlayerDt;
         HandleFallingAnimation();
         HandleCameraDamping();
         if (isRunningToTarget) CheckRunToPos();
@@ -158,11 +161,8 @@ public class CharacterController2D : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (VFXManager.isInBulletTime)
-        {
-            rb.velocity += Physics2D.gravity * rb.gravityScale * Time.unscaledDeltaTime;
-            rb.MovePosition(rb.position + rb.velocity * Time.unscaledDeltaTime);
-        }
+        float playerScale = TimeScaleManager.PlayerScale;
+        rb.velocity += Physics2D.gravity * gravity * TimeScaleManager.FixedDelta(TimeChannel.Player) * playerScale;
         GroundCheck();
     }
 
@@ -182,30 +182,29 @@ public class CharacterController2D : MonoBehaviour
             SetRunningState(false);
             rb.velocity = Vector3.SmoothDamp(
                 rb.velocity,
-                new Vector2(0, rb.velocity.y),
+                new Vector2(0f, rb.velocity.y),
                 ref m_Velocity,
                 m_MovementSmoothing,
                 Mathf.Infinity,
-                VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime
+                TimeScaleManager.Delta(TimeChannel.Player)
             );
-            hasTriggeredMoveAction = false; // Reset when movement is not allowed
+            hasTriggeredMoveAction = false;
             return;
         }
 
         if (!(isGrounded || m_AirControl))
             return;
+
         bool moving = move != 0;
         SetRunningState(moving);
 
-        // Quest trigger for player movement
         if (moving || !hasTriggeredMoveAction)
         {
             QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.Move);
             hasTriggeredMoveAction = true;
         }
-        else hasTriggeredMoveAction = false; // Reset when player stops moving
+        else hasTriggeredMoveAction = false;
 
-        //Air check
         if (!isGrounded && m_AirControl)
         {
             speed = isFloating ? 0f : airRunSpeed;
@@ -217,14 +216,16 @@ public class CharacterController2D : MonoBehaviour
         if (isGrounded && !isJumping)
             HandleGroundedAnimationTransitions(state, moving);
 
-        Vector3 targetVelocity = new Vector2(move * speed, rb.velocity.y);
+        float playerScale = TimeScaleManager.PlayerScale;
+        Vector3 targetVelocity = new Vector2(move * speed * playerScale, rb.velocity.y);
+
         rb.velocity = Vector3.SmoothDamp(
             rb.velocity,
             targetVelocity,
             ref m_Velocity,
             m_MovementSmoothing,
             Mathf.Infinity,
-            VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime
+            TimeScaleManager.Delta(TimeChannel.Player)
         );
 
         HandleFlipping(move);
@@ -306,7 +307,7 @@ public class CharacterController2D : MonoBehaviour
                 floatTriggered = true;
             }
             float x = rb.velocity.x;
-            rb.velocity = new Vector2(x, (VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime) * -floatingSpeed);
+            rb.velocity = new Vector2(x, TimeScaleManager.PlayerScale * -floatingSpeed);
             if (!isFloating)
                 PlayAnimClipInCombat("sword_jump_pre", "sword_jump_pre_combat");
             if (!resetRumbleJump)
@@ -342,8 +343,9 @@ public class CharacterController2D : MonoBehaviour
         coyoteTimer = 0f;
         isGrounded = false;
         float x = rb.velocity.x;
-        rb.velocity = new Vector2(x, m_JumpForce);
+        rb.velocity = new Vector2(x, m_JumpForce * TimeScaleManager.PlayerScale);
         isJumping = true;
+
         QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.Jump);
         var state = anim.GetCurrentAnimatorStateInfo(0);
         float duration = state.normalizedTime;
@@ -359,17 +361,21 @@ public class CharacterController2D : MonoBehaviour
     {
         if (!CanDoubleJump() || isGrounded) return;
         if (!energy.DoubleJumpConsume()) return;
+
         float x = rb.velocity.x;
         float strength = Mathf.Lerp(MinDoubleJumpForceMultiplier, DoubleJumpForceMultiplier, holdTime / DoubleJumpForceTime);
 
         SoundManager.PlaySound("sword_jump");
-        rb.velocity = new Vector2(x, m_JumpForce * strength);
+        rb.velocity = new Vector2(x, m_JumpForce * strength * TimeScaleManager.PlayerScale);
+
         ActionLock.Add("doubleJumping", Lock.SwordJump);
         isFloating = false;
         isFalling = false;
         isJumping = true;
+
         QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.SwordJump);
         PlayAnimClipInCombat("sword_jump_after", "sword_jump_after_combat");
+
         bool hit = playerAttack.JumpAttack();
         if (hit)
         {
@@ -519,7 +525,9 @@ public class CharacterController2D : MonoBehaviour
         TeleportSword.SetActive(true);
 
         bool finished = false;
-        TeleportSword.transform.DOMove(pos, TeleportDuration).SetEase(Ease.Linear).OnComplete(() => finished = true);
+        TeleportSword.transform.DOMove(pos, TeleportDuration).
+            SetEase(Ease.Linear).OnComplete(() => finished = true).
+            SetTimeDt(this, TimeChannel.Player);
 
         yield return new WaitUntil(() => finished);
         TeleportToSword();
@@ -552,8 +560,8 @@ public class CharacterController2D : MonoBehaviour
         bool finished = false;
         TeleportSword.transform.DOMove(targetPos, TeleportDuration)
             .SetEase(Ease.Linear)
-            .SetUpdate(VFXManager.isInBulletTime)
-            .OnComplete(() => finished = true);
+            .OnComplete(() => finished = true)
+            .SetTimeDt(this, TimeChannel.Player);
 
         yield return new WaitUntil(() => finished);
         TeleportToSword();
@@ -623,7 +631,7 @@ public class CharacterController2D : MonoBehaviour
         if (isGrounded && !isJumping)
             coyoteTimer = coyoteTime;
         else
-            coyoteTimer -= VFXManager.isInBulletTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            coyoteTimer -= TimeScaleManager.Delta(TimeChannel.Player);
     }
 
     public void SetRunningState(bool running)
@@ -674,12 +682,18 @@ public class CharacterController2D : MonoBehaviour
 
     private void HandleCameraDamping()
     {
-        if (rb.velocity.y < _fallSpeedYDampingChangeThreshold && !CameraManager.instance.isLerpingYDaming && !CameraManager.instance.lerpedFromPlayerFalling)
+        if (!isGrounded &&
+       rb.velocity.y < _fallSpeedYDampingChangeThreshold &&
+       !CameraManager.instance.isLerpingYDaming &&
+       !CameraManager.instance.lerpedFromPlayerFalling)
         {
             CameraManager.instance.LerpYDamping(true);
             CameraFollow.instance.ChangeOffset(CameraFollow.instance.fallingOffset);
         }
-        if (rb.velocity.y >= 0 && !CameraManager.instance.isLerpingYDaming && CameraManager.instance.lerpedFromPlayerFalling)
+
+        if ((isGrounded || rb.velocity.y >= 0f) &&
+            !CameraManager.instance.isLerpingYDaming &&
+            CameraManager.instance.lerpedFromPlayerFalling)
         {
             CameraManager.instance.lerpedFromPlayerFalling = false;
             CameraManager.instance.LerpYDamping(false);

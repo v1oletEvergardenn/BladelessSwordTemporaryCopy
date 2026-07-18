@@ -16,6 +16,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
 {
     #region Inspector Fields & Attributes
 
+    public bool DebugMode = false;
     public SO_HeartSwordAttribute commonAttribute;
     public SO_HeartSwordAttribute branch1Attribute;
     public SO_HeartSwordAttribute branch2Attribute;
@@ -320,7 +321,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
             {
                 if (proj.isHostileToPlayer && !proj.collided)
                 {
-                    if (!IsInCounterDirection(proj.GetPivot())) continue;
+                    if (!IsInCounterDirection(proj.GetHitPos())) continue;
                     HS_counterAttack(proj);
                 }
             }

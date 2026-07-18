@@ -29,66 +29,51 @@ public abstract class IDamagable : MonoBehaviour
         return 0;
     }
 
-    public virtual void Repel(float force, bool left)
+    public virtual void Repel(float distance, bool left)
     {
-        TryGetComponent<Rigidbody2D>(out var rb);
-        if (rb != null)
-        {
-            rb.AddForce((left ? Vector3.left : Vector3.right) * force, ForceMode2D.Impulse);
-        }
+        Vector3 targetPosition = transform.position + (left ? Vector3.left : Vector3.right) * distance;
+
+        transform.DOKill();
+        transform.DOMove(targetPosition, GetRepelTime(targetPosition))
+            .SetEase(Ease.OutSine)
+            .SetTimeDt(this, TimeChannel.Gameplay);
     }
 
-    public void ForceRepel(float force, bool left)
+    public void RepelWithoutDirection(float distance)
     {
-        TryGetComponent<Rigidbody2D>(out var rb);
-        if (rb != null)
-        {
-            rb.AddForce((left ? Vector3.left : Vector3.right) * force, ForceMode2D.Impulse);
-        }
-    }
-
-    public void RepelInDistance(float distance)
-    {
-        TryGetComponent<Rigidbody2D>(out var rb);
-        if (rb != null)
-        {
-            Vector2 targetPosition = rb.position + (Vector2.right * distance);
-
-            rb.velocity = Vector2.zero;
-            rb.DOKill();
-            rb.DOMove(targetPosition, 30)
-                .SetEase(Ease.OutQuint)
-                .SetSpeedBased(true)
-                .SetUpdate(UpdateType.Fixed);
-        }
+        Vector3 targetPosition = transform.position + (Vector3.right * distance);
+        transform.DOKill();
+        transform.DOMove(targetPosition, GetRepelTime(targetPosition))
+            .SetEase(Ease.OutSine)
+            .SetTimeDt(this, TimeChannel.Gameplay);
     }
 
     public void RepelToPosition(Vector3 targetPosition)
     {
-        TryGetComponent<Rigidbody2D>(out var rb);
-        if (rb != null)
-        {
-            rb.velocity = Vector2.zero;
-            rb.DOKill();
-            rb.DOMove(new Vector3(targetPosition.x, transform.position.y, 0), 15)
-                .SetEase(Ease.OutQuint)
-                .SetSpeedBased(true)
-                .SetUpdate(UpdateType.Fixed);
-        }
+        transform.DOKill();
+        transform.DOMove(new Vector3(targetPosition.x, transform.position.y, 0), GetRepelTime(targetPosition))
+            .SetEase(Ease.OutSine)
+            .SetTimeDt(this, TimeChannel.Gameplay);
     }
 
     public void RepelToPosition(Transform targetPosition)
     {
-        TryGetComponent<Rigidbody2D>(out var rb);
-        if (rb != null)
-        {
-            rb.velocity = Vector2.zero;
-            rb.DOKill();
-            rb.DOMove(new Vector3(targetPosition.position.x, transform.position.y, 0), 15)
-                .SetEase(Ease.OutQuint)
-                .SetSpeedBased(true)
-                .SetUpdate(UpdateType.Fixed);
-        }
+        RepelToPosition(targetPosition.position);
+    }
+
+    private float GetRepelTime(Vector3 target)
+    {
+        float maxRepelTime = 0.55f;
+        float repelTimeDistanceScale = 4f;
+
+        float distance = Mathf.Abs(target.x - transform.position.x);
+        float scale = Mathf.Max(0.0001f, repelTimeDistanceScale);
+
+        // Asymptotic normalization: keeps increasing, but slower at larger distances.
+        float normalizedDistance = distance / (distance + scale);
+
+        // OutSine-like growth curve.
+        return Mathf.Sin(normalizedDistance * Mathf.PI * 0.5f) * maxRepelTime;
     }
 
     private void OnDrawGizmosSelected()

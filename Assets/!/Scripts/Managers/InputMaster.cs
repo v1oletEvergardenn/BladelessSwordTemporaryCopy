@@ -156,7 +156,7 @@ public class InputMaster : MonoBehaviour
         callBack_fail = _callback_fail;
         isQTE = true;
         qteInteractedKey_image.fillAmount = 0;
-        Time.timeScale = 0.1f;
+        TimeScaleManager.AddModifier(TimeChannel.Gameplay, "QTE", 0.1f);
 
         #region input key determine
 
@@ -213,7 +213,7 @@ public class InputMaster : MonoBehaviour
 
         while (elapsedTime <= duration)
         {
-            elapsedTime += Time.deltaTime;
+            elapsedTime += TimeScaleManager.GameplayDt;
             qteInteractedKey_image.fillAmount = 1 - (elapsedTime / duration);
             if (inputActionKey.triggered)
             {
@@ -245,7 +245,7 @@ public class InputMaster : MonoBehaviour
         callBack_fail = _callback_fail;
         isQTE = true;
         qteInteractedKey_image.fillAmount = 0;
-        Time.timeScale = 0.1f;
+        TimeScaleManager.AddModifier(TimeChannel.Gameplay, "QTE", 0.1f);
 
         #region input key determine
 
@@ -303,10 +303,12 @@ public class InputMaster : MonoBehaviour
 
         while (true)
         {
-            elapsedTime += Time.deltaTime;
+            elapsedTime += TimeScaleManager.GameplayDt;
             // Decrease timeScale linearly based on elapsedTime and duration
             float t = Mathf.Clamp01(elapsedTime / duration);
-            Time.timeScale = Mathf.Lerp(startTimeScale, 0f, t);
+
+            float gameplayScale = Mathf.Lerp(startTimeScale, 0f, t);
+            TimeScaleManager.SetOrAddModifier(TimeChannel.Gameplay, "QTE", gameplayScale, -1f, true);
 
             qteInteractedKey_image.fillAmount = 1 - t;
 
@@ -327,7 +329,7 @@ public class InputMaster : MonoBehaviour
     {
         if (isQTE)
         {
-            Time.timeScale = 1f;
+            TimeScaleManager.RemoveModifiersBySource("QTE");
             StopCoroutine(co_QTE);
             isQTE = false;
             qteKey.SetActive(false);

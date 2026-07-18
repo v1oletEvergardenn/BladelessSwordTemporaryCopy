@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -6237435637134449254}
   - component: {fileID: 7482267552894218598}
   - component: {fileID: 6037384052687581855}
+  - component: {fileID: 4449338730546088984}
   m_Layer: 8
   m_Name: HS_slash_wave_small
   m_TagString: Untagged
@@ -75,7 +76,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 708749965
-  m_SortingLayer: 3
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_Sprite: {fileID: 4764228029789550804, guid: 29bed80294e20d4439285849c9700538, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -121,41 +122,64 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d69f7399e3955c4f97571aa6c87ad01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
-  speed: 0
-  originalSpeed: 0
-  rotationSpeed: 100
-  stunDuration: 0.3
-  lifeTime: 10
-  stunValue: 1
-  stopLayer:
-    serializedVersion: 2
-    m_Bits: 265344
   showPivot: 0
   pivotOffset: {x: 0, y: 0, z: 0}
   color: {r: 1, g: 0, b: 0, a: 1}
-  hitEffectSettings:
-    rumbleDuration: 0
-    frequency_norm: {x: 0, y: 0}
-    frequncy_perfect: {x: 0, y: 0}
-    freezeTime: 0
-    Time_scale: 0
-    repelForce: 0
-    cameraShakeForce: {x: 0, y: 0}
-  vfx: {fileID: 0}
-  gameManager: {fileID: 0}
+  attribute:
+    damage: 0
+    speed: 0
+    stunDuration: 0
+    bossBreakValue: 0
+  stopLayer:
+    serializedVersion: 2
+    m_Bits: 265344
+  rotationSpeed: 100
+  lifeTime: 10
+  delay: 0
+  hitEffect:
+    copyPerfectForHit: 0
+    copyNormalForHit: 0
+    frequency_hit: {x: 0, y: 0}
+    rumbleDuration_hit: 0
+    hitFreezeDuration_hit: 0
+    repel_hit: 0
+    cameraShakeForce_hit: {x: 0, y: 0}
+    copyHitForPerfect: 0
+    copyNormalForPerfect: 0
+    frequency_perfect: {x: 0, y: 0}
+    rumbleDuration_perfect: 0
+    hitFreezeDuration_perfect: 0
+    repel_perfect: 0
+    cameraShakeForce_perfect: {x: 0, y: 0}
+    copyHitForNormal: 0
+    copyPerfectForNormal: 0
+    frequency_normal: {x: 0, y: 0}
+    rumbleDuration_normal: 0
+    hitFreezeDuration_normal: 0
+    repel_normal: 0
+    cameraShakeForce_normal: {x: 0, y: 0}
+  originalSpeed: 0
   owner: {fileID: 0}
   followTarget: 0
   target: {fileID: 0}
-  rb: {fileID: 0}
   collided: 0
+  delayTriggered: 0
   lifeTimer: 0
   isHostileToPlayer: 0
   isPerfect: 0
+  canInterruptDelay: 0
+  collisionEnabled: 1
+  delayTimer: 0
+  vfx: {fileID: 0}
+  rb: {fileID: 0}
+  gameManager: {fileID: 0}
   anim_after_hit: hit
   death_delay_time_after_hit: 1
   stopCollider: {fileID: 6037384052687581855}
   damageCollider: {fileID: 6037384052687581855}
+  showBox: 0
+  boxSize: {x: 1, y: 1}
+  boxOffset: {x: 0, y: 0}
 --- !u!50 &7482267552894218598
 Rigidbody2D:
   serializedVersion: 4
@@ -228,3 +252,17 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.8443743, y: 0.6854112}
   m_EdgeRadius: 0
+--- !u!114 &4449338730546088984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8334080593992630854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 4
+  useUnscaledUpdateMode: 1

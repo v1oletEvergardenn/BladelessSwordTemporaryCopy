@@ -1,8 +1,9 @@
+using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEditor.Timeline;
 
 [CustomEditor(typeof(IEnemyAction), true)]
-public class IEnemyActionEditor : Editor
+public class IEnemyActionEditor : OdinEditor
 {
     public override void OnInspectorGUI()
     {

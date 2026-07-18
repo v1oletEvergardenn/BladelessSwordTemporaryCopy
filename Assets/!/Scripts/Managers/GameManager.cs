@@ -141,7 +141,7 @@ public class GameManager : MonoBehaviour
     public void PauseGame()
     {
         GamePaused = true;
-        Time.timeScale = 0f;
+        TimeScaleManager.SetPause(true);
         InputMaster.SwitchToUIAction();
         PlayerAttack.instance.anim.SetBool("isRunning", false);
     }
@@ -149,7 +149,7 @@ public class GameManager : MonoBehaviour
     public void UnpauseGame()
     {
         GamePaused = false;
-        Time.timeScale = 1f;
+        TimeScaleManager.SetPause(false);
         InputMaster.SwitchToGameplayAction();
     }
 

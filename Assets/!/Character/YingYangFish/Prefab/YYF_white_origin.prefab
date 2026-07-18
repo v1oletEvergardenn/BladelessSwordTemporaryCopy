@@ -157,6 +157,7 @@ GameObject:
   - component: {fileID: 6776806173474886192}
   - component: {fileID: 5075351527937817694}
   - component: {fileID: 4188400412219776541}
+  - component: {fileID: 789134904427033252}
   m_Layer: 13
   m_Name: white_fish_GFX
   m_TagString: Untagged
@@ -306,6 +307,20 @@ MonoBehaviour:
   act6:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &789134904427033252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6268946569381943940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 3
+  useUnscaledUpdateMode: 1
 --- !u!1 &6505474898341240998
 GameObject:
   m_ObjectHideFlags: 0

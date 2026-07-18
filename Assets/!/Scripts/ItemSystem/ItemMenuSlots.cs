@@ -41,9 +41,9 @@ public class ItemMenuSlots : MonoBehaviour
         description.alpha = 0f;
         line.DOFillAmount(1f, 1f).SetEase(Ease.OutQuad).OnComplete(() =>
         {
-            title.DOFade(1f, 0.5f).SetEase(Ease.OutQuad);
-            description.DOFade(1f, 0.5f).SetEase(Ease.OutQuad);
-        });
+            title.DOFade(1f, 0.5f).SetEase(Ease.OutQuad).SetTimeDt(this, TimeChannel.UI);
+            description.DOFade(1f, 0.5f).SetEase(Ease.OutQuad).SetTimeDt(this, TimeChannel.UI);
+        }).SetTimeDt(this, TimeChannel.UI);
         UpdateUI();
     }
 
@@ -60,13 +60,13 @@ public class ItemMenuSlots : MonoBehaviour
     public void OnSelect()
     {
         selectedImage.rectTransform.DOComplete();
-        selectedImage.rectTransform.DOAnchorPosY(-20f, 0.2f).SetEase(Ease.OutQuad);
+        selectedImage.rectTransform.DOAnchorPosY(-20f, 0.2f).SetEase(Ease.OutQuad).SetTimeDt(this, TimeChannel.UI);
     }
 
     public void OnDeselect()
     {
         selectedImage.rectTransform.DOComplete();
-        selectedImage.rectTransform.DOAnchorPosY(0f, 0.2f).SetEase(Ease.OutQuad);
+        selectedImage.rectTransform.DOAnchorPosY(0f, 0.2f).SetEase(Ease.OutQuad).SetTimeDt(this, TimeChannel.UI);
     }
 
     public void TryUnequipItem()

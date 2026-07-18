@@ -74,6 +74,8 @@ public abstract class IEnemyController : IDamagable
     [HideInInspector] public Energy playerEnergy;
     [HideInInspector] public CharacterController2D playerController;
 
+    [HideInInspector] public float enemyDelta => TimeScaleManager.EnemyDt;
+
     #endregion PRIVATE VARIABLES
 
     #region UNITY_LifeCycle
@@ -187,7 +189,7 @@ public abstract class IEnemyController : IDamagable
         float elapsedTime = 0f;
         while (elapsedTime < 0.2f)
         {
-            elapsedTime += Time.deltaTime;
+            elapsedTime += enemyDelta;
             currentFlashAmount = outline_flash_anim_curve.Evaluate(elapsedTime);
             sprite.material.SetFloat("_OutLineThickness", currentFlashAmount);
             yield return null;
@@ -378,14 +380,14 @@ public abstract class IEnemyController : IDamagable
     {
         isBossBreaking = true;
         CancelAllAction();
-        VFXManager.instance.BulletTime();
+        TimeScaleManager.EnterBulletTime();
         float duration = breakDuration;
         float elapsed = 0f;
         float startBreak = currentBreak;
 
         while (elapsed < duration)
         {
-            elapsed += Time.unscaledDeltaTime; // Use unscaled time to be immune to bullet time
+            elapsed += TimeScaleManager.GlobalDt; // Use unscaled time to be immune to bullet time
             float t = Mathf.Clamp01(elapsed / duration);
             currentBreak = Mathf.Lerp(startBreak, maxBreak, t);
 
@@ -398,10 +400,9 @@ public abstract class IEnemyController : IDamagable
         currentBreak = maxBreak;
         if (bossBreakBar != null && maxBreak > 0)
             bossBreakBar.UpdateBar(maxBreak);
-
-        VFXManager.instance.UnBulletTime();
+        TimeScaleManager.ExitBulletTime();
         isBossBreaking = false;
-        yield return new WaitForSeconds(1f);
+        yield return WaitForEnemy(1f);
         StartAction();
         yield return null;
     }
@@ -412,7 +413,7 @@ public abstract class IEnemyController : IDamagable
 
     private IEnumerator Run(ActionCaller caller, Action onDone)
     {
-        yield return new WaitForSeconds(caller.delay);
+        yield return WaitForEnemy(caller.delay);
         yield return caller.action.act_routine = StartCoroutine(caller.action.Act_coroutine(caller.factor));
         onDone?.Invoke();
     }
@@ -479,6 +480,11 @@ public abstract class IEnemyController : IDamagable
     public T RandomChoice<T>(T a, T b)
     {
         return UnityEngine.Random.value < 0.5f ? a : b;
+    }
+
+    public IEnumerator WaitForEnemy(float seconds)
+    {
+        yield return TimeScaleManager.WaitForChannelSeconds(seconds, TimeChannel.Enemy);
     }
 
     #endregion UTILITY

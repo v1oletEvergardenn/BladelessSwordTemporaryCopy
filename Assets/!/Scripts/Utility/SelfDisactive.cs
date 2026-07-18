@@ -33,13 +33,13 @@ public class SelfDisactive : MonoBehaviour
 
     public IEnumerator DisActive(float time)
     {
-        yield return new WaitForSeconds(time);
+        yield return TimeScaleManager.WaitForChannelSeconds(time, TimeChannel.Gameplay);
         gameObject.SetActive(false);
     }
 
     public IEnumerator AnimBeforeDisActive(float time)
     {
-        yield return new WaitForSeconds(time);
+        yield return TimeScaleManager.WaitForChannelSeconds(time, TimeChannel.Gameplay);
         GetComponent<Animator>().Play(endAnimName);
         co_disactive = StartCoroutine(DisActive(animTime));
     }

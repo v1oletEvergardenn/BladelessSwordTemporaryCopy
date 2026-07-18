@@ -6,7 +6,6 @@ using UnityEngine;
 public class Bubble : IProjectile
 {
     private Animator anim;
-    public Hit_Effect hitEffect;
     public bool isRed;
 
     public float explodeRange = 3f;
@@ -60,13 +59,13 @@ public class Bubble : IProjectile
         attribute.speed = 0f;
         collided = true;
 
-        yield return new WaitForSeconds(0.05f);
+        yield return WaitForProj(0.05f);
 
         if (dmg != null)
         {
             dmg.Damage(attribute, transform);
         }
-        yield return new WaitForSeconds(0.2f);
+        yield return WaitForProj(0.2f);
         gameObject.SetActive(false);
     }
 

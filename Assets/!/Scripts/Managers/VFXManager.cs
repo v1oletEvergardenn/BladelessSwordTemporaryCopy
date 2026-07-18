@@ -46,20 +46,12 @@ public class VFXManager : MonoBehaviour
 
     #endregion Fields
 
-    #region Time
-
-    public static float globalTimeScale = 1f;
-    public static bool isInBulletTime = false;
-
-    #endregion Time
-
     #region Unity Lifecycle
 
     private void Awake()
     {
         if (instance == null) { instance = this; }
         else { Destroy(this.gameObject); }
-        globalTimeScale = 1f;
     }
 
     private void Start()
@@ -78,7 +70,7 @@ public class VFXManager : MonoBehaviour
         target.Repel(melee.repel, left);
         CameraShake(melee.cameraShake);
         RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
-        SlowTimeForSeconds(melee.freezeTime, 0.2f);
+        TimeScaleManager.HitFreeze(melee.freezeTime);
     }
 
     public void MeleeAttackEffect(MeleeAttack melee, IDamagable target)
@@ -86,7 +78,7 @@ public class VFXManager : MonoBehaviour
         SpawnHitEffect(true, target.GetHitPos());
         CameraShake(melee.cameraShake);
         RumblePulse(melee.rumble.x * 2, melee.rumble.y * 2, melee.rumbleDuration * 2);
-        SlowTimeForSeconds(melee.freezeTime, 0.2f);
+        TimeScaleManager.HitFreeze(melee.freezeTime);
     }
 
     #endregion MainMethods
@@ -147,7 +139,7 @@ public class VFXManager : MonoBehaviour
     /// </summary>
     private IEnumerator StopRumble(float duration, Gamepad pad)
     {
-        yield return new WaitForSecondsRealtime(duration);
+        yield return TimeScaleManager.WaitForUnscaledSeconds(duration);
 
         if (CharacterController2D.instance.resetRumbleJump)
         {
@@ -161,68 +153,6 @@ public class VFXManager : MonoBehaviour
     }
 
     #endregion Rumble
-
-    #region Time Manipulation
-
-    /// <summary>
-    /// Temporarily slows down time for a given duration.
-    /// </summary>
-    /// <param name="duration">Duration of the slow effect in seconds.</param>
-    /// <param name="timeSpeed">Time scale to set during the effect.</param>
-    public void SlowTimeForSeconds(float duration, float timeSpeed)
-    {
-        if (gameManager.isInPerformingState) return;
-        StartCoroutine(IESlowTime(duration, timeSpeed));
-    }
-
-    /// <summary>
-    /// Coroutine to handle time slow effect.
-    /// </summary>
-    private IEnumerator IESlowTime(float duration, float timeSpeed)
-    {
-        Time.timeScale = timeSpeed;
-        yield return new WaitForSecondsRealtime(duration);
-        Time.timeScale = globalTimeScale;
-    }
-
-    /// <summary>
-    /// Freezes the game time (sets time scale to 0).
-    /// </summary>
-    public void FreezeTime()
-    {
-        Time.timeScale = 0f;
-    }
-
-    /// <summary>
-    /// Unfreezes the game time (sets time scale to 1).
-    /// </summary>
-    public void UnFreezeTime()
-    {
-        Time.timeScale = 1f;
-    }
-
-    public void BulletTime()
-    {
-        //stop all
-        StartBossBreakEffect();
-        Time.timeScale = 0.1f;
-        globalTimeScale = 0.1f;
-        isInBulletTime = true;
-        PlayerAttack.instance.anim.updateMode = AnimatorUpdateMode.UnscaledTime;
-        Time.fixedDeltaTime = Time.deltaTime * 0.02f;
-    }
-
-    public void UnBulletTime()
-    {
-        EndBossBreakEffect();
-        Time.timeScale = 1f;
-        globalTimeScale = 1f;
-        isInBulletTime = false;
-        PlayerAttack.instance.anim.updateMode = AnimatorUpdateMode.Normal;
-        Time.fixedDeltaTime = 0.02f;
-    }
-
-    #endregion Time Manipulation
 
     #region Camera Effects
 
@@ -244,14 +174,14 @@ public class VFXManager : MonoBehaviour
     private float originalLightIntensity;
     private float originalLightIntensity2;
 
-    private static void StartBossBreakEffect()
+    public static void StartBossBreakEffect()
     {
         instance.originalLightIntensity = instance.globalLight.intensity;
         instance.originalLightIntensity2 = instance.light_player_enemy.intensity;
         instance.StartCoroutine(instance.BossBreakEffectCoroutine(true));
     }
 
-    private static void EndBossBreakEffect()
+    public static void EndBossBreakEffect()
     {
         instance.StartCoroutine(instance.BossBreakEffectCoroutine(false));
     }
@@ -278,7 +208,7 @@ public class VFXManager : MonoBehaviour
         light_player_enemy.intensity = from_lightIntensity2;
         while (elapsed < duration)
         {
-            elapsed += Time.unscaledDeltaTime;
+            elapsed += TimeScaleManager.CameraDt;
             float t = Mathf.Clamp01(elapsed / duration);
 
             // Use DOTween's DOVirtual.EasedValue for easing
@@ -290,18 +220,6 @@ public class VFXManager : MonoBehaviour
             globalLight.intensity = lightIntensity;
             yield return null;
         }
-
-        //elapsed = 0f;
-        //while (elapsed < 0.2f)
-        //{
-        //    elapsed += Time.unscaledDeltaTime;
-        //    float t = Mathf.Clamp01(elapsed / 0.2f);
-
-        //    float breakValue2 = DOVirtual.EasedValue(1, 0.8f, t, easeType);
-        //    breakEffect.weight = breakValue2;
-        //    yield return null;
-        //}
-
         // Optionally disable the effect when finished decreasing
         if (!start)
             breakEffect.enabled = false;
@@ -424,15 +342,15 @@ public class VFXManager : MonoBehaviour
         Vector3 endPos = startPos + new Vector3(0, 0.5f, 0); // Move up 0.5 units
 
         // Fade in and move up
-        sr.DOFade(1f, 0.2f).SetUpdate(true);
-        symbol.DOLocalMove(endPos, 0.2f).SetEase(Ease.OutCubic).SetUpdate(true);
+        sr.DOFade(1f, 0.2f).SetTimeDt(this, TimeChannel.UI);
+        symbol.DOLocalMove(endPos, 0.2f).SetEase(Ease.OutCubic).SetUpdate(true).SetTimeDt(this, TimeChannel.UI);
 
-        yield return new WaitForSecondsRealtime(0.5f);
+        yield return TimeScaleManager.WaitForChannelSeconds(0.5f, TimeChannel.UI);
 
         // Fade out
-        sr.DOFade(0f, 0.2f).SetUpdate(true);
+        sr.DOFade(0f, 0.2f).SetTimeDt(this, TimeChannel.UI);
 
-        yield return new WaitForSecondsRealtime(0.2f);
+        yield return TimeScaleManager.WaitForChannelSeconds(0.2f, TimeChannel.UI);
 
         symbol.gameObject.SetActive(false);
         symbol.localPosition = startPos; // Reset position for next time

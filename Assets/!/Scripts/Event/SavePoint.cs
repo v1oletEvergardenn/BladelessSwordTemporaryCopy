@@ -14,7 +14,7 @@ public class SavePoint : IDamagable
     {
         if (hitCount > 0)
         {
-            hitTimer += Time.deltaTime;
+            hitTimer += TimeScaleManager.GameplayDt;
             if (hitTimer >= comboTimeout)
             {
                 switch (hitCount)

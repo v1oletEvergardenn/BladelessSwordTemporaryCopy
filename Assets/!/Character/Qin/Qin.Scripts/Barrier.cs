@@ -25,7 +25,7 @@ public class Barrier : MonoBehaviour
         {
             if (collider.TryGetComponent<IProjectile>(out IProjectile i) && i.isHostileToPlayer)
             {
-                float distance = Vector3.Distance(i.GetPivot(), transform.position);
+                float distance = Vector3.Distance(i.GetHitPos(), transform.position);
                 if (distance <= radius) { CounterAttackBarrier(i); }
             }
         }

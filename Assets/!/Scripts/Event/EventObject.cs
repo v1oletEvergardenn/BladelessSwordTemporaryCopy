@@ -43,7 +43,7 @@ public abstract class EventObject : MonoBehaviour
     {
         if (isHolding)
         {
-            holdingTimer += Time.deltaTime;
+            holdingTimer += TimeScaleManager.UIDt;
             InteractedRing.fillAmount = holdingTimer / holdingTime;
         }
     }

@@ -341,13 +341,13 @@ namespace Doublsb.Dialog
 
                     case Command.close:
                         Close();
-                        yield return new WaitForSeconds(float.Parse(item.Context));
+                        yield return TimeScaleManager.WaitForChannelSeconds(float.Parse(item.Context), TimeChannel.UI);
                         Printer.SetActive(true);
                         Characters.SetActive(true);
                         break;
 
                     case Command.wait:
-                        yield return new WaitForSeconds(float.Parse(item.Context));
+                        yield return TimeScaleManager.WaitForChannelSeconds(float.Parse(item.Context), TimeChannel.UI);
                         break;
                 }
             }
@@ -371,7 +371,7 @@ namespace Doublsb.Dialog
                 Printer_Text.text = _current_Data.PrintText + _current_Data.Format.CloseTagger;
 
                 if (Text[i] != ' ') Play_ChatSE();
-                if (_currentDelay != 0) yield return new WaitForSeconds(_currentDelay);
+                if (_currentDelay != 0) yield return TimeScaleManager.WaitForChannelSeconds(_currentDelay, TimeChannel.UI);
             }
 
             _current_Data.PrintText += _current_Data.Format.CloseTagger;

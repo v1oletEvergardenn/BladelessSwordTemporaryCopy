@@ -186,7 +186,7 @@ public class HeartSwordAbilities : MonoBehaviour
     {
         if (isIncreasing == true)
         {
-            alpha += Time.deltaTime * 1f;
+            alpha += TimeScaleManager.UIDt * 1f;
             if (alpha >= 1f)
             {
                 isIncreasing = false;
@@ -194,7 +194,7 @@ public class HeartSwordAbilities : MonoBehaviour
         }
         else
         {
-            alpha -= Time.deltaTime * 1f;
+            alpha -= TimeScaleManager.UIDt * 1f;
             if (alpha <= 0.3f)
             {
                 isIncreasing = true;

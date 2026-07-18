@@ -7,7 +7,6 @@ public class Gatling_bubbles : IProjectile
     public string anim_after_hit = "after_hit";
     public float death_delay_time_after_hit = 0f;
     private Animator anim;
-    public Hit_Effect hitEffect;
     public Gradient counterAttackedColor;
     public Gradient normalColor;
     public TrailRenderer trail;
@@ -99,7 +98,7 @@ public class Gatling_bubbles : IProjectile
         moveSpeed = _attribute.speed;
         originalSpeed = _attribute.speed;
 
-        rb.velocity = transform.right * attribute.speed;
+        rb.velocity = transform.right * attribute.speed * TimeScaleManager.ProjScale;
 
         isPerfect = false;
         lifeTimer = 0f;
@@ -110,7 +109,7 @@ public class Gatling_bubbles : IProjectile
     {
         if (collided) return;
 
-        lifeTimer += Time.deltaTime;
+        lifeTimer += TimeScaleManager.ProjDt;
         if (lifeTimer >= lifeTime)
         {
             Die();
@@ -138,7 +137,7 @@ public class Gatling_bubbles : IProjectile
         }
 
         // Smoothly ramp up turn speed for smooth curve
-        currentTurnSpeed = Mathf.MoveTowards(currentTurnSpeed, maxTurnSpeed, turnAcceleration * Time.deltaTime);
+        currentTurnSpeed = Mathf.MoveTowards(currentTurnSpeed, maxTurnSpeed, turnAcceleration * TimeScaleManager.ProjDt);
 
         // Calculate angle to player
         Quaternion targetRotation = CalculateWantedRotation(GetTargetHitPosition(trackTarget));
@@ -154,7 +153,7 @@ public class Gatling_bubbles : IProjectile
         else
         {
             // Turn in the predetermined direction (creates heart curve)
-            float rotationAmount = currentTurnSpeed * Time.deltaTime * turnDirection;
+            float rotationAmount = currentTurnSpeed * TimeScaleManager.ProjDt * turnDirection;
             transform.Rotate(0, 0, rotationAmount);
 
             // Alternative: if we've turned past the target, snap to it
@@ -168,13 +167,13 @@ public class Gatling_bubbles : IProjectile
         }
 
         // Move forward
-        rb.velocity = transform.right * attribute.speed;
+        rb.velocity = transform.right * attribute.speed * TimeScaleManager.ProjScale;
     }
 
     private void UpdateShootingPhase()
     {
         // No turning - shoot straight in current direction
-        rb.velocity = transform.right * attribute.speed;
+        rb.velocity = transform.right * attribute.speed * TimeScaleManager.ProjScale;
     }
 
     public override void OnTriggerEnter2D(Collider2D collision)
@@ -182,16 +181,14 @@ public class Gatling_bubbles : IProjectile
         IDamagable target = collision.gameObject.GetComponent<IDamagable>();
         if (target != null && collision.gameObject != owner && !collided)
         {
-            if (isHostileToPlayer && collision.gameObject.layer == 13) { return; }
+            if (CheckHostile(target.gameObject)) { return; }
 
             if (collision.gameObject == gameManager.player)
             {
                 if (collision.gameObject.layer == 14) { return; }
                 if (!isHostileToPlayer) { return; }
 
-                vfx.RumblePulse(hitEffectSettings.frequency_norm, hitEffectSettings.rumbleDuration);
-                vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
-                gameManager.playerhealth.Repel(hitEffectSettings.repelForce, transform.right.x < 0 ? true : false);
+                CheckHitPlayer(target);
             }
 
             Hit();
@@ -219,7 +216,6 @@ public class Gatling_bubbles : IProjectile
     public override void Hit()
     {
         if (anim != null) anim.Play(anim_after_hit);
-        vfx.SpawnEffectWithEnum(hitEffect, transform.position);
         Stop();
         Invoke("Die", death_delay_time_after_hit);
     }

@@ -151,11 +151,13 @@ public class InputPlayer : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Minus))
         {
-            Time.timeScale -= 0.2f;
+            float cur = TimeScaleManager.instance.GetBaseScale(TimeChannel.Gameplay);
+            TimeScaleManager.instance.SetBaseScale(TimeChannel.Gameplay, cur - 0.2f);
         }
         else if (Input.GetKeyDown(KeyCode.Equals))
         {
-            Time.timeScale += 0.2f;
+            float cur = TimeScaleManager.instance.GetBaseScale(TimeChannel.Gameplay);
+            TimeScaleManager.instance.SetBaseScale(TimeChannel.Gameplay, cur + 0.2f);
         }
     }
 
@@ -230,9 +232,10 @@ public class InputPlayer : MonoBehaviour
     {
         if (learnedDoubleJump && input_floating)
         {
-            input_floating_timer += Time.deltaTime;
+            input_floating_timer += Time.unscaledDeltaTime;
             controller.floatingTime = input_floating_timer;
         }
+
         if (learnedDoubleJump && input_floating_timer > 0f)
         {
             controller.input_floating = true;

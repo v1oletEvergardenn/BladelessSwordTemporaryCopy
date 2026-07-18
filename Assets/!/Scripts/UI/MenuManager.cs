@@ -297,10 +297,10 @@ public class MenuManager : MonoBehaviour
         HSAbilityUpgradeMenu.SetActive(true);
 
         backgroundImage1.color = new Color(backgroundImage1.color.r, backgroundImage1.color.g, backgroundImage1.color.b, 0f);
-        backgroundImage1.DOFade(1f, 1f).SetEase(Ease.OutCubic);
+        backgroundImage1.DOFade(1f, 1f).SetEase(Ease.OutCubic).SetTimeDt(this, TimeChannel.UI);
 
         backgroundImage2.color = new Color(backgroundImage2.color.r, backgroundImage2.color.g, backgroundImage2.color.b, 0f);
-        backgroundImage2.DOFade(1f, 1f).SetEase(Ease.OutCubic);
+        backgroundImage2.DOFade(1f, 1f).SetEase(Ease.OutCubic).SetTimeDt(this, TimeChannel.UI);
 
         foreach (var ui in hsUpgradeUIs)
         {
@@ -320,13 +320,13 @@ public class MenuManager : MonoBehaviour
             ui.ShowOrHide(false);
         }
         backgroundImage1.color = new Color(backgroundImage1.color.r, backgroundImage1.color.g, backgroundImage1.color.b, 1f);
-        backgroundImage1.DOFade(0f, 1f).SetEase(Ease.OutCubic);
+        backgroundImage1.DOFade(0f, 1f).SetEase(Ease.OutCubic).SetTimeDt(this, TimeChannel.UI);
 
         backgroundImage2.color = new Color(backgroundImage2.color.r, backgroundImage2.color.g, backgroundImage2.color.b, 1f);
-        backgroundImage2.DOFade(0f, 1f).SetEase(Ease.OutCubic);
+        backgroundImage2.DOFade(0f, 1f).SetEase(Ease.OutCubic).SetTimeDt(this, TimeChannel.UI);
 
         CameraManager.instance.SwitchToNormalCam();
-        yield return new WaitForSeconds(0.7f);
+        yield return TimeScaleManager.WaitForChannelSeconds(0.7f, TimeChannel.UI);
         HSAbilityUpgradeMenu.SetActive(false);
         if (openSavePointMenu)
         {
@@ -335,7 +335,7 @@ public class MenuManager : MonoBehaviour
         else
         {
             SavePointCanvas.SetActive(false);
-            yield return new WaitForSeconds(0.3f);
+            yield return TimeScaleManager.WaitForChannelSeconds(0.3f, TimeChannel.UI);
             InputMaster.SwitchToGameplayAction();
         }
         currentIndexTab = 0;
@@ -674,7 +674,7 @@ public class MenuManager : MonoBehaviour
             new Vector3(0, 0, targetAngle),
             0.3f,
             RotateMode.Fast
-        ).SetEase(Ease.OutSine);
+        ).SetEase(Ease.OutSine).SetTimeDt(this, TimeChannel.UI);
 
         previousHSUpgradeTabIndex = currentIndexTab;
 
@@ -778,8 +778,9 @@ public class MenuManager : MonoBehaviour
 
         // Tween the alpha
         instance.fadeOutImage.DOFade(targetAlpha, duration)
-            .SetEase(Ease.OutCubic);
-        yield return new WaitForSeconds(duration);
+            .SetEase(Ease.OutCubic)
+            .SetTimeDt(instance, TimeChannel.UI);
+        yield return TimeScaleManager.WaitForChannelSeconds(duration, TimeChannel.UI);
     }
 
     #endregion Save & Transition

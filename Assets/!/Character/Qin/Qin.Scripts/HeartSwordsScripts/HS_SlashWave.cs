@@ -96,34 +96,27 @@ public class HS_SlashWave : IHeartSwordAbility
         if (largeSlash)
         {
             Attack();
-            if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(0.03f);
-            else yield return new WaitForSeconds(0.03f);
+            yield return TimeScaleManager.WaitForChannelSeconds(0.03f, TimeChannel.Player);
             LaunchSlash(largeSlash);
         }
         else
         {
             Attack();
-            if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(0.03f);
-            else yield return new WaitForSeconds(0.03f);
+            yield return TimeScaleManager.WaitForChannelSeconds(0.03f, TimeChannel.Player);
             LaunchSlash(largeSlash);
 
-            if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(0.21f);
-            else yield return new WaitForSeconds(0.21f);
+            yield return TimeScaleManager.WaitForChannelSeconds(0.21f, TimeChannel.Player);
             Attack();
-            if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(0.03f);
-            else yield return new WaitForSeconds(0.03f);
+            yield return TimeScaleManager.WaitForChannelSeconds(0.03f, TimeChannel.Player);
             LaunchSlash(largeSlash);
 
-            if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(0.21f);
-            else yield return new WaitForSeconds(0.21f);
+            yield return TimeScaleManager.WaitForChannelSeconds(0.21f, TimeChannel.Player);
             Attack();
-            if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(0.03f);
-            else yield return new WaitForSeconds(0.03f);
+            yield return TimeScaleManager.WaitForChannelSeconds(0.03f, TimeChannel.Player);
             LaunchSlash(largeSlash);
         }
 
-        if (VFXManager.isInBulletTime) yield return new WaitForSecondsRealtime(0.16f);
-        else yield return new WaitForSeconds(0.16f);
+        yield return TimeScaleManager.WaitForChannelSeconds(0.16f, TimeChannel.Player);
         EndAction();
     }
 

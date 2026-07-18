@@ -1,0 +1,147 @@
+OVDF v1.1
+PlayerAttack, Project.Main
+MetaGuid:43869d446fa846545a44c31a1934629d
+
+# $2PidfJJMPy8MA42VtdiUrt
+Position: $root:55
++ [Sirenix.OdinInspector.TitleGroupAttribute]
+	GroupName = "Storm"
+	Indent = True
+
+# $FGmco7Ly2C8WSVd5DiPy6h
+Position: $root:18
++ [Sirenix.OdinInspector.TitleGroupAttribute]
+	GroupName = "JumpAttack"
+	Indent = True
+
+# $9GeHF4AuUzJH9gPtGTnLm3
+Position: $root:15
++ [Sirenix.OdinInspector.TitleGroupAttribute]
+	GroupName = "Attack"
+	Indent = True
+
+# basicAttackDamage
+Position: $9GeHF4AuUzJH9gPtGTnLm3:5
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugAttack"
+
+# showCounterAttackRange
+Position: $TAPVwEat9jw5HNWHAkBp6n:0
+
+# showJumpAttackRange
+Position: $XMUPKRYWWUSQEW56NaTv5A:0
+
+# anim
+Position: $root:13
+
+# pointerPos
+Position: $root:14
+
+# showBarrierRange
+Position: $ByGFB2iyu2F9A4UzSLCQxS:0
+
+# CounterAttackRadius
+Position: $9GeHF4AuUzJH9gPtGTnLm3:6
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugAttack"
+
+# jumpCounterAttackRadius
+Position: $FGmco7Ly2C8WSVd5DiPy6h:2
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugJumpAttack"
+
+# jumpAttackPoint
+Position: $FGmco7Ly2C8WSVd5DiPy6h:0
+
+# counterAttackPoint
+Position: $9GeHF4AuUzJH9gPtGTnLm3:1
+
+# counterAttackCollider
+Position: $9GeHF4AuUzJH9gPtGTnLm3:0
+
+# counterAttackCheckDuration
+Position: $9GeHF4AuUzJH9gPtGTnLm3:7
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugAttack"
+
+# perfectCounterAttackCheckDuration
+Position: $9GeHF4AuUzJH9gPtGTnLm3:8
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugAttack"
+
+# attackGap
+Position: $9GeHF4AuUzJH9gPtGTnLm3:9
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugAttack"
+
+# commonHitEffect
+Position: $9GeHF4AuUzJH9gPtGTnLm3:3
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugAttack"
+
+# attackTimer
+Position: $root:56
+
+# pointerDirection
+Position: $root:60
+Visibility: Hidden
+
+# attackIndex
+Position: $root:57
+Visibility: Hidden
+
+# barrierGroupHold
+Visibility: Hidden
+
+# stormEffectPos
+Position: $2PidfJJMPy8MA42VtdiUrt:1
+
+# prepareStormTimer
+Position: $root:59
+Visibility: Hidden
+
+# stormReady
+Position: $root:58
+Visibility: Hidden
+
+# repelForce
+Position: $2PidfJJMPy8MA42VtdiUrt:7
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugStorm"
+
+# repelLayer
+Position: $2PidfJJMPy8MA42VtdiUrt:3
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugStorm"
+
+# storm_radius
+Position: $2PidfJJMPy8MA42VtdiUrt:6
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugStorm"
+
+# stormDuration
+Position: $2PidfJJMPy8MA42VtdiUrt:5
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugStorm"
+
+# prepareStormTime
+Position: $2PidfJJMPy8MA42VtdiUrt:4
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugStorm"
+
+# storm
+Position: $2PidfJJMPy8MA42VtdiUrt:0
+
+# DebugStorm
+Position: $2PidfJJMPy8MA42VtdiUrt:2
+
+# DebugJumpAttack
+Position: $FGmco7Ly2C8WSVd5DiPy6h:1
+
+# DebugAttack
+Position: $9GeHF4AuUzJH9gPtGTnLm3:2
+
+# counterAttackPointOriginalLocalPos
+Position: $9GeHF4AuUzJH9gPtGTnLm3:4
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "DebugAttack"

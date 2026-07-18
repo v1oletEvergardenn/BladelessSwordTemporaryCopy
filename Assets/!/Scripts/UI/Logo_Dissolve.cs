@@ -30,7 +30,7 @@ public class Logo_Dissolve : MonoBehaviour
         {
             float dissolveAmount = Mathf.Lerp(0f, 2f, elapsed / duration);
             mat.SetFloat("_DissolveAmount", dissolveAmount);
-            elapsed += Time.deltaTime;
+            elapsed += TimeScaleManager.UIDt;
             yield return null;
         }
         mainmenu.SetActive(true);

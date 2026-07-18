@@ -1,0 +1,102 @@
+OVDF v1.1
+ProjectileHit, Project.Main
+
+# $JFYgPMdFNnEkFERnzSukpD
+Position: $root:0
++ [Sirenix.OdinInspector.TabGroupAttribute]
+
+# $DMMTnKmkpBFXsMzSRvqL6F
+Position: $JFYgPMdFNnEkFERnzSukpD:0
++ [Sirenix.OdinInspector.TabGroupAttribute+TabSubGroupAttribute]
+	GroupName = "Hit"
+
+# $7wtLtWzdZsMhKofTjs8sXn
+Position: $JFYgPMdFNnEkFERnzSukpD:1
++ [Sirenix.OdinInspector.TabGroupAttribute+TabSubGroupAttribute]
+	GroupName = "Perfect"
+
+# $CxAuen1eFg7FQ7imyuMz2g
+Position: $JFYgPMdFNnEkFERnzSukpD:2
++ [Sirenix.OdinInspector.TabGroupAttribute+TabSubGroupAttribute]
+	GroupName = "Normal"
+
+# frequency_hit
+Position: $DMMTnKmkpBFXsMzSRvqL6F:2
++ [Sirenix.OdinInspector.MinMaxSliderAttribute]
+	MaxValue = 2
+	MinValue = 0
+	ShowFields = False
+
+# rumbleDuration_hit
+Position: $DMMTnKmkpBFXsMzSRvqL6F:3
+* [UnityEngine.RangeAttribute]
+	max = 0.3
+
+# hitFreezeDuration_hit
+Position: $DMMTnKmkpBFXsMzSRvqL6F:4
+* [UnityEngine.RangeAttribute]
+	max = 0.3
+
+# repel_hit
+Position: $DMMTnKmkpBFXsMzSRvqL6F:5
+
+# cameraShakeForce_hit
+Position: $DMMTnKmkpBFXsMzSRvqL6F:6
++ [Sirenix.OdinInspector.MinMaxSliderAttribute]
+	MaxValue = 0.2
+
+# frequency_perfect
+Position: $7wtLtWzdZsMhKofTjs8sXn:2
++ [Sirenix.OdinInspector.MinMaxSliderAttribute]
+	MaxValue = 2
+
+# rumbleDuration_perfect
+Position: $7wtLtWzdZsMhKofTjs8sXn:3
+
+# hitFreezeDuration_perfect
+Position: $7wtLtWzdZsMhKofTjs8sXn:4
+
+# repel_perfect
+Position: $7wtLtWzdZsMhKofTjs8sXn:5
+
+# cameraShakeForce_perfect
+Position: $7wtLtWzdZsMhKofTjs8sXn:6
++ [Sirenix.OdinInspector.MinMaxSliderAttribute]
+	MaxValue = 0.2
+
+# frequency_normal
+Position: $CxAuen1eFg7FQ7imyuMz2g:2
++ [Sirenix.OdinInspector.MinMaxSliderAttribute]
+	MaxValue = 2
+
+# rumbleDuration_normal
+Position: $CxAuen1eFg7FQ7imyuMz2g:3
+
+# hitFreezeDuration_normal
+Position: $CxAuen1eFg7FQ7imyuMz2g:4
+
+# repel_normal
+Position: $CxAuen1eFg7FQ7imyuMz2g:5
+
+# cameraShakeForce_normal
+Position: $CxAuen1eFg7FQ7imyuMz2g:6
++ [Sirenix.OdinInspector.MinMaxSliderAttribute]
+	MaxValue = 0.2
+
+# copyPerfectForHit
+Position: $DMMTnKmkpBFXsMzSRvqL6F:0
+
+# copyNormalForHit
+Position: $DMMTnKmkpBFXsMzSRvqL6F:1
+
+# copyHitForPerfect
+Position: $7wtLtWzdZsMhKofTjs8sXn:0
+
+# copyNormalForPerfect
+Position: $7wtLtWzdZsMhKofTjs8sXn:1
+
+# copyHitForNormal
+Position: $CxAuen1eFg7FQ7imyuMz2g:0
+
+# copyPerfectForNormal
+Position: $CxAuen1eFg7FQ7imyuMz2g:1

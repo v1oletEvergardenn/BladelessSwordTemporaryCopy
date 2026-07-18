@@ -270,7 +270,7 @@ public class ActionLock : MonoBehaviour
     {
         while (!timer.Cancelled && timer.Remaining > 0f)
         {
-            float delta = timer.UseUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            float delta = timer.UseUnscaledTime ? Time.unscaledDeltaTime : TimeScaleManager.GameplayDt;
             timer.Remaining -= delta;
             yield return null;
         }

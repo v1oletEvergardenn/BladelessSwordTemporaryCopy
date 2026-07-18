@@ -41,7 +41,7 @@ public class DamageFlash : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime < flashTime)
         {
-            elapsedTime += Time.deltaTime;
+            elapsedTime += TimeScaleManager.GameplayDt;
             currentFlashAmount = Mathf.Lerp(1f, flashCurve.Evaluate(elapsedTime), elapsedTime / flashTime);
             sprite.material.SetFloat("_FlashAmount", currentFlashAmount);
             yield return null;

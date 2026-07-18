@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3524618554732351117}
   - component: {fileID: 865071752633607263}
   - component: {fileID: 561534206170360048}
+  - component: {fileID: 8147543643336454615}
   m_Layer: 8
   m_Name: water_spear
   m_TagString: Untagged
@@ -77,7 +78,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1968539179
-  m_SortingLayer: 1
+  m_SortingLayer: 4
   m_SortingOrder: 2
   m_Sprite: {fileID: -285599268107387250, guid: 45e08a8c92a53a34fab47a5b61e5aed7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -123,39 +124,58 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2848486c4ff996a46951b2d69ec3979d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
-  speed: 0
-  originalSpeed: 0
-  rotationSpeed: 100000
-  stunDuration: 0.3
-  lifeTime: 5
-  stunValue: 1
-  stopLayer:
-    serializedVersion: 2
-    m_Bits: 3200
   showPivot: 1
   pivotOffset: {x: -0.01, y: 0, z: 0}
   color: {r: 1, g: 0, b: 0, a: 1}
-  hitEffectSettings:
-    rumbleDuration: 0.218
-    frequency_norm: {x: 0.6595174, y: 0.7882037}
-    frequncy_perfect: {x: 1.0214477, y: 1.2747989}
-    freezeTime: 0.1492
-    Time_scale: 0.148
-    repelForce: 148
-    cameraShakeForce: {x: 0.10134049, y: 0.12010725}
-  vfx: {fileID: 0}
-  gameManager: {fileID: 0}
+  attribute:
+    damage: 0
+    speed: 0
+    stunDuration: 0
+    bossBreakValue: 0
+  stopLayer:
+    serializedVersion: 2
+    m_Bits: 3200
+  rotationSpeed: 100000
+  lifeTime: 5
+  delay: 0
+  hitEffect:
+    copyPerfectForHit: 0
+    copyNormalForHit: 0
+    frequency_hit: {x: 0.1, y: 0.3}
+    rumbleDuration_hit: 0.1
+    hitFreezeDuration_hit: 0.1
+    repel_hit: 3
+    cameraShakeForce_hit: {x: 0.05, y: 0.1}
+    copyHitForPerfect: 0
+    copyNormalForPerfect: 0
+    frequency_perfect: {x: 0.1, y: 0.3}
+    rumbleDuration_perfect: 0.1
+    hitFreezeDuration_perfect: 0.1
+    repel_perfect: 3
+    cameraShakeForce_perfect: {x: 0.05, y: 0.1}
+    copyHitForNormal: 0
+    copyPerfectForNormal: 0
+    frequency_normal: {x: 0.1, y: 0.3}
+    rumbleDuration_normal: 0.1
+    hitFreezeDuration_normal: 0.1
+    repel_normal: 3
+    cameraShakeForce_normal: {x: 0.05, y: 0.1}
+  originalSpeed: 0
   owner: {fileID: 0}
   followTarget: 0
   target: {fileID: 0}
-  rb: {fileID: 0}
   collided: 0
+  delayTriggered: 0
   lifeTimer: 0
   isHostileToPlayer: 0
   isPerfect: 0
+  canInterruptDelay: 0
+  collisionEnabled: 1
+  delayTimer: 0
+  vfx: {fileID: 0}
+  rb: {fileID: 0}
+  gameManager: {fileID: 0}
   facingRight: 0
-  collisionActive: 0
 --- !u!50 &865071752633607263
 Rigidbody2D:
   serializedVersion: 4
@@ -228,6 +248,20 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 9.616134, y: 0.79279584}
   m_EdgeRadius: 0
+--- !u!114 &8147543643336454615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1820414133887720108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 4
+  useUnscaledUpdateMode: 1
 --- !u!1 &3338600976682016751
 GameObject:
   m_ObjectHideFlags: 0

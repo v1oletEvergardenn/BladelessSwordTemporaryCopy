@@ -108,7 +108,7 @@ public class YingYangFish_AI : IEnemyController
     {
         distanceToPlayer = Mathf.Abs(transform.position.x - player.position.x);
         healthPercentage = currentHealth / maxHealth;
-        playerDistanceTimer += Time.deltaTime;
+        playerDistanceTimer += TimeScaleManager.GameplayDt;
         playerDistanceCache.Enqueue(distanceToPlayer);
 
         if (playerDistanceTimer >= 3)
@@ -143,7 +143,7 @@ public class YingYangFish_AI : IEnemyController
 
         anim.SetBool("isRotating", false);
         anim.Play("rotate_to_swim");
-        fish.DOLocalRotate(new Vector3(0, 0, -20), 0.3f).SetEase(Ease.Linear);
+        fish.DOLocalRotate(new Vector3(0, 0, -20), 0.3f).SetEase(Ease.Linear).SetTimeDt(this, TimeChannel.Enemy);
         SetFishRotateSpeed(isBlack, 0, false);
     }
 
@@ -158,7 +158,7 @@ public class YingYangFish_AI : IEnemyController
 
         yield return new WaitUntil(() =>
         {
-            origin.position += fish.right * swimSpeed * Time.deltaTime;
+            origin.position += fish.right * swimSpeed * TimeScaleManager.EnemyDt;
             return IsUnderWater(fishOrigin);
         });
     }
@@ -184,14 +184,16 @@ public class YingYangFish_AI : IEnemyController
         if (targetAngle > currentZ) targetAngle -= 360f;
 
         fishGFX.DORotate(new Vector3(0, 0, targetAngle), rotationDuration, RotateMode.Fast)
-            .SetEase(Ease.InSine);
-        yield return new WaitForSeconds(rotationDuration);
+            .SetEase(Ease.InSine)
+            .SetTimeDt(this, TimeChannel.Enemy);
+        yield return WaitForEnemy(rotationDuration);
 
         float x = origin.position.x;
         bool moveDone = false;
         origin.DOMove(new Vector3(x, waterLevel.position.y - 7, 0), swimSpeed)
              .SetSpeedBased()
-             .SetEase(Ease.Linear).OnComplete(() => moveDone = true);
+             .SetEase(Ease.Linear).OnComplete(() => moveDone = true).
+             SetTimeDt(this, TimeChannel.Enemy);
 
         yield return new WaitUntil(() => moveDone);
 
@@ -267,18 +269,18 @@ public class YingYangFish_AI : IEnemyController
         //set alpha to 0, then fade in
         blackFishGFX.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
         whiteFishGFX.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
-        blackFishGFX.GetComponent<SpriteRenderer>().DOFade(1, 0.7f);
-        whiteFishGFX.GetComponent<SpriteRenderer>().DOFade(1, 0.7f);
-        blackFishGFX.DOLocalMoveX(0, 0.7f).SetEase(Ease.OutSine);
-        whiteFishGFX.DOLocalMoveX(0, 0.7f).SetEase(Ease.OutSine);
-        yield return new WaitForSeconds(0.5f);
+        blackFishGFX.GetComponent<SpriteRenderer>().DOFade(1, 0.7f).SetTimeDt(this, TimeChannel.Enemy);
+        whiteFishGFX.GetComponent<SpriteRenderer>().DOFade(1, 0.7f).SetTimeDt(this, TimeChannel.Enemy);
+        blackFishGFX.DOLocalMoveX(0, 0.7f).SetEase(Ease.OutSine).SetTimeDt(this, TimeChannel.Enemy);
+        whiteFishGFX.DOLocalMoveX(0, 0.7f).SetEase(Ease.OutSine).SetTimeDt(this, TimeChannel.Enemy);
+        yield return WaitForEnemy(0.5f);
         SetBothRotateSpeed(idleRotateSpeed, false);
         blackAnim.SetBool("isRotating", true);
         whiteAnim.SetBool("isRotating", true);
-        yield return new WaitForSeconds(0.2f);
-        blackFish.DOLocalRotate(new Vector3(0, 0, -20), 0.5f);
-        whiteFish.DOLocalRotate(new Vector3(0, 0, -20), 0.5f);
-        yield return new WaitForSeconds(0.5f);
+        yield return WaitForEnemy(0.2f);
+        blackFish.DOLocalRotate(new Vector3(0, 0, -20), 0.5f).SetTimeDt(this, TimeChannel.Enemy);
+        whiteFish.DOLocalRotate(new Vector3(0, 0, -20), 0.5f).SetTimeDt(this, TimeChannel.Enemy);
+        yield return WaitForEnemy(0.5f);
 
         //sprint to angle
         yield return co_multiCoroutine = StartCoroutine(StartMultipleCoroutines(new List<IEnumerator> {
@@ -495,10 +497,10 @@ public class YingYangFish_AI : IEnemyController
         leftBoundary.gameObject.SetActive(true);
         rightBoundary.gameObject.SetActive(true);
         float timer = 0f;
-        center.DOLocalMove(Vector3.zero, 2f).SetEase(Ease.InOutSine).SetDelay(1f);
+        center.DOLocalMove(Vector3.zero, 2f).SetEase(Ease.InOutSine).SetDelay(1f).SetTimeDt(this, TimeChannel.Enemy);
         while (timer <= 2f)
         {
-            timer += Time.deltaTime;
+            timer += enemyDelta;
 
             if (timer > 1f)
             {
@@ -509,7 +511,7 @@ public class YingYangFish_AI : IEnemyController
         }
         VFXManager.instance.StopRumble();
 
-        yield return new WaitForSeconds(2f);
+        yield return WaitForEnemy(2f);
 
         //fish appear
         yield return co_fishAppear = StartCoroutine(FishAppear());
@@ -606,11 +608,11 @@ public class YingYangFish_AI : IEnemyController
 
             centerAnim.SetBool("secondPhase", true);
             CharacterUIManager.ShowBlackEdge(true);
-            yield return new WaitForSeconds(2f);
+            yield return WaitForEnemy(2f);
             centerAnim.Play("center_break");
-            yield return new WaitForSeconds(0.5f);
-            center.DOLocalMove(new Vector3(0, -8.4f, 0), 0.5f).SetEase(Ease.InSine);
-            yield return new WaitForSeconds(0.5f);
+            yield return WaitForEnemy(0.5f);
+            center.DOLocalMove(new Vector3(0, -8.4f, 0), 0.5f).SetEase(Ease.InSine).SetTimeDt(this, TimeChannel.Enemy);
+            yield return WaitForEnemy(0.5f);
             //UI
             EventInteract.SetActive(true);
         }
@@ -621,8 +623,8 @@ public class YingYangFish_AI : IEnemyController
         //disable player's actions
         centerAnim.Play("center_fade");
         PlaySecondPhaseTimeLine();
-        center.DOLocalMove(Vector3.zero, 2.5f).SetEase(Ease.InOutSine);
-        yield return new WaitForSeconds(1f);
+        center.DOLocalMove(Vector3.zero, 2.5f).SetEase(Ease.InOutSine).SetTimeDt(this, TimeChannel.Enemy);
+        yield return WaitForEnemy(1f);
         Health.instance.RepelToPosition(new Vector3(-37, 0, 0));
     }
 
@@ -633,7 +635,7 @@ public class YingYangFish_AI : IEnemyController
         CancelAllAction();
         ResetOrigin();
         SetBothRotateSpeed(0);
-        VFXManager.instance.BulletTime();
+        TimeScaleManager.EnterBulletTime();
         float duration = breakDuration;
         float elapsed = 0f;
         float startStun = currentBreak;
@@ -654,7 +656,7 @@ public class YingYangFish_AI : IEnemyController
         if (bossBreakBar != null && maxBreak > 0)
             bossBreakBar.UpdateBar(maxBreak);
 
-        VFXManager.instance.UnBulletTime();
+        TimeScaleManager.ExitBulletTime();
         isBossBreaking = false;
 
         yield return co_fishAppear = StartCoroutine(FishAppear());
@@ -677,7 +679,9 @@ public class YingYangFish_AI : IEnemyController
         rightBoundary.gameObject.SetActive(true);
 
         //center animation
-        center.DOLocalMove(Vector3.zero, 2f).SetEase(Ease.InOutSine).OnComplete(() => { SetCenterCameraFollow(false); });
+        center.DOLocalMove(Vector3.zero, 2f).SetEase(Ease.InOutSine).
+            OnComplete(() => { SetCenterCameraFollow(false); }).
+            SetTimeDt(this, TimeChannel.Enemy);
         centerAnim.Play("center_rumbling");
 
         //states

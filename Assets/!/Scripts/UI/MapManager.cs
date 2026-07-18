@@ -356,7 +356,7 @@ public class MapManager : MonoBehaviour
         GameManager.instance.PauseGame();
         DeselectIcon();
 
-        mapCanvas.GetComponent<CanvasGroup>()?.DOFade(1f, 0.2f).From(0f).SetUpdate(true);
+        mapCanvas.GetComponent<CanvasGroup>()?.DOFade(1f, 0.2f).From(0f).SetTimeDt(this, TimeChannel.UI);
     }
 
     public void CloseMap()
@@ -373,7 +373,7 @@ public class MapManager : MonoBehaviour
         var canvasGroup = mapCanvas.GetComponent<CanvasGroup>();
         if (canvasGroup != null)
         {
-            canvasGroup.DOFade(0f, 0.2f).OnComplete(() => mapCanvas.SetActive(false));
+            canvasGroup.DOFade(0f, 0.2f).OnComplete(() => mapCanvas.SetActive(false)).SetTimeDt(this, TimeChannel.UI);
         }
         else
         {
@@ -436,7 +436,7 @@ public class MapManager : MonoBehaviour
         placedWorldIcons.Add(mapIcon);
 
         iconRect.localScale = Vector3.zero;
-        iconRect.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack).SetUpdate(true);
+        iconRect.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack).SetTimeDt(this, TimeChannel.UI);
 
         isSelectingIcon = false;
     }
@@ -573,7 +573,7 @@ public class MapManager : MonoBehaviour
         placedCustomIcons.Add(mapIcon);
 
         iconRect.localScale = Vector3.zero;
-        iconRect.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack).SetUpdate(true);
+        iconRect.DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack).SetTimeDt(this, TimeChannel.UI);
 
         isSelectingIcon = false;
     }
@@ -594,7 +594,7 @@ public class MapManager : MonoBehaviour
         icon.RectTransform.DOScale(Vector3.zero, 0.15f)
             .SetEase(Ease.InBack)
             .OnComplete(() => Destroy(icon.gameObject))
-            .SetUpdate(true);
+            .SetTimeDt(this, TimeChannel.UI);
 
         DeselectIcon();
     }
@@ -673,7 +673,7 @@ public class MapManager : MonoBehaviour
 
         cursorIcon.DOKill();
         targetCursorPosition = icon.RectTransform.anchoredPosition;
-        cursorIcon.DOAnchorPos(targetCursorPosition, 0.15f).SetEase(Ease.OutCubic).SetUpdate(true);
+        cursorIcon.DOAnchorPos(targetCursorPosition, 0.15f).SetEase(Ease.OutCubic).SetTimeDt(this, TimeChannel.UI);
     }
 
     private void DeselectIcon()
@@ -771,11 +771,11 @@ public class MapIcon : MonoBehaviour
 
         if (isSelected)
         {
-            RectTransform.DOScale(1.2f, 0.1f).SetEase(Ease.OutBack).SetUpdate(true);
+            RectTransform.DOScale(1.2f, 0.1f).SetEase(Ease.OutBack).SetTimeDt(this, TimeChannel.UI);
         }
         else
         {
-            RectTransform.DOScale(1f, 0.1f).SetEase(Ease.OutCubic).SetUpdate(true);
+            RectTransform.DOScale(1f, 0.1f).SetEase(Ease.OutCubic).SetTimeDt(this, TimeChannel.UI);
         }
     }
 

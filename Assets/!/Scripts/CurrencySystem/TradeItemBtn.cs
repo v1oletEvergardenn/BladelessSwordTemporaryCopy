@@ -95,8 +95,10 @@ public class TradeItemBtn : MonoBehaviour
               .OnComplete(() =>
               {
                   rect.DOAnchorPos(originalPos, 0.1f)
-                      .SetEase(Ease.OutSine);
-              });
+                      .SetEase(Ease.OutSine)
+                      .SetTimeDt(this, TimeChannel.UI);
+              })
+              .SetTimeDt(this, TimeChannel.UI);
         VFXManager.instance.RumblePulse(0.1f, 0.2f, 0.1f);
     }
 
@@ -110,8 +112,10 @@ public class TradeItemBtn : MonoBehaviour
             rect.DOShakeAnchorPos(0.1f, new Vector2(40f, 0f), 10, 20, false, true)
                 .OnComplete(() =>
                 {
-                    rect.DOShakeAnchorPos(0.1f, new Vector2(20f, 0f), 10, 20, false, true);
-                });
+                    rect.DOShakeAnchorPos(0.1f, new Vector2(20f, 0f), 10, 20, false, true)
+                        .SetTimeDt(this, TimeChannel.UI);
+                })
+                .SetTimeDt(this, TimeChannel.UI);
         }
 
         VFXManager.instance.RumblePulse(0.2f, 0.3f, 0.1f);

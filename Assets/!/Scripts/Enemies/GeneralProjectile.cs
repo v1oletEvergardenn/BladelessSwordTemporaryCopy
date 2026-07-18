@@ -8,7 +8,6 @@ public class GeneralProjectile : IProjectile
     public float death_delay_time_after_hit = 0f;
 
     private Animator anim;
-    public Hit_Effect hitEffect;
     public bool isRed;
 
     // Start is called before the first frame update
@@ -16,36 +15,6 @@ public class GeneralProjectile : IProjectile
     {
         base.Start();
         anim = GetComponent<Animator>();
-    }
-
-    public override void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (canInterruptDelay && IsInDelay())
-        {
-            delayTimer = delay;
-        }
-        if (!collisionEnabled) return;
-        IDamagable target = collision.gameObject.GetComponent<IDamagable>();
-        if (target != null && !IsOwner(collision.gameObject) && !collided)
-        {
-            if (isHostileToPlayer && (collision.gameObject.layer == 13 || collision.gameObject.layer == 25)) { return; }
-
-            if (collision.gameObject == gameManager.player)
-            {
-                if (collision.gameObject.layer == 14) { return; }
-                if (!isHostileToPlayer) { return; }
-
-                vfx.RumblePulse(hitEffectSettings.frequency_norm, hitEffectSettings.rumbleDuration);
-                vfx.SlowTimeForSeconds(hitEffectSettings.freezeTime, hitEffectSettings.Time_scale);
-                gameManager.playerhealth.Repel(hitEffectSettings.repelForce, transform.right.x < 0 ? true : false);
-            }
-            target.Damage(attribute, transform);
-            Hit();
-        }
-        else if (!IsOwner(collision.gameObject) && (stopLayer.value & (1 << collision.gameObject.layer)) > 0 && !collided)
-        {
-            Hit();
-        }
     }
 
     public override void HitByHSAttack()
@@ -61,7 +30,6 @@ public class GeneralProjectile : IProjectile
     public override void Hit()
     {
         if (anim != null) anim.Play(anim_after_hit);
-        vfx.SpawnEffectWithEnum(hitEffect, transform.position, isRed);
         rb.velocity = Vector3.zero;
         rb.gravityScale = 0;
         attribute.speed = 0f;

@@ -70,16 +70,17 @@ public class YYF_Splash : IEnemyAction
             //jump out
             float temp_x = toLeft ? trueTarget.position.x + 2 : trueTarget.position.x - 2;
             if (isBlack) temp_x = toLeft ? trueTarget.position.x - 2 : trueTarget.position.x + 2;
-            origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 10f, 0), 0.5f).SetEase(Ease.OutSine);
+            origin.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 10f, 0), 0.5f).SetEase(Ease.OutSine).SetTimeDt(this, TimeChannel.Enemy);
             anim.Play("splash");
 
             //keep rotating fishGFX
             Tween rotating = fishGFX.DOLocalRotate(new Vector3(0, 0, -360f), 0.2f, RotateMode.FastBeyond360)
               .SetEase(Ease.Linear)
-              .SetLoops(-1, LoopType.Restart);
+              .SetLoops(-1, LoopType.Restart)
+              .SetTimeDt(this, TimeChannel.Enemy);
             Transform splashEffect = isBlack ? splashEffect_2 : splashEffect_1;
 
-            yield return new WaitForSeconds(0.5f);
+            yield return WaitForEnemy(0.5f);
 
             //set splash effect position to fish GFX position
             splashEffect.position = fish.position;
@@ -90,29 +91,31 @@ public class YYF_Splash : IEnemyAction
             //fade in to show splash effect
             splashEffect.gameObject.SetActive(true);
             splashEffect.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
-            splashEffect.GetComponent<SpriteRenderer>().DOFade(1, 0.5f);
+            splashEffect.GetComponent<SpriteRenderer>().DOFade(1, 0.5f).SetTimeDt(this, TimeChannel.Enemy);
 
             //be ready;
-            yield return new WaitForSeconds(0.5f);
+            yield return WaitForEnemy(0.5f);
 
             //blackfish: be ready and dash to player.
             if (isBlack)
             {
                 origin.DOMove(new Vector3(trueTarget.position.x, bossAI.waterLevel.position.y, 0), bossAI.fastSwimSpeed)
                     .SetEase(Ease.OutSine)
-                    .SetSpeedBased();
+                    .SetSpeedBased()
+                    .SetTimeDt(this, TimeChannel.Enemy);
             }
             //white fish: be ready dash to ground
             else
             {
                 origin.DOMove(new Vector3(origin.position.x, bossAI.waterLevel.position.y, 0), bossAI.fastSwimSpeed)
                     .SetEase(Ease.OutSine)
-                    .SetSpeedBased();
+                    .SetSpeedBased()
+                    .SetTimeDt(this, TimeChannel.Enemy);
             }
 
             StartCoroutine(ApplyAttackInCircle(0.3f, hitRange, origin, splashAttack));
 
-            yield return new WaitForSeconds(0.3f);
+            yield return WaitForEnemy(0.3f);
 
             if (spawningBullets)
             {
@@ -134,7 +137,9 @@ public class YYF_Splash : IEnemyAction
             StopCoroutine(co_facePlayer);
             rotating.Kill();
             origin.DOKill();
-            origin.DOMove(new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, 0f), 0.05f).SetEase(Ease.Linear);
+            origin.DOMove(new Vector3(origin.position.x, bossAI.waterLevel.position.y - 7f, 0f), 0.05f).
+                SetEase(Ease.Linear).
+                SetTimeDt(this, TimeChannel.Enemy);
             YYFFish.gameObject.SetActive(false);
         }
         else if (factor == 2 || factor == 5)//both fish
@@ -169,18 +174,22 @@ public class YYF_Splash : IEnemyAction
 
             //jump out
             float temp_x = toLeft ? trueTarget.position.x + 2 : trueTarget.position.x - 2;
-            white_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 10f, 0), 0.5f).SetEase(Ease.OutSine);
-            black_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 10f, 0), 0.5f).SetEase(Ease.OutSine);
+            white_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 10f, 0), 0.5f).
+                SetEase(Ease.OutSine).SetTimeDt(this, TimeChannel.Enemy);
+            black_YYFFish.transform.DOMove(new Vector3(temp_x, bossAI.waterLevel.position.y + 10f, 0), 0.5f).
+                SetEase(Ease.OutSine).SetTimeDt(this, TimeChannel.Enemy);
             black_YYFFish.anim.Play("splash");
             white_YYFFish.anim.Play("splash");
 
             //keep rotating fishGFX
             Tween rotating = white_YYFFish.transform.DOLocalRotate(new Vector3(0, 0, -360f), 0.2f, RotateMode.FastBeyond360)
               .SetEase(Ease.Linear)
-              .SetLoops(-1, LoopType.Restart);
+              .SetLoops(-1, LoopType.Restart)
+              .SetTimeDt(this, TimeChannel.Enemy);
             Tween rotating2 = black_YYFFish.transform.DOLocalRotate(new Vector3(0, 0, -360f), 0.2f, RotateMode.FastBeyond360)
               .SetEase(Ease.Linear)
-              .SetLoops(-1, LoopType.Restart);
+              .SetLoops(-1, LoopType.Restart)
+              .SetTimeDt(this, TimeChannel.Enemy);
 
             //set splash effect position to fish GFX position
             splashEffect_1.position = white_YYFFish.transform.position;
@@ -192,22 +201,23 @@ public class YYF_Splash : IEnemyAction
             //fade in to show splash effect
             splashEffect_1.gameObject.SetActive(true);
             splashEffect_1.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
-            splashEffect_1.GetComponent<SpriteRenderer>().DOFade(1, 0.8f);
+            splashEffect_1.GetComponent<SpriteRenderer>().DOFade(1, 0.8f).SetTimeDt(this, TimeChannel.Enemy);
 
             //be ready;
-            yield return new WaitForSeconds(1f);
+            yield return WaitForEnemy(1f);
 
             //blackfish: be ready and dash to player.
 
             white_YYFFish.transform.DOMove(new Vector3(trueTarget.position.x, bossAI.waterLevel.position.y, 0), bossAI.fastSwimSpeed)
                 .SetEase(Ease.OutSine)
-                .SetSpeedBased();
+                .SetSpeedBased()
+                .SetTimeDt(this, TimeChannel.Enemy);
             black_YYFFish.transform.DOMove(new Vector3(trueTarget.position.x, bossAI.waterLevel.position.y, 0), bossAI.fastSwimSpeed)
                 .SetEase(Ease.OutSine)
-                .SetSpeedBased();
-
+                .SetSpeedBased()
+                .SetTimeDt(this, TimeChannel.Enemy);
             StartCoroutine(ApplyAttackInCircle(0.3f, hitRange, white_YYFFish.transform, splashAttack));
-            yield return new WaitForSeconds(0.3f);
+            yield return WaitForEnemy(0.3f);
             //spawn bullets
             if (spawningBullets)
             {
@@ -223,13 +233,15 @@ public class YYF_Splash : IEnemyAction
             rotating2.Kill();
             white_YYFFish.transform.DOKill();
             black_YYFFish.transform.DOKill();
-            white_YYFFish.transform.DOMove(new Vector3(white_YYFFish.transform.position.x, bossAI.waterLevel.position.y - 7f, 0f), 0.05f).SetEase(Ease.Linear);
-            black_YYFFish.transform.DOMove(new Vector3(black_YYFFish.transform.position.x, bossAI.waterLevel.position.y - 7f, 0f), 0.05f).SetEase(Ease.Linear);
+            white_YYFFish.transform.DOMove(new Vector3(white_YYFFish.transform.position.x, bossAI.waterLevel.position.y - 7f, 0f),
+                0.05f).SetEase(Ease.Linear).SetTimeDt(this, TimeChannel.Enemy);
+            black_YYFFish.transform.DOMove(new Vector3(black_YYFFish.transform.position.x, bossAI.waterLevel.position.y - 7f, 0f),
+                0.05f).SetEase(Ease.Linear).SetTimeDt(this, TimeChannel.Enemy);
             white_YYFFish.gameObject.SetActive(false);
             black_YYFFish.gameObject.SetActive(false);
         }
 
-        yield return new WaitForSeconds(0.1f);
+        yield return WaitForEnemy(0.1f);
         splashEffect_1.gameObject.SetActive(false);
         attackDirectionSet = false;
         yield return null;
@@ -242,19 +254,19 @@ public class YYF_Splash : IEnemyAction
         {
             effect.position = transform.position;
             if (face && elapsedTime <= 1f) effect.eulerAngles = CalculateWantedEuler(trueTarget.position, effect.position);
-            elapsedTime += Time.deltaTime;
+            elapsedTime += TimeScaleManager.EnemyDt;
             yield return null;
         }
     }
 
     public IEnumerator IESpawnBullet(Vector3 pos, bool isBlack, float delay = 0)
     {
-        yield return new WaitForSeconds(delay);
+        yield return WaitForEnemy(delay);
         for (int i = 0; i < shootPositionX.Count() - (isBlack ? 1 : 0); i++)
         {
             if (isBlack) SpawnIceThorn(pos, i);
             else StartCoroutine(SpawnWaterBullet(pos, i));
-            yield return new WaitForSeconds(0.2f);
+            yield return WaitForEnemy(0.2f);
         }
     }
 
@@ -267,7 +279,7 @@ public class YYF_Splash : IEnemyAction
            bossAI.CreateWaterLevelYAxis(pos.x - shootPositionX[index]));
         spawnEffect1.GetComponent<SelfDisactive>().SetNewDisActiveTime(spawnDelay);
         spawnEffect2.GetComponent<SelfDisactive>().SetNewDisActiveTime(spawnDelay);
-        yield return new WaitForSeconds(spawnDelay);
+        yield return WaitForEnemy(spawnDelay);
         IProjectile bullet = bossAI.selfPooler.SpawnFromPool("water_bullet",
             new Vector3(pos.x + shootPositionX[index],
             bossAI.waterLevel.position.y + 1.5f, 0)).

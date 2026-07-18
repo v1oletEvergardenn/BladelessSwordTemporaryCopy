@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3753462209579370816}
   - component: {fileID: 4287838519459949036}
   - component: {fileID: 1993168190912905049}
+  - component: {fileID: 8045941296356134315}
   m_Layer: 0
   m_Name: splash_water_bullet_bubble
   m_TagString: Untagged
@@ -123,3 +124,17 @@ MonoBehaviour:
   useAnim: 1
   endAnimName: end
   animTime: 0.5
+--- !u!114 &8045941296356134315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8322270151892760531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 801433e14850f3f41af9c9c2ba5aeb70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  channel: 3
+  useUnscaledUpdateMode: 1

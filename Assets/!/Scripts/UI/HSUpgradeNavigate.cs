@@ -11,12 +11,12 @@ public class HSUpgradeNavigate : UIChildNavigate
     public override void OnDeselect(BaseEventData eventData)
     {
         eventData.selectedObject.transform.DOComplete();
-        eventData.selectedObject.transform.DOScale(original_scale, 0.2f);
+        eventData.selectedObject.transform.DOScale(original_scale, 0.2f).SetTimeDt(this, TimeChannel.UI);
     }
 
     public override void OnSelect(BaseEventData eventData)
     {
         eventData.selectedObject.transform.DOComplete();
-        eventData.selectedObject.transform.DOScale(original_scale * 1.1f, 0.2f);
+        eventData.selectedObject.transform.DOScale(original_scale * 1.1f, 0.2f).SetTimeDt(this, TimeChannel.UI);
     }
 }

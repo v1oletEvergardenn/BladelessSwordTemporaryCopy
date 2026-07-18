@@ -21,7 +21,10 @@ public class YYF_fish : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        transform.Rotate(new Vector3(0, 0, -1), isBlack ? bossAI.black_rotateSpeed * Time.deltaTime : bossAI.white_rotateSpeed * Time.deltaTime);
+        transform.Rotate
+            (new Vector3(0, 0, -1),
+            isBlack ? bossAI.black_rotateSpeed * TimeScaleManager.EnemyDt :
+            bossAI.white_rotateSpeed * TimeScaleManager.EnemyDt);
     }
 
     public void SetDamageableParent(IDamagable parent)
