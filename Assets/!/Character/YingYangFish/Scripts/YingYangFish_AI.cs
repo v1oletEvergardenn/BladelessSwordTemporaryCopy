@@ -525,8 +525,8 @@ public class YingYangFish_AI : IEnemyController
 
     public override int Damage(float damageAmount, Transform sender, float stunDuration = 0, bool damageFlash = true, float stunValue = 0)
     {
-        if (DEAD || !canTakeDamage) { damageAmount = 0; }
-
+        if (DEAD) { damageAmount = 0; }
+        if (!canTakeDamage) damageAmount /= 0.5f;
         int attackId = sender != null ? sender.GetInstanceID() : 0;
         if (lastAttackId == attackId && Time.time - lastAttackTime < attackCooldown) return 0;
 
@@ -547,7 +547,7 @@ public class YingYangFish_AI : IEnemyController
         }
 
         healthBar.UpdateBar(currentHealth);
-        DoBreak(stunValue);
+        DoBreak(stunValue * 1.5f);
 
         if (currentHealth <= 0)
         {

@@ -187,8 +187,6 @@ public class Gatling_bubbles : IProjectile
             {
                 if (collision.gameObject.layer == 14) { return; }
                 if (!isHostileToPlayer) { return; }
-
-                CheckHitPlayer(target);
             }
 
             Hit();

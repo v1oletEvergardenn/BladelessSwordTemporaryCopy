@@ -89,7 +89,7 @@ public class GameManager : MonoBehaviour
         {
             if (PlayerSave.instance != null) player = PlayerSave.instance.gameObject;
             else player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
-            DontDestroyOnLoad(player);
+            //DontDestroyOnLoad(player);
         }
         InputMaster.SwitchToGameplayAction();
         CreatePlayerReference(player);

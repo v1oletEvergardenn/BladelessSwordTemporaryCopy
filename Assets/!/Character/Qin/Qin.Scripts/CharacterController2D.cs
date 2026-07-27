@@ -1,16 +1,15 @@
+using DG.Tweening;
+using EditorAttributes;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
-using EditorAttributes;
 using UnityEngine.InputSystem;
-
-using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.InputSystem.XR;
-using DG.Tweening;
-using System;
-
+using static UnityEngine.EventSystems.EventTrigger;
 using Void = EditorAttributes.Void;
 
 [SelectionBase]
@@ -20,6 +19,7 @@ public class CharacterController2D : MonoBehaviour
 
     public static CharacterController2D instance;
     [Title("references", 15)][SerializeField] public Animator anim;
+    public Animator legAnim;
     [HideInInspector] public Rigidbody2D rb;
     private PlayerAttack playerAttack;
     private Energy energy;
@@ -151,6 +151,7 @@ public class CharacterController2D : MonoBehaviour
 
     private void Update()
     {
+        UpdateLegAnimator();
         UpdateCoyoteTimer();
         isFloating = Float();
         teleportTimer += TimeScaleManager.PlayerDt;
@@ -162,6 +163,7 @@ public class CharacterController2D : MonoBehaviour
     private void FixedUpdate()
     {
         float playerScale = TimeScaleManager.PlayerScale;
+
         rb.velocity += Physics2D.gravity * gravity * TimeScaleManager.FixedDelta(TimeChannel.Player) * playerScale;
         GroundCheck();
     }
@@ -640,6 +642,28 @@ public class CharacterController2D : MonoBehaviour
         isRunning = running;
     }
 
+    private void UpdateLegAnimator()
+    {
+        var s = anim.GetCurrentAnimatorStateInfo(0);
+        if (s.IsName("run") ||
+            s.IsName("run_combat") ||
+            s.IsName("attack_run_1") ||
+            s.IsName("attack_run_2") ||
+            s.IsName("drawback_run") ||
+            s.IsName("storm_pre_run") ||
+            s.IsName("storm_ready_run") ||
+            s.IsName("HS_attack_run_1") ||
+            s.IsName("HS_attack_run_2")
+            )
+        {
+            legAnim.SetBool("isRunning", isRunning);
+        }
+        else
+        {
+            legAnim.SetBool("isRunning", false);
+        }
+    }
+
     private void HandleFallingAnimation()
     {
         if (rb.velocity.y < -1 && !isGrounded && !isFalling)
@@ -959,6 +983,14 @@ public class CharacterController2D : MonoBehaviour
 
     private bool IsHSAttackJumpOrFallState(AnimatorStateInfo s) =>
         s.IsName("HS_attack_jump_" + playerAttack.attackIndex) || s.IsName("HS_attack_fall_" + playerAttack.attackIndex);
+
+    public void SyncRunningAnim()
+    {
+        var state = anim.GetCurrentAnimatorStateInfo(0);
+        var legState = legAnim.GetCurrentAnimatorStateInfo(0);
+
+        anim.Play(state.fullPathHash, 0, legState.normalizedTime);
+    }
 
     #endregion Private Helpers
 }

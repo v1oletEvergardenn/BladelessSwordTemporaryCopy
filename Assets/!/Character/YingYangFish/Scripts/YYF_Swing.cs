@@ -254,7 +254,7 @@ public class YYF_Swing : IEnemyAction
     /// <param name="offset">The offset to apply to the attack position.</param>
     public override void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default)
     {
-        MeleeAttackResult dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.breakAmount);
+        MeleeAttackResult dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee.damage, melee.freezeTime);
         bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
 
         if (dealtDamage == MeleeAttackResult.Countered)//counter attack

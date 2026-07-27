@@ -85,6 +85,7 @@ public class Health : IDamagable
     /// 1: target is defending</returns>
     public override int Damage(float damageAmount, Transform sender, float stun_duration = 0f, bool damageFlash = true, float stunValue = 0)
     {
+        print(stun_duration);
         if (isDead) return -1;
         if (playerAttack.isDefending)
         {
@@ -131,7 +132,6 @@ public class Health : IDamagable
             isDead = true;
             controller.SetIsRunningToTarget(false);
             GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-            GetComponent<Rigidbody2D>().isKinematic = true;
             anim.SetBool("dead", true);
             anim.Play("death");
             Invoke("OnDeath", 4f);
