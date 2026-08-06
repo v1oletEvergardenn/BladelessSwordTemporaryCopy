@@ -8,7 +8,7 @@ public enum ObjectiveType
     Collect,
     Explore,
     Talk,
-    Attack,
+    Combat,
     PlayerInput,
     HeartSword,
     Custom
@@ -43,9 +43,13 @@ public class PlayerInputObjectiveIDs : ObjectiveIDs
 
 public class HeartSwordObjectiveIDs : ObjectiveIDs
 {
-    public static readonly string HeartSwordCounterAttack = "hs_attack";
-    public static readonly string HeartSwordSlash = "hs_slash";
-    public static readonly string HeartSwordWaves = "hs_wave";
+    public static readonly string HS_CounterAttack_released = "hs_attack_released";
+    public static readonly string HS_CriticalSlash_released = "hs_CriticalSlash_released";
+    public static readonly string HS_Waves_released = "hs_wave_released";
+
+    public static readonly string HS_CounterAttack_hit = "hs_attack_hit";
+    public static readonly string HS_CriticalSlash_hit = "hs_CriticalSlash_hit";
+    public static readonly string HS_Waves_hit = "hs_wave_hit";
     public override ObjectiveType ObjectiveType => ObjectiveType.HeartSword;
 }
 
@@ -73,12 +77,13 @@ public class TalkObjectiveIDs : ObjectiveIDs
     public override ObjectiveType ObjectiveType => ObjectiveType.Talk;
 }
 
-// Attack objectives
-public class AttackObjectiveIDs : ObjectiveIDs
+// Combat objectives
+public class CombatObjectiveIDs : ObjectiveIDs
 {
-    public static readonly string CounterAttack = "counter_attack";
-    public static readonly string HeartSwordAttack = "heart_sword_attack";
-    public override ObjectiveType ObjectiveType => ObjectiveType.Attack;
+    public static readonly string CT_norm_Proj = "CT_norm_Proj";
+    public static readonly string CT_perf_Proj = "CT_perf_Proj";
+    public static readonly string CT_Melee = "CT_Melee";
+    public override ObjectiveType ObjectiveType => ObjectiveType.Combat;
 }
 
 // Custom objectives

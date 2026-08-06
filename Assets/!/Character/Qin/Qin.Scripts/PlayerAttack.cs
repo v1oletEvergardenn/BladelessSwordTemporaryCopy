@@ -104,6 +104,8 @@ public class PlayerAttack : MonoBehaviour
 
     #region Unity Lifecycle
 
+    private PlayerQuestActionKey playerQuestActionKey;
+
     private void Awake()
     {
         if (instance == null) { instance = this; }
@@ -123,7 +125,7 @@ public class PlayerAttack : MonoBehaviour
         originalStormPos = storm.transform.localPosition;
         counterAttackCollider = GetCounterAttackPoint().GetComponent<CircleCollider2D>();
         attackIndex = 2;//max index, so that next loop will start from initial
-
+        playerQuestActionKey = gameManager.playerQuestActionKey;
         if (counterAttackCollider != null)
         {
             counterAttackColliderOriginalOffset = counterAttackCollider.offset;
@@ -153,7 +155,7 @@ public class PlayerAttack : MonoBehaviour
 
         if (isPreparingStorm && prepareStormTimer >= prepareStormTime && !stormReady)
         {
-            stormReady = true; SoundManager.PlaySound("defend_block2"); vfx.SpawnSlashEffect(stormEffectPos.position);
+            stormReady = true; vfx.SpawnSlashEffect(stormEffectPos.position);
         }
         if (combatTimer <= 0) { anim.SetBool("isCombat", false); isInCombat = false; combatTimer = 0; }
         if (comboTimer >= 0.67f) { attackIndex = 2; }
@@ -176,11 +178,20 @@ public class PlayerAttack : MonoBehaviour
         if (attackTimer < attackGap) return false;
         if (consumeEnergy) if (!energy.AttackConsume()) { return false; }
         InitializeAttack(attackLeft);
-        if (attackLeft) { QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.leftCounterAttack); }
-        else { QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.rightCounterAttack); }
+        if (attackLeft) { QuestManager.OnAction(playerQuestActionKey.leftCounterAttack); }
+        else { QuestManager.OnAction(playerQuestActionKey.rightCounterAttack); }
         // Play the appropriate attack animation
         anim.Play(GetAttackAnimName());
         anim.SetBool("isCombat", true);
+        int i = Random.Range(0, 2);
+        if (i == 0)
+        {
+            SoundManager.PlaySound("attackempty", random: true);
+        }
+        else
+        {
+            SoundManager.PlaySound("quickAttEmpty", random: true);
+        }
 
         return true;
     }
@@ -298,8 +309,11 @@ public class PlayerAttack : MonoBehaviour
         //if (isAimingRightStick) { projectile.transform.position = pointerPos.position; }
         attackTimer = attackGap;
         HitEffect(projectile, true);
+
         if (isPerfect)
         {
+            QuestManager.OnAction(playerQuestActionKey.CT_Proj);
+            QuestManager.OnAction(playerQuestActionKey.CT_perf_Proj);
             hSAbilitiesManager.ModifyHSPoint(0.5f);
             energy.ChangeEnergy(-energy.attack_energy_consumption);
 
@@ -309,11 +323,16 @@ public class PlayerAttack : MonoBehaviour
                 SetDamage(projectile.attribute.damage * basicAttackDamage).
                 SetAdditionalSpeed(100);
             projectile.PerfectCounterAttack();
-
-            SoundManager.PlaySound("perfect_attack");
+            if (!projectile.muteHitSound)
+            {
+                SoundManager.PlaySound("PerfectParry", 0.7f);
+                SoundManager.PlaySound("PerfectParryConfirm", 0.7f);
+            }
         }
         else
         {
+            QuestManager.OnAction(playerQuestActionKey.CT_Proj);
+            QuestManager.OnAction(playerQuestActionKey.CT_norm_Proj);
             hSAbilitiesManager.ModifyHSPoint(0.2f);
             projectile.hitEffect.Repel(ProjectileHitResult.Normal, projectile, health);
             projectile.SetUp(pointerDirection, this.gameObject).
@@ -322,16 +341,17 @@ public class PlayerAttack : MonoBehaviour
                 SetAdditionalSpeed(30);
 
             projectile.NormalCounterAttack();
-            SoundManager.PlaySound("normal_counter_attack");
         }
     }
 
     public void CounterMeleeAttack()
     {
+        SoundManager.PlaySound("PerfectParry", 0.7f);
+        SoundManager.PlaySound("PerfectParryConfirm", 0.7f);
+        QuestManager.OnAction(playerQuestActionKey.CT_Melee);
         hSAbilitiesManager.ModifyHSPoint(1);
         energy.ChangeEnergy(-2);
         int i = Random.Range(1, 3);
-        SoundManager.PlaySound("metal_hit" + i);
         energy.PerfectCounterAttackRestore();
         isCounterAttacking = false;
         attackTimer = 3f;
@@ -347,7 +367,6 @@ public class PlayerAttack : MonoBehaviour
             PerfectCounterAttackEffect.CameraShake(ProjectileHitResult.Perfect);
             PerfectCounterAttackEffect.RumblePulse(ProjectileHitResult.Perfect);
             vfx.SpawnHitEffect(true, dmg.GetHitPos());
-            SoundManager.PlaySound("perfect_attack");
         }
         else
         {
@@ -363,7 +382,6 @@ public class PlayerAttack : MonoBehaviour
             PerfectCounterAttackEffect.CameraShake(ProjectileHitResult.Perfect);
             PerfectCounterAttackEffect.RumblePulse(ProjectileHitResult.Perfect);
             vfx.SpawnHitEffect(true, projectile.GetHitPos());
-            SoundManager.PlaySound("perfect_attack");
         }
         else
         {
@@ -400,7 +418,6 @@ public class PlayerAttack : MonoBehaviour
     {
         hSAbilitiesManager.ModifyHSPoint(0.5f);
         Vector3 v = new Vector3(0, 0, -90);
-        SoundManager.PlaySound("normal_counter_attack");
         projectile.SetUp(v, this.gameObject).SetAdditionalSpeed(100).SetHostileToPlayer(false);
         energy.ChangeEnergy(4);
         projectile.PerfectCounterAttack();
@@ -415,8 +432,9 @@ public class PlayerAttack : MonoBehaviour
         if (CanDefend())
         {
             if (!energy.DefendConsume()) { return; }
-            if (!isDefending) { QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.defend); }
+            if (!isDefending) { QuestManager.OnAction(playerQuestActionKey.defend); }
             isDefending = true;
+
             //animSet.Anim_Defend(0);
             ActionLock.Add("onDefend", Lock.Move | Lock.Attack | Lock.Jump | Lock.SwordTeleport | Lock.SwordJump);
             anim.Play("defend");
@@ -426,8 +444,8 @@ public class PlayerAttack : MonoBehaviour
     public void DefendHit()
     {
         int i = Random.Range(1, 3);
-        SoundManager.PlaySound("defend_block" + i);
         anim.Play("defend_hit");
+        SoundManager.PlaySound("defend", random: true);
     }
 
     public void EndDefend()
@@ -465,7 +483,6 @@ public class PlayerAttack : MonoBehaviour
                 anim.SetBool("isCombat", true);
                 isInCombat = true;
                 isOnStorm = true;
-                SoundManager.PlaySound("storm");
                 storm.SetActive(true);
                 Invoke("EndStorm", stormDuration);
                 StormCounterAttack();

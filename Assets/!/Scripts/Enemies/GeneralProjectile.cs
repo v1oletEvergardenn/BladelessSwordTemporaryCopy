@@ -32,8 +32,8 @@ public class GeneralProjectile : IProjectile
         if (anim != null) anim.Play(anim_after_hit);
         rb.velocity = Vector3.zero;
         rb.gravityScale = 0;
-        attribute.speed = 0f;
         collided = true;
-        Invoke("Die", death_delay_time_after_hit);
+        GetComponent<Collider2D>().enabled = false;
+        Die();
     }
 }

@@ -1,47 +1,27 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// Static quest manager: does not require a GameObject.
-/// </summary>
 public static class QuestManager
 {
-    // Active quests and their progress (questID -> QuestProgress)
-
     private static readonly Dictionary<string, QuestProgress> activeQuests = new();
-
-    // Completed and failed quest IDs
     private static readonly HashSet<string> completedQuests = new();
-
     private static readonly HashSet<string> failedQuests = new();
-
-    // Tracks all-time progress for each objectiveID (objectiveID -> total count)
     private static readonly Dictionary<string, int> globalObjectiveProgress = new();
 
-    /// <summary>
-    /// Call this when an action relevant to quests occurs (e.g., kill, collect).
-    /// </summary>
-    public static void OnAction(ObjectiveType type, string actionID)
+    public static void OnAction(string actionID)
     {
-        QuestAction action = new QuestAction(type, actionID);
+        if (string.IsNullOrEmpty(actionID)) return;
+        QuestAction action = new QuestAction(actionID);
         OnAction(action);
     }
 
-    public static void OnAction(QuestObjID actionID)
-    {
-        QuestAction action = new QuestAction(actionID.type, actionID.GetObjectiveID());
-        OnAction(action);
-    }
-
-    /// <summary>
-    /// Handles quest progress updates and completion checks.
-    /// </summary>
     public static void OnAction(QuestAction actionTaken)
     {
-        if (GameManager.instance.GamePaused) return;
-        // Update global progress for all-time tracking
+        if (GameManager.instance != null && GameManager.instance.GamePaused) return;
+
+        if (string.IsNullOrEmpty(actionTaken.actionID)) return;
+
         if (!globalObjectiveProgress.ContainsKey(actionTaken.actionID))
             globalObjectiveProgress[actionTaken.actionID] = 0;
         globalObjectiveProgress[actionTaken.actionID] += 1;
@@ -52,107 +32,88 @@ public static class QuestManager
         {
             QuestProgress progress = quest.Value;
             bool updated = false;
+            int previousLayer = progress.CurrentLayer;
 
-            // Only progress objectives in the current active layer
             for (int i = 0; i < progress.ActiveObjectives.Count(); i++)
             {
                 var obj = progress.ActiveObjectives.ElementAt(i);
-                if (obj.type == actionTaken.type && obj.objectiveID == actionTaken.actionID && !obj.isCompleted)
+                if (obj.objectiveID == actionTaken.actionID && !obj.isCompleted)
                 {
                     if (obj.fromZero)
-                    {
                         obj.currentAmount += 1;
-                    }
                     else
-                    {
                         obj.currentAmount = globalObjectiveProgress[actionTaken.actionID];
-                    }
 
                     if (obj.currentAmount > obj.requiredAmount)
                         obj.currentAmount = obj.requiredAmount;
 
-                    // Trigger objective complete event if just completed
                     if (obj.currentAmount == obj.requiredAmount)
-                    {
                         progress.quest.objectives[progress.objectives.IndexOf(obj)].onObjectiveComplete?.Invoke();
-                    }
+
                     updated = true;
                 }
             }
 
             if (updated && progress.IsCompleted)
                 questsToComplete.Add(progress.QuestID);
+            else if (updated && progress.CurrentLayer != previousLayer)
+                TriggerObjectiveBeginEvents(progress);
         }
 
-        foreach (var questID in questsToComplete)
-            CompleteQuest(questID);
+        for (int i = 0; i < questsToComplete.Count; i++)
+            CompleteQuest(questsToComplete[i]);
 
         UpdateUI();
     }
 
-    /// <summary>
-    /// Returns all active quest progress objects.
-    /// </summary>
     public static IEnumerable<QuestProgress> GetActiveQuests()
     {
         return activeQuests.Values;
     }
 
-    public static void DebugActiveQuests()
-    {
-        Debug.Log("=== Active Quests ===");
-        foreach (var questProgress in activeQuests.Values)
-        {
-            var quest = questProgress.quest;
-            Debug.Log($"Quest: {quest.questName} (ID: {quest.questID}) - {quest.questDescription}");
-            foreach (var obj in questProgress.objectives)
-            {
-                Debug.Log(
-                    $"  Objective: {obj.objectiveDescription} | " +
-                    $"Type: {obj.type} | " +
-                    $"ID: {obj.objectiveID} | " +
-                    $"Progress: {obj.currentAmount}/{obj.requiredAmount} | " +
-                    $"FromZero: {obj.fromZero} | " +
-                    $"Completed: {obj.isCompleted}"
-                );
-            }
-        }
-        Debug.Log("=====================");
-    }
-
-    /// <summary>
-    /// Starts tracking a new quest and initializes objectives based on tracking mode.
-    /// </summary>
     public static void StartQuest(Quest quest)
     {
+        if (quest == null || string.IsNullOrEmpty(quest.questID)) return;
+
         if (!activeQuests.ContainsKey(quest.questID) && !completedQuests.Contains(quest.questID))
         {
             var progress = new QuestProgress(quest);
 
-            // Initialize each objective's currentAmount based on tracking mode
             foreach (var obj in progress.objectives)
             {
                 if (!obj.fromZero)
                 {
-                    // All-time: set to global progress so far
                     globalObjectiveProgress.TryGetValue(obj.objectiveID, out int allTimeCount);
                     obj.currentAmount = allTimeCount;
                 }
                 else
                 {
-                    // From zero: always start at 0
                     obj.currentAmount = 0;
                 }
             }
 
             activeQuests[quest.questID] = progress;
+            TriggerObjectiveBeginEvents(progress);
             UpdateUI();
         }
     }
 
-    /// <summary>
-    /// Marks a quest as completed and removes it from active tracking.
-    /// </summary>
+    private static void TriggerObjectiveBeginEvents(QuestProgress progress)
+    {
+        int activeLayer = progress.CurrentLayer;
+        if (activeLayer < 0) return;
+
+        for (int i = 0; i < progress.objectives.Count; i++)
+        {
+            QuestObjectives runtimeObjective = progress.objectives[i];
+            if (runtimeObjective.layer != activeLayer || runtimeObjective.isCompleted || runtimeObjective.hasBegun)
+                continue;
+
+            runtimeObjective.hasBegun = true;
+            progress.quest.objectives[i].onObjectiveBegin?.Invoke();
+        }
+    }
+
     public static void CompleteQuest(string questID)
     {
         if (activeQuests.TryGetValue(questID, out var progress))
@@ -160,35 +121,18 @@ public static class QuestManager
             completedQuests.Add(questID);
             activeQuests.Remove(questID);
             Debug.Log($"Quest {progress.quest.questName} completed!");
-
-            // TODO: Add reward logic, notifications, etc.
             progress.quest.onQuestComplete?.Invoke();
             UpdateUI();
         }
     }
 
-    /// <summary>
-    /// Returns all completed quest IDs.
-    /// </summary>
-    public static IEnumerable<string> GetCompletedQuests()
-    {
-        return completedQuests;
-    }
+    public static IEnumerable<string> GetCompletedQuests() => completedQuests;
 
-    /// <summary>
-    /// Returns all failed quest IDs.
-    /// </summary>
-    public static IEnumerable<string> GetFailedQuests()
-    {
-        return failedQuests;
-    }
+    public static IEnumerable<string> GetFailedQuests() => failedQuests;
 
-    /// <summary>
-    /// Updates the quest UI (calls MenuManager).
-    /// </summary>
     public static void UpdateUI()
     {
-        // If MenuManager is also static, call directly; otherwise, find or reference it as needed.
+        if (MenuManager.instance == null) return;
         MenuManager.instance.UpdateQuestUI();
     }
 
@@ -212,22 +156,16 @@ public static class QuestManager
         failedQuests.Clear();
         globalObjectiveProgress.Clear();
         UpdateUI();
-        Debug.Log("QuestManager initialized.");
     }
 }
 
-/// <summary>
-/// Represents a single quest-related action (e.g., kill, collect).
-/// </summary>
 public struct QuestAction
 {
     public string actionID;
-    public ObjectiveType type;
 
-    public QuestAction(ObjectiveType type, string _actionID)
+    public QuestAction(string actionID)
     {
-        this.type = type;
-        this.actionID = _actionID;
+        this.actionID = actionID;
     }
 
     public void Act()

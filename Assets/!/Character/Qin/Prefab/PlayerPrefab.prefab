@@ -1966,7 +1966,7 @@ MonoBehaviour:
   runToTarget: {x: 0, y: 0, z: 0}
   gravity: 0
   canSwitchNormalAnim: 1
-  m_JumpForce: 20
+  m_JumpForce: 15
   DoubleJumpForceMultiplier: 1.34
   MinDoubleJumpForceMultiplier: 0.751
   DoubleJumpForceTime: 1
@@ -2164,6 +2164,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   getHitPosition: {x: 0, y: 1.38, z: 0}
   color: {r: 1, g: 0, b: 0, a: 1}
+  questKey_Idmg: {fileID: 0}
   canBeHitWithoutHSAttack: 0
   resetAttackCDOnHit: 0
   consumeEnergyOnHit: 1
@@ -2391,16 +2392,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _player: {fileID: 1977391573695511326}
-  _flipYTime: 0.5
-  offset: {x: 0, y: 1.69, z: 0}
+  camFollow: {fileID: 8131088150795358970}
+  cam: {fileID: 3441472992290037726}
   fallingOffset: {x: 0, y: -1.39, z: 0}
   normalOffset: {x: 0, y: 1.69, z: 0}
   useOffset: 1
   showOffsetPos: 0
-  camFollow: {fileID: 8131088150795358970}
-  limitCamFollow: {fileID: 0}
-  cam: {fileID: 3441472992290037726}
-  limitCam: {fileID: 0}
+  offset: {x: 0, y: 1.69, z: 0}
   targets: []
   minZoom: 2.5
   targetZoom: 0
@@ -2408,6 +2406,12 @@ MonoBehaviour:
   activate: 0
   cameraPositionSmoothTime: 0.2
   cameraOrthoSmoothTime: 0.2
+  limitCamFollow: {fileID: 0}
+  limitCam: {fileID: 0}
+  lockWhenNoTarget: 0
+  noTargetPosition: {x: 0, y: 0, z: 0}
+  noTargetOrthoSize: 4
+  _flipYTime: 0.5
 --- !u!1 &3632477486540431086
 GameObject:
   m_ObjectHideFlags: 0
@@ -2873,8 +2877,6 @@ MonoBehaviour:
   commonAttribute: {fileID: 11400000, guid: 8ed998852960ace4587a29aa97ea295c, type: 2}
   branch1Attribute: {fileID: 0}
   branch2Attribute: {fileID: 0}
-  type: 6
-  questActionID: hs_attack
   isActive: 0
   isPerforming: 0
   hsHitEffectPlayed: 0
@@ -4160,8 +4162,6 @@ MonoBehaviour:
   commonAttribute: {fileID: 11400000, guid: 645b4d8a2c674644983d036e199d5cf9, type: 2}
   branch1Attribute: {fileID: 11400000, guid: 7893d02e8c58f4e4a921d4fe5aad2428, type: 2}
   branch2Attribute: {fileID: 11400000, guid: b12a06da6a96693418e75d555cf23bec, type: 2}
-  type: 6
-  questActionID: hs_slash
   isActive: 0
   isPerforming: 0
   hsHitEffectPlayed: 0
@@ -5498,8 +5498,6 @@ MonoBehaviour:
   commonAttribute: {fileID: 11400000, guid: 9b6def557c93f8f4c87ff35d47f826f6, type: 2}
   branch1Attribute: {fileID: 0}
   branch2Attribute: {fileID: 0}
-  type: 6
-  questActionID: hs_wave
   isActive: 0
   isPerforming: 0
   hsHitEffectPlayed: 0

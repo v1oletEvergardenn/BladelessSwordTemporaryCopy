@@ -1,231 +1,468 @@
-using Cinemachine;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using Cinemachine;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
+/// <summary>
+/// Handles player-follow camera behavior and optional dynamic framing/zoom
+/// when a <see cref="CameraLimit"/> zone is active.
+/// </summary>
 public class CameraFollow : MonoBehaviour
 {
-    [SerializeField] public Transform _player;
-    [SerializeField] private float _flipYTime = 0.5f;
-    [HideInInspector] public Vector3 offset;
+    #region Inspector - Core References
+
+    [FoldoutGroup("References"), Required, SerializeField]
+    public Transform _player;
+
+    [FoldoutGroup("References"), Required]
+    public Transform camFollow;
+
+    [FoldoutGroup("References"), Required]
+    public CinemachineVirtualCamera cam;
+
+    #endregion Inspector - Core References
+
+    #region Inspector - Offsets
+
+    [FoldoutGroup("Offsets")]
     public Vector3 fallingOffset;
+
+    [FoldoutGroup("Offsets")]
     public Vector3 normalOffset;
+
+    [FoldoutGroup("Offsets")]
     public bool useOffset = true;
+
+    [FoldoutGroup("Offsets")]
     public bool showOffsetPos;
 
+    [HideInInspector]
+    public Vector3 offset;
+
+    #endregion Inspector - Offsets
+
+    #region Inspector - Runtime Camera Limit Settings
+
+    [FoldoutGroup("Limit Runtime")]
+    public List<Transform> targets = new List<Transform>();
+
+    [FoldoutGroup("Limit Runtime")]
+    public float minZoom = 2.5f;
+
+    [FoldoutGroup("Limit Runtime")]
+    public float targetZoom;
+
+    [FoldoutGroup("Limit Runtime")]
+    public float y_limit_low;
+
+    [FoldoutGroup("Limit Runtime")]
+    public bool activate = false;
+
+    [FoldoutGroup("Limit Runtime"), Range(0.1f, 1f)]
+    public float cameraPositionSmoothTime = 0.2f;
+
+    [FoldoutGroup("Limit Runtime"), Range(0.1f, 10f)]
+    public float cameraOrthoSmoothTime = 0.2f;
+
+    [HideInInspector]
+    public Transform limitCamFollow;
+
+    [HideInInspector]
+    public CinemachineVirtualCamera limitCam;
+
+    [HideInInspector]
+    public bool lockWhenNoTarget = false;
+
+    [HideInInspector]
+    public Vector3 noTargetPosition;
+
+    [HideInInspector]
+    public float noTargetOrthoSize = 4f;
+
+    #endregion Inspector - Runtime Camera Limit Settings
+
+    #region Singleton
+
+    public static CameraFollow instance;
+
+    #endregion Singleton
+
+    #region Private Runtime State
+
+    [SerializeField] private float _flipYTime = 0.5f;
+
     private Coroutine _turnCoroutine;
+    private Coroutine _offsetCoroutine;
     private CharacterController2D player;
     private bool _isFacingRight;
-    public Transform camFollow;
-    [HideInInspector] public Transform limitCamFollow;
-    public static CameraFollow instance;
-    public CinemachineVirtualCamera cam;
-    [HideInInspector] public CinemachineVirtualCamera limitCam;
-    public List<Transform> targets;
     private Vector3 center = Vector3.zero;
-    public float minZoom = 2.5f;
-    public float targetZoom;
-    public float y_limit_low;
     private Vector3 velocity;
     private float xAmount;
-    public bool activate = false;
-    [Range(0.1f, 1f)] public float cameraPositionSmoothTime = 0.2f;
-    [Range(0.1f, 10f)] public float cameraOrthoSmoothTime = 0.2f;
-
     private float normalOrthoSize = 4f;
+    private Bounds _bound;
 
+    #endregion Private Runtime State
+
+    /// <summary>
+    /// Initializes singleton reference.
+    /// </summary>
     private void Awake()
     {
-        if (instance == null) { instance = this; }
+        if (instance == null || instance == this)
+        {
+            instance = this;
+        }
+        else
+        {
+            Debug.LogWarning("[CameraFollow] Duplicate instance detected. Keeping first instance.");
+        }
     }
 
-    // Start is called before the first frame update
+    /// <summary>
+    /// Initializes follow references and defaults.
+    /// </summary>
     private void Start()
     {
+        if (camFollow == null || cam == null)
+        {
+            Debug.LogWarning("[CameraFollow] Missing camFollow or cam reference.");
+            enabled = false;
+            return;
+        }
+
+        if (player == null)
+        {
+            player = CharacterController2D.instance;
+        }
+
+        if (player == null || _player == null)
+        {
+            Debug.LogWarning("[CameraFollow] Missing player references.");
+            enabled = false;
+            return;
+        }
+
         limitCamFollow = camFollow;
         normalOrthoSize = cam.m_Lens.OrthographicSize;
-        player = CharacterController2D.instance;
+        noTargetOrthoSize = normalOrthoSize;
+        noTargetPosition = camFollow.position;
         _isFacingRight = player.FacingRight;
         camFollow.SetParent(null);
         offset = normalOffset;
         limitCam = cam;
     }
 
-    private Bounds _bound;
-
-    // Update is called once per frame
+    /// <summary>
+    /// Updates regular follow and optional limit-camera logic.
+    /// </summary>
     private void Update()
     {
-        Vector3 _tempOffset = offset;
-        if (!useOffset) { _tempOffset = Vector3.zero; }
-        if (float.IsNaN(camFollow.position.x) || float.IsNaN(xAmount))
+        UpdatePlayerFollowPosition();
+
+        if (!activate)
         {
-            Debug.LogWarning("[CameraFollow] NaN detected! Resetting camFollow position and velocity.");
-            camFollow.position = new Vector3(player.transform.position.x, camFollow.position.y, camFollow.position.z);
-            xAmount = 0f;
+            return;
         }
 
-        camFollow.position = new Vector3(
-            Mathf.SmoothDamp(camFollow.position.x, player.transform.position.x + _tempOffset.x, ref xAmount, cameraPositionSmoothTime),
-            player.transform.position.y + _tempOffset.y,
-            camFollow.position.z);
-
-        if (!activate) { return; }
-
-        var bound = new Bounds(player.transform.position, Vector3.zero);
-        for (int i = 0; i < targets.Count; i++)
-        {
-            if (targets[i].gameObject.activeInHierarchy)
-            {
-                if (targets[i].TryGetComponent<CameraFollowCondition>(out CameraFollowCondition condition))
-                {
-                    if (!condition.CheckCameraFollowCondition()) { continue; }
-                }
-
-                if (targets[i].TryGetComponent<IDamagable>(out IDamagable a))
-                {
-                    bound.Encapsulate(a.GetHitPos());
-                    bound.Encapsulate(a.GetHitPos() + new Vector3(3, 3));
-                    bound.Encapsulate(a.GetHitPos() - new Vector3(3, 3));
-                }
-                else
-                {
-                    bound.Encapsulate(targets[i].position);
-                    Vector3 v = new Vector3(3, 3);
-                    if (targets[i].gameObject.TryGetComponent<CameraBoundOffset>(out CameraBoundOffset obj))
-                    {
-                        v = new Vector3(obj.offset, obj.offset);
-                    }
-                    bound.Encapsulate(targets[i].position + v);
-                    bound.Encapsulate(targets[i].position - v);
-                }
-            }
-        }
-        center = bound.center;
-        _bound = bound;
-
-        if (targets.Count != 0)
-        {
-            float screenAspect = (float)Screen.width / (float)Screen.height;
-            float orthoSize_width = ((bound.size.x + 3f) / 2f) / screenAspect;
-            float orthoSize_height = (bound.size.y + 3f) / 2f;
-
-            targetZoom = Mathf.Max(minZoom, MathF.Max(orthoSize_width, orthoSize_height));
-            limitCam.m_Lens.OrthographicSize = Mathf.Lerp(limitCam.m_Lens.OrthographicSize, targetZoom, Time.unscaledDeltaTime * cameraOrthoSmoothTime);
-        }
-        else
-        {
-            limitCam.m_Lens.OrthographicSize = Mathf.Max(minZoom, normalOrthoSize);
-        }
-
-        Vector3 tempOffset = offset;
-        if (!useOffset) { tempOffset = Vector3.zero; }
-        float y = center.y + tempOffset.y;
-        if (y <= y_limit_low) { y = y_limit_low; }
-        limitCamFollow.position = Vector3.SmoothDamp(limitCamFollow.position, new Vector3(center.x + tempOffset.x, y, limitCamFollow.position.z), ref velocity, cameraPositionSmoothTime);
+        UpdateLimitCamera();
     }
 
+    /// <summary>
+    /// Adds a dynamic target to the current limit camera.
+    /// </summary>
+    /// <param name="target">Target transform to add.</param>
     public static void AddTarget(Transform target)
     {
+        if (instance == null || target == null)
+        {
+            return;
+        }
+
+        if (instance.targets == null)
+        {
+            instance.targets = new List<Transform>();
+        }
+
         if (!instance.targets.Contains(target))
         {
             instance.targets.Add(target);
         }
     }
 
+    /// <summary>
+    /// Removes a dynamic target from the current limit camera.
+    /// </summary>
+    /// <param name="target">Target transform to remove.</param>
     public static void RemoveTarget(Transform target)
     {
+        if (instance == null || target == null || instance.targets == null)
+        {
+            return;
+        }
+
         if (instance.targets.Contains(target))
         {
             instance.targets.Remove(target);
         }
     }
 
+    /// <summary>
+    /// Starts smooth Y-axis camera pivot rotation.
+    /// </summary>
     public void CallTurn()
     {
-        StopAllCoroutines();
+        if (_turnCoroutine != null)
+        {
+            StopCoroutine(_turnCoroutine);
+        }
+
         _turnCoroutine = StartCoroutine(FlipYLerp());
     }
 
+    /// <summary>
+    /// Restores default camera mode and clears temporary limit data.
+    /// </summary>
     public void Deactivate()
     {
         CameraManager.instance.SwitchToNormalCam();
-        //currentLimit = maxLimit;
+
         activate = false;
         useOffset = true;
-        targets.Clear();
-    }
+        lockWhenNoTarget = false;
 
-    /// <summary>
-    /// flip around Y axis smoothly.
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator FlipYLerp()
-    {
-        float startRotation = camFollow.transform.localEulerAngles.y;
-        float endRotationAmount = 0f;
-        endRotationAmount += DetermineEndRotation();
-        float yRotation = 0f;
-
-        float elapsedTime = 0f;
-        while (elapsedTime < _flipYTime)
+        if (targets != null)
         {
-            elapsedTime += Time.unscaledDeltaTime;
-
-            yRotation = Mathf.Lerp(startRotation, endRotationAmount, (elapsedTime / _flipYTime));
-            camFollow.rotation = Quaternion.Euler(0f, yRotation, 0f);
-
-            yield return null;
+            targets.Clear();
         }
     }
 
-    private float DetermineEndRotation()
-    {
-        _isFacingRight = !_isFacingRight;
-
-        if (_isFacingRight) { return 0; }
-        else { return 180f; }
-    }
-
+    /// <summary>
+    /// Draws debug gizmos for offset and current tracking bounds.
+    /// </summary>
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
-        //Gizmos.DrawWireCube(transform.position, new Vector3(minLimit.x, minLimit.y, 1));
-        //Gizmos.DrawWireCube(transform.position, new Vector3(maxLimit.x, maxLimit.y, 1));
-        //Gizmos.color = Color.red;
-        //Gizmos.DrawWireCube(transform.position, new Vector3(currentLimit.x, currentLimit.y, 1));
 
-        if (showOffsetPos)
+        if (showOffsetPos && _player != null)
         {
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(_player.position + normalOffset, 0.1f);
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(_player.position + fallingOffset, 0.1f);
         }
+
+        Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(_bound.center, _bound.size);
     }
 
+    /// <summary>
+    /// Smoothly changes camera follow offset over time.
+    /// </summary>
+    /// <param name="desireOffset">Target offset.</param>
     public void ChangeOffset(Vector2 desireOffset)
     {
-        StopAllCoroutines();
-        StartCoroutine(IEChangeOffset(desireOffset));
+        if (_offsetCoroutine != null)
+        {
+            StopCoroutine(_offsetCoroutine);
+        }
+
+        _offsetCoroutine = StartCoroutine(IEChangeOffset(desireOffset));
     }
 
+    /// <summary>
+    /// Coroutine for smooth offset transition.
+    /// </summary>
+    /// <param name="desireOffset">Target offset.</param>
+    /// <returns>Coroutine enumerator.</returns>
     public IEnumerator IEChangeOffset(Vector2 desireOffset)
     {
         float elapsedTime = 0f;
         float lerpTime = 0.4f;
         Vector2 startAmount = offset;
         Vector2 endAmount = desireOffset;
+
         while (elapsedTime < lerpTime)
         {
             elapsedTime += Time.unscaledDeltaTime;
-            Vector2 lerpedPanAmount = Vector2.Lerp(startAmount, endAmount, (elapsedTime / lerpTime));
+            Vector2 lerpedPanAmount = Vector2.Lerp(startAmount, endAmount, elapsedTime / lerpTime);
             offset = lerpedPanAmount;
-
             yield return null;
         }
+
+        offset = endAmount;
+    }
+
+    /// <summary>
+    /// Updates basic player follow movement for the normal camera anchor.
+    /// </summary>
+    private void UpdatePlayerFollowPosition()
+    {
+        if (player == null || camFollow == null)
+        {
+            return;
+        }
+
+        Vector3 tempOffset = useOffset ? offset : Vector3.zero;
+
+        if (float.IsNaN(camFollow.position.x) || float.IsNaN(xAmount))
+        {
+            Debug.LogWarning("[CameraFollow] NaN detected. Resetting follow values.");
+            camFollow.position = new Vector3(player.transform.position.x, camFollow.position.y, camFollow.position.z);
+            xAmount = 0f;
+        }
+
+        camFollow.position = new Vector3(
+            Mathf.SmoothDamp(camFollow.position.x, player.transform.position.x + tempOffset.x, ref xAmount, cameraPositionSmoothTime),
+            player.transform.position.y + tempOffset.y,
+            camFollow.position.z);
+    }
+
+    /// <summary>
+    /// Updates dynamic bounds, zoom, and position for the active limit camera.
+    /// </summary>
+    private void UpdateLimitCamera()
+    {
+        if (limitCam == null || limitCamFollow == null || player == null)
+        {
+            return;
+        }
+
+        bool hasNoTargets = targets == null || targets.Count == 0;
+        if (hasNoTargets && lockWhenNoTarget)
+        {
+            limitCam.m_Lens.OrthographicSize = Mathf.Max(minZoom, noTargetOrthoSize);
+            limitCamFollow.position = noTargetPosition;
+            return;
+        }
+
+        if (!TryBuildTargetBounds(out Bounds bounds))
+        {
+            limitCam.m_Lens.OrthographicSize = Mathf.Max(minZoom, normalOrthoSize);
+            return;
+        }
+
+        center = bounds.center;
+        _bound = bounds;
+
+        ApplyDynamicZoom(bounds);
+        ApplyLimitCameraPosition();
+    }
+
+    /// <summary>
+    /// Builds world bounds from player and all valid dynamic targets.
+    /// </summary>
+    /// <param name="bounds">Result bounds.</param>
+    /// <returns>True if at least one valid target contributed.</returns>
+    private bool TryBuildTargetBounds(out Bounds bounds)
+    {
+        bounds = new Bounds(player.transform.position, Vector3.zero);
+        bool hasAnyTarget = false;
+
+        if (targets == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < targets.Count; i++)
+        {
+            Transform target = targets[i];
+            if (target == null || !target.gameObject.activeInHierarchy)
+            {
+                continue;
+            }
+
+            if (target.TryGetComponent<CameraFollowCondition>(out CameraFollowCondition condition) &&
+                !condition.CheckCameraFollowCondition())
+            {
+                continue;
+            }
+
+            hasAnyTarget = true;
+
+            if (target.TryGetComponent<IDamagable>(out IDamagable damagable))
+            {
+                Vector3 hitPos = damagable.GetHitPos();
+                bounds.Encapsulate(hitPos);
+                bounds.Encapsulate(hitPos + new Vector3(3f, 3f));
+                bounds.Encapsulate(hitPos - new Vector3(3f, 3f));
+            }
+            else
+            {
+                Vector3 margin = new Vector3(3f, 3f);
+                if (target.TryGetComponent<CameraBoundOffset>(out CameraBoundOffset boundOffset))
+                {
+                    margin = new Vector3(boundOffset.offset, boundOffset.offset);
+                }
+
+                bounds.Encapsulate(target.position);
+                bounds.Encapsulate(target.position + margin);
+                bounds.Encapsulate(target.position - margin);
+            }
+        }
+
+        return hasAnyTarget;
+    }
+
+    /// <summary>
+    /// Applies orthographic zoom based on target bounds.
+    /// </summary>
+    /// <param name="bounds">Current dynamic bounds.</param>
+    private void ApplyDynamicZoom(Bounds bounds)
+    {
+        float screenAspect = (float)Screen.width / Screen.height;
+        float orthoSizeWidth = ((bounds.size.x + 3f) / 2f) / screenAspect;
+        float orthoSizeHeight = (bounds.size.y + 3f) / 2f;
+
+        targetZoom = Mathf.Max(minZoom, Mathf.Max(orthoSizeWidth, orthoSizeHeight));
+        limitCam.m_Lens.OrthographicSize = Mathf.Lerp(
+            limitCam.m_Lens.OrthographicSize,
+            targetZoom,
+            Time.unscaledDeltaTime * cameraOrthoSmoothTime);
+    }
+
+    /// <summary>
+    /// Applies smooth camera anchor movement to the limit camera follow transform.
+    /// </summary>
+    private void ApplyLimitCameraPosition()
+    {
+        Vector3 tempOffset = useOffset ? offset : Vector3.zero;
+        float y = center.y + tempOffset.y;
+        if (y <= y_limit_low)
+        {
+            y = y_limit_low;
+        }
+
+        Vector3 desired = new Vector3(center.x + tempOffset.x, y, limitCamFollow.position.z);
+        limitCamFollow.position = Vector3.SmoothDamp(limitCamFollow.position, desired, ref velocity, cameraPositionSmoothTime);
+    }
+
+    /// <summary>
+    /// Smoothly flips camera pivot around Y axis.
+    /// </summary>
+    /// <returns>Coroutine enumerator.</returns>
+    private IEnumerator FlipYLerp()
+    {
+        float startRotation = camFollow.transform.localEulerAngles.y;
+        float endRotationAmount = DetermineEndRotation();
+        float elapsedTime = 0f;
+
+        while (elapsedTime < _flipYTime)
+        {
+            elapsedTime += Time.unscaledDeltaTime;
+            float yRotation = Mathf.Lerp(startRotation, endRotationAmount, elapsedTime / _flipYTime);
+            camFollow.rotation = Quaternion.Euler(0f, yRotation, 0f);
+            yield return null;
+        }
+    }
+
+    /// <summary>
+    /// Computes next Y rotation target based on facing direction.
+    /// </summary>
+    /// <returns>Y angle in degrees.</returns>
+    private float DetermineEndRotation()
+    {
+        _isFacingRight = !_isFacingRight;
+        return _isFacingRight ? 0f : 180f;
     }
 }

@@ -37,6 +37,8 @@ public abstract class IProjectile : MonoBehaviour
     [HideInInspector] public Rigidbody2D rb;
     [HideInInspector] public GameManager gameManager;
 
+    public bool muteHitSound = false;
+
     public virtual void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -117,9 +119,13 @@ public abstract class IProjectile : MonoBehaviour
         {
             if (!delayTriggered)
             {
-                rb.velocity = transform.right * attribute.speed / 10 * TimeScaleManager.ProjScale;
+                rb.velocity = transform.right * attribute.speed / 10f * TimeScaleManager.ProjScale;
                 delayTriggered = true;
                 collisionEnabled = true;
+            }
+            else if (rb.gravityScale == 0f)
+            {
+                rb.velocity = transform.right * attribute.speed / 10f * TimeScaleManager.ProjScale;
             }
         }
 
@@ -238,7 +244,7 @@ public abstract class IProjectile : MonoBehaviour
         if (obj == owner) return true;
 
         // Resolve the root IDamagable from the owner.
-        // Check SubDamageable FIRST — SubDamageable also implements IDamagable,
+        // Check SubDamageable FIRST ?SubDamageable also implements IDamagable,
         // so checking IDamagable first would incorrectly treat a child as the root.
         IDamagable rootOwner = null;
         if (owner.TryGetComponent<SubDamageable>(out SubDamageable ownerSub))
@@ -324,7 +330,7 @@ public class ProjectileBuilder
 
     public ProjectileBuilder SetAdditionalSpeed(float additionSpeed)
     {
-        _projectile.attribute.speed = _projectile.originalSpeed + additionSpeed;
+        _projectile.attribute.speed += additionSpeed;
         return this;
     }
 

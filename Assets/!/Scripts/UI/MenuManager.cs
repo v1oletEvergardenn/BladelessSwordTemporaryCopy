@@ -36,7 +36,14 @@ public class MenuManager : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null) { instance = this; }
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
         PauseGameCanvas.SetActive(false);
         SavePointCanvas.SetActive(false);
         SavePointMenu.SetActive(false);
@@ -117,6 +124,9 @@ public class MenuManager : MonoBehaviour
     public GameObject objectiveUIPrefab;
     [HideInInspector] public List<UI_Objective> ui_objs = new List<UI_Objective>();
 
+    private readonly List<UI_Quest> questUiPool = new();
+    private readonly List<UI_Objective> objectiveUiPool = new();
+
     #endregion Quest UI
 
     #region Item Menu
@@ -135,17 +145,14 @@ public class MenuManager : MonoBehaviour
     {
         // Initialize menu states
 
-        InputMaster.instance.uiActions.FlipPage_LB.performed += ctx => PreviousTab();
-        InputMaster.instance.uiActions.FlipPage_RB.performed += ctx => NextTab();
-        InputMaster.instance._MenuOpenAction.performed += ctx => OpenPauseGameCanvas();
-        InputMaster.instance.uiActions.MenuClose.performed += ctx => CloseMenu();
-        InputMaster.instance.uiActions.Uninstall.performed += ctx => CloseMenu();
-        InputMaster.instance.uiActions.Cancel.performed += ctx => BackToLastMenu();
-        InputMaster.instance._OpenMapAction.performed += ctx => OpenMapCanvas();
-        InputMaster.instance._CloseMapAction.performed += ctx => CloseMapCanvas();
+        //InputMaster.instance.uiActions.FlipPage_LB.performed += ctx => PreviousTab();
+        //InputMaster.instance.uiActions.FlipPage_RB.performed += ctx => NextTab();
+
+        //InputMaster.instance.uiActions.Cancel.performed += ctx => BackToLastMenu();
+        //InputMaster.instance._OpenMapAction.performed += ctx => OpenMapCanvas();
+        //InputMaster.instance._CloseMapAction.performed += ctx => CloseMapCanvas();
         // Register input events for tab navigation and menu open/close
 
-        UpdateQuestUI();
         TradeItemPoolGenerate();
 
         StoreMenuTabs.Clear();
@@ -161,6 +168,21 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    public void Update()
+    {
+        if (InputMaster.instance._MenuOpenAction.WasPerformedThisFrame())
+        {
+            if (PauseGameCanvas.activeInHierarchy)
+            {
+                CloseMenu();
+            }
+            else
+            {
+                OpenPauseGameCanvas();
+            }
+        }
+    }
+
     #endregion Unity Methods
 
     /// <summary>
@@ -168,6 +190,7 @@ public class MenuManager : MonoBehaviour
     /// </summary>
     public void CloseMenu()
     {
+        print(PauseGameCanvas);
         if (PauseGameCanvas.activeInHierarchy)
         {
             ClosePauseGameCanvas();
@@ -242,6 +265,7 @@ public class MenuManager : MonoBehaviour
     public void OpenPauseGameCanvas()
     {
         GameManager.instance.PauseGame();
+        Time.timeScale = 0f;
         PauseGameCanvas.SetActive(true);
         InputMaster.SwitchToUIAction();
     }
@@ -252,6 +276,7 @@ public class MenuManager : MonoBehaviour
     public void ClosePauseGameCanvas()
     {
         if (!canCloseMenu) return;
+        Time.timeScale = 1f;
         GameManager.instance.UnpauseGame();
         PauseGameCanvas.SetActive(false);
         InputMaster.SwitchToGameplayAction();
@@ -708,35 +733,105 @@ public class MenuManager : MonoBehaviour
     /// </summary>
     public void UpdateQuestUI()
     {
-        foreach (Transform child in questHolder)
+        ui_objs.Clear();
+
+        IEnumerable<QuestProgress> questEnumerable = QuestManager.GetActiveQuests();
+        if (questEnumerable == null || !questEnumerable.Any())
         {
-            Destroy(child.gameObject);
+            if (border != null)
+            {
+                border.gameObject.SetActive(false);
+            }
+
+            for (int i = 0; i < questUiPool.Count; i++)
+            {
+                questUiPool[i].gameObject.SetActive(false);
+            }
+
+            for (int i = 0; i < objectiveUiPool.Count; i++)
+            {
+                objectiveUiPool[i].gameObject.SetActive(false);
+            }
+
+            return;
         }
-        if (QuestManager.GetActiveQuests().Count() > 0)
+
+        if (questHolder == null || questUIPrefab == null || objectiveUIPrefab == null)
+        {
+            return;
+        }
+
+        List<QuestProgress> activeQuests = questEnumerable.ToList();
+        if (border != null)
         {
             border.gameObject.SetActive(true);
-            foreach (var quest in QuestManager.GetActiveQuests())
-            {
-                UI_Quest quests = Instantiate(questUIPrefab, questHolder).GetComponent<UI_Quest>();
-                quests.name = quest.quest.name;
-                quests.UpdateUI(quest);
+        }
 
-                // Only show active objectives (current layer)
-                foreach (var objective in quest.ActiveObjectives)
-                {
-                    UI_Objective obj = Instantiate(objectiveUIPrefab, questHolder).GetComponent<UI_Objective>();
-                    ui_objs.Add(obj);
-                    obj.linkedObjective = objective;
-                    obj.UpdateUI();
-                }
-            }
-            questHolder.GetComponent<ContentSizeFitter>().enabled = true;
-            questHolder.GetComponent<ContentSizeFitter>().enabled = false;
-        }
-        else
+        int questIndex = 0;
+        int objectiveIndex = 0;
+        int siblingIndex = 0;
+
+        foreach (QuestProgress quest in activeQuests)
         {
-            border.gameObject.SetActive(false);
+            if (quest.quest == null)
+            {
+                continue;
+            }
+            UI_Quest questUI = GetQuestUI(questIndex++);
+            questUI.transform.SetSiblingIndex(siblingIndex++);
+            questUI.gameObject.SetActive(true);
+            questUI.name = quest.quest.name;
+            questUI.UpdateUI(quest);
+
+            foreach (QuestObjectives objective in quest.ActiveObjectives)
+            {
+                UI_Objective objUI = GetObjectiveUI(objectiveIndex++);
+                objUI.transform.SetSiblingIndex(siblingIndex++);
+                objUI.gameObject.SetActive(true);
+                objUI.linkedObjective = objective;
+                objUI.UpdateUI();
+                ui_objs.Add(objUI);
+            }
         }
+
+        for (int i = questIndex; i < questUiPool.Count; i++)
+        {
+            questUiPool[i].gameObject.SetActive(false);
+        }
+
+        for (int i = objectiveIndex; i < objectiveUiPool.Count; i++)
+        {
+            objectiveUiPool[i].gameObject.SetActive(false);
+        }
+
+        if (questHolder is RectTransform rectTransform)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+        }
+    }
+
+    private UI_Quest GetQuestUI(int index)
+    {
+        while (questUiPool.Count <= index)
+        {
+            UI_Quest ui = Instantiate(questUIPrefab, questHolder).GetComponent<UI_Quest>();
+            ui.gameObject.SetActive(false);
+            questUiPool.Add(ui);
+        }
+
+        return questUiPool[index];
+    }
+
+    private UI_Objective GetObjectiveUI(int index)
+    {
+        while (objectiveUiPool.Count <= index)
+        {
+            UI_Objective ui = Instantiate(objectiveUIPrefab, questHolder).GetComponent<UI_Objective>();
+            ui.gameObject.SetActive(false);
+            objectiveUiPool.Add(ui);
+        }
+
+        return objectiveUiPool[index];
     }
 
     #endregion Quest UI

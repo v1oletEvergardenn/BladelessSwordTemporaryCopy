@@ -79,6 +79,8 @@ public class HS_SlashWave : IHeartSwordAbility
         if (!CheckEnoughHeartSwordPoints()) return false;
         if (CheckAnyPerformingAbility()) return false;
         if (health.stunned) return false;
+
+        QuestManager.OnAction(GameManager.instance.playerQuestActionKey.HS_Waves_released);
         hSAbilityManager.ModifyHSPoint(-GetCurrentAttribute().HS_Cost);
         largeSlash = false;
         hsHitEffectPlayed = false;
@@ -191,6 +193,11 @@ public class HS_SlashWave : IHeartSwordAbility
         hsHitEffectPlayed = false;
         attacked = false;
         ActionLock.Remove("HS_slashWave");
+    }
+
+    public override void HitTarget()
+    {
+        QuestManager.OnAction(GameManager.instance.playerQuestActionKey.HS_Waves_hit);
     }
 
     #endregion Utility Methods

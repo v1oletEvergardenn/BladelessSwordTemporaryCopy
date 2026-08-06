@@ -108,7 +108,17 @@ public class Health : IDamagable
             //if (controller.m_FacingRight && x > transform.position.x) { return; }
             //if (!controller.m_FacingRight && x < transform.position.x) { return; }
         }
-        SoundManager.PlaySound("player_take_damage");
+        if (sender != null && sender.TryGetComponent<IProjectile>(out IProjectile projectile))
+        {
+            if (!projectile.muteHitSound)
+            {
+                SoundManager.PlaySound("player_take_damage");
+            }
+        }
+        else
+        {
+            SoundManager.PlaySound("player_take_damage");
+        }
         currentHealth -= damageAmount;
         if (damageAmount > 0)
         {

@@ -25,6 +25,11 @@ public class UI_Objective : MonoBehaviour
             " (" + linkedObjective.currentAmount + "/" +
             linkedObjective.requiredAmount + ")";
 
+        // Reset state first (important for pooled reuse)
+        text.color = Color.white;
+        tickBox.color = Color.white;
+        tickBox.sprite = uncompletedTickBoxSprite;
+
         if (linkedObjective.isCompleted)
         {
             CompleteObjective(Color.green);

@@ -42,6 +42,9 @@ public class HS_CounterAttack : IHeartSwordAbility
         if (hSAbilityManager.currentHS_point < GetCurrentAttribute().HS_Cost) { return false; }
         if (controller.FacingRight == isLeft) { controller.Flip(); }
 
+        SoundManager.PlaySound("heavyAttEmpty", random: true);
+        QuestManager.OnAction(GameManager.instance.playerQuestActionKey.HS_CounterAttack_released);
+
         hSAbilityManager.ModifyHSPoint(-GetCurrentAttribute().HS_Cost);
         isPerforming = true;
         playerAttack.InitializeAttack(isLeft);
@@ -138,7 +141,7 @@ public class HS_CounterAttack : IHeartSwordAbility
     public override void CheckHSCounterAttack(Collider2D col)
     {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(playerAttack.counterAttackPoint.position, HS_attack_radius + 5);
-        float hsCheckDistance = HS_attack_radius + playerAttack.counterAttackPoint.localPosition.x;
+        float hsCheckDistance = HS_attack_radius;
         // Gather projectiles and damagables, and find closest of each
         foreach (Collider2D collider in colliders)
         {
@@ -157,8 +160,11 @@ public class HS_CounterAttack : IHeartSwordAbility
             if (collider.TryGetComponent<IDamagable>(out IDamagable dmg))
             {
                 if (!IsInCounterDirection(dmg.GetHitPos())) continue;
-                float dist = Vector3.Distance(dmg.GetHitPos(), health.GetHitPos());
-                if (dist <= hsCheckDistance) HS_meleeAttack(dmg);
+                float dist = Vector2.Distance(dmg.GetHitPos(), health.GetHitPos());
+                if (dist <= hsCheckDistance)
+                {
+                    HS_meleeAttack(dmg);
+                }
             }
         }
         // Helper: checks if a target is in the correct direction for counter
@@ -191,6 +197,7 @@ public class HS_CounterAttack : IHeartSwordAbility
         vfx.SpawnHeartSwordHitEffect(damagable.GetHitPos());
 
         damagable.Damage(attackEffect.damage, this.transform, 0, bossBreakValue: attackEffect.breakAmount);
+        HitTarget();
         //playerAttack.canDefend = true;
     }
 
@@ -200,11 +207,17 @@ public class HS_CounterAttack : IHeartSwordAbility
         playerAttack.attackTimer = playerAttack.attackGap + 0.5f;
         //playerAttack.canDefend = true;
 
+        HitTarget();
         energy.ChangeEnergy(-energy.attack_energy_consumption);
         //projectile.SetUp(playerAttack.pointerDirection, this.gameObject, 100, _isHostileToPlayer: false, _damage: projectile.damage * playerAttack.basicAttackDamage);
         //projectile.PerfectCounterAttack();
         projectile.HitByHSAttack();
         SoundManager.PlaySound("perfect_attack");
+    }
+
+    public override void HitTarget()
+    {
+        QuestManager.OnAction(GameManager.instance.playerQuestActionKey.HS_CounterAttack_hit);
     }
 
     #endregion Utility Methods

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public abstract class AdvancedShooter : MonoBehaviour
+public class AdvancedShooter : MonoBehaviour
 {
     [Header("references")] public GameObject senderOfProjectile;
     public Transform shootPos;
@@ -42,13 +42,11 @@ public abstract class AdvancedShooter : MonoBehaviour
         }
     }
 
-    private float enemyDt = TimeScaleManager.EnemyDt;
-
     public virtual void Update()
     {
         if (!isShooting && canShoot)
         {
-            CDtimer += enemyDt;
+            CDtimer += TimeScaleManager.EnemyDt;
             if (CDtimer >= roundCD)
             {
                 StartCoroutine(IEShoot());
@@ -95,6 +93,11 @@ public abstract class AdvancedShooter : MonoBehaviour
         }
         isShooting = false;
         afterRoundShooting.Invoke();
+    }
+
+    public void SetShooting(bool isShooting)
+    {
+        canShoot = isShooting;
     }
 
     public virtual void Flip()

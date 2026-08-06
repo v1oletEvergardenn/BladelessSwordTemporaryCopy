@@ -35,6 +35,8 @@ public class GameManager : MonoBehaviour
     public bool GamePaused = false;
     public bool isInPerformingState = false;
 
+    public PlayerQuestActionKey playerQuestActionKey;
+
     private void Awake()
     {
         if (instance == null) { instance = this; }
@@ -51,12 +53,20 @@ public class GameManager : MonoBehaviour
     /// action is taken if the active scene is "MainMenu".</remarks>
     public void CheckIfStartFromMainMenu()
     {
-        if (SceneManager.GetActiveScene().name != "MainMenu" &&
-            SceneManager.GetActiveScene().name != "PreLoad")
+        bool isMenuLoaded =
+            SceneManager.GetSceneByName("MainMenu").isLoaded ||
+            SceneManager.GetSceneByName("PreLoad").isLoaded;
+
+        if (!isMenuLoaded)
         {
-            //SaveSystem.SetCurrentSaveSlot(-1);
-            if (CharacterController2D.instance != null) CreatePlayerReference(CharacterController2D.instance.gameObject);
-            else CreateNewPlayer();
+            if (CharacterController2D.instance != null)
+            {
+                CreatePlayerReference(CharacterController2D.instance.gameObject);
+            }
+            else
+            {
+                CreateNewPlayer();
+            }
         }
     }
 

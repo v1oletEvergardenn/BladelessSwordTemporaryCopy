@@ -110,10 +110,11 @@ public class InputMaster : MonoBehaviour
     {
         gameManager = GameManager.instance;
 
-        string sceneName = SceneManager.GetActiveScene().name;
-        bool isMenuScene = sceneName == "MainMenu" || sceneName == "PreLoad";
+        bool isMenuLoaded =
+            SceneManager.GetSceneByName("MainMenu").isLoaded ||
+            SceneManager.GetSceneByName("PreLoad").isLoaded;
 
-        if (isMenuScene)
+        if (isMenuLoaded)
         {
             SwitchToUIAction();
         }

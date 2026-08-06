@@ -1,0 +1,79 @@
+OVDF v1.1
+QuestObjectives, Project.Main
+
+# $G51GbzYdxgNqQY16WQjhX
+Position: $9igukLzuAqpwEhh7JXDtgF:1
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "attributes"
+
+# $9igukLzuAqpwEhh7JXDtgF
+Position: $root:6
++ [Sirenix.OdinInspector.BoxGroupAttribute]
+	GroupName = "Attributes"
+
+# $6ZG7oWH9xEW91DAD6iS31E
+Position: $9igukLzuAqpwEhh7JXDtgF:2
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "EventBegin"
+
+# $bUbzo1b2FzfWEk1iEe4ty
+Position: $9igukLzuAqpwEhh7JXDtgF:3
++ [Sirenix.OdinInspector.FoldoutGroupAttribute]
+	GroupName = "EventComplete"
+
+# requiredAmount
+Position: $G51GbzYdxgNqQY16WQjhX:3
+- [UnityEngine.SpaceAttribute]
+
+# onObjectiveComplete
+Position: $bUbzo1b2FzfWEk1iEe4ty:0
+- [UnityEngine.SpaceAttribute]
+
+# type
+Position: $G51GbzYdxgNqQY16WQjhX:0
+- [UnityEngine.SpaceAttribute]
+
+# objectiveDescription
+Position: $root:0
++ [Sirenix.OdinInspector.GUIColorAttribute]
+	GetColor = "GetObjectiveDescriptionColor"
++ [UnityEngine.TextAreaAttribute]
+	minLines = 1
+	maxLines = 5
+
+# fromZero
+Position: $G51GbzYdxgNqQY16WQjhX:4
+
+# dropDownObjectiveID
+Position: $G51GbzYdxgNqQY16WQjhX:5
+
+# useDropDown
+Position: $G51GbzYdxgNqQY16WQjhX:3
+
+# customObjectiveID
+Position: $G51GbzYdxgNqQY16WQjhX:4
+
+# layer
+Position: $9igukLzuAqpwEhh7JXDtgF:0
++ [UnityEngine.RangeAttribute]
+	max = 20
++ [Sirenix.OdinInspector.GUIColorAttribute]
+	GetColor = "GetObjectiveDescriptionColor"
+
+# SetObjectiveID()
+Visibility: Hidden
+
+# currentAmount
+Visibility: Hidden
+
+# onObjectiveBegin
+Position: $6ZG7oWH9xEW91DAD6iS31E:0
+
+# objectiveKey
+Position: $G51GbzYdxgNqQY16WQjhX:0
+
+# objectiveID
+Position: $G51GbzYdxgNqQY16WQjhX:2
+
+# objectiveAction
+Position: $G51GbzYdxgNqQY16WQjhX:1

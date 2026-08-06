@@ -79,6 +79,9 @@ public class YingYangFish_AI : IEnemyController
     [SerializeField] private List<YYFActionPhase> swingStart_lowHealth = new List<YYFActionPhase>();
     [SerializeField] private List<YYFActionPhase> bubbleTrapStart_lowHealth = new List<YYFActionPhase>();
 
+    public AudioSource music1;
+    public AudioSource music2;
+
     public void Awake()
     {
         if (instance == null)
@@ -493,6 +496,7 @@ public class YingYangFish_AI : IEnemyController
     public override IEnumerator IE_Activate()
     {
         // center interact and flowing upward animation
+        StartCoroutine(PlayerMusic());
         Vector3 pos = new Vector3(center.position.x, 0, 0);
         leftBoundary.gameObject.SetActive(true);
         rightBoundary.gameObject.SetActive(true);
@@ -521,6 +525,15 @@ public class YingYangFish_AI : IEnemyController
 
         StartAction();
         co_act = StartCoroutine(Act());
+    }
+
+    public IEnumerator PlayerMusic()
+    {
+        print(1);
+        music1.Play();
+        yield return new WaitForSecondsRealtime(26f);
+        music2.Play();
+        yield return null;
     }
 
     public override int Damage(float damageAmount, Transform sender, float stunDuration = 0, bool damageFlash = true, float stunValue = 0)
@@ -668,6 +681,7 @@ public class YingYangFish_AI : IEnemyController
 
     public void PlaySecondPhaseTimeLine()
     {
+        return;
         //Timeline start
         secondPhaseDirector.Play();
 

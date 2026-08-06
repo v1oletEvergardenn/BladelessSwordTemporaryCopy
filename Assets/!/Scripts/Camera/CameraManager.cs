@@ -1,10 +1,8 @@
 using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
-using UnityEngine.Windows.WebCam;
 
 public class CameraManager : MonoBehaviour
 {
@@ -30,6 +28,8 @@ public class CameraManager : MonoBehaviour
     [Header("PixelPerfectCameraSetting")]
     public Camera mainCam;
 
+    private PixelPerfectCamera mainCamPixelPerfect;
+
     public bool askForSwitchPixelPerfectCamera = false;
 
     private List<float> pixelCameraOrthographicSizes = new List<float> {
@@ -53,22 +53,19 @@ public class CameraManager : MonoBehaviour
     {
         if (instance == null) { instance = this; }
         else { Destroy(this.gameObject); }
+        mainCamPixelPerfect = mainCam.GetComponent<PixelPerfectCamera>();
     }
 
     private void Update()
     {
-        mainCam = Camera.main;
-        if (mainCam.TryGetComponent<PixelPerfectCamera>(out PixelPerfectCamera cam))
+        if (mainCamPixelPerfect.enabled != desiredPixelPerfectCamState)
         {
-            if (cam.enabled != desiredPixelPerfectCamState)
+            if (mainCam.orthographicSize <= desiredOrthographicSizeThreshold.x || mainCam.orthographicSize >= desiredOrthographicSizeThreshold.y)
             {
-                if (mainCam.orthographicSize <= desiredOrthographicSizeThreshold.x || mainCam.orthographicSize >= desiredOrthographicSizeThreshold.y)
-                {
-                    mainCam.GetComponent<PixelPerfectCamera>().enabled = desiredPixelPerfectCamState;
-                }
+                mainCamPixelPerfect.enabled = desiredPixelPerfectCamState;
             }
-            //Debug.Log($"OrthoSize: {mainCam.orthographicSize}, PixelRatio: {mainCam.GetComponent<PixelPerfectCamera>().pixelRatio}");
         }
+        //Debug.Log($"OrthoSize: {mainCam.orthographicSize}, PixelRatio: {mainCam.GetComponent<PixelPerfectCamera>().pixelRatio}");
     }
 
     private List<float> PixelCameraOrthoSizes()
@@ -79,7 +76,7 @@ public class CameraManager : MonoBehaviour
 
         for (int n = 1; n <= steps; n++)
         {
-            float orthoSize = (float)screenHeight / (2f * mainCam.GetComponent<PixelPerfectCamera>().assetsPPU * n);
+            float orthoSize = (float)screenHeight / (2f * mainCamPixelPerfect.assetsPPU * n);
             pixelCameraOrthographicSizes.Add(orthoSize);
         }
 
@@ -116,7 +113,7 @@ public class CameraManager : MonoBehaviour
 
     public void SwitchToNormalCam()
     {
-        mainCam.GetComponent<PixelPerfectCamera>().enabled = true;
+        mainCamPixelPerfect.enabled = true;
         if (playerNormalCam == null)
         {
             GameObject cam = GameObject.Find("CM_normalCam");

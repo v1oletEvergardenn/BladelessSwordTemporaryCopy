@@ -8,6 +8,7 @@ public class SceneLoader : MonoBehaviour
     public void LoadSceneWithString(string scene)
     {
         SceneManager.LoadScene(scene);
+        VFXManager.instance.StopRumble();
     }
 
     public void ReloadScene()

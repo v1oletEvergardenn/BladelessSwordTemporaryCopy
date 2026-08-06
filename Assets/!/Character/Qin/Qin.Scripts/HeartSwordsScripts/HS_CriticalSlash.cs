@@ -30,6 +30,7 @@ public class HS_CriticalSlash : IHeartSwordAbility
 
         inputPlayer.DisableAllActions();
 
+        QuestManager.OnAction(GameManager.instance.playerQuestActionKey.HS_CriticalSlash_released);
         ActionLock.Add("HS_CriticalSlash", Lock.All);
         controller.canSwitchNormalAnim = false;
         hsHitEffectPlayed = false;
@@ -117,6 +118,11 @@ public class HS_CriticalSlash : IHeartSwordAbility
         hitBox.enabled = false;
         hsHitEffectPlayed = false;
         ActionLock.Remove("HS_CriticalSlash");
+    }
+
+    public override void HitTarget()
+    {
+        QuestManager.OnAction(GameManager.instance.playerQuestActionKey.HS_CriticalSlash_hit);
     }
 
     #endregion Utility Methods

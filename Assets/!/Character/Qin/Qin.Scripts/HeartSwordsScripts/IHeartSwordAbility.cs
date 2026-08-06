@@ -20,8 +20,6 @@ public abstract class IHeartSwordAbility : MonoBehaviour
     public SO_HeartSwordAttribute commonAttribute;
     public SO_HeartSwordAttribute branch1Attribute;
     public SO_HeartSwordAttribute branch2Attribute;
-    [HideInInspector] public ObjectiveType type = ObjectiveType.HeartSword;
-    [ObjectiveIDDropdown] public string questActionID;
 
     protected bool unlocked = false;
     public bool isActive = false;
@@ -372,7 +370,10 @@ public abstract class IHeartSwordAbility : MonoBehaviour
 
         // Apply damage
         damagable.Damage(attackEffect.damage, this.transform, 0, bossBreakValue: attackEffect.breakAmount);
+        HitTarget();
     }
+
+    public abstract void HitTarget();
 
     /// <summary>
     /// Performs a counter-attack on the specified projectile.
@@ -383,6 +384,7 @@ public abstract class IHeartSwordAbility : MonoBehaviour
         energy.ChangeEnergy(-energy.attack_energy_consumption);
         projectile.HitByHSAttack();
         SoundManager.PlaySound("perfect_attack");
+        HitTarget();
     }
 
     #endregion Combat & Counter Logic

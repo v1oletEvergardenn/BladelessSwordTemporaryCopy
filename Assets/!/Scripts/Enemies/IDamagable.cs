@@ -8,6 +8,7 @@ public abstract class IDamagable : MonoBehaviour
 {
     [SerializeField] public Vector3 getHitPosition;
     [SerializeField] public Color color = Color.red;
+    [SerializeField] public IDamagbleActionKey questKey_Idmg;
     public bool canBeHitWithoutHSAttack = false;
     public bool resetAttackCDOnHit = false;
     public bool consumeEnergyOnHit = true;
@@ -15,6 +16,7 @@ public abstract class IDamagable : MonoBehaviour
 
     public virtual int Damage(float damageAmount, Transform sender = null, float stunDuration = 0f, bool damageFlash = true, float bossBreakValue = 0)
     {
+        Death();
         return 0;
     }
 
@@ -37,6 +39,14 @@ public abstract class IDamagable : MonoBehaviour
         transform.DOMove(targetPosition, GetRepelTime(targetPosition))
             .SetEase(Ease.OutSine)
             .SetTimeDt(this, TimeChannel.Gameplay);
+    }
+
+    public virtual void Death()
+    {
+        if (questKey_Idmg != null)
+        {
+            questKey_Idmg.OnAction(questKey_Idmg.dead);
+        }
     }
 
     public void RepelWithoutDirection(float distance)

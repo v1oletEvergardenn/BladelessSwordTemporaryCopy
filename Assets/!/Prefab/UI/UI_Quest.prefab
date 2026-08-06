@@ -118,7 +118,7 @@ MonoBehaviour:
 
     It can be restored by counterattacking.'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 866751ea293f96c46b2da3d9059c1ff8, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: cc5bfacc8b7ccd949b7c402f7978cf74, type: 2}
   m_sharedMaterial: {fileID: -10159114001071445, guid: 866751ea293f96c46b2da3d9059c1ff8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -182,7 +182,7 @@ MonoBehaviour:
   m_margin: {x: -42.042786, y: 0, z: -412.71985, w: 0.1730814}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &602128550819094986
@@ -213,3 +213,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   offset: 0
   maxHeight: 0
+  enforceChildrenTopAnchors: 0

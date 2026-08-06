@@ -291,7 +291,6 @@ public class InputPlayer : MonoBehaviour
             else if (rightJustPressed) { success = currentAbility.CheckPerformAbility(false); }
             if (success)
             {
-                QuestManager.OnAction(ObjectiveType.HeartSword, currentAbility.questActionID);
                 return;
             }
         }
@@ -445,7 +444,7 @@ public class InputPlayer : MonoBehaviour
 
         if (rightAttackDir != Vector2.zero)
         {
-            if (!playerAttack.isAimingRightStick) QuestManager.OnAction(ObjectiveType.PlayerInput, PlayerInputObjectiveIDs.aim);
+            if (!playerAttack.isAimingRightStick) QuestManager.OnAction(GameManager.instance.playerQuestActionKey.aim);
             pointerSpriteRenderer.sprite = rightPointer;
             playerAttack.isAimingRightStick = true;
             float angle = Vector2.SignedAngle(transform.up, rightAttackDir) + 90;

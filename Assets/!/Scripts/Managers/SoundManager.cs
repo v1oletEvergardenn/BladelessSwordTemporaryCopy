@@ -59,23 +59,63 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    public static void PlaySound(string tag, float volume = 1)
+    public static void PlaySound(string tag, float volume = 1, bool random = false)
     {
-        if (!instance.soundDcitionary.ContainsKey(tag))
+        if (instance == null || instance.soundDcitionary == null)
         {
-            Debug.LogWarning("Sound tag not found: " + tag);
+            Debug.LogWarning("SoundManager is not initialized.");
             return;
         }
+
+        AudioClip clipToPlay = null;
+
+        if (random)
+        {
+            clipToPlay = instance.GetRandomClipByPrefix(tag);
+            if (clipToPlay == null)
+            {
+                Debug.LogWarning("No random sound found with tag prefix: " + tag);
+                return;
+            }
+        }
+        else
+        {
+            if (!instance.soundDcitionary.ContainsKey(tag))
+            {
+                Debug.LogWarning("Sound tag not found: " + tag);
+                return;
+            }
+
+            clipToPlay = instance.soundDcitionary[tag];
+        }
+
         var source = instance.GetNextSoundFXSource();
-        source.PlayOneShot(instance.soundDcitionary[tag], volume);
+        source.PlayOneShot(clipToPlay, volume);
     }
 
     public static void PlaySound(AudioClip clip, float volume = 1)
     {
-        print("canceled sound");
-        return;
         var source = instance.GetNextSoundFXSource();
         source.PlayOneShot(clip, volume);
+    }
+
+    private AudioClip GetRandomClipByPrefix(string tagPrefix)
+    {
+        List<AudioClip> matchingClips = new List<AudioClip>();
+
+        foreach (var pair in soundDcitionary)
+        {
+            if (pair.Key.StartsWith(tagPrefix))
+            {
+                matchingClips.Add(pair.Value);
+            }
+        }
+
+        if (matchingClips.Count == 0)
+            return null;
+
+        int randomIndex = Random.Range(0, matchingClips.Count);
+        return matchingClips[randomIndex];
     }
 
     private AudioSource GetNextSoundFXSource()

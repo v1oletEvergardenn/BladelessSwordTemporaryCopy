@@ -1,8 +1,7 @@
-using EditorAttributes;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Sirenix.OdinInspector;
 
 public class Quest : MonoBehaviour
 {
@@ -17,71 +16,56 @@ public class Quest : MonoBehaviour
         QuestManager.StartQuest(this);
     }
 
-    public void OnAction(ObjectiveType type, string actionID)
+    public void OnAction(string actionID)
     {
-        QuestManager.OnAction(type, actionID);
-    }
-}
-
-[System.Serializable]
-public struct QuestObjID
-{
-    public ObjectiveType type;
-    [SerializeField] public bool useDropDown;
-
-    [SerializeField, ShowField(nameof(useDropDown))]
-    [ObjectiveIDDropdown]
-    public string dropDownObjectiveID;
-
-    [SerializeField, HideField(nameof(useDropDown))]
-    public string customObjectiveID;
-
-    public string GetObjectiveID()
-    {
-        return useDropDown ? dropDownObjectiveID : customObjectiveID;
+        QuestManager.OnAction(actionID);
     }
 }
 
 [System.Serializable]
 public class QuestObjectives
 {
-    [TextArea(2, 5)]
+    [GUIColor(nameof(GetObjectiveDescriptionColor))]
     public string objectiveDescription;
 
-    [Space(20)]
-    public ObjectiveType type;
+    public QuestActionKey objectiveKey;
 
-    [SerializeField] public bool useDropDown;
-
-    [SerializeField, ShowField(nameof(useDropDown))]
-    [OnValueChanged(nameof(SetObjectiveID))]
-    [ObjectiveIDDropdown]
-    public string dropDownObjectiveID;
-
-    [SerializeField, HideField(nameof(useDropDown))]
-    [OnValueChanged(nameof(SetObjectiveID))]
-    public string customObjectiveID;
+    [SerializeField, ObjectiveKeyActionDropdown(nameof(objectiveKey))]
+    public string objectiveAction;
 
     [HideInInspector] public string objectiveID;
 
-    [Space(20)]
     public int requiredAmount;
 
     [HideInInspector] public int currentAmount;
     public bool fromZero = true;
-    public int layer = 0; // The step/layer this objective belongs to
+    public int layer = 0;
 
-    [Space(20)]
+    public UnityEvent onObjectiveBegin;
     public UnityEvent onObjectiveComplete;
 
+    [HideInInspector] public bool hasBegun;
     [HideInInspector] public bool isCompleted => currentAmount >= requiredAmount;
+
+    private Color GetObjectiveDescriptionColor()
+    {
+        return (layer & 1) == 0
+            ? new Color(0.58f, 0.70f, 1.00f, 1.00f)
+            : new Color(1.00f, 0.68f, 0.58f, 1.00f);
+    }
 
     public void SetObjectiveID()
     {
-        if (useDropDown)
-            objectiveID = dropDownObjectiveID;
-        else
-            objectiveID = customObjectiveID;
+        if (objectiveKey == null || string.IsNullOrEmpty(objectiveAction))
+        {
+            objectiveID = string.Empty;
+            return;
+        }
+
+        // If already composed (AssetName.action), keep as-is
+        objectiveID = objectiveAction.Contains(".")
+            ? objectiveAction
+            : objectiveKey.ActionID(objectiveAction);
     }
 }
 
@@ -95,19 +79,19 @@ public class QuestProgress
     {
         this.quest = quest;
         objectives = new List<QuestObjectives>();
+
         foreach (var obj in quest.objectives)
         {
             var newObjective = new QuestObjectives
             {
-                dropDownObjectiveID = obj.dropDownObjectiveID,
-                customObjectiveID = obj.customObjectiveID,
-                useDropDown = obj.useDropDown,
                 objectiveDescription = obj.objectiveDescription,
-                type = obj.type,
+                objectiveKey = obj.objectiveKey,
+                objectiveAction = obj.objectiveAction,
                 requiredAmount = obj.requiredAmount,
                 currentAmount = 0,
                 fromZero = obj.fromZero,
-                layer = obj.layer
+                layer = obj.layer,
+                hasBegun = false
             };
 
             objectives.Add(newObjective);
@@ -115,7 +99,6 @@ public class QuestProgress
         }
     }
 
-    // Returns the current active layer (lowest incomplete layer)
     public int CurrentLayer
     {
         get
@@ -130,7 +113,6 @@ public class QuestProgress
         }
     }
 
-    // Only objectives in the current layer are active
     public IEnumerable<QuestObjectives> ActiveObjectives
     {
         get
