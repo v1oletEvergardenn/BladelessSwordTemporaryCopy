@@ -85,7 +85,6 @@ public class Health : IDamagable
     /// 1: target is defending</returns>
     public override int Damage(float damageAmount, Transform sender, float stun_duration = 0f, bool damageFlash = true, float stunValue = 0)
     {
-        print(stun_duration);
         if (isDead) return -1;
         if (playerAttack.isDefending)
         {

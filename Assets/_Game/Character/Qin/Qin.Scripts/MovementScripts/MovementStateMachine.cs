@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 
 /// <summary>
 /// Lightweight state machine for player movement.
@@ -55,11 +56,6 @@ public sealed class MovementStateMachine
     /// Tick current state from FixedUpdate.
     /// </summary>
     public void FixedTick() => Current?.FixedTick();
-
-    /// <summary>
-    /// Forward movement input.
-    /// </summary>
-    public void Move(float input) => Current?.Move(input);
 
     /// <summary>
     /// Forward movement input with speed override.

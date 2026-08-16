@@ -215,11 +215,22 @@ public class PlayerAttack : MonoBehaviour
     private string GetAttackAnimName()
     {
         string indexStr = attackIndex.ToString();
-        if (controller.isJumping)
+        if (controller.movementState == PlayerMovementStateType.WindWalking)
+        {
+            if (controller.FacingRight == isAttackingLeft)
+            {
+                return $"walk_attack_back";
+            }
+            else
+            {
+                return $"body_walk_wind_attack_{indexStr}";
+            }
+        }
+        else if (controller.isJumping)
             return $"attack_jump_{indexStr}";
-        if (controller.isFalling)
+        else if (controller.isFalling)
             return $"attack_fall_{indexStr}";
-        if (controller.isRunning)
+        else if (controller.isRunning)
         {
             if (controller.FacingRight == isAttackingLeft)
             {

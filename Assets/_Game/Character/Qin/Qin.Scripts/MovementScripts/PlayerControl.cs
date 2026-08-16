@@ -50,7 +50,7 @@ public partial class PlayerControl : MonoBehaviour
     [SerializeField] private Transform pointer;
     [SerializeField] private CameraFollow camFollow;
 
-    [SerializeField] private PlayerMovementStateType movementState = PlayerMovementStateType.Normal;
+    [SerializeField] public PlayerMovementStateType movementState = PlayerMovementStateType.Normal;
     private MovementStateMachine movementStateMachine;
 
     #endregion Singleton & References

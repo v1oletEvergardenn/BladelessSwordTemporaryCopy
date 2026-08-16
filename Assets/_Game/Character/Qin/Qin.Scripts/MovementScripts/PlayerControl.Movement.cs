@@ -237,6 +237,13 @@ public partial class PlayerControl
         return Quaternion.Euler(0, 0, angle);
     }
 
+    public void SetWindWalkingState()
+    {
+        if (movementStateMachine == null)
+            return;
+        SetMovementState(PlayerMovementStateType.WindWalking);
+    }
+
     #endregion Utility
 
     #region Timing Helpers

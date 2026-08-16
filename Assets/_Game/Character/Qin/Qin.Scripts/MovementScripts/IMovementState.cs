@@ -29,11 +29,6 @@ public interface IMovementState
     void FixedTick();
 
     /// <summary>
-    /// Handle movement with default state speed.
-    /// </summary>
-    void Move(float input);
-
-    /// <summary>
     /// Handle movement with speed override.
     /// </summary>
     void Move(float input, float speed);

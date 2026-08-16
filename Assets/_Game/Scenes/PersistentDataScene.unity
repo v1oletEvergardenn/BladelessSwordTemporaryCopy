@@ -205,13 +205,9 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2754981768461782020, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
-      propertyPath: leg
-      value: 
-      objectReference: {fileID: 907462744}
-    - target: {fileID: 2754981768461782020, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
-      propertyPath: body
-      value: 
-      objectReference: {fileID: 907462744}
+      propertyPath: movementState
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2959508685687309300, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -261,11 +257,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
---- !u!4 &907462744 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8697933507540174883, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
-  m_PrefabInstance: {fileID: 820373468}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

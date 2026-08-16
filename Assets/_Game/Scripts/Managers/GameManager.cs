@@ -41,7 +41,6 @@ public class GameManager : MonoBehaviour
     {
         if (instance == null) { instance = this; }
         else { if (NOTSTARTATMAINMENU) Destroy(this.gameObject); }
-        CheckIfStartFromMainMenu();
     }
 
     /// <summary>
@@ -76,6 +75,7 @@ public class GameManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         InputSystem.DisableDevice(Mouse.current);
+        CheckIfStartFromMainMenu();
     }
 
     public bool LoadPlayer()

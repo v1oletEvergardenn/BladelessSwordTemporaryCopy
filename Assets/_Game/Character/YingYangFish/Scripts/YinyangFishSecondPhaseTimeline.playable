@@ -90,6 +90,22 @@ MonoBehaviour:
   barIndex: 8
   beatInBar: 0
   isBarStart: 0
+--- !u!114 &-9011690871285848567
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
+  m_Name: Signal Emitter
+  m_EditorClassIdentifier: 
+  m_Time: 6.5
+  m_Retroactive: 0
+  m_EmitOnce: 0
+  m_Asset: {fileID: 11400000, guid: b452cbd70e6a1b14fb734e411e09b34b, type: 2}
 --- !u!114 &-8896829062154299908
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -7286,7 +7302,8 @@ MonoBehaviour:
     m_PreExtrapolationTime: 0
     m_DisplayName: PlayerActionClip
   m_Markers:
-    m_Objects: []
+    m_Objects:
+    - {fileID: -9011690871285848567}
 --- !u!114 &-61237745190122681
 MonoBehaviour:
   m_ObjectHideFlags: 1

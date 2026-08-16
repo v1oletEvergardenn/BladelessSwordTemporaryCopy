@@ -17,13 +17,7 @@ public partial class PlayerControl
 
     public void Move(float move)
     {
-        if (movementStateMachine != null)
-        {
-            movementStateMachine.Move(move);
-            return;
-        }
-
-        MoveNormalState(move, GetSpeed());
+        Move(move, GetSpeed());
     }
 
     public void Move(float move, float speed)
@@ -94,7 +88,7 @@ public partial class PlayerControl
             movementState = newState;
             return;
         }
-
+        print(1);
         if (movementStateMachine.ChangeState(newState))
             movementState = newState;
     }
