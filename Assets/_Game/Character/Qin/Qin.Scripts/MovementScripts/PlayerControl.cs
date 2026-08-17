@@ -187,4 +187,29 @@ public partial class PlayerControl : MonoBehaviour
     }
 
     #endregion Unity Lifecycle
+
+    /// <summary>
+    /// Controls camera Y damping changes when the player starts/stops falling.
+    /// Prevents repeated damping lerps by checking camera manager flags.
+    /// </summary>
+    private void HandleCameraDamping()
+    {
+        if (!isGrounded &&
+            rb.velocity.y < _fallSpeedYDampingChangeThreshold &&
+            !CameraManager.instance.isLerpingYDaming &&
+            !CameraManager.instance.lerpedFromPlayerFalling)
+        {
+            CameraManager.instance.LerpYDamping(true);
+            CameraFollow.instance.ChangeOffset(CameraFollow.instance.fallingOffset);
+        }
+
+        if ((isGrounded || rb.velocity.y >= 0f) &&
+            !CameraManager.instance.isLerpingYDaming &&
+            CameraManager.instance.lerpedFromPlayerFalling)
+        {
+            CameraManager.instance.lerpedFromPlayerFalling = false;
+            CameraManager.instance.LerpYDamping(false);
+            CameraFollow.instance.ChangeOffset(CameraFollow.instance.normalOffset);
+        }
+    }
 }

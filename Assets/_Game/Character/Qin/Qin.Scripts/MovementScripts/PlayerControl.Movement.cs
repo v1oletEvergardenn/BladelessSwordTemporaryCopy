@@ -32,22 +32,6 @@ public partial class PlayerControl
         Move(dir, GetSpeed());
     }
 
-    public float GetSpeed() => useRunningSpeed ? runSpeed : walkSpeed;
-
-    public float GetRunSpeed() => runSpeed;
-
-    public float GetWalkSpeed() => walkSpeed;
-
-    public void SetIsRunningToTarget(bool value)
-    {
-        isRunningToTarget = value;
-
-        if (value)
-            inputPlayer.movementInputUpdateLock.Add(MovementLockKeys.RunningToTarget);
-        else
-            inputPlayer.movementInputUpdateLock.Remove(MovementLockKeys.RunningToTarget);
-    }
-
     /// <summary>
     /// Performs grounded detection and landing transition.
     /// Resets jump-related locks/flags when contact is found.
@@ -214,6 +198,22 @@ public partial class PlayerControl
     #endregion Move To Position
 
     #region Utility
+
+    public float GetSpeed() => useRunningSpeed ? runSpeed : walkSpeed;
+
+    public float GetRunSpeed() => runSpeed;
+
+    public float GetWalkSpeed() => walkSpeed;
+
+    public void SetIsRunningToTarget(bool value)
+    {
+        isRunningToTarget = value;
+
+        if (value)
+            inputPlayer.movementInputUpdateLock.Add(MovementLockKeys.RunningToTarget);
+        else
+            inputPlayer.movementInputUpdateLock.Remove(MovementLockKeys.RunningToTarget);
+    }
 
     public void EnableGravity(bool enable)
     {
