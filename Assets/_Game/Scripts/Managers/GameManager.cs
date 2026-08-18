@@ -37,6 +37,9 @@ public class GameManager : MonoBehaviour
 
     public PlayerQuestActionKey playerQuestActionKey;
 
+    //Dialogue System
+    public bool isInDialogue = false;
+
     private void Awake()
     {
         if (instance == null) { instance = this; }
@@ -167,4 +170,22 @@ public class GameManager : MonoBehaviour
     {
         hsManager.SetCurrentHSPoint(hsManager.GetMaxHSpoint());
     }
+
+    #region Dialogue System
+
+    public void OnDialogueStart()
+    {
+        isInDialogue = true;
+        InputMaster.SwitchToUIAction();
+        CharacterUIManager.SetPlayerUI(false);
+    }
+
+    public void OnDialogueEnd()
+    {
+        isInDialogue = false;
+        InputMaster.SwitchToGameplayAction();
+        CharacterUIManager.SetPlayerUI(true);
+    }
+
+    #endregion Dialogue System
 }

@@ -10,6 +10,8 @@ public class CharacterUIManager : MonoBehaviour
     public Image TopBlackEdge;
     public Image BotBlackEdge;
 
+    public GameObject PlayerUI;
+
     private void Awake()
     {
         instance = this;
@@ -19,5 +21,10 @@ public class CharacterUIManager : MonoBehaviour
     {
         instance.TopBlackEdge.GetComponent<Animator>().SetBool("show", show);
         instance.BotBlackEdge.GetComponent<Animator>().SetBool("show", show);
+    }
+
+    public static void SetPlayerUI(bool show)
+    {
+        instance.PlayerUI.SetActive(show);
     }
 }
