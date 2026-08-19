@@ -10,7 +10,6 @@ using UnityEngine.SceneManagement;
 using System;
 using static UnityEngine.EventSystems.EventTrigger;
 using Void = EditorAttributes.Void;
-using Doublsb.Dialog;
 
 public class InputPlayer : MonoBehaviour
 {
@@ -177,17 +176,12 @@ public class InputPlayer : MonoBehaviour
 
     private bool HandleEventKeyInput()
     {
-        if (inputMaster._EventKeyAction.WasPressedThisFrame())
+        if (inputMaster._EventKeyAction.IsPressed())
         {
-            if (DialogManager.instance != null && DialogManager.instance.Printer.activeInHierarchy)
-            {
-                DialogManager.instance.Click_Window();
-                return true;
-            }
             if (currentEventObject != null)
             {
                 currentEventObject.Interact(true);
-                return true;
+                if (inputMaster._EventKeyAction.WasPressedThisFrame()) return true;
             }
         }
 

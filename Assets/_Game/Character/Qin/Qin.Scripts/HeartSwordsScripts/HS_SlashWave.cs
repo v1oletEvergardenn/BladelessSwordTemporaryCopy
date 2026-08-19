@@ -188,7 +188,6 @@ public class HS_SlashWave : IHeartSwordAbility
 
     public override void EndAction()
     {
-        if (controller != null) controller.canSwitchNormalAnim = true;
         isPerforming = false;
         hsHitEffectPlayed = false;
         attacked = false;

@@ -45,6 +45,11 @@ public abstract class EventObject : MonoBehaviour
         {
             holdingTimer += TimeScaleManager.UIDt;
             InteractedRing.fillAmount = holdingTimer / holdingTime;
+            if (holdingTimer >= holdingTime)
+            {
+                InteractEvent();
+                EndInteraction();
+            }
         }
     }
 

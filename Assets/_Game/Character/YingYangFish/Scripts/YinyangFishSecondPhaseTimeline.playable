@@ -473,7 +473,7 @@ MonoBehaviour:
   m_Muted: 0
   m_CustomPlayableFullTypename: 
   m_Curves: {fileID: 0}
-  m_Parent: {fileID: 11400000}
+  m_Parent: {fileID: 1866031852653764813}
   m_Children: []
   m_Clips:
   - m_Version: 1
@@ -2512,7 +2512,7 @@ MonoBehaviour:
   m_Muted: 0
   m_CustomPlayableFullTypename: 
   m_Curves: {fileID: 0}
-  m_Parent: {fileID: 11400000}
+  m_Parent: {fileID: 1866031852653764813}
   m_Children: []
   m_Clips:
   - m_Version: 1
@@ -2970,7 +2970,7 @@ MonoBehaviour:
   m_Muted: 0
   m_CustomPlayableFullTypename: 
   m_Curves: {fileID: 0}
-  m_Parent: {fileID: 11400000}
+  m_Parent: {fileID: 1866031852653764813}
   m_Children: []
   m_Clips:
   - m_Version: 1
@@ -7229,7 +7229,7 @@ MonoBehaviour:
   m_Muted: 0
   m_CustomPlayableFullTypename: 
   m_Curves: {fileID: 0}
-  m_Parent: {fileID: 11400000}
+  m_Parent: {fileID: 1866031852653764813}
   m_Children: []
   m_Clips:
   - m_Version: 1
@@ -7435,10 +7435,8 @@ MonoBehaviour:
   m_Version: 0
   m_Tracks:
   - {fileID: 2680011248431719272}
-  - {fileID: -8164579748204366211}
-  - {fileID: -67647145516551251}
-  - {fileID: -5043321194288386920}
-  - {fileID: -4305020745561313927}
+  - {fileID: 1866031852653764813}
+  - {fileID: 7236369867379053034}
   m_FixedDuration: 88.67999999999999
   m_EditorSettings:
     m_Framerate: 60
@@ -8151,6 +8149,33 @@ MonoBehaviour:
   barIndex: 11
   beatInBar: 6
   isBarStart: 0
+--- !u!114 &1866031852653764813
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0fc6f5187a81dc47999eefade6f0935, type: 3}
+  m_Name: Player
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children:
+  - {fileID: -8164579748204366211}
+  - {fileID: -67647145516551251}
+  - {fileID: -5043321194288386920}
+  - {fileID: -4305020745561313927}
+  m_Clips: []
+  m_Markers:
+    m_Objects: []
 --- !u!114 &1873579598372397499
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -11780,6 +11805,29 @@ MonoBehaviour:
   barIndex: 11
   beatInBar: 5
   isBarStart: 0
+--- !u!114 &7236369867379053034
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0fc6f5187a81dc47999eefade6f0935, type: 3}
+  m_Name: Conversation
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips: []
+  m_Markers:
+    m_Objects: []
 --- !u!114 &7258441759943829882
 MonoBehaviour:
   m_ObjectHideFlags: 1

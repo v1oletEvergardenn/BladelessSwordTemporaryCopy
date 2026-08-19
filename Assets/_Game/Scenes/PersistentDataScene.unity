@@ -260,11 +260,6 @@ PrefabInstance:
       addedObject: {fileID: 680803644}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5169ba3ac14536b41972324dc231d013, type: 3}
---- !u!1 &610762493 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5769736533489229269, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
-  m_PrefabInstance: {fileID: 820373468}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &680803643
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -322,6 +317,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: b28abbc45fb6bcd46a6dfed49c568566, type: 2}
     - target: {fileID: 8709836130286232083, guid: ed07fd1ccba47dd45b2544ed1e86be49, type: 3}
+      propertyPath: displaySettings.cameraSettings.cameraEasing
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8709836130286232083, guid: ed07fd1ccba47dd45b2544ed1e86be49, type: 3}
       propertyPath: displaySettings.subtitleSettings.continueButton
       value: 1
       objectReference: {fileID: 0}
@@ -332,6 +331,10 @@ PrefabInstance:
     - target: {fileID: 8709836130286232083, guid: ed07fd1ccba47dd45b2544ed1e86be49, type: 3}
       propertyPath: displaySettings.subtitleSettings.showPCSubtitlesDuringLine
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8709836130286233699, guid: ed07fd1ccba47dd45b2544ed1e86be49, type: 3}
+      propertyPath: inputDevice
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8709836130286233699, guid: ed07fd1ccba47dd45b2544ed1e86be49, type: 3}
       propertyPath: alwaysAutoFocus
@@ -491,17 +494,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 287322211983118090, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
-      propertyPath: PlayerUI
-      value: 
-      objectReference: {fileID: 610762493}
-    - target: {fileID: 2378711396498855369, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
-      propertyPath: m_BlockingMask.m_Bits
-      value: 266338295
-      objectReference: {fileID: 0}
     - target: {fileID: 2754981768461782020, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
       propertyPath: movementState
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2959508685687309300, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -549,17 +544,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 2959508685687309300, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1589925333}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
---- !u!4 &865209108 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2959508685687309300, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
-  m_PrefabInstance: {fileID: 820373468}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &977797267 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 584282488413863748, guid: 5169ba3ac14536b41972324dc231d013, type: 3}
@@ -576,93 +563,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1489f7a5fe2f61940af94a6c14b88e6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1589925332
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1589925333}
-  - component: {fileID: 1589925335}
-  - component: {fileID: 1589925334}
-  m_Layer: 0
-  m_Name: DialogueActor
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1589925333
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1589925332}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 865209108}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1589925334
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1589925332}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee71021279e3ed7479c5d677748f4e23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 1831646174}
-  offset: {x: 0, y: 0, z: 0}
---- !u!114 &1589925335
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1589925332}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a64578247383140469c45370654a984a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  actor: Player
-  persistentDataName: Player__6532776
-  portrait: {fileID: 0}
-  spritePortrait: {fileID: 0}
-  cameraAngles: {fileID: 0}
-  audioSource: {fileID: 0}
-  barkUISettings:
-    barkUI: {fileID: 0}
-    barkUIOffset: {x: 0, y: 2, z: 0}
-  standardDialogueUISettings:
-    subtitlePanelNumber: 2
-    customSubtitlePanel: {fileID: 6632446995177476298, guid: 9dd594283ef86c048a336d027a3b0741, type: 3}
-    customSubtitlePanelOffset: {x: 0, y: 2.3, z: 0}
-    menuPanelNumber: 1
-    customMenuPanel: {fileID: 0}
-    customMenuPanelOffset: {x: 0, y: 0, z: 0}
-    useMenuPanelFor: 0
-    portraitAnimatorController: {fileID: 0}
-    setSubtitleColor: 0
-    applyColorToPrependedName: 0
-    prependActorNameSeparator: ': '
-    prependActorNameFormat: '{0}{1}'
-    subtitleColor: {r: 1, g: 1, b: 1, a: 1}
---- !u!4 &1831646174 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1977391573695511326, guid: 27e45f6871364d842a2a1fc818c7613c, type: 3}
-  m_PrefabInstance: {fileID: 820373468}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

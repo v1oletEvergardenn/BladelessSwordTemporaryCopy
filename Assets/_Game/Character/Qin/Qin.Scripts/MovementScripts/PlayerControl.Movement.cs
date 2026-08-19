@@ -51,10 +51,9 @@ public partial class PlayerControl
         isGrounded = true;
         ActionLock.Remove(MovementLockKeys.DoubleJumping);
         floatTriggered = false;
-        var state = anim.GetCurrentAnimatorStateInfo(0);
 
         if (!wasGrounded)
-            HandleLandingAnimation(state);
+            HandleLandingAnimation();
     }
 
     #endregion Basic Movement

@@ -48,7 +48,7 @@ public partial class PlayerControl
 
                 var state = anim.GetCurrentAnimatorStateInfo(0);
                 float duration = state.normalizedTime;
-                if (IsAttackRunState(state) && playerAttack.isAttackingLeft == (move > 0f))
+                if (IsAttackRunState() && playerAttack.isAttackingLeft == (move > 0f))
                 {
                     if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
                         anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));

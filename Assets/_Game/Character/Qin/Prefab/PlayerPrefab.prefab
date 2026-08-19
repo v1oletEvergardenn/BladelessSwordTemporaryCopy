@@ -872,7 +872,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 266338295
 --- !u!114 &287322211983118090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -887,6 +887,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TopBlackEdge: {fileID: 4758266897395386118}
   BotBlackEdge: {fileID: 5334423013883774219}
+  PlayerUI: {fileID: 5769736533489229269}
 --- !u!1 &681913030285178758
 GameObject:
   m_ObjectHideFlags: 0
@@ -1951,7 +1952,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   pointer: {fileID: 6550604400399710803}
   camFollow: {fileID: 8182197119023295165}
-  movementState: 1
+  movementState: 0
   m_WhatIsGround:
     serializedVersion: 2
     m_Bits: 330880
@@ -3160,6 +3161,7 @@ Transform:
   - {fileID: 6550604400399710803}
   - {fileID: 5218209458245704288}
   - {fileID: 598099966776000366}
+  - {fileID: 3689235612843177472}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4758134271141812437
@@ -5484,6 +5486,105 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 8.475348, y: 5.001947}
   m_EdgeRadius: 0
+--- !u!1 &7615831350423008958
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3689235612843177472}
+  - component: {fileID: 4292343869940769544}
+  - component: {fileID: 2365318610708869714}
+  - component: {fileID: 2561731549588149087}
+  m_Layer: 0
+  m_Name: DialogueActor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3689235612843177472
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7615831350423008958}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2959508685687309300}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4292343869940769544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7615831350423008958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a64578247383140469c45370654a984a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actor: Player
+  persistentDataName: Player__6532776
+  portrait: {fileID: 0}
+  spritePortrait: {fileID: 0}
+  cameraAngles: {fileID: 0}
+  audioSource: {fileID: 0}
+  barkUISettings:
+    barkUI: {fileID: 0}
+    barkUIOffset: {x: 0, y: 2, z: 0}
+  standardDialogueUISettings:
+    subtitlePanelNumber: 2
+    customSubtitlePanel: {fileID: 8548024140249292864, guid: 9dd594283ef86c048a336d027a3b0741, type: 3}
+    customSubtitlePanelOffset: {x: 0, y: 2.3, z: 0}
+    menuPanelNumber: 1
+    customMenuPanel: {fileID: 0}
+    customMenuPanelOffset: {x: 0, y: 0, z: 0}
+    useMenuPanelFor: 0
+    portraitAnimatorController: {fileID: 0}
+    setSubtitleColor: 0
+    applyColorToPrependedName: 0
+    prependActorNameSeparator: ': '
+    prependActorNameFormat: '{0}{1}'
+    subtitleColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &2365318610708869714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7615831350423008958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee71021279e3ed7479c5d677748f4e23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 1977391573695511326}
+  offset: {x: 0, y: 0, z: 0}
+--- !u!114 &2561731549588149087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7615831350423008958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24295f20136b614488596547c8bbad25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  primaryClip: {fileID: 8300000, guid: 1ad78fd6586d8ba4c8a0e9cfe64d6d14, type: 3}
+  alternateClips:
+  - {fileID: 8300000, guid: 6c00ed03bb7f13f449f09bef270268c4, type: 3}
+  - {fileID: 8300000, guid: 5aa948679296f2649802b2f562804537, type: 3}
 --- !u!1 &7692349019359649549
 GameObject:
   m_ObjectHideFlags: 0

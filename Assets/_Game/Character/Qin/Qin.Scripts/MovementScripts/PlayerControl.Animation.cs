@@ -2,61 +2,22 @@ using UnityEngine;
 
 public partial class PlayerControl
 {
-    #region Animation Helpers
+    [HideInInspector] public float BackAttackBlendThreshold = 35f / 71f;
+    [HideInInspector] public float BackAttackDurationScale = 71f / 35f;
 
-    private void UpdateLegAnimator()
-    {
-        var s = anim.GetCurrentAnimatorStateInfo(0);
-        if (s.IsName("run") ||
-            s.IsName("run_combat") ||
-            s.IsName("attack_run_1") ||
-            s.IsName("attack_run_2") ||
-            s.IsName("drawback_run") ||
-            s.IsName("storm_pre_run") ||
-            s.IsName("storm_ready_run") ||
-            s.IsName("HS_attack_run_1") ||
-            s.IsName("HS_attack_run_2"))
-        {
-            legAnim.SetBool("isRunning", isRunning);
-        }
-        else
-        {
-            legAnim.SetBool("isRunning", false);
-        }
-    }
+    #region Link To MovementState
 
-    /// <summary>
-    /// Switches player to falling variants based on the current combat animation context.
-    /// Preserves normalized time to keep transitions visually continuous.
-    /// </summary>
     private void HandleFallingAnimation()
     {
         if (rb.velocity.y < -1 && !isGrounded && !isFalling)
         {
             if (!playerAttack.isDefending)
             {
-                var state = anim.GetCurrentAnimatorStateInfo(0);
-                float duration = state.normalizedTime;
-                if (IsAttackRunState(state) || IsAttackJumpState(state) || IsAttackIdleState(state))
-                    anim.Play("attack_fall_" + playerAttack.attackIndex, 0, duration);
-                else if (IsHSAttackRunState(state) || IsHSAttackJumpState(state) || IsHSAttackIdleState(state))
-                    anim.Play("HS_attack_fall_" + playerAttack.attackIndex, 0, duration);
-                else if (state.IsName("attack_idle_after") || state.IsName("attack_jump_after"))
-                    anim.Play("attack_fall_after", 0, duration);
-                else if (IsStormReadyState(state))
-                    anim.Play("storm_ready_fall", 0, duration);
-                else if (IsStormPreState(state))
-                    anim.Play("storm_pre_fall", 0, duration);
-                else if (state.IsName("tele_pre_jump"))
-                    anim.Play("tele_pre_fall", 0, duration);
-                else
-                {
-                    if (playerAttack.isPreparingStorm)
-                        anim.Play("storm_ready_fall");
-                    else if (canSwitchNormalAnim)
-                        PlayAnimClipInCombat("pre_fall", "pre_fall_combat");
-                }
+                HandleMovementStateOrNormal(
+               movementStateMachine != null ? movementStateMachine.HandleFallingAnimation : null,
+               HandleFallingAnimationNormalState);
             }
+
             isFalling = true;
             isJumping = false;
         }
@@ -66,209 +27,389 @@ public partial class PlayerControl
         }
     }
 
+    public void HandleGroundedAnimation()
+    {
+        HandleMovementStateOrNormal(
+            movementStateMachine != null ? movementStateMachine.HandleGroundedAnimation : null,
+            HandleGroundedAnimationNormalState);
+    }
+
+    public void HandleLandingAnimation()
+    {
+        HandleMovementStateOrNormal(
+            movementStateMachine != null ? movementStateMachine.HandleLandingAnimation : null,
+            HandleLandingAnimationNormalState);
+    }
+
+    public void HandleJumpAnimation()
+    {
+        HandleMovementStateOrNormal(
+            movementStateMachine != null ? movementStateMachine.HandleJumpAnimation : null,
+            HandleJumpAnimationNormalState);
+    }
+
+    private void HandleMovementStateOrNormal(System.Action movementStateHandler, System.Action normalHandler)
+    {
+        if (movementStateHandler != null)
+        {
+            movementStateHandler();
+            return;
+        }
+
+        normalHandler();
+    }
+
+    #endregion Link To MovementState
+
+    #region Fall Anim
+
+    public void HandleFallingAnimationNormalState()
+    {
+        //isAttacking
+        if (IsAttackRunState() || IsAttackJumpState() || IsAttackIdleState())
+        {
+            PlayAnim(AttackClip("fall"));
+            return;
+        }
+
+        //isHSAttacking
+        if (IsHSAttackRunState() || IsHSAttackJumpState() || IsHSAttackIdleState())
+        {
+            PlayAnim(HSAttackClip("fall"));
+            return;
+        }
+
+        //is attack after
+        if (CheckName("attack_idle_after") || CheckName("attack_jump_after"))
+        {
+            PlayAnim("attack_fall_after");
+            return;
+        }
+
+        //teleport in air
+        if (CheckName("tele_pre_jump"))
+        {
+            PlayAnim("tele_pre_fall");
+            return;
+        }
+
+        //storm state
+        if (IsStormReadyState())
+        {
+            PlayAnim("storm_ready_fall");
+            return;
+        }
+        else if (IsStormPreState())
+        {
+            PlayAnim("storm_pre_fall");
+            return;
+        }
+        else
+        {
+            if (playerAttack.isPreparingStorm)
+            {
+                PlayAnim("storm_ready_fall");
+            }
+            else if (canSwitchNormalAnim)
+                PlayAnimClipInCombat("pre_fall", "pre_fall_combat");
+        }
+    }
+
+    #endregion Fall Anim
+
+    #region Ground Anim
+
     /// <summary>
     /// Chooses run/idle animation transitions when grounded.
     /// Includes attack-chain, heavy-attack, drawback, and storm variants.
     /// </summary>
-    public void HandleGroundedAnimationTransitions(AnimatorStateInfo state, bool isRunning)
+    public void HandleGroundedAnimationNormalState()
     {
-        float duration = state.normalizedTime;
-        if (isRunning)
+        if (!isRunning)
         {
-            if (IsAttackRunState(state) && playerAttack.isAttackingLeft == FacingRight)
+            //attack Run
+            if (IsAttackRunState())
             {
-                if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
-                    anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
-                else if (playerAttack.attackIndex == 2)
-                    anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration);
-                else
-                    anim.Play(anim.GetBool("storm") ? "storm_pre_run" : "run_combat");
+                PlayAnim(AttackClip("idle"));
+                return;
             }
-            else if (IsHSAttackRunState(state) && playerAttack.isAttackingLeft == FacingRight)
+            //HS attack Run
+            if (IsHSAttackRunState())
             {
-                if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
-                    anim.Play("HS_attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
-                else if (playerAttack.attackIndex == 2)
-                    anim.Play("HS_attack_back_" + playerAttack.attackIndex, 0, duration);
-                else
-                    anim.Play(anim.GetBool("storm") ? "storm_pre_run" : "run_combat");
+                PlayAnim(HSAttackClip("idle"));
+                return;
             }
-            else if (state.IsName("attack_idle_" + playerAttack.attackIndex))
-                anim.Play("attack_run_" + playerAttack.attackIndex, 0, duration);
-            else if (state.IsName("HS_attack_idle_" + playerAttack.attackIndex))
-                anim.Play("HS_attack_run_" + playerAttack.attackIndex, 0, duration);
-            else if (state.IsName("drawback_idle"))
-                anim.Play("drawback_run", 0, duration);
-            else if (IsStormReadyState(state) && !state.IsName("storm_ready_run"))
-                anim.Play("storm_ready_run", 0, duration);
-            else if (IsStormPreState(state) && !state.IsName("storm_pre_run"))
-                anim.Play("storm_pre_run", 0, duration);
+            //drawback run
+            if (CheckName("drawback_run"))
+            {
+                PlayAnim("drawback_idle");
+                return;
+            }
+
+            if (CheckName("attack_jump_after") || CheckName("attack_fall_after"))
+            {
+                PlayAnim("attack_idle_after");
+                return;
+            }
+
+            if (IsStormReadyState() && !CheckName("storm_ready_idle"))
+            {
+                PlayAnim("storm_ready_idle");
+                return;
+            }
+
+            if (IsStormPreState() && !CheckName("storm_pre_idle"))
+            {
+                PlayAnim("storm_pre_idle");
+                return;
+            }
         }
+        //running state
         else
         {
-            if (IsAttackRunState(state))
-                anim.Play("attack_idle_" + playerAttack.attackIndex, 0, duration);
-            else if (IsHSAttackRunState(state))
-                anim.Play("HS_attack_idle_" + playerAttack.attackIndex, 0, duration);
-            else if (state.IsName("drawback_run"))
-                anim.Play("drawback_idle", 0, duration);
-            else if (state.IsName("attack_jump_after") || state.IsName("attack_fall_after"))
-                anim.Play("attack_idle_after", 0, duration);
-            else if (IsStormReadyState(state) && !state.IsName("storm_ready_idle"))
-                anim.Play("storm_ready_idle", 0, duration);
-            else if (IsStormPreState(state) && !state.IsName("storm_pre_idle"))
-                anim.Play("storm_pre_idle", 0, duration);
+            //back attack running
+            if (IsAttackRunState() && playerAttack.isAttackingLeft == FacingRight)
+            {
+                PlayBackAttack(false);
+                return;
+            }
+
+            //HS back attack running
+            if (IsHSAttackRunState() &&
+                playerAttack.isAttackingLeft == FacingRight)
+            {
+                PlayBackAttack(true);
+                return;
+            }
+
+            //attack idle
+            if (CheckName(AttackClip("idle")))
+            {
+                PlayAnim(AttackClip("run"));
+                return;
+            }
+
+            //HS attack idle
+            if (CheckName(HSAttackClip("idle")))
+            {
+                PlayAnim(HSAttackClip("run"));
+                return;
+            }
+
+            //drawback idle
+            if (CheckName("drawback_idle"))
+            {
+                PlayAnim("drawback_run");
+                return;
+            }
+
+            //storm
+            if (IsStormReadyState() && !CheckName("storm_ready_run"))
+            {
+                PlayAnim("storm_ready_run");
+                return;
+            }
+
+            if (IsStormPreState() && !CheckName("storm_pre_run"))
+            {
+                PlayAnim("storm_pre_run");
+                return;
+            }
         }
     }
+
+    #endregion Ground Anim
+
+    #region Landing Anim
 
     /// <summary>
     /// Resolves landing behavior and maps airborne attack variants back to grounded equivalents.
     /// </summary>
-    private void HandleLandingAnimation(AnimatorStateInfo state)
+    public void HandleLandingAnimationNormalState()
     {
+        var state = anim.GetCurrentAnimatorStateInfo(0);
+
         if (!isJumping && !playerAttack.isDefending)
         {
-            if (!state.IsName("slash") && !state.IsName("slash_end") && canSwitchNormalAnim)
-                PlayAnimClipInCombat("land", "land_combat");
+            if (canSwitchNormalAnim) PlayAnimClipInCombat("land", "land_combat");
+
             isFalling = false;
             isJumping = false;
         }
 
         CameraFollow.instance.ChangeOffset(CameraFollow.instance.normalOffset);
-
-        float duration = state.normalizedTime;
-        if (!isJumping && IsAttackJumpOrFallState(state))
+        if (!isJumping && IsAttackJumpOrFallState())
         {
             if (isRunning)
             {
                 if (playerAttack.isAttackingLeft == FacingRight)
-                {
-                    if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
-                        anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
-                    else if (playerAttack.attackIndex == 2)
-                        anim.Play("attack_back_" + playerAttack.attackIndex, 0, duration);
-                    else
-                        anim.Play(anim.GetBool("storm") ? "storm_pre_run" : "run_combat");
-                }
+                    PlayBackAttack(false);
                 else
-                    anim.Play("attack_run_" + playerAttack.attackIndex, 0, duration);
+                    PlayAnim(AttackClip("run"));
             }
             else
             {
-                anim.Play("attack_idle_" + playerAttack.attackIndex, 0, duration);
+                PlayAnim(AttackClip("idle"));
             }
         }
-        else if (!isJumping && IsHSAttackJumpOrFallState(state))
+        else if (!isJumping && IsHSAttackJumpOrFallState())
         {
             if (isRunning)
             {
                 if (playerAttack.isAttackingLeft == FacingRight)
                 {
-                    if (playerAttack.attackIndex == 1 && duration < (35f / 71f))
-                        anim.Play("HS_attack_back_" + playerAttack.attackIndex, 0, duration * (71f / 35f));
-                    else if (playerAttack.attackIndex == 2)
-                        anim.Play("HS_attack_back_" + playerAttack.attackIndex, 0, duration);
+                    PlayBackAttack(true);
                 }
                 else
                 {
-                    anim.Play("HS_attack_run_" + playerAttack.attackIndex, 0, duration);
+                    PlayAnim(HSAttackClip("run"));
                 }
             }
             else
             {
-                anim.Play("HS_attack_idle_" + playerAttack.attackIndex, 0, duration);
+                PlayAnim(HSAttackClip("idle"));
             }
         }
     }
+
+    #endregion Landing Anim
+
+    #region Jump Anim
 
     /// <summary>
     /// Maps current animation state into its jump variant while preserving chain timing.
     /// Returns true when a custom transition was applied.
     /// </summary>
-    private bool HandleJumpAnimationTransitions(AnimatorStateInfo state, float duration)
+    public void HandleJumpAnimationNormalState()
     {
-        if (IsAttackRunOrIdleState(state))
+        float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
+        if (IsAttackRunOrIdleState())
         {
-            anim.Play("attack_jump_" + playerAttack.attackIndex, 0, duration);
-            return true;
+            PlayAnim(AttackClip("jump"));
+            return;
         }
 
-        if (IsHSAttackRunOrIdleState(state))
+        if (IsHSAttackRunOrIdleState())
         {
-            anim.Play("HS_attack_jump_" + playerAttack.attackIndex, 0, duration);
-            return true;
+            PlayAnim(HSAttackClip("jump"));
+            return;
         }
 
-        if (state.IsName("attack_back_" + playerAttack.attackIndex))
+        if (CheckName(AttackBackClip(false)))
         {
-            anim.Play("attack_jump_1", 0, duration * (35f / 71f));
+            PlayAnim("attack_jump_1", duration * BackAttackBlendThreshold);
             playerAttack.attackIndex = 1;
-            return true;
+            return;
         }
 
-        if (state.IsName("HS_attack_back_" + playerAttack.attackIndex))
+        if (CheckName(AttackBackClip(true)))
         {
-            anim.Play("HS_attack_jump_1", 0, duration * (35f / 71f));
+            PlayAnim("HS_attack_jump_1", duration * BackAttackBlendThreshold);
             playerAttack.attackIndex = 1;
-            return true;
+            return;
         }
 
-        if (state.IsName("attack_fall_after") || state.IsName("attack_idle_after"))
+        if (CheckName("attack_fall_after") || CheckName("attack_idle_after"))
         {
-            anim.Play("attack_jump_after", 0, duration);
-            return true;
+            PlayAnim("attack_jump_after");
+            return;
         }
 
-        if (IsStormReadyState(state))
+        if (IsStormReadyState())
         {
-            anim.Play("storm_ready_jump", 0, duration);
-            return true;
+            PlayAnim("storm_ready_jump");
+            return;
         }
 
-        if (IsStormPreState(state))
+        if (IsStormPreState())
         {
-            anim.Play("storm_pre_jump", 0, duration);
-            return true;
+            PlayAnim("storm_pre_jump");
+            return;
         }
-
-        return false;
     }
 
-    private bool IsAttackIdleState(AnimatorStateInfo s) => s.IsName("attack_idle_" + playerAttack.attackIndex);
+    #endregion Jump Anim
 
-    private bool IsAttackRunState(AnimatorStateInfo s) => s.IsName("attack_run_" + playerAttack.attackIndex);
+    #region Animation Helpers
 
-    private bool IsAttackJumpState(AnimatorStateInfo s) => s.IsName("attack_jump_" + playerAttack.attackIndex);
+    public void PlayBackAttack(bool isHSAttack)
+    {
+        float duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
+        if (playerAttack.attackIndex == 1 && duration < BackAttackBlendThreshold)
+        {
+            PlayAnim(AttackBackClip(isHSAttack), duration * BackAttackDurationScale);
+            return;
+        }
 
-    private bool IsAttackFallState(AnimatorStateInfo s) => s.IsName("attack_fall_" + playerAttack.attackIndex);
+        if (playerAttack.attackIndex == 2)
+        {
+            PlayAnim(AttackBackClip(isHSAttack));
+            return;
+        }
+    }
 
-    private bool IsHSAttackJumpState(AnimatorStateInfo s) => s.IsName("HS_attack_jump_" + playerAttack.attackIndex);
+    public string AttackClip(string phase) => "attack_" + phase + "_" + playerAttack.attackIndex;
 
-    private bool IsHSAttackFallState(AnimatorStateInfo s) => s.IsName("HS_attack_fall_" + playerAttack.attackIndex);
+    public string HSAttackClip(string phase) => "HS_attack_" + phase + "_" + playerAttack.attackIndex;
 
-    private bool IsHSAttackRunState(AnimatorStateInfo s) => s.IsName("HS_attack_run_" + playerAttack.attackIndex);
+    public string AttackBackClip(bool isHSAttack) =>
+        (isHSAttack ? "HS_attack_back_" : "attack_back_") + playerAttack.attackIndex;
 
-    private bool IsHSAttackIdleState(AnimatorStateInfo s) => s.IsName("HS_attack_idle_" + playerAttack.attackIndex);
+    public bool IsAttackIdleState() => CheckName(AttackClip("idle"));
 
-    private bool IsStormReadyState(AnimatorStateInfo s) =>
-        s.IsName("storm_ready_idle") || s.IsName("storm_ready_jump") ||
-        s.IsName("storm_ready_fall") || s.IsName("storm_ready_run");
+    public bool IsAttackRunState() => CheckName(AttackClip("run"));
 
-    private bool IsStormPreState(AnimatorStateInfo s) =>
-        s.IsName("storm_pre_idle") || s.IsName("storm_pre_jump") ||
-        s.IsName("storm_pre_fall") || s.IsName("storm_pre_run");
+    public bool IsAttackJumpState() => CheckName(AttackClip("jump"));
 
-    private bool IsAttackRunOrIdleState(AnimatorStateInfo s) =>
-        s.IsName("attack_run_" + playerAttack.attackIndex) || s.IsName("attack_idle_" + playerAttack.attackIndex);
+    public bool IsAttackFallState() => CheckName(AttackClip("fall"));
 
-    private bool IsHSAttackRunOrIdleState(AnimatorStateInfo s) =>
-        s.IsName("HS_attack_run_" + playerAttack.attackIndex) || s.IsName("HS_attack_idle_" + playerAttack.attackIndex);
+    public bool IsHSAttackJumpState() => CheckName(HSAttackClip("jump"));
 
-    private bool IsAttackJumpOrFallState(AnimatorStateInfo s) =>
-        s.IsName("attack_jump_" + playerAttack.attackIndex) || s.IsName("attack_fall_" + playerAttack.attackIndex);
+    public bool IsHSAttackFallState() => CheckName(HSAttackClip("fall"));
 
-    private bool IsHSAttackJumpOrFallState(AnimatorStateInfo s) =>
-        s.IsName("HS_attack_jump_" + playerAttack.attackIndex) || s.IsName("HS_attack_fall_" + playerAttack.attackIndex);
+    public bool IsHSAttackRunState() => CheckName(HSAttackClip("run"));
+
+    public bool IsHSAttackIdleState() => CheckName(HSAttackClip("idle"));
+
+    public bool IsStormReadyState() =>
+        CheckName("storm_ready_idle") ||
+        CheckName("storm_ready_jump") ||
+        CheckName("storm_ready_fall") ||
+        CheckName("storm_ready_run");
+
+    public bool IsStormPreState() =>
+        CheckName("storm_pre_idle") ||
+        CheckName("storm_pre_jump") ||
+        CheckName("storm_pre_fall") ||
+        CheckName("storm_pre_run");
+
+    public bool IsAttackRunOrIdleState() =>
+        CheckName(AttackClip("run")) ||
+        CheckName(AttackClip("idle"));
+
+    public bool IsHSAttackRunOrIdleState() =>
+        CheckName(HSAttackClip("run")) ||
+        CheckName(HSAttackClip("idle"));
+
+    public bool IsAttackJumpOrFallState() =>
+        CheckName(AttackClip("jump")) ||
+        CheckName(AttackClip("fall"));
+
+    public bool IsHSAttackJumpOrFallState() =>
+        CheckName(HSAttackClip("jump")) ||
+        CheckName(HSAttackClip("fall"));
+
+    public bool CheckName(string name) => anim.GetCurrentAnimatorStateInfo(0).IsName(name);
+
+    public void PlayAnim(string clip, float duration = -1)
+    {
+        if (duration == -1) duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
+        anim.Play(clip, 0, duration);
+    }
+
+    #endregion Animation Helpers
+
+    #region Utility
 
     public void SyncRunningAnim()
     {
@@ -276,8 +417,6 @@ public partial class PlayerControl
         var legState = legAnim.GetCurrentAnimatorStateInfo(0);
         anim.Play(state.fullPathHash, 0, legState.normalizedTime);
     }
-
-    #endregion Animation Helpers
 
     private int lastLegStateHash = -1;
 
@@ -296,4 +435,25 @@ public partial class PlayerControl
     {
         body.localPosition = Vector3.zero;
     }
+
+    private void UpdateLegAnimator()
+    {
+        var state = anim.GetCurrentAnimatorStateInfo(0);
+        legAnim.SetBool("isRunning", IsLegRunningState(state) && isRunning);
+    }
+
+    private bool IsLegRunningState(AnimatorStateInfo state)
+    {
+        return state.IsName("run") ||
+               state.IsName("run_combat") ||
+               state.IsName("attack_run_1") ||
+               state.IsName("attack_run_2") ||
+               state.IsName("drawback_run") ||
+               state.IsName("storm_pre_run") ||
+               state.IsName("storm_ready_run") ||
+               state.IsName("HS_attack_run_1") ||
+               state.IsName("HS_attack_run_2");
+    }
+
+    #endregion Utility
 }

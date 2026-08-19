@@ -61,6 +61,28 @@ MonoBehaviour:
     spritePortrait: {fileID: 0}
     alternatePortraits: []
     spritePortraits: []
+  - id: 4
+    fields:
+    - title: Name
+      value: Er Xi
+      type: 0
+      typeString: 
+    - title: Pictures
+      value: '[]'
+      type: 3
+      typeString: CustomFieldType_Files
+    - title: Description
+      value: A rabbit
+      type: 0
+      typeString: CustomFieldType_Text
+    - title: IsPlayer
+      value: False
+      type: 2
+      typeString: CustomFieldType_Boolean
+    portrait: {fileID: 0}
+    spritePortrait: {fileID: 0}
+    alternatePortraits: []
+    spritePortraits: []
   - id: 2
     fields:
     - title: Name
@@ -105,10 +127,10 @@ MonoBehaviour:
     spritePortrait: {fileID: 0}
     alternatePortraits: []
     spritePortraits: []
-  - id: 4
+  - id: 5
     fields:
     - title: Name
-      value: Er Xi
+      value: NPC
       type: 0
       typeString: 
     - title: Pictures
@@ -116,7 +138,7 @@ MonoBehaviour:
       type: 3
       typeString: CustomFieldType_Files
     - title: Description
-      value: A rabbit
+      value: npc to test dialogue
       type: 0
       typeString: CustomFieldType_Text
     - title: IsPlayer
@@ -179,7 +201,7 @@ MonoBehaviour:
     - title: Initial Value
       value: 
       type: 0
-      typeString: CustomFieldType_Text
+      typeString: CustomFieldType_Files
     - title: Description
       value: 
       type: 0
@@ -249,7 +271,7 @@ MonoBehaviour:
         type: 5
         typeString: CustomFieldType_Actor
       - title: Conversant
-        value: 2
+        value: 5
         type: 5
         typeString: CustomFieldType_Actor
       - title: Menu Text
@@ -300,7 +322,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Actor
-        value: 2
+        value: 5
         type: 5
         typeString: CustomFieldType_Actor
       - title: Conversant
@@ -341,7 +363,7 @@ MonoBehaviour:
       canvasRect:
         serializedVersion: 2
         x: 80
-        y: 134
+        y: 133.27005
         width: 160
         height: 30
     - id: 2
@@ -355,11 +377,11 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Actor
-        value: 1
+        value: 5
         type: 5
         typeString: CustomFieldType_Actor
       - title: Conversant
-        value: 2
+        value: 1
         type: 5
         typeString: CustomFieldType_Actor
       - title: Menu Text
@@ -414,7 +436,7 @@ MonoBehaviour:
         type: 5
         typeString: CustomFieldType_Actor
       - title: Conversant
-        value: 2
+        value: 5
         type: 5
         typeString: CustomFieldType_Actor
       - title: Menu Text
@@ -465,7 +487,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Actor
-        value: 2
+        value: 5
         type: 5
         typeString: CustomFieldType_Actor
       - title: Conversant
@@ -499,13 +521,13 @@ MonoBehaviour:
           m_Calls: []
       canvasRect:
         serializedVersion: 2
-        x: 80
+        x: 79.27008
         y: 386
         width: 160
         height: 30
     entryGroups: []
-    canvasScrollPosition: {x: 0, y: 0}
-    canvasZoom: 1.3700002
+    canvasScrollPosition: {x: 0, y: 5.090803}
+    canvasZoom: 1.4900001
   - id: 2
     fields:
     - title: Title
@@ -882,8 +904,8 @@ MonoBehaviour:
         width: 160
         height: 30
     entryGroups: []
-    canvasScrollPosition: {x: 53.228394, y: 36.91706}
-    canvasZoom: 1.1799998
+    canvasScrollPosition: {x: 1.9281807, y: 0}
+    canvasZoom: 1.03
   syncInfo:
     syncActors: 0
     syncItems: 0

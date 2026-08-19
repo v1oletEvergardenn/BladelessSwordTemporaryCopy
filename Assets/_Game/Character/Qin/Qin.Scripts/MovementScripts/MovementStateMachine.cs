@@ -76,4 +76,12 @@ public sealed class MovementStateMachine
     /// Forward sword teleport.
     /// </summary>
     public void SwordTeleport() => Current?.SwordTeleport();
+
+    public void HandleFallingAnimation() => Current?.HandleFallingAnimation();
+
+    public void HandleLandingAnimation() => Current?.HandleLandingAnimation();
+
+    public void HandleJumpAnimation() => Current?.HandleJumpAnimation();
+
+    public void HandleGroundedAnimation() => Current?.HandleGroundedAnimation();
 }

@@ -158,10 +158,8 @@ public partial class PlayerControl
             SetRunningState(false);
         }
 
-        var state = anim.GetCurrentAnimatorStateInfo(0);
-
         if (isGrounded && !isJumping)
-            HandleGroundedAnimationTransitions(state, moving);
+            HandleGroundedAnimation();
 
         float playerScale = TimeScaleManager.PlayerScale;
         Vector3 targetVelocity = new Vector2(move * speed * playerScale, rb.velocity.y);
@@ -193,11 +191,8 @@ public partial class PlayerControl
         isJumping = true;
 
         QuestManager.OnAction(GameManager.instance.playerQuestActionKey.Jump);
-        var state = anim.GetCurrentAnimatorStateInfo(0);
-        float duration = state.normalizedTime;
 
-        if (HandleJumpAnimationTransitions(state, duration))
-            return;
+        HandleJumpAnimation();
 
         if (canSwitchNormalAnim)
             PlayAnimClipInCombat("jump", "jump_combat");
