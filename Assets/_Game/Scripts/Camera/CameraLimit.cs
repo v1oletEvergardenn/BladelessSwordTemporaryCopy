@@ -101,8 +101,6 @@ public class CameraLimit : MonoBehaviour
             return;
         }
 
-        CameraManager.SwitchPixelPerfectCamera(false);
-
         CameraRegister register = cam.GetComponent<CameraRegister>();
         if (register != null)
         {
@@ -123,8 +121,6 @@ public class CameraLimit : MonoBehaviour
     /// </summary>
     public void Deactivate()
     {
-        CameraManager.SwitchPixelPerfectCamera(true);
-
         if (CameraFollow.instance != null)
         {
             CameraFollow.instance.Deactivate();

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public partial class PlayerControl
 {
@@ -48,18 +49,38 @@ public partial class PlayerControl
             HandleJumpAnimationNormalState);
     }
 
-    private void HandleMovementStateOrNormal(System.Action movementStateHandler, System.Action normalHandler)
+    public string GetAttackAnimName()
     {
-        if (movementStateHandler != null)
-        {
-            movementStateHandler();
-            return;
-        }
-
-        normalHandler();
+        if (movementStateMachine != null) return movementStateMachine.GetAttackAnimName();
+        else return GetAttackAnimNameNormalState();
     }
 
     #endregion Link To MovementState
+
+    public string GetAttackAnimNameNormalState()
+    {
+        string indexStr = playerAttack.attackIndex.ToString();
+        if (isJumping)
+        {
+            return $"attack_jump_{indexStr}";
+        }
+        else if (isFalling)
+        {
+            return $"attack_fall_{indexStr}";
+        }
+        else if (isRunning)
+        {
+            if (FacingRight == playerAttack.isAttackingLeft)
+            {
+                return $"attack_back_{indexStr}";
+            }
+            else
+            {
+                return $"attack_run_{indexStr}";
+            }
+        }
+        return $"attack_idle_{indexStr}";
+    }
 
     #region Fall Anim
 
@@ -401,10 +422,18 @@ public partial class PlayerControl
 
     public bool CheckName(string name) => anim.GetCurrentAnimatorStateInfo(0).IsName(name);
 
+    public bool CheckNameLeg(string name) => legAnim.GetCurrentAnimatorStateInfo(0).IsName(name);
+
     public void PlayAnim(string clip, float duration = -1)
     {
         if (duration == -1) duration = anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
         anim.Play(clip, 0, duration);
+    }
+
+    public void PlayAnimLeg(string clip, float duration = -1)
+    {
+        if (duration == -1) duration = legAnim.GetCurrentAnimatorStateInfo(0).normalizedTime;
+        legAnim.Play(clip, 0, duration);
     }
 
     #endregion Animation Helpers
@@ -453,6 +482,17 @@ public partial class PlayerControl
                state.IsName("storm_ready_run") ||
                state.IsName("HS_attack_run_1") ||
                state.IsName("HS_attack_run_2");
+    }
+
+    private void HandleMovementStateOrNormal(System.Action movementStateHandler, System.Action normalHandler)
+    {
+        if (movementStateHandler != null)
+        {
+            movementStateHandler();
+            return;
+        }
+
+        normalHandler();
     }
 
     #endregion Utility

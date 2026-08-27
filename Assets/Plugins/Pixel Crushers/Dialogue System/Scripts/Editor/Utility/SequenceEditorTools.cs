@@ -9,10 +9,11 @@ using System.Text.RegularExpressions;
 
 namespace PixelCrushers.DialogueSystem
 {
-
-    public enum SequenceSyntaxState { Unchecked, Valid, Error }
+    public enum SequenceSyntaxState
+    { Unchecked, Valid, Error }
 
     public delegate void SetupGenericMenuDelegate(GenericMenu menu);
+
     public delegate bool TryDragAndDropDelegate(UnityEngine.Object obj, ref string sequence);
 
     /// <summary>
@@ -20,7 +21,6 @@ namespace PixelCrushers.DialogueSystem
     /// </summary>
     public static class SequenceEditorTools
     {
-
         /// <summary>
         /// Assign delegate handler to check extra drag-n-drop options.
         /// </summary>
@@ -56,17 +56,20 @@ namespace PixelCrushers.DialogueSystem
 
         private static MenuResult menuResult = MenuResult.Unselected;
 
-        private enum AudioDragDropCommand { AudioWait, Audio, SALSA, LipSync, Nothing }
+        private enum AudioDragDropCommand
+        { AudioWait, Audio, SALSA, LipSync, Nothing }
 
         private static AudioDragDropCommand audioDragDropCommand = AudioDragDropCommand.AudioWait;
 
-        private enum GameObjectDragDropCommand { Camera, DOF, SetActiveTrue, SetActiveFalse, Nothing }
+        private enum GameObjectDragDropCommand
+        { Camera, DOF, SetActiveTrue, SetActiveFalse, Nothing }
 
         private static GameObjectDragDropCommand gameObjectDragDropCommand = GameObjectDragDropCommand.Camera;
 
         private static GameObjectDragDropCommand alternateGameObjectDragDropCommand = GameObjectDragDropCommand.SetActiveTrue;
 
-        private enum ComponentDragDropCommand { SetEnabledTrue, SetEnabledFalse, Nothing }
+        private enum ComponentDragDropCommand
+        { SetEnabledTrue, SetEnabledFalse, Nothing }
 
         private static ComponentDragDropCommand componentDragDropCommand = ComponentDragDropCommand.SetEnabledTrue;
 
@@ -107,6 +110,17 @@ namespace PixelCrushers.DialogueSystem
         }
 
         private static bool needToCheckSyntax = false;
+
+        private const string SequenceEditorFontSizePrefKey = "PixelCrushers.DialogueSystem.SequenceEditor.FontSize";
+        private const int DefaultSequenceEditorFontSize = 12;
+        private const int MinSequenceEditorFontSize = 10;
+        private const int MaxSequenceEditorFontSize = 26;
+
+        private static GUIContent FontDecreaseButtonLabel = new GUIContent("A-", "Decrease sequence text size.");
+        private static GUIContent FontIncreaseButtonLabel = new GUIContent("A+", "Increase sequence text size.");
+
+        private static GUIStyle sequenceTextAreaStyle = null;
+        private static GUIStyle sequenceMessagePreviewStyle = null;
 
         public static string DrawLayout(GUIContent guiContent, string sequence, ref Rect rect,
             ref SequenceSyntaxState syntaxState, DialogueEntry entry = null, Field field = null,
@@ -150,6 +164,17 @@ namespace PixelCrushers.DialogueSystem
             {
                 DrawContextMenu(sequence);
             }
+
+            if (GUILayout.Button(FontDecreaseButtonLabel, EditorStyles.miniButton, GUILayout.Width(30)))
+            {
+                SetSequenceEditorFontSize(GetSequenceEditorFontSize() - 1);
+            }
+
+            if (GUILayout.Button(FontIncreaseButtonLabel, EditorStyles.miniButton, GUILayout.Width(30)))
+            {
+                SetSequenceEditorFontSize(GetSequenceEditorFontSize() + 1);
+            }
+
             EditorGUILayout.EndHorizontal();
             if (menuResult != MenuResult.Unselected)
             {
@@ -159,7 +184,7 @@ namespace PixelCrushers.DialogueSystem
 
             SetSyntaxStateGUIColor(syntaxState);
 
-            var newSequence = EditorGUILayout.TextArea(sequence);
+            var newSequence = EditorGUILayout.TextArea(sequence, GetSequenceTextAreaStyle(), GUILayout.MinHeight(GetSequenceTextAreaMinHeight()));
 
             ClearSyntaxStateGUIColor();
             if (!string.Equals(newSequence, sequence))
@@ -168,11 +193,14 @@ namespace PixelCrushers.DialogueSystem
                 GUI.changed = true;
             }
 
+            DrawMessageColorPreview(sequence);
+
             switch (Event.current.type)
             {
                 case EventType.Repaint:
                     rect = GUILayoutUtility.GetLastRect();
                     break;
+
                 case EventType.DragUpdated:
                 case EventType.DragPerform:
                     if (rect.Contains(Event.current.mousePosition))
@@ -335,12 +363,16 @@ namespace PixelCrushers.DialogueSystem
             {
                 case AudioDragDropCommand.Nothing:
                     return string.Empty;
+
                 case AudioDragDropCommand.Audio:
                     return "Audio";
+
                 case AudioDragDropCommand.SALSA:
                     return "SALSA";
+
                 case AudioDragDropCommand.LipSync:
                     return "LipSync";
+
                 default:
                     return "AudioWait";
             }
@@ -369,12 +401,16 @@ namespace PixelCrushers.DialogueSystem
                 default:
                 case GameObjectDragDropCommand.Camera:
                     return "Camera(default," + goName + ")";
+
                 case GameObjectDragDropCommand.DOF:
                     return "DOF(" + goName + ")";
+
                 case GameObjectDragDropCommand.SetActiveTrue:
                     return "SetActive(" + goName + ",true)";
+
                 case GameObjectDragDropCommand.SetActiveFalse:
                     return "SetActive(" + goName + ",false)";
+
                 case GameObjectDragDropCommand.Nothing:
                     return string.Empty;
             }
@@ -398,8 +434,10 @@ namespace PixelCrushers.DialogueSystem
                 default:
                 case ComponentDragDropCommand.SetEnabledTrue:
                     return "SetEnabled(" + componentName + ",true," + goName + ")";
+
                 case ComponentDragDropCommand.SetEnabledFalse:
                     return "SetEnabled(" + componentName + ",false," + goName + ")";
+
                 case ComponentDragDropCommand.Nothing:
                     return string.Empty;
             }
@@ -430,26 +468,37 @@ namespace PixelCrushers.DialogueSystem
             {
                 case MenuResult.DefaultSequence:
                     return "{{default}}";
+
                 case MenuResult.Delay:
                     return "Delay({{end}})";
+
                 case MenuResult.DefaultCameraAngle:
                     return "Camera(default)";
+
                 case MenuResult.UpdateTracker:
                     return "UpdateTracker()";
+
                 case MenuResult.RandomizeNextEntry:
                     return "RandomizeNextEntry()";
+
                 case MenuResult.RandomizeNextEntryNoDuplicate:
                     return "RandomizeNextEntry(true)";
+
                 case MenuResult.None:
                     return "None()";
+
                 case MenuResult.Continue:
                     return "Continue()";
+
                 case MenuResult.ContinueTrue:
                     return "SetContinueMode(true)";
+
                 case MenuResult.ContinueFalse:
                     return "SetContinueMode(false)";
+
                 case MenuResult.OtherCommand:
                     return otherCommandName;
+
                 default:
                     return string.Empty;
             }
@@ -604,14 +653,12 @@ namespace PixelCrushers.DialogueSystem
 
         private static void StartSequencerCommand(object data)
         {
-
             otherCommandName = (string)data + "(";
             SetMenuResult(MenuResult.OtherCommand);
         }
 
         private static void StartOtherCommand(object data)
         {
-
             otherCommandName = (string)data;
             SetMenuResult(MenuResult.OtherCommand);
         }
@@ -641,6 +688,7 @@ namespace PixelCrushers.DialogueSystem
                 case SequenceSyntaxState.Valid:
                     GUI.color = Color.green;
                     break;
+
                 case SequenceSyntaxState.Error:
                     GUI.color = Color.red;
                     break;
@@ -652,6 +700,72 @@ namespace PixelCrushers.DialogueSystem
             GUI.color = Color.white;
         }
 
-    }
+        private static int GetSequenceEditorFontSize()
+        {
+            return Mathf.Clamp(EditorPrefs.GetInt(SequenceEditorFontSizePrefKey, DefaultSequenceEditorFontSize), MinSequenceEditorFontSize, MaxSequenceEditorFontSize);
+        }
 
+        private static void SetSequenceEditorFontSize(int size)
+        {
+            EditorPrefs.SetInt(SequenceEditorFontSizePrefKey, Mathf.Clamp(size, MinSequenceEditorFontSize, MaxSequenceEditorFontSize));
+        }
+
+        private static GUIStyle GetSequenceTextAreaStyle()
+        {
+            if (sequenceTextAreaStyle == null)
+            {
+                sequenceTextAreaStyle = new GUIStyle(EditorStyles.textArea);
+            }
+            sequenceTextAreaStyle.fontSize = GetSequenceEditorFontSize();
+            return sequenceTextAreaStyle;
+        }
+
+        private static float GetSequenceTextAreaMinHeight()
+        {
+            return Mathf.Max(216f, GetSequenceEditorFontSize() * 30f);
+        }
+
+        private static void DrawMessageColorPreview(string sequence)
+        {
+            if (string.IsNullOrEmpty(sequence)) return;
+
+            var previewText = BuildMessageColorPreview(sequence);
+            if (string.IsNullOrEmpty(previewText)) return;
+
+            EditorGUILayout.LabelField("Message Color Preview", EditorStyles.miniBoldLabel);
+            GUILayout.Label(previewText, GetSequenceMessagePreviewStyle(), GUILayout.MinHeight(36f));
+        }
+
+        private static GUIStyle GetSequenceMessagePreviewStyle()
+        {
+            if (sequenceMessagePreviewStyle == null)
+            {
+                sequenceMessagePreviewStyle = new GUIStyle(EditorStyles.helpBox);
+                sequenceMessagePreviewStyle.richText = true;
+                sequenceMessagePreviewStyle.wordWrap = true;
+            }
+
+            return sequenceMessagePreviewStyle;
+        }
+
+        private static string BuildMessageColorPreview(string sequence)
+        {
+            var s = EscapeRichText(sequence);
+
+            // @m(...) / @Message(...) => green
+            s = Regex.Replace(s, @"@(?:m|message)\(\s*[^)]*\)", m => "<color=#3FB950>" + m.Value + "</color>", RegexOptions.IgnoreCase);
+
+            // !m(...), !Message(...), ->m(...), ->Message(...) => blue
+            s = Regex.Replace(s, @"!(?:m|message)\(\s*[^)]*\)", m => "<color=#58A6FF>" + m.Value + "</color>", RegexOptions.IgnoreCase);
+            s = Regex.Replace(s, @"->\s*(?:m|message)\(\s*[^)]*\)", m => "<color=#58A6FF>" + m.Value + "</color>", RegexOptions.IgnoreCase);
+
+            return s;
+        }
+
+        private static string EscapeRichText(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return string.Empty;
+            return s.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
+        }
+    }
 }

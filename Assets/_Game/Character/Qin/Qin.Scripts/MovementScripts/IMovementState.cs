@@ -18,6 +18,12 @@ public abstract class IMovementState
     public InputPlayer inputPlayer;
     public Rigidbody2D rb;
 
+    public bool isJumping => controller.isJumping;
+    public bool isFalling => controller.isFalling;
+    public bool isRunning => controller.isRunning;
+    public bool FacingRight => controller.FacingRight;
+    public bool isAttackingLeft => playerAttack.isAttackingLeft;
+
     public IMovementState(PlayerControl controller)
     {
         this.controller = controller;
@@ -94,6 +100,11 @@ public abstract class IMovementState
         controller.HandleJumpAnimationNormalState();
     }
 
+    public virtual string GetAttackAnimName()
+    {
+        return controller.GetAttackAnimNameNormalState();
+    }
+
     public virtual void HandleGroundedAnimation()
     {
         controller.HandleGroundedAnimationNormalState();
@@ -139,7 +150,11 @@ public abstract class IMovementState
 
     public virtual bool CheckName(string name) => controller.CheckName(name);
 
+    public virtual bool CheckNameLeg(string name) => controller.CheckNameLeg(name);
+
     public virtual void PlayAnim(string clip, float duration = -1) => controller.PlayAnim(clip, duration);
+
+    public virtual void PlayAnimLeg(string clip, float duration = -1) => controller.PlayAnimLeg(clip, duration);
 
     public virtual void PlayAnimClipInCombat(string normalClip, string combatClip) => controller.PlayAnimClipInCombat(normalClip, combatClip);
 

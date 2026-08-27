@@ -9,12 +9,17 @@ public class CameraRegister : MonoBehaviour
     private void Start()
     {
         CameraManager.Register(GetComponent<CinemachineVirtualCamera>());
+
         gameObject.AddComponent<CinemachinePixelPerfect>();
         if (isMainCam)
         {
             CameraManager.instance.playerNormalCam = GetComponent<CinemachineVirtualCamera>();
             CameraManager.instance._framingTransposer = CameraManager.instance.playerNormalCam.GetCinemachineComponent<CinemachineFramingTransposer>();
             CameraManager.instance._normYPanAmount = CameraManager.instance._framingTransposer.m_YDamping;
+            CameraManager.SwitchCamera(CameraManager.instance.playerNormalCam);
+        }
+        else
+        {
         }
     }
 

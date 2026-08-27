@@ -83,5 +83,7 @@ public sealed class MovementStateMachine
 
     public void HandleJumpAnimation() => Current?.HandleJumpAnimation();
 
+    public string GetAttackAnimName() => Current?.GetAttackAnimName();
+
     public void HandleGroundedAnimation() => Current?.HandleGroundedAnimation();
 }

@@ -1,0 +1,224 @@
+# Dialogue System Camera Sequence Commands Cheat Sheet
+
+This project supports custom camera commands for Dialogue System sequences.
+
+---
+
+## Quick Start
+
+### Recommended cutscene pattern
+1. Save current camera state: `CamPush()`
+2. Run cutscene camera commands.
+3. Restore safely: `CamPop()` (or `CamPop(duration,ease,cut)`)
+
+This ensures skip-safe restore behavior.
+
+---
+
+## Command Reference
+
+## 1) `Cam(...)`
+Switches camera by key/name, or to player/previous camera.
+
+### Signature
+`Cam(target [,duration=1] [,ease=InOutSine|cut] [,cut])`
+
+### Parameters
+- `target`:
+  - camera key from `CameraManager.cutsceneCameras` (recommended)
+  - scene camera object name
+  - `player` / `normal`
+  - `back` / `previous` / `last`
+- `duration` (optional): blend time in seconds, default `1`
+- `ease` (optional): easing token, default `InOutSine`
+- `cut` (optional): force instant cut
+
+### Examples
+- `Cam(BossIntroCam)`
+- `Cam(BossIntroCam,0.75)`
+- `Cam(BossIntroCam,1.2,OutSine)`
+- `Cam(player,0.6,InOutSine)`
+- `Cam(back,0.4,OutQuad)`
+- `Cam(player,0,cut)`  
+- `Cam(BossIntroCam,1,cut)` (cut override)
+
+---
+
+## 2) `CamZoom(...)`
+Zooms active camera (orthographic size).
+
+### Signature
+`CamZoom(value [,duration=1] [,ease=InOutSine] [,mode=absolute])`
+
+### Parameters
+- `value`: target zoom (absolute) or delta (relative)
+- `duration` (optional): default `1`
+- `ease` (optional): default `InOutSine`
+- `mode` (optional):
+  - `absolute` (default): set orthographic size to `value`
+  - `relative` / `delta` / `add`: add `value` to current size
+
+### Examples
+- `CamZoom(5.5)`  
+- `CamZoom(4.2,0.8,InOutSine)`  
+- `CamZoom(-1.25,1,InOutSine,relative)`  (zoom in)
+- `CamZoom(1.0,0.7,OutSine,relative)`    (zoom out)
+
+---
+
+## 3) `CamZoomReset(...)`
+Resets active camera zoom to its recorded default.
+
+### Signature
+`CamZoomReset([duration=1] [,ease=InOutSine])`
+
+### Examples
+- `CamZoomReset()`
+- `CamZoomReset(0.6,OutSine)`
+
+---
+
+## 4) `CamWait(...)`
+Hold/wait command for camera pacing.
+
+### Signature
+`CamWait([duration=1])`
+
+### Examples
+- `CamWait()`
+- `CamWait(0.35)`
+
+---
+
+## 5) `CamFollow(...)`
+Temporary follow target override, with optional auto-reset delay.
+
+### Signature
+- Override: `CamFollow(target [,duration=0])`
+- Reset: `CamFollow(reset [,delay=0])`
+
+### Parameters
+- `target`: `speaker`, `listener`, or GameObject name
+- `duration`:
+  - when setting target: auto-reset delay
+  - when reset: delay before returning to default follow target
+
+### Examples
+- `CamFollow(listener)`  
+- `CamFollow(Boss,2.0)`  
+- `CamFollow(reset)`  
+- `CamFollow(reset,0.5)`
+
+---
+
+## 6) `CamShake(...)`
+Adds temporary camera shake (requires `CinemachineBasicMultiChannelPerlin` on active vcam).
+
+### Signature
+`CamShake([duration=0.5] [,amplitude=1] [,frequency=20] [,ease=InOutSine])`
+
+### Parameters
+- `duration` (optional): shake length in seconds, default `0.5`
+- `amplitude` (optional): shake strength, default `1`
+- `frequency` (optional): shake speed, default `20`
+- `ease` (optional): decay curve, default `InOutSine`
+
+### Examples
+- `CamShake()`  
+- `CamShake(0.5)`  
+- `CamShake(0.8,1.5,25)`  
+- `CamShake(1.0,2.0,30,OutSine)`
+
+---
+
+## 7) `CamOffset(...)`
+Tweens `CinemachineFramingTransposer.m_TrackedObjectOffset`.
+
+### Signature
+- Set: `CamOffset(x, y [,duration=1] [,mode=relative] [,ease=InOutSine])`
+- Reset: `CamOffset(reset [,duration=1] [,ease=InOutSine])`
+
+### Parameters
+- `mode`:
+  - `relative` / `delta` / `add` (default): add `(x,y)` to current offset
+  - `absolute` / `set`: set to `(x,y)`
+
+### Examples
+- `CamOffset(1.0,0.25)`  
+- `CamOffset(2.0,0.0,0.8,relative,OutSine)`  
+- `CamOffset(0.5,-0.2,1.0,absolute,InOutSine)`  
+- `CamOffset(reset)`  
+- `CamOffset(reset,0.6,InOutSine)`
+
+---
+
+## 8) `CamPush()`
+Saves current camera state (camera, follow target, zoom, offset, blend defaults).
+
+### Signature
+`CamPush()`
+
+### Example
+- `CamPush()`
+
+---
+
+## 9) `CamPop(...)`
+Restores the most recent pushed state.
+
+### Signature
+`CamPop([duration=1] [,ease=InOutSine] [,cut])`
+
+### Examples
+- `CamPop()`
+- `CamPop(0.8,InOutSine)`
+- `CamPop(0,InOutSine,cut)`
+
+---
+
+## Easing Tokens
+
+Supported tokens (case-insensitive):
+- `Linear`
+- `InSine`
+- `OutSine`
+- `InOutSine` (default)
+- `InQuad`
+- `OutQuad`
+- `InOutQuad`
+
+Aliases are accepted (for example: `EaseInOutSine`, `ease-in-out` style variants).
+
+---
+
+## Cut Override Tokens
+
+Accepted tokens:
+- `cut`
+- `instant`
+- `now`
+
+---
+
+## Test Sequence (Run All Commands One-by-One)
+
+> Replace `IntroShotCam` and `Boss` with real camera key/object names in your scene.
+
+CamPush();
+Cam(IntroShotCam,1,InOutSine);
+CamWait(0.5)->Message(Step1);
+
+CamZoom(-1.2,1,InOutSine,relative)@Message(Step1)->Message(Step2);
+CamOffset(1.5,0.25,0.8,OutSine,relative)@Message(Step2)->Message(Step3);
+CamShake(0.8,1.5,25,InOutSine)@Message(Step3)->Message(Step4);
+
+CamFollow(Boss,1.5)@Message(Step4)->Message(Step5);
+CamFollow(reset,0)@Message(Step5)->Message(Step6);
+
+Cam(back,0.6,InOutSine)@Message(Step6)->Message(Step7);
+Cam(player,0,cut)@Message(Step7)->Message(Step8);
+
+CamZoomReset(0.8,InOutSine)@Message(Step8)->Message(Step9);
+CamOffset(reset,0.8,InOutSine)@Message(Step9)->Message(Step10);
+
+CamPop(1,InOutSine)@Message(Step10);

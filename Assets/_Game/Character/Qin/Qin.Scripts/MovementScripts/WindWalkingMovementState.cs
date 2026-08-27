@@ -4,8 +4,6 @@ using UnityEngine.InputSystem.XR;
 
 public class WindWalkingMovementState : IMovementState
 {
-    #region References
-
     public WindWalkingMovementState(PlayerControl controller) : base(controller)
     {
         base.controller = controller;
@@ -18,10 +16,6 @@ public class WindWalkingMovementState : IMovementState
     }
 
     public override PlayerMovementStateType Type => PlayerMovementStateType.WindWalking;
-
-    #endregion References
-
-    #region Variables
 
     private const float MoveInputThreshold = 0.01f;
     private const float StepDistance = 1.1f;
@@ -40,20 +34,16 @@ public class WindWalkingMovementState : IMovementState
     private float _lastInputDirection;
     private int _nextStepIndex;
 
-    #endregion Variables
-
-    #region Overrides
-
     public override void Enter()
     {
         _isStepping = false;
         _idleTimer = 0f;
         _hasMoveInput = false;
-        _lastInputDirection = controller.FacingRight ? 1f : -1f;
+        _lastInputDirection = FacingRight ? 1f : -1f;
         _nextStepIndex = 1;
 
         ApplyBodyIdle();
-        PlayIfNotCurrent(controller.legAnim, "leg_wind_idle_1");
+        PlayIfNotCurrent(legAnim, "leg_wind_idle_1");
         ActionLock.AddExcept("WindWalking", Lock.Move | Lock.Attack | Lock.Flip);
     }
 
@@ -71,6 +61,11 @@ public class WindWalkingMovementState : IMovementState
     {
         controller.TickNormalState();
         UpdateStepFlow();
+
+        if (_isStepping && (CheckNameLeg("leg_wind_idle_2") || CheckNameLeg("leg_wind_idle_1")))
+        {
+            PlayIfNotCurrent(legAnim, "leg_wind_walk_" + _nextStepIndex, _stepTween.ElapsedPercentage());
+        }
     }
 
     public override void FixedTick()
@@ -90,16 +85,28 @@ public class WindWalkingMovementState : IMovementState
         if (_hasMoveInput)
             _lastInputDirection = Mathf.Sign(input);
 
-        // Do not flip while stepping; it causes backward-looking movement.
-        if (_hasMoveInput && !_isStepping)
+        // Prevent post-attack auto-flip when counter-attack is active in wind-walking.
+        if (_hasMoveInput && !_isStepping && !playerAttack.isCounterAttacking)
             controller.HandleFlipping(_lastInputDirection);
 
-        // If not currently stepping and no idle wait is active, try to start immediately.
         if (!_isStepping && _idleTimer <= 0f)
             TryStartStep();
     }
 
-    #region Fall Anim
+    public override string GetAttackAnimName()
+    {
+        string indexStr = playerAttack.attackIndex.ToString();
+
+        if (FacingRight == isAttackingLeft)
+        {
+            legAnim.Play("leg_wind_back_attack");
+            return $"walk_attack_back";
+        }
+        else
+        {
+            return $"walk_wind_attack_{indexStr}";
+        }
+    }
 
     public override void HandleFallingAnimation()
     {
@@ -154,10 +161,6 @@ public class WindWalkingMovementState : IMovementState
         }
     }
 
-    #endregion Fall Anim
-
-    #region Landing Anim
-
     /// <summary>
     /// Resolves landing behavior and maps airborne attack variants back to grounded equivalents.
     /// </summary>
@@ -201,21 +204,17 @@ public class WindWalkingMovementState : IMovementState
         if (playerAttack.attackIndex == 1 && duration < controller.BackAttackBlendThreshold)
         {
             PlayAnim(AttackBackClip(isHSAttack), duration * controller.BackAttackDurationScale);
+            legAnim.Play("leg_wind_back_attack");
             return;
         }
 
         if (playerAttack.attackIndex == 2)
         {
             PlayAnim(AttackBackClip(isHSAttack));
+            legAnim.Play("leg_wind_back_attack");
             return;
         }
     }
-
-    #endregion Landing Anim
-
-    #endregion Overrides
-
-    #region Local Methods
 
     private void UpdateStepFlow()
     {
@@ -286,6 +285,7 @@ public class WindWalkingMovementState : IMovementState
 
     private void PlayWalkAnimationForStep()
     {
+        if (CheckNameLeg("leg_wind_back_attack")) return;
         string clip = _nextStepIndex == 1 ? LegWindWalk1 : LegWindWalk2;
         PlayIfNotCurrent(controller.legAnim, clip);
         _nextStepIndex = _nextStepIndex == 1 ? 2 : 1;
@@ -307,7 +307,7 @@ public class WindWalkingMovementState : IMovementState
         _stepTween = null;
     }
 
-    private static void PlayIfNotCurrent(Animator animator, string stateName)
+    private static void PlayIfNotCurrent(Animator animator, string stateName, float duration = 0f)
     {
         if (animator == null)
             return;
@@ -316,8 +316,6 @@ public class WindWalkingMovementState : IMovementState
         if (state.IsName(stateName))
             return;
 
-        animator.Play(stateName, 0, 0f);
+        animator.Play(stateName, 0, duration);
     }
-
-    #endregion Local Methods
 }

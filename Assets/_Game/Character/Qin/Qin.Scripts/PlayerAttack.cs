@@ -181,7 +181,7 @@ public class PlayerAttack : MonoBehaviour
         if (attackLeft) { QuestManager.OnAction(playerQuestActionKey.leftCounterAttack); }
         else { QuestManager.OnAction(playerQuestActionKey.rightCounterAttack); }
         // Play the appropriate attack animation
-        anim.Play(GetAttackAnimName());
+        anim.Play(controller.GetAttackAnimName());
         anim.SetBool("isCombat", true);
         int i = Random.Range(0, 2);
         if (i == 0)
@@ -210,38 +210,6 @@ public class PlayerAttack : MonoBehaviour
         hitIdamagables.Clear();
         UpdateAttackPointPosition();
         UpdateCounterAttackColliderState();
-    }
-
-    private string GetAttackAnimName()
-    {
-        string indexStr = attackIndex.ToString();
-        if (controller.movementState == PlayerMovementStateType.WindWalking)
-        {
-            if (controller.FacingRight == isAttackingLeft)
-            {
-                return $"walk_attack_back";
-            }
-            else
-            {
-                return $"body_walk_wind_attack_{indexStr}";
-            }
-        }
-        else if (controller.isJumping)
-            return $"attack_jump_{indexStr}";
-        else if (controller.isFalling)
-            return $"attack_fall_{indexStr}";
-        else if (controller.isRunning)
-        {
-            if (controller.FacingRight == isAttackingLeft)
-            {
-                return $"attack_back_{indexStr}";
-            }
-            else
-            {
-                return $"attack_run_{indexStr}";
-            }
-        }
-        return $"attack_idle_{indexStr}";
     }
 
     private List<IDamagable> hitIdamagables = new List<IDamagable>();

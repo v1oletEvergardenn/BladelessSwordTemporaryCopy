@@ -8,13 +8,14 @@ using PixelCrushers.DialogueSystem.SequencerCommands;
 
 namespace PixelCrushers.DialogueSystem
 {
-
     /// <summary>
     /// Custom exception for parser errors.
     /// </summary>
     public class ParserException : System.Exception
     {
-        public ParserException(string message) : base(message) { }
+        public ParserException(string message) : base(message)
+        {
+        }
     }
 
     /// <summary>
@@ -258,10 +259,54 @@ namespace PixelCrushers.DialogueSystem
                 ParseAtSignModifier(reader, out atTime, out atMessage);
             }
             ParseOptionalWhitespace(reader);
+            if (IsNextChar(reader, '-') || IsNextChar(reader, '!'))
+            {
+                ParseSendMessageModifier(reader, out sendMessage);
+            }
+        }
+
+        private void ParseSendMessageModifier(StringReader reader, out string sendMessage)
+        {
+            sendMessage = string.Empty;
             if (IsNextChar(reader, '-'))
             {
-                ParseArrowModifier(reader, out sendMessage);
+                ReadNextChar(reader);
+                if (!IsNextChar(reader, '>'))
+                {
+                    throw new ParserException("Invalid modifier after command; expected @time, @Message(x), @m(x), ->Message(x), ->m(x), !Message(x), !m(x), or nothing");
+                }
+
+                ReadNextChar(reader);
+                ParseOptionalWhitespace(reader);
+                ParseMessageExpression(reader, out sendMessage);
             }
+            else if (IsNextChar(reader, '!'))
+            {
+                ReadNextChar(reader);
+                ParseOptionalWhitespace(reader);
+                ParseMessageExpression(reader, out sendMessage);
+            }
+        }
+
+        private void ParseMessageExpression(StringReader reader, out string message)
+        {
+            message = string.Empty;
+            var s = ParseWord(reader);
+            if (IsMessageKeyword(s))
+            {
+                ParseOptionalWhitespace(reader);
+                ParseChar(reader, '(');
+                ParseOptionalWhitespace(reader);
+                s = ParseWord(reader, true);
+                message = s.Trim();
+                ParseChar(reader, ')');
+            }
+        }
+
+        private static bool IsMessageKeyword(string s)
+        {
+            return string.Equals(s, "message", System.StringComparison.OrdinalIgnoreCase)
+                || string.Equals(s, "m", System.StringComparison.OrdinalIgnoreCase);
         }
 
         private void ParseAtSignModifier(StringReader reader, out float atTime, out string atMessage)
@@ -273,7 +318,7 @@ namespace PixelCrushers.DialogueSystem
                 ReadNextChar(reader);
                 ParseOptionalWhitespace(reader);
                 var s = ParseWord(reader);
-                if (string.Equals(s, "message", System.StringComparison.OrdinalIgnoreCase))
+                if (IsMessageKeyword(s))
                 {
                     ParseOptionalWhitespace(reader);
                     ParseChar(reader, '(');
@@ -310,14 +355,14 @@ namespace PixelCrushers.DialogueSystem
                 ReadNextChar(reader);
                 if (!IsNextChar(reader, '>'))
                 {
-                    throw new ParserException("Invalid modifier after command; expected @time, @Message(x), ->Message(x) or nothing");
+                    throw new ParserException("Invalid modifier after command; expected @time, @Message(x), @m(x), ->Message(x), ->m(x), !Message(x), !m(x), or nothing");
                 }
                 else
                 {
                     ReadNextChar(reader);
                     ParseOptionalWhitespace(reader);
                     var s = ParseWord(reader);
-                    if (string.Equals(s, SequencerKeywords.Message, System.StringComparison.OrdinalIgnoreCase))
+                    if (IsMessageKeyword(s))
                     {
                         ParseOptionalWhitespace(reader);
                         ParseChar(reader, '(');
@@ -355,6 +400,5 @@ namespace PixelCrushers.DialogueSystem
             }
             return false;
         }
-
     }
 }
