@@ -20,6 +20,7 @@ public class FactorData
 [Serializable]
 public abstract class IEnemyAction : MonoBehaviour
 {
+    public bool EnableDebug = false;
     [HideInInspector] public Animator anim;
     [HideInInspector] public IEnemyController controller;
     [HideInInspector] public SpriteRenderer sprite;
@@ -32,8 +33,6 @@ public abstract class IEnemyAction : MonoBehaviour
     [HideInInspector] public Energy playerEnergy;
     [HideInInspector] public PlayerControl playerController;
 
-    [HideInInspector] public IEnemyController bossController;
-
     public Coroutine act_routine;
 
     public bool fixedDuration = true;
@@ -44,7 +43,6 @@ public abstract class IEnemyAction : MonoBehaviour
 
     public virtual void Start()
     {
-        bossController = GetComponent<IEnemyController>();
         playerIDamagable = Health.instance;
         player = playerIDamagable.gameObject;
         vfx = VFXManager.instance;
@@ -122,52 +120,68 @@ public abstract class IEnemyAction : MonoBehaviour
     /// <param name="attackPos"></param>
     /// <param name="melee"></param>
     /// <returns></returns>
-    public virtual IEnumerator ApplyAttackInCircle(float duration, float range, Transform attackPos, MeleeAttack melee, Vector3 offset = default)
+    public virtual IEnumerator ApplyAttackInCircle(float duration, float range, Transform attackPos, MeleeAttack melee, float delay = 0f, Vector3 offset = default)
     {
-        List<IDamagable> hitIdamagables = new List<IDamagable>();
-        List<IProjectile> hitProjectiles = new List<IProjectile>();
-        float elapsedTime = 0f;
-        while (elapsedTime <= duration)
-        {
-            elapsedTime += TimeScaleManager.EnemyDt;
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPos.position + offset, range);
-            foreach (Collider2D collider in colliders)
-            {
-                if (bossController.subDamagables.Contains(collider.GetComponent<IDamagable>())
-                    || collider.gameObject == this.gameObject)
-                {
-                    continue; // Skip if it's the boss itself or a sub-damagable of the boss
-                }
+        yield return WaitForEnemy(delay);
 
-                //Hit Idamagables
-                if (collider.TryGetComponent<IDamagable>(out IDamagable idmg))
+        int debugId = BeginCircleAttackDebug(attackPos, offset, range);
+
+        try
+        {
+            List<IDamagable> hitIdamagables = new List<IDamagable>();
+            List<IProjectile> hitProjectiles = new List<IProjectile>();
+            float elapsedTime = 0f;
+            while (elapsedTime <= duration)
+            {
+                elapsedTime += TimeScaleManager.EnemyDt;
+
+                UpdateCircleAttackDebug(debugId, attackPos, offset, range);
+
+                Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPos.position + offset, range);
+                foreach (Collider2D collider in colliders)
                 {
-                    if (!hitIdamagables.Contains(idmg))
+                    if (controller.subDamagables.Contains(collider.GetComponent<IDamagable>())
+                        || collider.gameObject == this.gameObject)
                     {
-                        hitIdamagables.Add(idmg);
-                        foreach (IDamagable subIdmg in idmg.subDamagables) { hitIdamagables.Add(subIdmg); }
-                        if (idmg == playerIDamagable) { HitPlayer(melee, attackPos, offset); }
-                        else { idmg.Damage(melee.damage, this.transform, melee.breakAmount); }
+                        continue; // Skip if it's the boss itself or a sub-damagable of the boss
+                    }
+
+                    //Hit Idamagables
+                    if (collider.TryGetComponent<IDamagable>(out IDamagable idmg))
+                    {
+                        if (!hitIdamagables.Contains(idmg))
+                        {
+                            hitIdamagables.Add(idmg);
+                            foreach (IDamagable subIdmg in idmg.subDamagables) { hitIdamagables.Add(subIdmg); }
+                            if (idmg == playerIDamagable) { HitPlayer(melee, attackPos, offset); }
+                            else { idmg.Damage(melee.damage, this.transform, melee.breakAmount); }
+                        }
+                    }
+                    //Hit Iprojectiles
+                    if (collider.TryGetComponent<IProjectile>(out IProjectile iProj))
+                    {
+                        if (!hitProjectiles.Contains(iProj) || !iProj.IsOwner(this.gameObject))
+                        {
+                            hitProjectiles.Add(iProj);
+                            iProj.HitByMeleeAttack();
+                        }
                     }
                 }
-                //Hit Iprojectiles
-                if (collider.TryGetComponent<IProjectile>(out IProjectile iProj))
-                {
-                    if (!hitProjectiles.Contains(iProj) || !iProj.IsOwner(this.gameObject))
-                    {
-                        hitProjectiles.Add(iProj);
-                        iProj.HitByMeleeAttack();
-                    }
-                }
+                yield return null;
             }
-            yield return null;
+        }
+        finally
+        {
+            EndCircleAttackDebug(debugId);
         }
 
         yield return null;
     }
 
-    public virtual IEnumerator ApplyAttackInCollider(float duration, Transform attackPos, Collider2D attack_collider, MeleeAttack melee, Vector3 offset = default)
+    public virtual IEnumerator ApplyAttackInCollider(float duration, Transform attackPos, Collider2D attack_collider, MeleeAttack melee, float delay = 0f, Vector3 offset = default)
     {
+        yield return WaitForEnemy(delay);
+
         List<IDamagable> hitIdamagables = new List<IDamagable>();
         List<IProjectile> hitProjectiles = new List<IProjectile>();
         float elapsedTime = 0f;
@@ -178,7 +192,7 @@ public abstract class IEnemyAction : MonoBehaviour
             Physics2D.OverlapCollider(attack_collider, new ContactFilter2D().NoFilter(), results);
             foreach (Collider2D collider in results)
             {
-                if (bossController.subDamagables.Contains(collider.GetComponent<IDamagable>())
+                if (controller.subDamagables.Contains(collider.GetComponent<IDamagable>())
                     || collider.gameObject == this.gameObject)
                 {
                     continue; // Skip if it's the boss itself or a sub-damagable of the boss
@@ -214,7 +228,7 @@ public abstract class IEnemyAction : MonoBehaviour
     public virtual void HitPlayer(MeleeAttack melee, Transform attackPos, Vector3 offset = default)
     {
         MeleeAttackResult dealtDamage = playerIDamagable.DamageFromMeleeAttack(attackPos, melee);
-        bool left = playerIDamagable.GetHitPos().x < attackPos.position.x ? true : false;
+        bool left = playerIDamagable.GetHitPos().x < transform.position.x ? true : false;
 
         if (dealtDamage == MeleeAttackResult.Countered)//counter attack
         {
@@ -229,6 +243,122 @@ public abstract class IEnemyAction : MonoBehaviour
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
         }
     }
+
+    #region Debugging Gizmos
+
+#if UNITY_EDITOR
+
+    private struct CircleAttackDebugData
+    {
+        public int id;
+        public Transform attackPos;
+        public Vector3 offset;
+        public float range;
+    }
+
+    private readonly List<CircleAttackDebugData> activeCircleAttackDebugs = new List<CircleAttackDebugData>();
+    private int nextCircleAttackDebugId = 1;
+#endif
+
+    private int BeginCircleAttackDebug(Transform attackPos, Vector3 offset, float range)
+    {
+#if UNITY_EDITOR
+        if (!EnableDebug) return -1;
+        int id = nextCircleAttackDebugId++;
+        activeCircleAttackDebugs.Add(new CircleAttackDebugData
+        {
+            id = id,
+            attackPos = attackPos,
+            offset = offset,
+            range = range
+        });
+        return id;
+#else
+        return -1;
+#endif
+    }
+
+    private void UpdateCircleAttackDebug(int id, Transform attackPos, Vector3 offset, float range)
+    {
+#if UNITY_EDITOR
+        if (!EnableDebug) { EndCircleAttackDebug(id); return; }
+        for (int i = 0; i < activeCircleAttackDebugs.Count; i++)
+        {
+            if (activeCircleAttackDebugs[i].id == id)
+            {
+                CircleAttackDebugData data = activeCircleAttackDebugs[i];
+                data.attackPos = attackPos;
+                data.offset = offset;
+                data.range = range;
+                activeCircleAttackDebugs[i] = data;
+                return;
+            }
+        }
+#endif
+    }
+
+    private void EndCircleAttackDebug(int id)
+    {
+#if UNITY_EDITOR
+        for (int i = activeCircleAttackDebugs.Count - 1; i >= 0; i--)
+        {
+            if (activeCircleAttackDebugs[i].id == id)
+            {
+                activeCircleAttackDebugs.RemoveAt(i);
+                break;
+            }
+        }
+#endif
+    }
+
+    protected virtual void DrawEditModeAttackDebugGizmos()
+    {
+    }
+
+#if UNITY_EDITOR
+
+    private void OnDrawGizmos()
+    {
+        if (!EnableDebug) return;
+
+        Color cachedColor = Gizmos.color;
+
+        if (Application.isPlaying)
+        {
+            if (activeCircleAttackDebugs.Count == 0)
+            {
+                Gizmos.color = cachedColor;
+                return;
+            }
+
+            Gizmos.color = new Color(1f, 0.25f, 0.9f);
+            for (int i = 0; i < activeCircleAttackDebugs.Count; i++)
+            {
+                CircleAttackDebugData data = activeCircleAttackDebugs[i];
+                if (data.attackPos == null) continue;
+
+                Vector3 center = data.attackPos.position + data.offset;
+                Gizmos.DrawWireSphere(center, data.range);
+            }
+        }
+        else
+        {
+            DrawEditModeAttackDebugGizmos();
+        }
+
+        Gizmos.color = cachedColor;
+    }
+
+    private void OnDisable()
+    {
+        activeCircleAttackDebugs.Clear();
+    }
+
+#endif
+
+    #endregion Debugging Gizmos
+
+    #region Utility Methods
 
     public bool Possibility(float i)
     {
@@ -324,6 +454,25 @@ public abstract class IEnemyAction : MonoBehaviour
     {
         yield return TimeScaleManager.WaitForChannelSeconds(i, TimeChannel.Enemy);
     }
+
+    public virtual void OnActionEnd()
+    {
+        attackDirectionSet = false;
+    }
+
+    public bool IsPlayerLeft()
+    {
+        if (player.transform.position.x <= transform.position.x)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    #endregion Utility Methods
 }
 
 [System.Serializable]

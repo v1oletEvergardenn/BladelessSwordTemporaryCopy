@@ -6,10 +6,10 @@ MetaGuid:3c49df15e1605774ea85769fa786a2ca
 Position: $root:1
 
 # $JTbuR7yJykQv9FTW1rVJb5
-Position: $root:1
+Position: $root:0
 
 # $R9yhVhLeycyVZGW5m8FxPg
-Position: $root:2
+Position: $root:1
 + [Sirenix.OdinInspector.FoldoutGroupAttribute]
 	GroupName = "Health and Stun"
 
@@ -22,7 +22,7 @@ Position: $QMuopHuRV5YxhSB4DKDn5i:1
 	LabelWidth = 0
 
 # $4TtzFAncLBmMK7Y9DmYj3Q
-Position: $R9yhVhLeycyVZGW5m8FxPg:0
+Position: $R9yhVhLeycyVZGW5m8FxPg:2
 + [Sirenix.OdinInspector.TabGroupAttribute]
 
 # $QMuopHuRV5YxhSB4DKDn5i
@@ -37,12 +37,12 @@ Position: $4TtzFAncLBmMK7Y9DmYj3Q:1
 	Icon = None
 
 # $R72cLQzxngnd7AP1cyciRf
-Position: $root:3
+Position: $root:2
 + [Sirenix.OdinInspector.FoldoutGroupAttribute]
 	GroupName = "General Setting"
 
 # $VZVgHBETbfc3YhCncoJAmB
-Position: $root:4
+Position: $root:3
 + [Sirenix.OdinInspector.FoldoutGroupAttribute]
 	GroupName = "Debug"
 
@@ -75,7 +75,7 @@ Position: $VZVgHBETbfc3YhCncoJAmB:0
 Position: $R72cLQzxngnd7AP1cyciRf:6
 
 # col
-Position: $R72cLQzxngnd7AP1cyciRf:0
+Position: $R72cLQzxngnd7AP1cyciRf:1
 
 # IN_COMBAT
 Position: $VZVgHBETbfc3YhCncoJAmB:4
@@ -97,16 +97,16 @@ Visibility: Shown
 Position: $R72cLQzxngnd7AP1cyciRf:5
 
 # leftBoundary
-Position: $R72cLQzxngnd7AP1cyciRf:1
-
-# rightBoundary
 Position: $R72cLQzxngnd7AP1cyciRf:2
 
-# GFX
+# rightBoundary
 Position: $R72cLQzxngnd7AP1cyciRf:3
 
-# selfPooler
+# GFX
 Position: $R72cLQzxngnd7AP1cyciRf:4
+
+# selfPooler
+Position: $R72cLQzxngnd7AP1cyciRf:5
 
 # healthPercentage
 Position: $VZVgHBETbfc3YhCncoJAmB:5
@@ -185,3 +185,16 @@ Visibility: Shown
 # ForceBossBreak()
 Position: $MDymr8mSeXbU61qrw73dVh:0
 Visibility: Shown
+
+# StartAction()
+Position: $root:4
+Visibility: Shown
+
+# BossName
+Position: $R9yhVhLeycyVZGW5m8FxPg:0
+
+# bossUI
+Position: $R9yhVhLeycyVZGW5m8FxPg:1
+
+# moveSpeed
+Position: $R72cLQzxngnd7AP1cyciRf:0

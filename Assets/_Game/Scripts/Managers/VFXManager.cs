@@ -58,6 +58,7 @@ public class VFXManager : MonoBehaviour
     {
         gameManager = GameManager.instance;
         objectPooler = ObjectPooler.instance;
+        StopRumble();
     }
 
     #endregion Unity Lifecycle

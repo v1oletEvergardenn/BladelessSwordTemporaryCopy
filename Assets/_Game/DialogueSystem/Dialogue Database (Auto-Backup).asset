@@ -290,7 +290,19 @@ MonoBehaviour:
           CamOffset(0,5,0.1)@0.1;
 
           required
-          CamOffset(reset,3)@1;'
+          CamOffset(reset,3)@2;
+
+          PFace(left);
+
+          PAttack(left,0.5)@2->m(1);
+
+          PAttack(left,0.5)@m(1)->m(2);
+
+          PAttack(left,0.5)@m(2)->m(3);
+
+          PAttack(left,0.5)@m(3)->m(4);
+
+          PAttack(left)@m(4);'
         type: 0
         typeString: 
       - title: Response Menu Sequence
@@ -318,8 +330,8 @@ MonoBehaviour:
           m_Calls: []
       canvasRect:
         serializedVersion: 2
-        x: 80
-        y: 49.28572
+        x: 78.21428
+        y: 47.5
         width: 160
         height: 30
     - id: 1
@@ -349,7 +361,15 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Sequence
-        value: 
+        value: 'PAttack(left)!m(done);
+
+          CamShake(0.1)@0.1!m(camDone);
+
+          {{CameraAndContinueOnStart}};
+
+          asdfasdf
+
+'
         type: 0
         typeString: 
       - title: Response Menu Sequence
@@ -377,8 +397,8 @@ MonoBehaviour:
           m_Calls: []
       canvasRect:
         serializedVersion: 2
-        x: 80.89285
-        y: 131.32143
+        x: 82.67856
+        y: 130.42857
         width: 160
         height: 30
     - id: 2
@@ -408,7 +428,7 @@ MonoBehaviour:
         type: 0
         typeString: CustomFieldType_Text
       - title: Sequence
-        value: PRunTo(TestPoint,right)->Message(P1);
+        value: 
         type: 0
         typeString: CustomFieldType_Text
       conversationID: 3
@@ -487,7 +507,7 @@ MonoBehaviour:
           m_Calls: []
       canvasRect:
         serializedVersion: 2
-        x: 80
+        x: 79.10713
         y: 302
         width: 160
         height: 30
@@ -596,8 +616,8 @@ MonoBehaviour:
         width: 160
         height: 30
     entryGroups: []
-    canvasScrollPosition: {x: 0, y: 0}
-    canvasZoom: 1.12
+    canvasScrollPosition: {x: 18.440857, y: 34.800434}
+    canvasZoom: 1.4199997
   - id: 4
     fields:
     - title: Title

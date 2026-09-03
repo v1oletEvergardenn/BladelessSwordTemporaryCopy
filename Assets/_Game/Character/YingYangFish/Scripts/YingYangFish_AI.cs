@@ -95,8 +95,7 @@ public class YingYangFish_AI : IEnemyController
         base.Start();
         movingTarget = player;
         EventInteract.SetActive(true);
-        HealthUI.SetActive(false);
-
+        bossUI.Hide();
         StopRotate(false);
         canTakeDamage = false;
         centerAnim = center.GetComponent<Animator>();
@@ -208,6 +207,7 @@ public class YingYangFish_AI : IEnemyController
 
     public override void CancelAllAction()
     {
+        base.CancelAllAction();
         TryStopCoroutine(co_sprintToAngle);
         TryStopCoroutine(co_multiCoroutine);
         TryStopCoroutine(co_multiActions);
@@ -451,9 +451,7 @@ public class YingYangFish_AI : IEnemyController
         //start action
         if (initialAction != null)
         {
-            //InsertAction(initialAction, 0);
             lastAction = initialAction;
-            //co_act = StartCoroutine(Act());
         }
         else { StartAction(); return; }
     }
@@ -504,7 +502,7 @@ public class YingYangFish_AI : IEnemyController
         center.DOLocalMove(Vector3.zero, 2f).SetEase(Ease.InOutSine).SetDelay(1f).SetTimeDt(this, TimeChannel.Enemy);
         while (timer <= 2f)
         {
-            timer += enemyDelta;
+            timer += TimeScaleManager.EnemyDt;
 
             if (timer > 1f)
             {
@@ -521,22 +519,20 @@ public class YingYangFish_AI : IEnemyController
         yield return co_fishAppear = StartCoroutine(FishAppear());
 
         IN_COMBAT = true;
-        HealthUI.SetActive(true);
-
+        bossUI.Show();
         StartAction();
         co_act = StartCoroutine(Act());
     }
 
     public IEnumerator PlayerMusic()
     {
-        print(1);
         music1.Play();
         yield return new WaitForSecondsRealtime(26f);
         music2.Play();
         yield return null;
     }
 
-    public override int Damage(float damageAmount, Transform sender, float stunDuration = 0, bool damageFlash = true, float stunValue = 0)
+    public override int Damage(float damageAmount, Transform sender = null, float stunDuration = 0, bool damageFlash = true, float stunValue = 0)
     {
         if (DEAD) { damageAmount = 0; }
         if (!canTakeDamage) damageAmount /= 0.5f;
@@ -555,11 +551,11 @@ public class YingYangFish_AI : IEnemyController
         if (!IN_COMBAT)
         {
             IN_COMBAT = true;
-            HealthUI.SetActive(true);
+            bossUI.Show();
             EventInteract.SetActive(false);
         }
 
-        healthBar.UpdateBar(currentHealth);
+        UpdateBossUI();
         DoBreak(stunValue * 1.5f);
 
         if (currentHealth <= 0)
@@ -659,15 +655,13 @@ public class YingYangFish_AI : IEnemyController
             float t = Mathf.Clamp01(elapsed / duration);
             currentBreak = Mathf.Lerp(startStun, maxBreak, t);
 
-            if (bossBreakBar != null && maxBreak > 0)
-                bossBreakBar.UpdateBar(currentBreak);
+            UpdateBossUI();
 
             yield return null;
         }
 
         currentBreak = maxBreak;
-        if (bossBreakBar != null && maxBreak > 0)
-            bossBreakBar.UpdateBar(maxBreak);
+        UpdateBossUI();
 
         TimeScaleManager.ExitBulletTime();
         isBossBreaking = false;
@@ -681,7 +675,6 @@ public class YingYangFish_AI : IEnemyController
 
     public void PlaySecondPhaseTimeLine()
     {
-
         //Timeline start
         secondPhaseDirector.Play();
 
@@ -702,7 +695,7 @@ public class YingYangFish_AI : IEnemyController
         EventInteract.SetActive(false);
         GameManager.instance.isInPerformingState = true;
         IN_COMBAT = true;
-        HealthUI.SetActive(true);
+        bossUI.Show();
         DEAD = true;
     }
 

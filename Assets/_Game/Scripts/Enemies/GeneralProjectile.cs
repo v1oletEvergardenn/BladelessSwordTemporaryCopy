@@ -33,7 +33,6 @@ public class GeneralProjectile : IProjectile
         rb.velocity = Vector3.zero;
         rb.gravityScale = 0;
         collided = true;
-        GetComponent<Collider2D>().enabled = false;
         Die();
     }
 }

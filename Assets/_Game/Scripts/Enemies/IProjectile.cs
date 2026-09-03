@@ -19,23 +19,24 @@ public abstract class IProjectile : MonoBehaviour
 
     public ProjectileHit hitEffect;
 
-    [HideInInspector] public float originalSpeed;
-    [HideInInspector] public GameObject owner;
-    [HideInInspector] public bool followTarget;
-    [HideInInspector] public Transform target;
-    [HideInInspector] public bool collided = false;
-    [HideInInspector] public bool delayTriggered = false;
-    [HideInInspector] public float lifeTimer = 0f;
-    [HideInInspector] public bool isHostileToPlayer;
-    [HideInInspector] public bool isPerfect;
-    [HideInInspector] public bool canInterruptDelay = false;
-    [HideInInspector] public bool collisionEnabled = true;
-    [HideInInspector] public float delayTimer = 0;
+    public float originalSpeed;
+    public GameObject owner;
+    public bool followTarget;
+    public Transform target;
+    public bool collided = false;
+    public bool delayTriggered = false;
+    public float lifeTimer = 0f;
+    public bool isHostileToPlayer;
+    public bool isPerfect;
+    public bool canInterruptDelay = false;
+    public bool collisionEnabled = true;
+    public float delayTimer = 0;
+    public bool aiming = false;
     // References to managers
 
-    [HideInInspector] public VFXManager vfx;
-    [HideInInspector] public Rigidbody2D rb;
-    [HideInInspector] public GameManager gameManager;
+    public VFXManager vfx;
+    public Rigidbody2D rb;
+    public GameManager gameManager;
 
     public bool muteHitSound = false;
 
@@ -81,6 +82,7 @@ public abstract class IProjectile : MonoBehaviour
         lifeTimer = 0f;
         delayTriggered = false;
         collisionEnabled = true;
+        aiming = false;
     }
 
     public virtual void FixedUpdate()
@@ -103,7 +105,7 @@ public abstract class IProjectile : MonoBehaviour
 
         float dt = TimeScaleManager.Delta(TimeChannel.Projectile);
 
-        if (target != null && followTarget)
+        if (target != null && (followTarget || aiming))
         {
             transform.rotation = Quaternion.RotateTowards(
                 transform.rotation,
@@ -120,6 +122,7 @@ public abstract class IProjectile : MonoBehaviour
             if (!delayTriggered)
             {
                 rb.velocity = transform.right * attribute.speed / 10f * TimeScaleManager.ProjScale;
+                aiming = false;
                 delayTriggered = true;
                 collisionEnabled = true;
             }
@@ -242,7 +245,7 @@ public abstract class IProjectile : MonoBehaviour
     public virtual bool IsOwner(GameObject obj)
     {
         if (obj == owner) return true;
-
+        if (owner == null) return false;
         // Resolve the root IDamagable from the owner.
         // Check SubDamageable FIRST ?SubDamageable also implements IDamagable,
         // so checking IDamagable first would incorrectly treat a child as the root.
@@ -386,11 +389,12 @@ public class ProjectileBuilder
         return this;
     }
 
-    public ProjectileBuilder SetDelay(float delay, bool canInterruptDelay)
+    public ProjectileBuilder SetDelay(float delay, bool canInterruptDelay, bool aiming = false)
     {
         _projectile.delay = delay;
         _projectile.delayTriggered = false;
         _projectile.canInterruptDelay = canInterruptDelay;
+        _projectile.aiming = aiming;
         if (!canInterruptDelay)
         {
             _projectile.collisionEnabled = false;
