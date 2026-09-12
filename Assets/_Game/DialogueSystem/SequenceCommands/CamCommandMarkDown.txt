@@ -124,7 +124,7 @@ Adds temporary camera shake (requires `CinemachineBasicMultiChannelPerlin` on ac
 - `ease` (optional): decay curve, default `InOutSine`
 
 ### Examples
-- `CamShake()`  
+- `CamShake()`   
 - `CamShake(0.5)`  
 - `CamShake(0.8,1.5,25)`  
 - `CamShake(1.0,2.0,30,OutSine)`
@@ -173,6 +173,43 @@ Restores the most recent pushed state.
 - `CamPop()`
 - `CamPop(0.8,InOutSine)`
 - `CamPop(0,InOutSine,cut)`
+
+---
+
+## 10) `CamMoveTo(...)`
+Moves camera follow anchor on X (cutscene helper), using the same movement pattern as player `PMoveTo`.
+
+### Signature
+`CamMoveTo(xOrTarget[,run|walk|speed][,relative|set])`
+
+### Parameters
+- `xOrTarget` (required):
+  - number: X movement amount or absolute X (based on space mode).
+  - string: target GameObject/subject name (moves to target world X).
+- `run|walk|speed` (optional):
+  - `run`: use run speed.
+  - `walk`: use walk speed.
+  - `speed`: custom speed (example: `1.8`).
+  - default: `run`.
+- `relative|set` (optional):
+  - numeric `x` only:
+    - `relative`: move by delta X from current anchor position.
+    - `set`: move to absolute world X.
+  - target name:
+    - moves to target world X directly.
+  - default: `relative`.
+
+### Behavior
+- Always waits until arrival.
+- Uses camera follow anchor movement (for cutscene authoring reliability).
+
+### Examples
+- `CamMoveTo(5)`
+- `CamMoveTo(5,walk)`
+- `CamMoveTo(14,run,set)`
+- `CamMoveTo(2.5,1.8,relative)`
+- `CamMoveTo(BossMark)`
+- `CamMoveTo("BossAnchor",walk)`
 
 ---
 

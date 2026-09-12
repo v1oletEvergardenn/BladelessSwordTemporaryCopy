@@ -49,7 +49,6 @@ Forces Heart Sword **CounterAttack only**.
 
 ### Notes
 - This command is hard-bound to `HS_CounterAttack`.
-- It does **not** use current activated HS ability.
 
 ### Examples
 - `PAttackHS()`
@@ -59,72 +58,53 @@ Forces Heart Sword **CounterAttack only**.
 ---
 
 ## 3) `PHS(...)`
-Forces a specific named Heart Sword ability.
+Forces a specific Heart Sword ability by `HSEnum`.
 
 ### Signature
-`PHS(left|right, abilityName)`
+`PHS(left|right, hsEnum)`
 
 ### Parameters
 - `left|right` (required):
   - attack direction context passed to the ability.
-- `abilityName` (required):
-  - name of HS ability to force.
-  - supported:
-    - `CounterAttack` (aliases: `counter`, `hs_counterattack`)
-    - `CriticalSlash` (aliases: `critical`, `hs_criticalslash`)
-    - `SlashWave` (aliases: `wave`, `hs_slashwave`)
+- `hsEnum` (required):
+  - enum token for ability:
+    - `HSCounterAttack`
+    - `CriticalSlash`
+    - `SlashWave`
+
+### Notes
+- Legacy aliases are still accepted for compatibility (for example `counter`, `critical`, `wave`), but `HSEnum` tokens are recommended.
 
 ### Examples
-- `PHS(left,CounterAttack)`
+- `PHS(left,HSCounterAttack)`
 - `PHS(right,CriticalSlash)`
 - `PHS(left,SlashWave)`
 
 ---
 
-## 4) `PTeleport(...)`
-Forces forward sword teleport.
-
-### Signature
-`PTeleport([wait|nowait])`
-
-### Parameters
-- `wait|nowait` (optional):
-  - `wait`: command blocks until teleport finishes.
-  - `nowait`: command continues immediately.
-  - default: `wait`.
-
-### Examples
-- `PTeleport()`
-- `PTeleport(wait)`
-- `PTeleport(nowait)`
-
----
-
-## 5) `PTeleportTo(...)`
+## 4) `PTeleportTo(...)`
 Forces designated sword teleport to world point or target.
 
 ### Signature
-- `PTeleportTo(x,y[,wait|nowait])`
-- `PTeleportTo(targetName[,wait|nowait])`
+- `PTeleportTo(x,y)`
+- `PTeleportTo(targetName)`
 
 ### Parameters
 - `x,y`:
   - world-space teleport destination.
 - `targetName`:
   - scene object name (or subject name) to use as destination.
-- `wait|nowait` (optional):
-  - same meaning as `PTeleport`.
-  - default: `wait`.
+
+### Notes
+- No `wait|nowait` parameter.
 
 ### Examples
 - `PTeleportTo(12.5,3.0)`
-- `PTeleportTo(12.5,3.0,nowait)`
 - `PTeleportTo(BossAnchor)`
-- `PTeleportTo(BossAnchor,wait)`
 
 ---
 
-## 6) `PMoveTo(...)`
+## 5) `PMoveTo(...)`
 Forced move helper with run/walk/custom speed and optional facing.
 
 ### Signature
@@ -151,68 +131,58 @@ Forced move helper with run/walk/custom speed and optional facing.
   - default: `relative`.
 
 ### Behavior
-- This command **always waits** until movement is complete.
-- No `wait|nowait` parameter.
+- Always waits until movement is complete.
 
 ### Examples
-- `PMoveTo(5)`                          // run, keep, relative
-- `PMoveTo(5,walk)`                     // walk, keep, relative
-- `PMoveTo(14,right,run,set)`           // world X=14
-- `PMoveTo(2.5,left,1.8,relative)`      // custom speed
-- `PMoveTo(BossMark)`                   // move to BossMark.x
-- `PMoveTo("gameobjectName")`           // quoted target form
-- `PMoveTo(BossMark,walk,left)`         // target + walk + facing
+- `PMoveTo(5)`
+- `PMoveTo(5,walk)`
+- `PMoveTo(14,right,run,set)`
+- `PMoveTo(2.5,left,1.8,relative)`
+- `PMoveTo(BossMark)`
+- `PMoveTo("gameobjectName")`
+- `PMoveTo(BossMark,walk,left)`
 
 ---
 
-## 7) `PFace(...)`
-Force facing direction or face target.
+## 6) `PFace(...)`
+Forces facing direction.
 
 ### Signature
-`PFace(left|right|targetName)`
+`PFace(left|right)`
 
 ### Parameters
-- `left|right`:
+- `left|right` (required):
   - explicit facing direction.
-- `targetName`:
-  - face toward target object¡¯s X position.
 
 ### Examples
 - `PFace(left)`
 - `PFace(right)`
-- `PFace(Boss)`
 
 ---
 
-## 8) `PStop()`
+## 7) `PStop()`
 Stops player movement/run-to-target flow.
 
 ### Signature
 `PStop()`
-
-### Parameters
-- none.
 
 ### Examples
 - `PStop()`
 
 ---
 
-## 9) `PJump()`
+## 8) `PJump()`
 Forces jump.
 
 ### Signature
 `PJump()`
-
-### Parameters
-- none.
 
 ### Examples
 - `PJump()`
 
 ---
 
-## 10) `PDoubleJump(...)`
+## 9) `PDoubleJump(...)`
 Forces double jump with hold strength.
 
 ### Signature
@@ -221,7 +191,6 @@ Forces double jump with hold strength.
 ### Parameters
 - `hold` (optional):
   - virtual hold time fed into double-jump force scaling.
-  - higher value => stronger jump (up to gameplay clamp).
   - default: `0.2`.
 
 ### Examples
@@ -230,16 +199,11 @@ Forces double jump with hold strength.
 
 ---
 
-## 11) `PGravity(...)`
+## 10) `PGravity(...)`
 Toggles player gravity.
 
 ### Signature
 `PGravity(on|off)`
-
-### Parameters
-- `on|off` (required):
-  - `on` = restore gravity.
-  - `off` = disable gravity.
 
 ### Examples
 - `PGravity(off)`
@@ -247,29 +211,22 @@ Toggles player gravity.
 
 ---
 
-## 12) `PClearInput()`
-Clears input states and pending attack/floating prep states.
+## 11) `PClearInput()`
+Clears input states and pending action prep states.
 
 ### Signature
 `PClearInput()`
-
-### Parameters
-- none.
 
 ### Examples
 - `PClearInput()`
 
 ---
 
-## 13) `PMoveState(...)`
+## 12) `PMoveState(...)`
 Switches movement state machine state.
 
 ### Signature
 `PMoveState(normal|windwalking|standingontemple)`
-
-### Parameters
-- `normal|windwalking|standingontemple` (required):
-  - target player movement state.
 
 ### Examples
 - `PMoveState(normal)`
@@ -278,42 +235,28 @@ Switches movement state machine state.
 
 ---
 
-## 14) `PAnim(...)`
+## 13) `PAnim(...)`
 Plays body animator state directly.
 
 ### Signature
-`PAnim(stateName[,normalizedTime])`
-
-### Parameters
-- `stateName` (required):
-  - animator state name in body animator.
-- `normalizedTime` (optional):
-  - start position in animation (`0` to `1`).
-  - default: `0`.
+`PAnim(stateName)`
 
 ### Examples
 - `PAnim(idle)`
-- `PAnim(attack_idle_1,0.0)`
-- `PAnim(tele_pre_idle,0.2)`
+- `PAnim(attack_idle_1)`
+- `PAnim(tele_pre_idle)`
 
 ---
 
-## 15) `PLegAnim(...)`
+## 14) `PLegAnim(...)`
 Plays leg animator state directly.
 
 ### Signature
-`PLegAnim(stateName[,normalizedTime])`
-
-### Parameters
-- `stateName` (required):
-  - animator state name in leg animator.
-- `normalizedTime` (optional):
-  - start position in animation (`0` to `1`).
-  - default: `0`.
+`PLegAnim(stateName)`
 
 ### Examples
 - `PLegAnim(leg_idle)`
-- `PLegAnim(leg_run,0.0)`
+- `PLegAnim(leg_run)`
 
 ---
 
@@ -332,7 +275,7 @@ Use message chaining for deterministic behavior:
 - `CmdA()->Message(Step1);`
 - `CmdB()@Message(Step1)->Message(Step2);`
 
-Use `required` for must-run cleanup/critical steps:
+Use `required` for must-run cleanup:
 - `required PStop()@Message(StepX);`
 
 ---
@@ -342,8 +285,8 @@ Use `required` for must-run cleanup/critical steps:
 PClearInput();
 
 PFace(right);
-PAnim(idle,0);
-PLegAnim(leg_idle,0);
+PAnim(idle);
+PLegAnim(leg_idle);
 
 PMoveTo(6,run,right,relative)->Message(P1);
 PMoveTo(2,walk,left,relative)@Message(P1)->Message(P2);
@@ -352,21 +295,20 @@ PMoveTo(14,1.8,keep,set)@Message(P2)->Message(P3);
 PAttack(right)@Message(P3)->Message(P4);
 PAttackHS(left)@Message(P4)->Message(P5);
 
-PHS(right,CounterAttack)@Message(P5)->Message(P6);
+PHS(right,HSCounterAttack)@Message(P5)->Message(P6);
 PHS(left,CriticalSlash)@Message(P6)->Message(P7);
 PHS(right,SlashWave)@Message(P7)->Message(P8);
 
-PTeleport(wait)@Message(P8)->Message(P9);
-PTeleportTo(Boss,wait)@Message(P9)->Message(P10);
+PTeleportTo(Boss)@Message(P8)->Message(P9);
 
-PJump()@Message(P10)->Message(P11);
-PDoubleJump(0.25)@Message(P11)->Message(P12);
+PJump()@Message(P9)->Message(P10);
+PDoubleJump(0.25)@Message(P10)->Message(P11);
 
-PGravity(off)@Message(P12)->Message(P13);
-PAnim(idle,0)@Message(P13)->Message(P14);
-PGravity(on)@Message(P14)->Message(P15);
+PGravity(off)@Message(P11)->Message(P12);
+PAnim(idle)@Message(P12)->Message(P13);
+PGravity(on)@Message(P13)->Message(P14);
 
-PMoveState(windwalking)@Message(P15)->Message(P16);
-PMoveState(normal)@Message(P16)->Message(P17);
+PMoveState(windwalking)@Message(P14)->Message(P15);
+PMoveState(normal)@Message(P15)->Message(P16);
 
-required PStop()@Message(P17);
+required PStop()@Message(P16);

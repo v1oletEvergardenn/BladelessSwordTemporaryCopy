@@ -7,18 +7,33 @@ using UnityEngine.Playables;
 public class PlayerActionBehaviour : PlayableBehaviour
 {
     public PlayerTimelineActionType actionType;
-    public bool useTimelineMotion;
-    public PlayerMoveExecutionMode moveMode;
+    public PlayerTimelineDirection direction;
+    public HSEnum hsEnum;
+
     public PlayerMoveSpeedOption speedOption;
     public float customSpeed;
     public bool useStartPosition;
-    public bool useRepelGizmoPosition;
+    public bool useStartTransform;
+    public Transform startTarget;
+    public Vector3 startWorldPosition;
+    public bool useEndTransform;
+    public Transform endTarget;
+    public Vector3 endWorldPosition;
+
+    public bool useTeleportTargetTransform;
+    public Transform teleportTarget;
+    public Vector3 teleportWorldPosition;
+
+    public bool useRepelDistance;
     public float repelDistance;
+    public bool useRepelTargetTransform;
+    public Transform repelTarget;
+    public Vector3 repelWorldPosition;
 
-    [Header("Move Path")]
-    public Vector3 startPosition;
-
-    public Vector3 endPosition;
+    public float doubleJumpHold;
+    public bool gravityEnabled;
+    public PlayerTimelineMoveState moveState;
+    public string animStateName;
 
     private bool _triggered;
     private PlayerControl _controller;
@@ -29,84 +44,112 @@ public class PlayerActionBehaviour : PlayableBehaviour
         if (info.effectiveWeight <= 0f)
             return;
 
-        if (actionType == PlayerTimelineActionType.MoveTo)
-        {
-            if (moveMode == PlayerMoveExecutionMode.RunToPosition)
-            {
-                if (!Application.isPlaying || _triggered)
-                    return;
-
-                _triggered = true;
-                ResolvePlayerContext();
-
-                if (useStartPosition && _playerTransform != null)
-                    _playerTransform.position = new Vector3(startPosition.x, _playerTransform.position.y, _playerTransform.position.z);
-
-                PlayerTimeLineActions handler = PlayerTimeLineActions.instance;
-                if (handler == null)
-                    return;
-
-                if (speedOption == PlayerMoveSpeedOption.WalkSpeed)
-                    handler.MoveTo(endPosition, false);
-                else if (speedOption == PlayerMoveSpeedOption.CustomSpeed)
-                    handler.MoveTo(endPosition, customSpeed);
-                else
-                    handler.MoveTo(endPosition, true);
-
-                return;
-            }
-
-            if (useTimelineMotion)
-            {
-                ResolvePlayerContext();
-                if (_playerTransform == null)
-                    return;
-
-                double duration = playable.GetDuration();
-                float t = duration > double.Epsilon
-                    ? Mathf.Clamp01((float)(playable.GetTime() / duration))
-                    : 1f;
-
-                float sampledX = Mathf.Lerp(startPosition.x, endPosition.x, t);
-                float dir = startPosition.x >= endPosition.x ? -1f : 1f;
-
-                InputPlayer.instance.movementInputUpdateLock.Add("isTimelineMoving");
-                if (Application.isPlaying && _controller != null)
-                    _controller.Move(dir, 0);
-
-                Vector3 p = _playerTransform.position;
-                _playerTransform.position = new Vector3(sampledX, p.y, p.z);
-                return;
-            }
-        }
-
         if (!Application.isPlaying || _triggered)
             return;
 
         _triggered = true;
+        ResolvePlayerContext();
 
         PlayerTimeLineActions actions = PlayerTimeLineActions.instance;
         if (actions == null)
             return;
 
-        if (actionType == PlayerTimelineActionType.Repel)
+        switch (actionType)
         {
-            if (useRepelGizmoPosition)
-                actions.RepelTo(endPosition);
-            else
-                actions.RepelByDistance(repelDistance);
+            case PlayerTimelineActionType.MoveTo:
+                ExecuteMoveTo(actions);
+                break;
+
+            case PlayerTimelineActionType.Repel:
+                if (useRepelDistance)
+                    actions.RepelByDistance(repelDistance);
+                else
+                    actions.RepelTo(ResolveWorldPosition(useRepelTargetTransform, repelTarget, repelWorldPosition));
+                break;
+
+            case PlayerTimelineActionType.Attack:
+                actions.Attack(direction == PlayerTimelineDirection.Left);
+                break;
+
+            case PlayerTimelineActionType.AttackHS:
+                actions.AttackHS(direction == PlayerTimelineDirection.Left);
+                break;
+
+            case PlayerTimelineActionType.HSAbility:
+                actions.HSAbility(hsEnum, direction == PlayerTimelineDirection.Left);
+                break;
+
+            case PlayerTimelineActionType.TeleportTo:
+                actions.TeleportTo(ResolveWorldPosition(useTeleportTargetTransform, teleportTarget, teleportWorldPosition));
+                break;
+
+            case PlayerTimelineActionType.Face:
+                actions.Face(direction == PlayerTimelineDirection.Right);
+                break;
+
+            case PlayerTimelineActionType.Stop:
+                actions.StopMovement();
+                break;
+
+            case PlayerTimelineActionType.Jump:
+                actions.Jump();
+                break;
+
+            case PlayerTimelineActionType.DoubleJump:
+                actions.DoubleJump(doubleJumpHold);
+                break;
+
+            case PlayerTimelineActionType.Gravity:
+                actions.SetGravity(gravityEnabled);
+                break;
+
+            case PlayerTimelineActionType.ClearInput:
+                actions.ClearInput();
+                break;
+
+            case PlayerTimelineActionType.MoveState:
+                actions.SetMoveState(moveState);
+                break;
+
+            case PlayerTimelineActionType.BodyAnim:
+                actions.PlayBodyAnim(animStateName);
+                break;
+
+            case PlayerTimelineActionType.LegAnim:
+                actions.PlayLegAnim(animStateName);
+                break;
         }
     }
 
     public override void OnBehaviourPause(Playable playable, FrameData info)
     {
         _triggered = false;
+    }
 
-        if (Application.isPlaying && _controller != null && useTimelineMotion)
+    private void ExecuteMoveTo(PlayerTimeLineActions actions)
+    {
+        if (useStartPosition && _playerTransform != null)
         {
-            _controller.Move(0f);
-            InputPlayer.instance.movementInputUpdateLock.Remove("isTimelineMoving");
+            Vector3 start = ResolveWorldPosition(useStartTransform, startTarget, startWorldPosition);
+            _playerTransform.position = new Vector3(start.x, _playerTransform.position.y, _playerTransform.position.z);
         }
+
+        Vector3 end = ResolveWorldPosition(useEndTransform, endTarget, endWorldPosition);
+
+        if (speedOption == PlayerMoveSpeedOption.WalkSpeed)
+            actions.MoveTo(end, false);
+        else if (speedOption == PlayerMoveSpeedOption.CustomSpeed)
+            actions.MoveTo(end, customSpeed);
+        else
+            actions.MoveTo(end, true);
+    }
+
+    private static Vector3 ResolveWorldPosition(bool useTransform, Transform target, Vector3 worldPosition)
+    {
+        if (useTransform && target != null)
+            return target.position;
+
+        return worldPosition;
     }
 
     private void ResolvePlayerContext()

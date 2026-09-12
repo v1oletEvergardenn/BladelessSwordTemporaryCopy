@@ -2,15 +2,6 @@ OVDF v1.1
 PlayerActionClip, Project.Main
 MetaGuid:028877a917aafc3429bf44ef9957ce2c
 
-# $SUDMk18hYzkpxVJ8q1YSoB
-Position: $root:7
-+ [Sirenix.OdinInspector.TitleGroupAttribute]
-	GroupName = "Actions"
-	Indent = True
-	BoldTitle = True
-	HorizontalLine = True
-	Alignment = Left
-
 # showMoveTargetGizmo
 Position: $VNDUaKpTqArmq2xCxFBBT4:0
 - [UnityEngine.HeaderAttribute]
@@ -22,8 +13,9 @@ Position: $VNDUaKpTqArmq2xCxFBBT4:2
 	SpaceAfter = 6
 
 # actionType
-Position: $SUDMk18hYzkpxVJ8q1YSoB:0
+Position: $root:0
 - [UnityEngine.HeaderAttribute]
++ [Sirenix.OdinInspector.EnumToggleButtonsAttribute]
 
 # useTargetTransform
 Position: $SUDMk18hYzkpxVJ8q1YSoB:1
@@ -44,32 +36,48 @@ Position: $SUDMk18hYzkpxVJ8q1YSoB:2
 Position: $SUDMk18hYzkpxVJ8q1YSoB:1
 
 # moveSpeed
-Position: $SUDMk18hYzkpxVJ8q1YSoB:2
+Position: $root:72
 - [UnityEngine.MinAttribute]
 
 # useStartTransform
-Position: $SUDMk18hYzkpxVJ8q1YSoB:3
+Position: $root:68
 - [UnityEngine.HeaderAttribute]
 
 # startTarget
-Position: $SUDMk18hYzkpxVJ8q1YSoB:5
+Position: $root:70
 
 # useEndTransform
-Position: $SUDMk18hYzkpxVJ8q1YSoB:4
+Position: $root:69
 
 # endTarget
-Position: $SUDMk18hYzkpxVJ8q1YSoB:6
+Position: $root:71
 
 # moveMode
-Position: $SUDMk18hYzkpxVJ8q1YSoB:1
+Position: $root:71
 
 # speedOption
-Position: $SUDMk18hYzkpxVJ8q1YSoB:8
+Position: $root:74
 + [Sirenix.OdinInspector.EnumToggleButtonsAttribute]
 
 # useStartPosition
-Position: $SUDMk18hYzkpxVJ8q1YSoB:7
+Position: $root:1
 
 # customSpeed
-Position: $SUDMk18hYzkpxVJ8q1YSoB:9
+Position: $root:75
 - [UnityEngine.MinAttribute]
+
+# direction
+Position: $root:76
++ [Sirenix.OdinInspector.EnumToggleButtonsAttribute]
+
+# hsAbilityName
+Position: $root:81
+
+# endWorldPosition
+Position: $root:72
+
+# startWorldPosition
+Position: $root:73
+
+# moveState
++ [Sirenix.OdinInspector.EnumToggleButtonsAttribute]

@@ -8,10 +8,6 @@ using UnityEngine.Timeline;
 [CustomTimelineEditor(typeof(PlayerActionClip))]
 public class PlayerActionClipTimelineEditor : ClipEditor
 {
-    private const float DefaultRunSpeed = 10f;
-    private const float DefaultWalkSpeed = 3f;
-    private const float RepelSpeed = 15f;
-
     private static readonly Color StartColor = new Color(0.3f, 1.0f, 0.8f, 1.0f);
     private static readonly Color EndColor = new Color(1.0f, 0.8f, 0.2f, 1.0f);
     private static readonly Color MidColor = new Color(0.9f, 0.95f, 1.0f, 1.0f);
@@ -38,19 +34,6 @@ public class PlayerActionClipTimelineEditor : ClipEditor
         SceneView.duringSceneGui += DrawSelectedClipHandles;
     }
 
-    public override void OnCreate(TimelineClip clip, TrackAsset track, TimelineClip clonedFrom)
-    {
-        base.OnCreate(clip, track, clonedFrom);
-        TryAutoUpdateClipDuration(clip);
-        SceneView.RepaintAll();
-    }
-
-    public override void OnClipChanged(TimelineClip clip)
-    {
-        TryAutoUpdateClipDuration(clip);
-        SceneView.RepaintAll();
-    }
-
     private static void DrawSelectedClipHandles(SceneView sceneView)
     {
         TimelineClip selectedClip = TimelineEditor.selectedClip;
@@ -60,16 +43,43 @@ public class PlayerActionClipTimelineEditor : ClipEditor
         PlayableDirector director = TimelineEditor.inspectedDirector;
         if (director == null) return;
 
-        bool isMove = clipAsset.actionType == PlayerTimelineActionType.MoveTo;
-        bool isRepel = clipAsset.actionType == PlayerTimelineActionType.Repel;
-        bool isTimelineMove = isMove && clipAsset.moveMode != PlayerMoveExecutionMode.RunToPosition;
-        bool isRunToPosition = isMove && clipAsset.moveMode == PlayerMoveExecutionMode.RunToPosition;
+        if (clipAsset.actionType == PlayerTimelineActionType.MoveTo)
+        {
+            DrawMoveHandles(clipAsset, director, selectedClip);
+            return;
+        }
 
-        bool showStartHandle = isTimelineMove || (isRunToPosition && clipAsset.useStartPosition);
-        Vector3 startPosition = ResolveStartPosition(clipAsset, director);
-        Vector3 endPosition = ResolveEndPosition(clipAsset, director);
+        if (clipAsset.actionType == PlayerTimelineActionType.TeleportTo && !clipAsset.useTeleportTargetTransform)
+        {
+            DrawCubePointHandle(
+                clipAsset,
+                clipAsset.teleportWorldPosition,
+                value => clipAsset.teleportWorldPosition = value,
+                "TeleportTo",
+                EndColor
+            );
+            return;
+        }
 
-        bool canEditStart = showStartHandle && (!isTimelineMove || !clipAsset.useStartTransform);
+        if (clipAsset.actionType == PlayerTimelineActionType.Repel && !clipAsset.useRepelDistance && !clipAsset.useRepelTargetTransform)
+        {
+            DrawCubePointHandle(
+                clipAsset,
+                clipAsset.repelWorldPosition,
+                value => clipAsset.repelWorldPosition = value,
+                "Repel",
+                EndColor
+            );
+        }
+    }
+
+    private static void DrawMoveHandles(PlayerActionClip clipAsset, PlayableDirector director, TimelineClip selectedClip)
+    {
+        Vector3 startPosition = ResolvePosition(clipAsset.useStartTransform, clipAsset.startTarget.Resolve(director), clipAsset.startWorldPosition);
+        Vector3 endPosition = ResolvePosition(clipAsset.useEndTransform, clipAsset.endTarget.Resolve(director), clipAsset.endWorldPosition);
+
+        bool showStartHandle = clipAsset.useStartPosition;
+        bool canEditStart = showStartHandle && !clipAsset.useStartTransform;
         bool canEditEnd = !clipAsset.useEndTransform;
         bool canMoveBoth = showStartHandle && canEditStart && canEditEnd;
 
@@ -98,8 +108,7 @@ public class PlayerActionClipTimelineEditor : ClipEditor
         else
         {
             float endSize = HandleUtility.GetHandleSize(endPosition) * 0.18f;
-            string endLabel = isRepel ? "Repel" : selectedClip.displayName;
-            DrawCubeHandleVisual(endPosition, endSize, EndColor, endLabel);
+            DrawCubeHandleVisual(endPosition, endSize, EndColor, selectedClip.displayName);
         }
 
         EditorGUI.BeginChangeCheck();
@@ -214,123 +223,42 @@ public class PlayerActionClipTimelineEditor : ClipEditor
             clipAsset.endWorldPosition = newEnd;
 
         EditorUtility.SetDirty(clipAsset);
-        TryAutoUpdateClipDuration(selectedClip);
         TimelineEditor.Refresh(RefreshReason.ContentsModified);
     }
 
-    private static void TryAutoUpdateClipDuration(TimelineClip clip)
+    private static void DrawCubePointHandle(PlayerActionClip clipAsset, Vector3 current, Action<Vector3> setter, string label, Color color)
     {
-        if (clip == null) return;
-        if (!(clip.asset is PlayerActionClip clipAsset)) return;
+        float size = HandleUtility.GetHandleSize(current) * 0.18f;
+        DrawCubeHandleVisual(current, size, color, label);
 
-        PlayableDirector director = TimelineEditor.inspectedDirector;
-        if (director == null) return;
+        EditorGUI.BeginChangeCheck();
 
-        double newDuration;
+        Handles.color = color;
+        Vector3 next = Handles.Slider2D(
+            current,
+            Vector3.forward,
+            Vector3.right,
+            Vector3.up,
+            HandleUtility.GetHandleSize(current) * 0.16f,
+            Handles.RectangleHandleCap,
+            Vector2.zero
+        );
 
-        if (clipAsset.actionType == PlayerTimelineActionType.MoveTo)
-        {
-            float speed;
-            Vector3 startPosition;
-
-            if (clipAsset.moveMode == PlayerMoveExecutionMode.TimelineFixedSpeed)
-            {
-                speed = Mathf.Max(0.01f, clipAsset.moveSpeed);
-                startPosition = ResolveStartPosition(clipAsset, director);
-            }
-            else if (clipAsset.moveMode == PlayerMoveExecutionMode.RunToPosition)
-            {
-                if (!clipAsset.useStartPosition)
-                    return;
-
-                speed = Mathf.Max(0.01f, ResolveMoveSpeed(clipAsset));
-                startPosition = ResolveStartPosition(clipAsset, director);
-            }
-            else
-            {
-                return;
-            }
-
-            Vector3 endPosition = ResolveEndPosition(clipAsset, director);
-            float distance = Vector3.Distance(startPosition, endPosition);
-            newDuration = Math.Max(0.05d, distance / speed);
-        }
-        else if (clipAsset.actionType == PlayerTimelineActionType.Repel)
-        {
-            // Keep manual clip length when using gizmo target, because player position is unknown in editor mode.
-            if (clipAsset.useRepelGizmoPosition)
-                return;
-
-            float distance = Mathf.Abs(clipAsset.repelDistance);
-            newDuration = Math.Max(0.05d, distance / RepelSpeed);
-        }
-        else
-        {
-            return;
-        }
-
-        if (Math.Abs(clip.duration - newDuration) < 0.0001d)
+        if (!EditorGUI.EndChangeCheck())
             return;
 
-        clip.duration = newDuration;
+        Undo.RecordObject(clipAsset, $"Move {label} Point");
+        setter(next);
+        EditorUtility.SetDirty(clipAsset);
         TimelineEditor.Refresh(RefreshReason.ContentsModified);
     }
 
-    private static float ResolveMoveSpeed(PlayerActionClip clipAsset)
+    private static Vector3 ResolvePosition(bool useTransform, Transform target, Vector3 worldPosition)
     {
-        if (clipAsset.speedOption == PlayerMoveSpeedOption.CustomSpeed)
-            return clipAsset.customSpeed;
+        if (useTransform && target != null)
+            return target.position;
 
-        PlayerControl controller = ResolveCharacterController();
-        if (controller == null)
-            return clipAsset.speedOption == PlayerMoveSpeedOption.WalkSpeed ? DefaultWalkSpeed : DefaultRunSpeed;
-
-        if (clipAsset.speedOption == PlayerMoveSpeedOption.WalkSpeed)
-            return controller.GetWalkSpeed();
-
-        return controller.GetRunSpeed();
-    }
-
-    private static PlayerControl ResolveCharacterController()
-    {
-        PlayerControl controller = PlayerControl.instance;
-        if (controller == null)
-            controller = UnityEngine.Object.FindObjectOfType<PlayerControl>();
-
-        return controller;
-    }
-
-    private static Vector3 ResolveCurrentPlayerPosition()
-    {
-        PlayerControl controller = ResolveCharacterController();
-        if (controller != null)
-            return controller.transform.position;
-
-        return Vector3.zero;
-    }
-
-    private static Vector3 ResolveStartPosition(PlayerActionClip clipAsset, PlayableDirector director)
-    {
-        if (clipAsset.useStartTransform && clipAsset.moveMode != PlayerMoveExecutionMode.RunToPosition)
-        {
-            Transform startTransform = clipAsset.startTarget.Resolve(director);
-            if (startTransform != null)
-                return startTransform.position;
-        }
-
-        return clipAsset.startWorldPosition;
-    }
-
-    private static Vector3 ResolveEndPosition(PlayerActionClip clipAsset, PlayableDirector director)
-    {
-        if (clipAsset.useEndTransform)
-        {
-            Transform endTransform = clipAsset.endTarget.Resolve(director);
-            if (endTransform != null)
-                return endTransform.position;
-        }
-
-        return clipAsset.endWorldPosition;
+        return worldPosition;
     }
 
     private static void DrawCubeHandleVisual(Vector3 position, float size, Color fillColor, string label)

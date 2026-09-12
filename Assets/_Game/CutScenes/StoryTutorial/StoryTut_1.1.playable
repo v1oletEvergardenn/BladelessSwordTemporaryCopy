@@ -1,0 +1,2391 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8468095771169858384
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b7f9d461c6bad14caf561f7801925a8, type: 3}
+  m_Name: DialogueCommandClip
+  m_EditorClassIdentifier: 
+  listener:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  commands:
+  - delay: 0
+    useClipLength: 1
+    commandType: 1
+    audioClip: 
+    audioSubjectMode: 0
+    audioSubjectName: 
+    audioSubjectTransform:
+      exposedName: 
+      defaultValue: {fileID: 0}
+    audioOneShot: 0
+    fadeDirection: 0
+    fadeDuration: 0.5
+    fadeColor: {r: 1, g: 1, b: 1, a: 1}
+    animatorCommandType: 0
+    animatorSubjectMode: 0
+    animatorSubjectName: 
+    animatorSubjectTransform:
+      exposedName: 
+      defaultValue: {fileID: 0}
+    animatorClipName: 
+    animatorResetTrigger: 
+    animatorBoolValue: 1
+    animatorIntValue: 1
+    animatorFloatValue: 1
+    animatorFloatDuration: 0
+    setActiveTargetMode: 2
+    setActiveTargetName: 
+    setActiveTargetTransform:
+      exposedName: 
+      defaultValue: {fileID: 0}
+    setActiveValue: 0
+    setEnabledComponentName: 
+    setEnabledValue: 0
+    setEnabledSubjectMode: 0
+    setEnabledSubjectName: 
+    setEnabledSubjectTransform:
+      exposedName: 
+      defaultValue: {fileID: 0}
+    sendMessageUpwards: 0
+    sendMessageMethod: 
+    sendMessageArgument: 
+    sendMessageSubjectMode: 0
+    sendMessageSubjectName: 
+    sendMessageSubjectTransform:
+      exposedName: 
+      defaultValue: {fileID: 0}
+    sendMessageBroadcast: 0
+    variableName: 
+    variableValue: true
+    continueAll: 0
+    continueMode: true
+    timelineCommandType: 1
+    timelineName: 
+--- !u!114 &-6234626198860982007
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7ce34e61cb2a84bbe870b881961a84, type: 3}
+  m_Name: CameraActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  actionType: 7
+  useClipDuration: 1
+  duration: 0.1
+  ease: 3
+  switchTargetType: 3
+  cameraKeyOrName: 
+  cameraReference:
+    exposedName: 962c94c93e9f3da4ba374945a698f91e
+    defaultValue: {fileID: 0}
+  cut: 0
+  useStartPosition: 0
+  useStartTransform: 0
+  startTarget:
+    exposedName: 4f0edcf445cbc0941b7301af11b9870c
+    defaultValue: {fileID: 0}
+  startWorldPosition: {x: -6.810943, y: 4.0872774, z: 0}
+  useEndTransform: 0
+  endTarget:
+    exposedName: e3d426922afe73d49b59a5c3f5e4e7e4
+    defaultValue: {fileID: 0}
+  endWorldPosition: {x: -6.416628, y: -2.9501953, z: 0}
+  resetTargets: 0
+  zoomValue: 0
+  zoomRelative: 0
+  followTarget:
+    exposedName: 495f6ad321fe82a44bf377a8a99ae6f3
+    defaultValue: {fileID: 0}
+  shakeAmplitude: 1
+  shakeFrequency: 20
+  offsetX: 0
+  offsetY: -1
+  offsetRelative: 1
+--- !u!114 &-6202038230866793980
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7ce34e61cb2a84bbe870b881961a84, type: 3}
+  m_Name: CameraActionClip
+  m_EditorClassIdentifier: 
+  actionType: 0
+  useClipDuration: 1
+  duration: 0.1
+  ease: 3
+  switchTargetType: 3
+  cameraKeyOrName: 
+  cameraReference:
+    exposedName: 6d00631687fa13c4c95c115521c021b5
+    defaultValue: {fileID: 0}
+  cut: 1
+  useStartPosition: 1
+  useStartTransform: 0
+  startTarget:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  startWorldPosition: {x: -6.810943, y: 4.0872774, z: 0}
+  useEndTransform: 0
+  endTarget:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  endWorldPosition: {x: -6.84302, y: -3.977723, z: 0}
+  resetTargets: 4
+  zoomValue: 0
+  zoomRelative: 0
+  followTarget:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  shakeAmplitude: 1
+  shakeFrequency: 20
+  offsetX: 0
+  offsetY: 5
+  offsetRelative: 1
+--- !u!114 &-5910791855190073809
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b7f9d461c6bad14caf561f7801925a8, type: 3}
+  m_Name: DialogueCommandClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  listener:
+    exposedName: b5311a2af39780e41951d54440a8e087
+    defaultValue: {fileID: 0}
+  commands:
+  - delay: 0
+    useClipLength: 1
+    commandType: 9
+    audioClip: 
+    audioSubjectMode: 0
+    audioSubjectName: 
+    audioSubjectTransform:
+      exposedName: 7c0782c42b8d5b7489e7c7f59ae1914b
+      defaultValue: {fileID: 0}
+    audioOneShot: 0
+    fadeDirection: 1
+    fadeDuration: 0.5
+    fadeColor: {r: 0, g: 0, b: 0, a: 1}
+    animatorCommandType: 0
+    animatorSubjectMode: 0
+    animatorSubjectName: 
+    animatorSubjectTransform:
+      exposedName: 0892d8c1b93fb4d47ab01bd5656bb15c
+      defaultValue: {fileID: 0}
+    animatorClipName: 
+    animatorResetTrigger: 
+    animatorBoolValue: 1
+    animatorIntValue: 1
+    animatorFloatValue: 1
+    animatorFloatDuration: 0
+    setActiveTargetMode: 2
+    setActiveTargetName: 
+    setActiveTargetTransform:
+      exposedName: 7c97610fed29cff45888345b4d2e8f0d
+      defaultValue: {fileID: 0}
+    setActiveValue: 0
+    setEnabledComponentName: 
+    setEnabledValue: 0
+    setEnabledSubjectMode: 0
+    setEnabledSubjectName: 
+    setEnabledSubjectTransform:
+      exposedName: d2692cc13c177b24da40f7ccf3abf5e5
+      defaultValue: {fileID: 0}
+    sendMessageUpwards: 0
+    sendMessageMethod: 
+    sendMessageArgument: 
+    sendMessageSubjectMode: 0
+    sendMessageSubjectName: 
+    sendMessageSubjectTransform:
+      exposedName: 468957ae4c92b464285feebd1ce856aa
+      defaultValue: {fileID: 0}
+    sendMessageBroadcast: 0
+    variableName: 
+    variableValue: true
+    continueAll: 0
+    continueMode: true
+    timelineCommandType: 0
+    timelineName: 
+--- !u!114 &-5371413182049310125
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b7f9d461c6bad14caf561f7801925a8, type: 3}
+  m_Name: DialogueCommandClip(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  listener:
+    exposedName: a6c37aff5e431dc4c846e15c27788489
+    defaultValue: {fileID: 0}
+  commands:
+  - delay: 0
+    useClipLength: 1
+    commandType: 1
+    audioClip: 
+    audioSubjectMode: 0
+    audioSubjectName: 
+    audioSubjectTransform:
+      exposedName: d46a5cf82e329574aa84910ad6a64586
+      defaultValue: {fileID: 0}
+    audioOneShot: 0
+    fadeDirection: 0
+    fadeDuration: 0.5
+    fadeColor: {r: 1, g: 1, b: 1, a: 1}
+    animatorCommandType: 0
+    animatorSubjectMode: 0
+    animatorSubjectName: 
+    animatorSubjectTransform:
+      exposedName: 2b2d46fadadc3bb4ab865e08ce65146f
+      defaultValue: {fileID: 0}
+    animatorClipName: 
+    animatorResetTrigger: 
+    animatorBoolValue: 1
+    animatorIntValue: 1
+    animatorFloatValue: 1
+    animatorFloatDuration: 0
+    setActiveTargetMode: 2
+    setActiveTargetName: 
+    setActiveTargetTransform:
+      exposedName: 9f68136790dec584fb302cbc5b4e2afe
+      defaultValue: {fileID: 0}
+    setActiveValue: 0
+    setEnabledComponentName: 
+    setEnabledValue: 0
+    setEnabledSubjectMode: 0
+    setEnabledSubjectName: 
+    setEnabledSubjectTransform:
+      exposedName: a7dd21cecfe941c43bc8fcbed4b3a463
+      defaultValue: {fileID: 0}
+    sendMessageUpwards: 0
+    sendMessageMethod: 
+    sendMessageArgument: 
+    sendMessageSubjectMode: 0
+    sendMessageSubjectName: 
+    sendMessageSubjectTransform:
+      exposedName: f0daffa8ef47c87408d64fd68415b1ac
+      defaultValue: {fileID: 0}
+    sendMessageBroadcast: 0
+    variableName: 
+    variableValue: true
+    continueAll: 0
+    continueMode: true
+    timelineCommandType: 1
+    timelineName: 
+--- !u!114 &-4216058159757309330
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 028877a917aafc3429bf44ef9957ce2c, type: 3}
+  m_Name: PlayerActionClip(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  actionType: 3
+  direction: 0
+  hsEnum: 1
+  speedOption: 0
+  customSpeed: 3
+  useStartPosition: 0
+  useStartTransform: 0
+  startTarget:
+    exposedName: c93a33d8a160f584788314be0ecb175e
+    defaultValue: {fileID: 0}
+  startWorldPosition: {x: 0, y: 0, z: 0}
+  useEndTransform: 0
+  endTarget:
+    exposedName: 76e58dd52d9c88e4aae9d3a254c878e8
+    defaultValue: {fileID: 0}
+  endWorldPosition: {x: -15.899578, y: -4.3220487, z: 0}
+  useTeleportTargetTransform: 0
+  teleportTarget:
+    exposedName: 86d2b352e5ba60946aef67b43a9fb888
+    defaultValue: {fileID: 0}
+  teleportWorldPosition: {x: 0, y: 0, z: 0}
+  useRepelDistance: 0
+  repelDistance: 2
+  useRepelTargetTransform: 0
+  repelTarget:
+    exposedName: 3bfd8706f57462a4fab4f2039ac39473
+    defaultValue: {fileID: 0}
+  repelWorldPosition: {x: 0, y: 0, z: 0}
+  doubleJumpHold: 0.2
+  gravityEnabled: 1
+  moveState: 0
+  animStateName: idle
+--- !u!114 &-3353567454671417032
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b7f9d461c6bad14caf561f7801925a8, type: 3}
+  m_Name: DialogueCommandClip(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  listener:
+    exposedName: aeb5b3ce4a79fe447ac9c3dab8786219
+    defaultValue: {fileID: 0}
+  commands:
+  - delay: 0
+    useClipLength: 1
+    commandType: 9
+    audioClip: 
+    audioSubjectMode: 0
+    audioSubjectName: 
+    audioSubjectTransform:
+      exposedName: 2e06dd760874ec74fb9fd53066b7ed44
+      defaultValue: {fileID: 0}
+    audioOneShot: 0
+    fadeDirection: 1
+    fadeDuration: 0.5
+    fadeColor: {r: 0, g: 0, b: 0, a: 1}
+    animatorCommandType: 0
+    animatorSubjectMode: 0
+    animatorSubjectName: 
+    animatorSubjectTransform:
+      exposedName: 04b0d3e1945ed8043b64e7dbde788116
+      defaultValue: {fileID: 0}
+    animatorClipName: 
+    animatorResetTrigger: 
+    animatorBoolValue: 1
+    animatorIntValue: 1
+    animatorFloatValue: 1
+    animatorFloatDuration: 0
+    setActiveTargetMode: 2
+    setActiveTargetName: 
+    setActiveTargetTransform:
+      exposedName: fae373ff566395d4b8ec87b067f6f2e4
+      defaultValue: {fileID: 0}
+    setActiveValue: 0
+    setEnabledComponentName: 
+    setEnabledValue: 0
+    setEnabledSubjectMode: 0
+    setEnabledSubjectName: 
+    setEnabledSubjectTransform:
+      exposedName: f34dd37b47574de428ce76ceeacaa969
+      defaultValue: {fileID: 0}
+    sendMessageUpwards: 0
+    sendMessageMethod: 
+    sendMessageArgument: 
+    sendMessageSubjectMode: 0
+    sendMessageSubjectName: 
+    sendMessageSubjectTransform:
+      exposedName: 8e6d0dd29aca44847b4ce7f653b7c311
+      defaultValue: {fileID: 0}
+    sendMessageBroadcast: 0
+    variableName: 
+    variableValue: true
+    continueAll: 0
+    continueMode: true
+    timelineCommandType: 0
+    timelineName: 
+--- !u!114 &-3147204651667308686
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17be7bf1597f61140a9050875368b992, type: 3}
+  m_Name: Camera Action Track (1)
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips: []
+  m_Markers:
+    m_Objects: []
+--- !u!114 &-3122333655386770629
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
+  m_Name: Signal Emitter
+  m_EditorClassIdentifier: 
+  m_Time: 5.45
+  m_Retroactive: 0
+  m_EmitOnce: 0
+  m_Asset: {fileID: 11400000, guid: 728aaecbd4e516e40b173f87072761ee, type: 2}
+--- !u!114 &-327731591620592193
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b7f9d461c6bad14caf561f7801925a8, type: 3}
+  m_Name: DialogueCommandClip(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  listener:
+    exposedName: 8e26f4f62b33ba64fa9d6268789ed20a
+    defaultValue: {fileID: 0}
+  commands:
+  - delay: 0
+    useClipLength: 1
+    commandType: 7
+    audioClip: 
+    audioSubjectMode: 0
+    audioSubjectName: 
+    audioSubjectTransform:
+      exposedName: 
+      defaultValue: {fileID: 0}
+    audioOneShot: 0
+    fadeDirection: 1
+    fadeDuration: 0.5
+    fadeColor: {r: 0, g: 0, b: 0, a: 1}
+    animatorCommandType: 0
+    animatorSubjectMode: 0
+    animatorSubjectName: 
+    animatorSubjectTransform:
+      exposedName: 
+      defaultValue: {fileID: 0}
+    animatorClipName: 
+    animatorResetTrigger: 
+    animatorBoolValue: 1
+    animatorIntValue: 1
+    animatorFloatValue: 1
+    animatorFloatDuration: 0
+    setActiveTargetMode: 2
+    setActiveTargetName: 
+    setActiveTargetTransform:
+      exposedName: 
+      defaultValue: {fileID: 0}
+    setActiveValue: 0
+    setEnabledComponentName: 
+    setEnabledValue: 0
+    setEnabledSubjectMode: 0
+    setEnabledSubjectName: 
+    setEnabledSubjectTransform:
+      exposedName: 
+      defaultValue: {fileID: 0}
+    sendMessageUpwards: 0
+    sendMessageMethod: 
+    sendMessageArgument: 
+    sendMessageSubjectMode: 0
+    sendMessageSubjectName: 
+    sendMessageSubjectTransform:
+      exposedName: 
+      defaultValue: {fileID: 0}
+    sendMessageBroadcast: 0
+    variableName: 
+    variableValue: true
+    continueAll: 0
+    continueMode: true
+    timelineCommandType: 2
+    timelineName: 
+--- !u!114 &-34543182882694951
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 028877a917aafc3429bf44ef9957ce2c, type: 3}
+  m_Name: PlayerActionClip(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  actionType: 0
+  direction: 0
+  hsEnum: 1
+  speedOption: 1
+  customSpeed: 3
+  useStartPosition: 0
+  useStartTransform: 0
+  startTarget:
+    exposedName: 7b65ef756fe35814f9a4fadc41202f0e
+    defaultValue: {fileID: 0}
+  startWorldPosition: {x: 0, y: 0, z: 0}
+  useEndTransform: 0
+  endTarget:
+    exposedName: 80f59ff22e7dc7d48a6acb467b3b3d9f
+    defaultValue: {fileID: 0}
+  endWorldPosition: {x: -19.054422, y: -5.1107593, z: 0}
+  useTeleportTargetTransform: 0
+  teleportTarget:
+    exposedName: a9cfab44eca2f964d8b48b36b78995ca
+    defaultValue: {fileID: 0}
+  teleportWorldPosition: {x: 0, y: 0, z: 0}
+  useRepelDistance: 0
+  repelDistance: 2
+  useRepelTargetTransform: 0
+  repelTarget:
+    exposedName: eb3c5da3c7c08fb499adaecc7339c426
+    defaultValue: {fileID: 0}
+  repelWorldPosition: {x: 0, y: 0, z: 0}
+  doubleJumpHold: 0.2
+  gravityEnabled: 1
+  moveState: 0
+  animStateName: idle
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
+  m_Name: StoryTut_1.1
+  m_EditorClassIdentifier: 
+  m_Version: 0
+  m_Tracks:
+  - {fileID: 6168856919664013914}
+  - {fileID: 5876109538014108305}
+  - {fileID: 1177994505242436102}
+  - {fileID: -3147204651667308686}
+  - {fileID: 1893539430902058778}
+  - {fileID: 1614465837107453841}
+  m_FixedDuration: 0
+  m_EditorSettings:
+    m_Framerate: 60
+    m_ScenePreview: 1
+  m_DurationMode: 0
+  m_MarkerTrack: {fileID: 0}
+--- !u!114 &1177994505242436102
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17be7bf1597f61140a9050875368b992, type: 3}
+  m_Name: Camera Action Track
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 0
+    m_ClipIn: 0
+    m_Asset: {fileID: -6202038230866793980}
+    m_Duration: 0.31666666666666665
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1177994505242436102}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: CameraActionClip
+  - m_Version: 1
+    m_Start: 0.31666666666666665
+    m_ClipIn: 0
+    m_Asset: {fileID: 4746859672269382118}
+    m_Duration: 2.6500000000000004
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1177994505242436102}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: CameraActionClip
+  - m_Version: 1
+    m_Start: 5.000000000000001
+    m_ClipIn: 0
+    m_Asset: {fileID: 3286720928545891901}
+    m_Duration: 1
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1177994505242436102}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: CameraActionClip
+  - m_Version: 1
+    m_Start: 6.666666666666668
+    m_ClipIn: 0
+    m_Asset: {fileID: 3787273482869199653}
+    m_Duration: 0.5499999999999998
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1177994505242436102}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: CameraActionClip
+  - m_Version: 1
+    m_Start: 7.216666666666668
+    m_ClipIn: 0
+    m_Asset: {fileID: -6234626198860982007}
+    m_Duration: 0.7666666666666666
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1177994505242436102}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: CameraActionClip
+  m_Markers:
+    m_Objects: []
+--- !u!114 &1614465837107453841
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c749e8c6bbcea4740af9d00fb0f8d4d0, type: 3}
+  m_Name: Dialogue Command Track (1)
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 2.6166666666666667
+    m_ClipIn: 0
+    m_Asset: {fileID: -3353567454671417032}
+    m_Duration: 0.3500000000000001
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1614465837107453841}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: DialogueCommandClip
+  - m_Version: 1
+    m_Start: 7.983333333333333
+    m_ClipIn: 0
+    m_Asset: {fileID: -5910791855190073809}
+    m_Duration: 0.3500000000000001
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1614465837107453841}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: DialogueCommandClip
+  m_Markers:
+    m_Objects: []
+--- !u!114 &1893539430902058778
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c749e8c6bbcea4740af9d00fb0f8d4d0, type: 3}
+  m_Name: Dialogue Command Track
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 0
+    m_ClipIn: 0
+    m_Asset: {fileID: -8468095771169858384}
+    m_Duration: 2.366666666666667
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1893539430902058778}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: DialogueCommandClip
+  - m_Version: 1
+    m_Start: 2.366666666666667
+    m_ClipIn: 0
+    m_Asset: {fileID: -327731591620592193}
+    m_Duration: 0.24999999999999956
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1893539430902058778}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: DialogueCommandClip
+  - m_Version: 1
+    m_Start: 6.650000000000001
+    m_ClipIn: 0
+    m_Asset: {fileID: 5312362051515935214}
+    m_Duration: 0.5499999999999998
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1893539430902058778}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: DialogueCommandClip
+  - m_Version: 1
+    m_Start: 7.200000000000001
+    m_ClipIn: 0
+    m_Asset: {fileID: -5371413182049310125}
+    m_Duration: 0.7833333333333332
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1893539430902058778}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: DialogueCommandClip
+  - m_Version: 1
+    m_Start: 7.983333333333334
+    m_ClipIn: 0
+    m_Asset: {fileID: 8082526667401327152}
+    m_Duration: 0.1999999999999993
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1893539430902058778}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: DialogueCommandClip
+  m_Markers:
+    m_Objects: []
+--- !u!114 &2323516092801860242
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 028877a917aafc3429bf44ef9957ce2c, type: 3}
+  m_Name: PlayerActionClip(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  actionType: 0
+  direction: 0
+  hsEnum: 1
+  speedOption: 0
+  customSpeed: 3
+  useStartPosition: 1
+  useStartTransform: 0
+  startTarget:
+    exposedName: f9b02f3f9a0ed4f4fa049467f2bd2035
+    defaultValue: {fileID: 0}
+  startWorldPosition: {x: -7.478999, y: -5.2382574, z: 0}
+  useEndTransform: 0
+  endTarget:
+    exposedName: 274a99ab44e5baa4daa991018c50194c
+    defaultValue: {fileID: 0}
+  endWorldPosition: {x: -7.4925833, y: -5.699056, z: 0}
+  useTeleportTargetTransform: 0
+  teleportTarget:
+    exposedName: d57a92d7fadfecb46814a00e95af2d6e
+    defaultValue: {fileID: 0}
+  teleportWorldPosition: {x: 0, y: 0, z: 0}
+  useRepelDistance: 0
+  repelDistance: 2
+  useRepelTargetTransform: 0
+  repelTarget:
+    exposedName: 95320e51143b20a47a3d0caeff1b704e
+    defaultValue: {fileID: 0}
+  repelWorldPosition: {x: 0, y: 0, z: 0}
+  doubleJumpHold: 0.2
+  gravityEnabled: 1
+  moveState: 0
+  animStateName: idle
+--- !u!114 &3286720928545891901
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7ce34e61cb2a84bbe870b881961a84, type: 3}
+  m_Name: CameraActionClip(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  actionType: 7
+  useClipDuration: 1
+  duration: 0.1
+  ease: 3
+  switchTargetType: 3
+  cameraKeyOrName: 
+  cameraReference:
+    exposedName: 04d69bb4895cacf40b6ab6b0d934cac9
+    defaultValue: {fileID: 0}
+  cut: 0
+  useStartPosition: 0
+  useStartTransform: 0
+  startTarget:
+    exposedName: 1f7df38a0b42a4545bf3473ac4533c4f
+    defaultValue: {fileID: 0}
+  startWorldPosition: {x: -6.810943, y: 4.0872774, z: 0}
+  useEndTransform: 0
+  endTarget:
+    exposedName: 03b9f1145c138464f886a0b8e40b3452
+    defaultValue: {fileID: 0}
+  endWorldPosition: {x: -6.416628, y: -2.9501953, z: 0}
+  resetTargets: 4
+  zoomValue: 0
+  zoomRelative: 0
+  followTarget:
+    exposedName: 769b75c884932c747ab4c14be7977a87
+    defaultValue: {fileID: 0}
+  shakeAmplitude: 1
+  shakeFrequency: 20
+  offsetX: -13
+  offsetY: 0
+  offsetRelative: 1
+--- !u!114 &3787273482869199653
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7ce34e61cb2a84bbe870b881961a84, type: 3}
+  m_Name: CameraActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  actionType: 7
+  useClipDuration: 1
+  duration: 0.1
+  ease: 3
+  switchTargetType: 3
+  cameraKeyOrName: 
+  cameraReference:
+    exposedName: c3fe8e3bfe87cf94cb068311d5233c3d
+    defaultValue: {fileID: 0}
+  cut: 0
+  useStartPosition: 0
+  useStartTransform: 0
+  startTarget:
+    exposedName: 5a9fe583a8c4b4649a17eccfb69de285
+    defaultValue: {fileID: 0}
+  startWorldPosition: {x: -6.810943, y: 4.0872774, z: 0}
+  useEndTransform: 0
+  endTarget:
+    exposedName: 2ad319ae78eb7894ea0b89f48a4ecbab
+    defaultValue: {fileID: 0}
+  endWorldPosition: {x: -6.416628, y: -2.9501953, z: 0}
+  resetTargets: 4
+  zoomValue: 0
+  zoomRelative: 0
+  followTarget:
+    exposedName: b6ee03349632d3a4889d2f629f801b3f
+    defaultValue: {fileID: 0}
+  shakeAmplitude: 1
+  shakeFrequency: 20
+  offsetX: 0
+  offsetY: 1
+  offsetRelative: 1
+--- !u!114 &4746859672269382118
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7ce34e61cb2a84bbe870b881961a84, type: 3}
+  m_Name: CameraActionClip(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  actionType: 1
+  useClipDuration: 1
+  duration: 0.1
+  ease: 3
+  switchTargetType: 3
+  cameraKeyOrName: 
+  cameraReference:
+    exposedName: 9ea02a5ce7086b14093a099c16a677ce
+    defaultValue: {fileID: 0}
+  cut: 1
+  useStartPosition: 1
+  useStartTransform: 0
+  startTarget:
+    exposedName: 8eb58154e36196c4b95d21acb1beecdb
+    defaultValue: {fileID: 0}
+  startWorldPosition: {x: -6.541274, y: 1.9821488, z: 0}
+  useEndTransform: 0
+  endTarget:
+    exposedName: 6e52a99aac06f2343826b9d8e46189a1
+    defaultValue: {fileID: 0}
+  endWorldPosition: {x: -6.542575, y: -5.0912895, z: 0}
+  resetTargets: 4
+  zoomValue: 0
+  zoomRelative: 0
+  followTarget:
+    exposedName: 36472ddbbdd6a3d4e94f654a9d3d22f0
+    defaultValue: {fileID: 0}
+  shakeAmplitude: 1
+  shakeFrequency: 20
+  offsetX: 0
+  offsetY: 5
+  offsetRelative: 1
+--- !u!114 &5304041700030772338
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 028877a917aafc3429bf44ef9957ce2c, type: 3}
+  m_Name: PlayerActionClip(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  actionType: 6
+  direction: 0
+  hsEnum: 1
+  speedOption: 0
+  customSpeed: 3
+  useStartPosition: 0
+  useStartTransform: 0
+  startTarget:
+    exposedName: d5e84c5143e282a41bf59596e646e1ab
+    defaultValue: {fileID: 0}
+  startWorldPosition: {x: 0, y: 0, z: 0}
+  useEndTransform: 0
+  endTarget:
+    exposedName: 78ab3a699e3cbf949bf8b28812a9a434
+    defaultValue: {fileID: 0}
+  endWorldPosition: {x: -15.899578, y: -4.3220487, z: 0}
+  useTeleportTargetTransform: 0
+  teleportTarget:
+    exposedName: c13e0dc4fd102e64694ec081d53d81dc
+    defaultValue: {fileID: 0}
+  teleportWorldPosition: {x: 0, y: 0, z: 0}
+  useRepelDistance: 0
+  repelDistance: 2
+  useRepelTargetTransform: 0
+  repelTarget:
+    exposedName: 7f180f583d906334996e0785dc03640c
+    defaultValue: {fileID: 0}
+  repelWorldPosition: {x: 0, y: 0, z: 0}
+  doubleJumpHold: 0.2
+  gravityEnabled: 1
+  moveState: 0
+  animStateName: idle
+--- !u!114 &5312362051515935214
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b7f9d461c6bad14caf561f7801925a8, type: 3}
+  m_Name: DialogueCommandClip(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  listener:
+    exposedName: 86838d9406cff7f439edbb3729ec6eaa
+    defaultValue: {fileID: 0}
+  commands:
+  - delay: 0
+    useClipLength: 1
+    commandType: 1
+    audioClip: 
+    audioSubjectMode: 0
+    audioSubjectName: 
+    audioSubjectTransform:
+      exposedName: 7ae6249cd44b69d4c93c8ecac0f2641e
+      defaultValue: {fileID: 0}
+    audioOneShot: 0
+    fadeDirection: 2
+    fadeDuration: 0.5
+    fadeColor: {r: 1, g: 1, b: 1, a: 1}
+    animatorCommandType: 0
+    animatorSubjectMode: 0
+    animatorSubjectName: 
+    animatorSubjectTransform:
+      exposedName: f9dacd75dcfcfa54098222b20905c7e8
+      defaultValue: {fileID: 0}
+    animatorClipName: 
+    animatorResetTrigger: 
+    animatorBoolValue: 1
+    animatorIntValue: 1
+    animatorFloatValue: 1
+    animatorFloatDuration: 0
+    setActiveTargetMode: 2
+    setActiveTargetName: 
+    setActiveTargetTransform:
+      exposedName: b2bad1981ae25d141bf84a8d808fa5db
+      defaultValue: {fileID: 0}
+    setActiveValue: 0
+    setEnabledComponentName: 
+    setEnabledValue: 0
+    setEnabledSubjectMode: 0
+    setEnabledSubjectName: 
+    setEnabledSubjectTransform:
+      exposedName: ef6ef8b0fd661974da5801039d21a99d
+      defaultValue: {fileID: 0}
+    sendMessageUpwards: 0
+    sendMessageMethod: 
+    sendMessageArgument: 
+    sendMessageSubjectMode: 0
+    sendMessageSubjectName: 
+    sendMessageSubjectTransform:
+      exposedName: aeaf564b1baaa014e80ceb8e55d15820
+      defaultValue: {fileID: 0}
+    sendMessageBroadcast: 0
+    variableName: 
+    variableValue: true
+    continueAll: 0
+    continueMode: true
+    timelineCommandType: 1
+    timelineName: 
+--- !u!114 &5373543945088112720
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 028877a917aafc3429bf44ef9957ce2c, type: 3}
+  m_Name: PlayerActionClip(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  actionType: 3
+  direction: 0
+  hsEnum: 1
+  speedOption: 0
+  customSpeed: 3
+  useStartPosition: 0
+  useStartTransform: 0
+  startTarget:
+    exposedName: ce1f6f185fc9b5945a4243744055dd40
+    defaultValue: {fileID: 0}
+  startWorldPosition: {x: 0, y: 0, z: 0}
+  useEndTransform: 0
+  endTarget:
+    exposedName: 61925a9b7a2dff44bb7d5f0f90b76873
+    defaultValue: {fileID: 0}
+  endWorldPosition: {x: -15.899578, y: -4.3220487, z: 0}
+  useTeleportTargetTransform: 0
+  teleportTarget:
+    exposedName: 495d94f4bcb4c5d40b11aa9d2cff4945
+    defaultValue: {fileID: 0}
+  teleportWorldPosition: {x: 0, y: 0, z: 0}
+  useRepelDistance: 0
+  repelDistance: 2
+  useRepelTargetTransform: 0
+  repelTarget:
+    exposedName: 90792afead813a940a7234853c0e6ef0
+    defaultValue: {fileID: 0}
+  repelWorldPosition: {x: 0, y: 0, z: 0}
+  doubleJumpHold: 0.2
+  gravityEnabled: 1
+  moveState: 0
+  animStateName: idle
+--- !u!114 &5876109538014108305
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84f0777ee7aedb5408e2497239908307, type: 3}
+  m_Name: Player Action Track (1)
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 0
+    m_ClipIn: 0
+    m_Asset: {fileID: 2323516092801860242}
+    m_Duration: 0.31666666666666665
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 5876109538014108305}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: PlayerActionClip
+  m_Markers:
+    m_Objects: []
+--- !u!114 &6168856919664013914
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84f0777ee7aedb5408e2497239908307, type: 3}
+  m_Name: Player Action Track
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 1.8333333333333337
+    m_ClipIn: 0
+    m_Asset: {fileID: 8800752936880820884}
+    m_Duration: 0.5333333333333334
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 6168856919664013914}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: PlayerActionClip
+  - m_Version: 1
+    m_Start: 0
+    m_ClipIn: 0
+    m_Asset: {fileID: 5304041700030772338}
+    m_Duration: 0.31666666666666665
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 6168856919664013914}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: PlayerActionClip
+  - m_Version: 1
+    m_Start: 2.966666666666667
+    m_ClipIn: 0
+    m_Asset: {fileID: -34543182882694951}
+    m_Duration: 1.6333333333333333
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 6168856919664013914}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: PlayerActionClip
+  - m_Version: 1
+    m_Start: 1.383333333333334
+    m_ClipIn: 0
+    m_Asset: {fileID: 5373543945088112720}
+    m_Duration: 0.44999999999999996
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 6168856919664013914}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: PlayerActionClip
+  - m_Version: 1
+    m_Start: 2.366666666666667
+    m_ClipIn: 0
+    m_Asset: {fileID: -4216058159757309330}
+    m_Duration: 0.5666666666666671
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 6168856919664013914}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: PlayerActionClip
+  m_Markers:
+    m_Objects: []
+--- !u!114 &8082526667401327152
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b7f9d461c6bad14caf561f7801925a8, type: 3}
+  m_Name: DialogueCommandClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  listener:
+    exposedName: b84ddbf4d6c2b3245b43365e9cee9226
+    defaultValue: {fileID: 0}
+  commands:
+  - delay: 0
+    useClipLength: 1
+    commandType: 7
+    audioClip: 
+    audioSubjectMode: 0
+    audioSubjectName: 
+    audioSubjectTransform:
+      exposedName: 3cfbeef7e4bce99438a3ca73a3655ef9
+      defaultValue: {fileID: 0}
+    audioOneShot: 0
+    fadeDirection: 0
+    fadeDuration: 0.5
+    fadeColor: {r: 1, g: 1, b: 1, a: 1}
+    animatorCommandType: 0
+    animatorSubjectMode: 0
+    animatorSubjectName: 
+    animatorSubjectTransform:
+      exposedName: a13891fe29a3e164dbf0e483708f6a8c
+      defaultValue: {fileID: 0}
+    animatorClipName: 
+    animatorResetTrigger: 
+    animatorBoolValue: 1
+    animatorIntValue: 1
+    animatorFloatValue: 1
+    animatorFloatDuration: 0
+    setActiveTargetMode: 2
+    setActiveTargetName: 
+    setActiveTargetTransform:
+      exposedName: 57b3a7e5a43f11645bbb120af88285a8
+      defaultValue: {fileID: 0}
+    setActiveValue: 0
+    setEnabledComponentName: 
+    setEnabledValue: 0
+    setEnabledSubjectMode: 0
+    setEnabledSubjectName: 
+    setEnabledSubjectTransform:
+      exposedName: ee27a86dcec8b93418aedf65059beb69
+      defaultValue: {fileID: 0}
+    sendMessageUpwards: 0
+    sendMessageMethod: 
+    sendMessageArgument: 
+    sendMessageSubjectMode: 0
+    sendMessageSubjectName: 
+    sendMessageSubjectTransform:
+      exposedName: 40bf771f16cca574d9ac50c83efb16df
+      defaultValue: {fileID: 0}
+    sendMessageBroadcast: 0
+    variableName: 
+    variableValue: true
+    continueAll: 0
+    continueMode: true
+    timelineCommandType: 1
+    timelineName: 
+--- !u!114 &8800752936880820884
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 028877a917aafc3429bf44ef9957ce2c, type: 3}
+  m_Name: PlayerActionClip
+  m_EditorClassIdentifier: 
+  actionType: 3
+  direction: 0
+  hsEnum: 1
+  speedOption: 0
+  customSpeed: 3
+  useStartPosition: 0
+  useStartTransform: 0
+  startTarget:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  startWorldPosition: {x: 0, y: 0, z: 0}
+  useEndTransform: 0
+  endTarget:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  endWorldPosition: {x: -15.899578, y: -4.3220487, z: 0}
+  useTeleportTargetTransform: 0
+  teleportTarget:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  teleportWorldPosition: {x: 0, y: 0, z: 0}
+  useRepelDistance: 0
+  repelDistance: 2
+  useRepelTargetTransform: 0
+  repelTarget:
+    exposedName: 
+    defaultValue: {fileID: 0}
+  repelWorldPosition: {x: 0, y: 0, z: 0}
+  doubleJumpHold: 0.2
+  gravityEnabled: 1
+  moveState: 0
+  animStateName: idle

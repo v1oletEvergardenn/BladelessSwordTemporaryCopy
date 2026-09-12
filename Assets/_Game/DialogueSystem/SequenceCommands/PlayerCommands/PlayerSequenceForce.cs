@@ -33,15 +33,59 @@ namespace PixelCrushers.DialogueSystem.SequencerCommands
             return ForceHSAbility(hs.hs_CounterAttack, attackLeft);
         }
 
-        public static bool ForceHS(string abilityName, bool attackLeft)
+        public static bool ForceHS(HSEnum abilityEnum, bool attackLeft)
         {
             var hs = HeartSwordAbilities.instance;
             if (hs == null) return false;
 
-            IHeartSwordAbility ability = ResolveAbility(hs, abilityName);
+            IHeartSwordAbility ability = ResolveAbility(hs, abilityEnum);
             if (ability == null) return false;
 
             return ForceHSAbility(ability, attackLeft);
+        }
+
+        // Kept for backward compatibility with old string-based calls.
+        public static bool ForceHS(string abilityName, bool attackLeft)
+        {
+            if (!TryParseHSEnum(abilityName, out HSEnum abilityEnum))
+                return false;
+
+            return ForceHS(abilityEnum, attackLeft);
+        }
+
+        public static bool TryParseHSEnum(string token, out HSEnum abilityEnum)
+        {
+            abilityEnum = HSEnum.None;
+
+            if (string.IsNullOrWhiteSpace(token))
+                return false;
+
+            string n = token.Trim().ToLowerInvariant();
+
+            if (n == "counterattack" || n == "counter" || n == "hs_counterattack")
+            {
+                abilityEnum = HSEnum.HSCounterAttack;
+                return true;
+            }
+
+            if (n == "criticalslash" || n == "critical" || n == "hs_criticalslash")
+            {
+                abilityEnum = HSEnum.CriticalSlash;
+                return true;
+            }
+
+            if (n == "slashwave" || n == "wave" || n == "hs_slashwave")
+            {
+                abilityEnum = HSEnum.SlashWave;
+                return true;
+            }
+
+            if (System.Enum.TryParse(token.Trim(), true, out abilityEnum))
+            {
+                return abilityEnum != HSEnum.None;
+            }
+
+            return false;
         }
 
         public static bool ForceTeleportForward()
@@ -157,16 +201,23 @@ namespace PixelCrushers.DialogueSystem.SequencerCommands
             return true;
         }
 
-        private static IHeartSwordAbility ResolveAbility(HeartSwordAbilities hs, string abilityName)
+        private static IHeartSwordAbility ResolveAbility(HeartSwordAbilities hs, HSEnum abilityEnum)
         {
-            if (string.IsNullOrWhiteSpace(abilityName)) return null;
-            string n = abilityName.Trim().ToLowerInvariant();
+            switch (abilityEnum)
+            {
+                case HSEnum.HSCounterAttack:
+                    return hs.hs_CounterAttack;
 
-            if (n == "counterattack" || n == "counter" || n == "hs_counterattack") return hs.hs_CounterAttack;
-            if (n == "criticalslash" || n == "critical" || n == "hs_criticalslash") return hs.hs_CriticalSlash;
-            if (n == "slashwave" || n == "wave" || n == "hs_slashwave") return hs.hs_SlashWave;
+                case HSEnum.CriticalSlash:
+                    return hs.hs_CriticalSlash;
 
-            return null;
+                case HSEnum.SlashWave:
+                    return hs.hs_SlashWave;
+
+                case HSEnum.None:
+                default:
+                    return null;
+            }
         }
     }
 }

@@ -5,13 +5,6 @@ using UnityEngine.Serialization;
 using UnityEngine.Timeline;
 using Sirenix.OdinInspector;
 
-public enum PlayerMoveExecutionMode
-{
-    TimelineFixedDuration,
-    TimelineFixedSpeed,
-    RunToPosition
-}
-
 public enum PlayerMoveSpeedOption
 {
     RunSpeed,
@@ -25,7 +18,13 @@ public class PlayerActionClip : PlayableAsset, ITimelineClipAsset
     [Header("Action")]
     public PlayerTimelineActionType actionType;
 
-    [ShowIf(nameof(IsRunToPositionMove))]
+    [ShowIf(nameof(ShowDirectionField))]
+    public PlayerTimelineDirection direction = PlayerTimelineDirection.Right;
+
+    [ShowIf(nameof(ShowHSField))]
+    public HSEnum hsEnum = HSEnum.HSCounterAttack;
+
+    [ShowIf(nameof(IsMoveAction))]
     [FormerlySerializedAs("legacySpeedOption")]
     public PlayerMoveSpeedOption speedOption = PlayerMoveSpeedOption.RunSpeed;
 
@@ -34,42 +33,67 @@ public class PlayerActionClip : PlayableAsset, ITimelineClipAsset
     [Min(0.01f)]
     public float customSpeed = 3f;
 
-    [ShowIf(nameof(IsRunToPositionMove))]
+    [ShowIf(nameof(IsMoveAction))]
     [FormerlySerializedAs("useLegacyStartPosition")]
     public bool useStartPosition = false;
 
-    [ShowIf(nameof(IsMoveAction))]
-    public PlayerMoveExecutionMode moveMode = PlayerMoveExecutionMode.TimelineFixedDuration;
+    [Header("MoveTo Path")]
+    [ShowIf(nameof(ShowMoveStartTransformToggleField))]
+    public bool useStartTransform = false;
 
-    [ShowIf(nameof(ShowMoveSpeedField))]
-    [Min(0.01f)]
-    public float moveSpeed = 3f;
+    [ShowIf(nameof(ShowMoveStartTransformField))]
+    public ExposedReference<Transform> startTarget;
+
+    [ShowIf(nameof(ShowMoveStartWorldPositionField))]
+    public Vector3 startWorldPosition;
+
+    [ShowIf(nameof(ShowMoveEndTransformToggleField))]
+    public bool useEndTransform = false;
+
+    [ShowIf(nameof(ShowMoveEndTransformField))]
+    public ExposedReference<Transform> endTarget;
+
+    [ShowIf(nameof(ShowMoveEndWorldPositionField))]
+    public Vector3 endWorldPosition;
+
+    [Header("TeleportTo Target")]
+    [ShowIf(nameof(IsTeleportToAction))]
+    public bool useTeleportTargetTransform = false;
+
+    [ShowIf(nameof(ShowTeleportTargetField))]
+    public ExposedReference<Transform> teleportTarget;
+
+    [ShowIf(nameof(ShowTeleportWorldPositionField))]
+    public Vector3 teleportWorldPosition;
 
     [Header("Repel")]
     [ShowIf(nameof(IsRepelAction))]
-    public bool useRepelGizmoPosition = true;
+    public bool useRepelDistance = false;
 
     [ShowIf(nameof(ShowRepelDistanceField))]
     public float repelDistance = 2f;
 
-    [Header("Path")]
-    [ShowIf(nameof(ShowUseStartTransformField))]
-    public bool useStartTransform = false;
+    [ShowIf(nameof(ShowRepelTransformToggleField))]
+    public bool useRepelTargetTransform = false;
 
-    [ShowIf(nameof(ShowStartTransformField))]
-    public ExposedReference<Transform> startTarget;
+    [ShowIf(nameof(ShowRepelTransformField))]
+    public ExposedReference<Transform> repelTarget;
 
-    [HideInInspector]
-    public Vector3 startWorldPosition;
+    [ShowIf(nameof(ShowRepelWorldPositionField))]
+    public Vector3 repelWorldPosition;
 
-    [ShowIf(nameof(ShowUseEndTransformField))]
-    public bool useEndTransform = false;
+    [ShowIf(nameof(ShowDoubleJumpField))]
+    [Min(0f)]
+    public float doubleJumpHold = 0.2f;
 
-    [ShowIf(nameof(ShowEndTransformField))]
-    public ExposedReference<Transform> endTarget;
+    [ShowIf(nameof(ShowGravityField))]
+    public bool gravityEnabled = true;
 
-    [HideInInspector]
-    public Vector3 endWorldPosition;
+    [ShowIf(nameof(ShowMoveStateField))]
+    public PlayerTimelineMoveState moveState = PlayerTimelineMoveState.Normal;
+
+    [ShowIf(nameof(ShowAnimStateField))]
+    public string animStateName = "idle";
 
     public ClipCaps clipCaps => ClipCaps.None;
 
@@ -79,19 +103,33 @@ public class PlayerActionClip : PlayableAsset, ITimelineClipAsset
         PlayerActionBehaviour behaviour = playable.GetBehaviour();
 
         behaviour.actionType = actionType;
-        behaviour.moveMode = moveMode;
-        behaviour.useTimelineMotion = IsTimelineMove;
+        behaviour.direction = direction;
+        behaviour.hsEnum = hsEnum;
+
         behaviour.speedOption = speedOption;
         behaviour.customSpeed = customSpeed;
-        behaviour.useStartPosition = IsRunToPositionMove && useStartPosition;
-        behaviour.useRepelGizmoPosition = IsRepelAction && useRepelGizmoPosition;
+        behaviour.useStartPosition = useStartPosition;
+        behaviour.useStartTransform = useStartTransform;
+        behaviour.startTarget = useStartTransform ? startTarget.Resolve(graph.GetResolver()) : null;
+        behaviour.startWorldPosition = startWorldPosition;
+        behaviour.useEndTransform = useEndTransform;
+        behaviour.endTarget = useEndTransform ? endTarget.Resolve(graph.GetResolver()) : null;
+        behaviour.endWorldPosition = endWorldPosition;
+
+        behaviour.useTeleportTargetTransform = useTeleportTargetTransform;
+        behaviour.teleportTarget = useTeleportTargetTransform ? teleportTarget.Resolve(graph.GetResolver()) : null;
+        behaviour.teleportWorldPosition = teleportWorldPosition;
+
+        behaviour.useRepelDistance = useRepelDistance;
         behaviour.repelDistance = repelDistance;
+        behaviour.useRepelTargetTransform = useRepelTargetTransform;
+        behaviour.repelTarget = useRepelTargetTransform ? repelTarget.Resolve(graph.GetResolver()) : null;
+        behaviour.repelWorldPosition = repelWorldPosition;
 
-        Transform resolvedStart = IsTimelineMove && useStartTransform ? startTarget.Resolve(graph.GetResolver()) : null;
-        Transform resolvedEnd = useEndTransform ? endTarget.Resolve(graph.GetResolver()) : null;
-
-        behaviour.startPosition = resolvedStart != null ? resolvedStart.position : startWorldPosition;
-        behaviour.endPosition = resolvedEnd != null ? resolvedEnd.position : endWorldPosition;
+        behaviour.doubleJumpHold = doubleJumpHold;
+        behaviour.gravityEnabled = gravityEnabled;
+        behaviour.moveState = moveState;
+        behaviour.animStateName = animStateName;
 
         return playable;
     }
@@ -102,30 +140,67 @@ public class PlayerActionClip : PlayableAsset, ITimelineClipAsset
     private bool IsRepelAction =>
         actionType == PlayerTimelineActionType.Repel;
 
-    private bool IsTimelineMove =>
-        IsMoveAction && moveMode != PlayerMoveExecutionMode.RunToPosition;
+    private bool IsTeleportToAction =>
+        actionType == PlayerTimelineActionType.TeleportTo;
 
-    private bool IsRunToPositionMove =>
-        IsMoveAction && moveMode == PlayerMoveExecutionMode.RunToPosition;
+    private bool ShowDirectionField =>
+        actionType == PlayerTimelineActionType.Attack ||
+        actionType == PlayerTimelineActionType.AttackHS ||
+        actionType == PlayerTimelineActionType.HSAbility ||
+        actionType == PlayerTimelineActionType.Face;
+
+    private bool ShowHSField =>
+        actionType == PlayerTimelineActionType.HSAbility;
 
     private bool ShowCustomSpeedField =>
-        IsRunToPositionMove && speedOption == PlayerMoveSpeedOption.CustomSpeed;
+        IsMoveAction && speedOption == PlayerMoveSpeedOption.CustomSpeed;
 
-    private bool ShowMoveSpeedField =>
-        IsMoveAction && moveMode == PlayerMoveExecutionMode.TimelineFixedSpeed;
+    private bool ShowMoveStartTransformToggleField =>
+        IsMoveAction && useStartPosition;
+
+    private bool ShowMoveStartTransformField =>
+        IsMoveAction && useStartPosition && useStartTransform;
+
+    private bool ShowMoveStartWorldPositionField =>
+        IsMoveAction && useStartPosition && !useStartTransform;
+
+    private bool ShowMoveEndTransformToggleField =>
+        IsMoveAction;
+
+    private bool ShowMoveEndTransformField =>
+        IsMoveAction && useEndTransform;
+
+    private bool ShowMoveEndWorldPositionField =>
+        IsMoveAction && !useEndTransform;
+
+    private bool ShowTeleportTargetField =>
+        IsTeleportToAction && useTeleportTargetTransform;
+
+    private bool ShowTeleportWorldPositionField =>
+        IsTeleportToAction && !useTeleportTargetTransform;
 
     private bool ShowRepelDistanceField =>
-        IsRepelAction && !useRepelGizmoPosition;
+        IsRepelAction && useRepelDistance;
 
-    private bool ShowUseStartTransformField =>
-        IsTimelineMove;
+    private bool ShowRepelTransformToggleField =>
+        IsRepelAction && !useRepelDistance;
 
-    private bool ShowStartTransformField =>
-        IsTimelineMove && useStartTransform;
+    private bool ShowRepelTransformField =>
+        IsRepelAction && !useRepelDistance && useRepelTargetTransform;
 
-    private bool ShowUseEndTransformField =>
-        IsTimelineMove;
+    private bool ShowRepelWorldPositionField =>
+        IsRepelAction && !useRepelDistance && !useRepelTargetTransform;
 
-    private bool ShowEndTransformField =>
-        IsTimelineMove && useEndTransform;
+    private bool ShowDoubleJumpField =>
+        actionType == PlayerTimelineActionType.DoubleJump;
+
+    private bool ShowGravityField =>
+        actionType == PlayerTimelineActionType.Gravity;
+
+    private bool ShowMoveStateField =>
+        actionType == PlayerTimelineActionType.MoveState;
+
+    private bool ShowAnimStateField =>
+        actionType == PlayerTimelineActionType.BodyAnim ||
+        actionType == PlayerTimelineActionType.LegAnim;
 }

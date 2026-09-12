@@ -14,22 +14,8 @@ namespace PixelCrushers.DialogueSystem.SequencerCommands
                 return;
             }
 
-            string token = GetParameter(0, "right");
-            string normalized = token.Trim().ToLowerInvariant();
-
-            if (normalized == "left")
-            {
-                player.Face(false);
-            }
-            else if (normalized == "right")
-            {
-                player.Face(true);
-            }
-            else
-            {
-                Transform t = GetSubject(0, null);
-                if (t != null) player.FaceTarget(t);
-            }
+            bool faceLeft = ParseLeftRight(GetParameter(0, "right"), false);
+            player.Face(!faceLeft);
 
             Stop();
         }

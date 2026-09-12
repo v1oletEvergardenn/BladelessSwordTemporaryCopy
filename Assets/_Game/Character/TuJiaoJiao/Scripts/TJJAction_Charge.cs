@@ -83,6 +83,7 @@ public class TJJAction_Charge : TJJBaseAction
             // when counterattacked by player, end moving and attack.
             wasCountered = true;
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
+            bossAi.Repel(2, !left);
             return;
         }
 

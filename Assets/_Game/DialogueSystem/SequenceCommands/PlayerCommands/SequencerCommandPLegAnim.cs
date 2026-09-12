@@ -15,11 +15,9 @@ namespace PixelCrushers.DialogueSystem.SequencerCommands
             }
 
             string state = GetParameter(0, string.Empty);
-            float normalizedTime = Mathf.Clamp01(GetParameterAsFloat(1, 0f));
-
             if (!string.IsNullOrWhiteSpace(state))
             {
-                player.legAnim.Play(state, 0, normalizedTime);
+                player.legAnim.Play(state);
             }
 
             Stop();

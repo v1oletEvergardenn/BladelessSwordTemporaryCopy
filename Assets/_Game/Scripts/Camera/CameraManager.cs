@@ -28,6 +28,9 @@ public class CameraManager : MonoBehaviour
         public CinemachineVirtualCamera camera;
     }
 
+    [Header("Noise (Handheld)")]
+    [SerializeField] public NoiseSettings handheldNormalMild;
+
     private struct CutsceneCameraState
     {
         public CinemachineVirtualCamera activeCamera;
@@ -57,6 +60,15 @@ public class CameraManager : MonoBehaviour
         new Dictionary<CinemachineVirtualCamera, Transform>();
 
     private readonly Dictionary<CinemachineVirtualCamera, Vector3> _defaultPanOffsetByCamera =
+        new Dictionary<CinemachineVirtualCamera, Vector3>();
+
+    private readonly Dictionary<CinemachineVirtualCamera, Vector3> _defaultPositionByCamera =
+        new Dictionary<CinemachineVirtualCamera, Vector3>();
+
+    private readonly Dictionary<CinemachineVirtualCamera, FollowTarget> _offsetProxyFollowerByCamera =
+        new Dictionary<CinemachineVirtualCamera, FollowTarget>();
+
+    private readonly Dictionary<CinemachineVirtualCamera, Vector3> _offsetProxyValueByCamera =
         new Dictionary<CinemachineVirtualCamera, Vector3>();
 
     private readonly Stack<CutsceneCameraState> _cutsceneStateStack = new Stack<CutsceneCameraState>();
@@ -888,24 +900,22 @@ public class CameraManager : MonoBehaviour
             return null;
         }
 
-        CinemachineFramingTransposer transposer = activeCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
-        if (transposer == null)
-        {
-            Debug.LogWarning("[CameraManager] Active camera has no CinemachineFramingTransposer.");
-            return null;
-        }
-
         RecordCameraDefaults(activeCamera);
 
-        Vector3 from = transposer.m_TrackedObjectOffset;
-        Vector3 to = relative
-            ? new Vector3(from.x + x, from.y + y, from.z)
-            : new Vector3(x, y, from.z);
+        CinemachineFramingTransposer transposer = activeCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
+        if (transposer != null)
+        {
+            Vector3 from = transposer.m_TrackedObjectOffset;
+            Vector3 to = relative
+                ? new Vector3(from.x + x, from.y + y, from.z)
+                : new Vector3(x, y, from.z);
 
-        StopOffsetTweenAndRestore();
+            StopOffsetTweenAndRestore();
+            co_offset = StartCoroutine(TweenPanOffsetRoutine(transposer, from, to, Mathf.Max(0f, duration), ease));
+            return co_offset;
+        }
 
-        co_offset = StartCoroutine(TweenPanOffsetRoutine(transposer, from, to, Mathf.Max(0f, duration), ease));
-        return co_offset;
+        return TweenPanOffsetWithoutTransposer(activeCamera, x, y, duration, relative, ease);
     }
 
     private Coroutine ResetPanOffsetInternal(float duration, CameraEase ease)
@@ -917,12 +927,162 @@ public class CameraManager : MonoBehaviour
 
         RecordCameraDefaults(activeCamera);
 
-        if (!_defaultPanOffsetByCamera.TryGetValue(activeCamera, out Vector3 defaultOffset))
+        CinemachineFramingTransposer transposer = activeCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
+        if (transposer != null)
         {
-            return null;
+            if (!_defaultPanOffsetByCamera.TryGetValue(activeCamera, out Vector3 defaultOffset))
+            {
+                return null;
+            }
+
+            return TweenPanOffsetInternal(defaultOffset.x, defaultOffset.y, duration, false, ease);
         }
 
-        return TweenPanOffsetInternal(defaultOffset.x, defaultOffset.y, duration, false, ease);
+        return ResetPanOffsetWithoutTransposer(activeCamera, duration, ease);
+    }
+
+    private Coroutine TweenPanOffsetWithoutTransposer(CinemachineVirtualCamera camera, float x, float y, float duration, bool relative, CameraEase ease)
+    {
+        StopOffsetTweenAndRestore();
+
+        if (camera.Follow != null)
+        {
+            FollowTarget follower = GetOrCreateOffsetProxyFollower(camera, camera.Follow);
+            Vector3 from = _offsetProxyValueByCamera.TryGetValue(camera, out Vector3 current) ? current : Vector3.zero;
+            Vector3 to = relative
+                ? new Vector3(from.x + x, from.y + y, from.z)
+                : new Vector3(x, y, from.z);
+
+            co_offset = StartCoroutine(TweenProxyOffsetRoutine(camera, follower, from, to, Mathf.Max(0f, duration), ease));
+            return co_offset;
+        }
+
+        Vector3 fromPos = camera.transform.position;
+        Vector3 basePos = _defaultPositionByCamera.TryGetValue(camera, out Vector3 defaultPos) ? defaultPos : fromPos;
+        Vector3 toPos = relative
+            ? fromPos + new Vector3(x, y, 0f)
+            : new Vector3(basePos.x + x, basePos.y + y, fromPos.z);
+
+        co_offset = StartCoroutine(TweenCameraPositionRoutine(camera, fromPos, toPos, Mathf.Max(0f, duration), ease));
+        return co_offset;
+    }
+
+    private Coroutine ResetPanOffsetWithoutTransposer(CinemachineVirtualCamera camera, float duration, CameraEase ease)
+    {
+        if (_offsetProxyFollowerByCamera.TryGetValue(camera, out FollowTarget follower) && follower != null)
+        {
+            Vector3 from = _offsetProxyValueByCamera.TryGetValue(camera, out Vector3 current) ? current : follower.offset;
+            Vector3 to = Vector3.zero;
+
+            co_offset = StartCoroutine(ResetProxyOffsetRoutine(camera, follower, from, to, Mathf.Max(0f, duration), ease));
+            return co_offset;
+        }
+
+        if (_defaultPositionByCamera.TryGetValue(camera, out Vector3 defaultPos))
+        {
+            co_offset = StartCoroutine(TweenCameraPositionRoutine(camera, camera.transform.position, defaultPos, Mathf.Max(0f, duration), ease));
+            return co_offset;
+        }
+
+        return null;
+    }
+
+    private FollowTarget GetOrCreateOffsetProxyFollower(CinemachineVirtualCamera camera, Transform sourceFollow)
+    {
+        if (!_offsetProxyFollowerByCamera.TryGetValue(camera, out FollowTarget follower) || follower == null)
+        {
+            GameObject go = new GameObject($"{camera.name}_OffsetProxy");
+            go.hideFlags = HideFlags.HideAndDontSave;
+            follower = go.AddComponent<FollowTarget>();
+            _offsetProxyFollowerByCamera[camera] = follower;
+        }
+
+        follower.target = sourceFollow;
+        if (!_offsetProxyValueByCamera.TryGetValue(camera, out Vector3 current))
+            current = Vector3.zero;
+
+        follower.offset = current;
+        camera.Follow = follower.transform;
+        return follower;
+    }
+
+    private IEnumerator TweenProxyOffsetRoutine(CinemachineVirtualCamera camera, FollowTarget follower, Vector3 from, Vector3 to, float duration, CameraEase ease)
+    {
+        try
+        {
+            if (follower == null)
+                yield break;
+
+            if (duration <= 0f)
+            {
+                follower.offset = to;
+                _offsetProxyValueByCamera[camera] = to;
+                yield break;
+            }
+
+            float elapsed = 0f;
+            while (elapsed < duration && follower != null)
+            {
+                elapsed += Mathf.Max(Time.deltaTime, 0f);
+                float t = Mathf.Clamp01(elapsed / duration);
+                float eased = EvaluateEase(ease, t);
+                follower.offset = Vector3.Lerp(from, to, eased);
+                yield return null;
+            }
+
+            if (follower != null)
+                follower.offset = to;
+
+            _offsetProxyValueByCamera[camera] = to;
+        }
+        finally
+        {
+            co_offset = null;
+            RestoreRawOffsetMode();
+        }
+    }
+
+    private IEnumerator ResetProxyOffsetRoutine(CinemachineVirtualCamera camera, FollowTarget follower, Vector3 from, Vector3 to, float duration, CameraEase ease)
+    {
+        yield return TweenProxyOffsetRoutine(camera, follower, from, to, duration, ease);
+
+        if (camera != null && _defaultFollowByCamera.TryGetValue(camera, out Transform defaultFollow))
+        {
+            camera.Follow = defaultFollow;
+        }
+    }
+
+    private IEnumerator TweenCameraPositionRoutine(CinemachineVirtualCamera camera, Vector3 from, Vector3 to, float duration, CameraEase ease)
+    {
+        try
+        {
+            if (camera == null)
+                yield break;
+
+            if (duration <= 0f)
+            {
+                camera.transform.position = to;
+                yield break;
+            }
+
+            float elapsed = 0f;
+            while (elapsed < duration && camera != null)
+            {
+                elapsed += Mathf.Max(Time.deltaTime, 0f);
+                float t = Mathf.Clamp01(elapsed / duration);
+                float eased = EvaluateEase(ease, t);
+                camera.transform.position = Vector3.Lerp(from, to, eased);
+                yield return null;
+            }
+
+            if (camera != null)
+                camera.transform.position = to;
+        }
+        finally
+        {
+            co_offset = null;
+            RestoreRawOffsetMode();
+        }
     }
 
     private IEnumerator TweenPanOffsetRoutine(CinemachineFramingTransposer transposer, Vector3 from, Vector3 to, float duration, CameraEase ease)
@@ -945,8 +1105,6 @@ public class CameraManager : MonoBehaviour
                 elapsed += Mathf.Max(Time.deltaTime, 0f);
                 float t = Mathf.Clamp01(elapsed / duration);
                 float easedT = EvaluateEase(ease, t);
-
-                // Straight offset interpolation; ease only changes speed over time.
                 transposer.m_TrackedObjectOffset = from + (delta * easedT);
                 yield return null;
             }
@@ -1029,9 +1187,6 @@ public class CameraManager : MonoBehaviour
         co_yLerp = StartCoroutine(LerpYAction(isPlayerFalling));
     }
 
-    /// <summary>
-    /// Smoothly interpolates Y damping using PlayerDt so camera behavior remains consistent with custom player time scaling.
-    /// </summary>
     private IEnumerator LerpYAction(bool isPlayerFalling)
     {
         isLerpingYDaming = true;
@@ -1051,10 +1206,8 @@ public class CameraManager : MonoBehaviour
         while (elapsedTime < _fallYPanTime)
         {
             elapsedTime += Mathf.Max(TimeScaleManager.PlayerDt, 0f);
-
             float t = Mathf.Clamp01(elapsedTime / _fallYPanTime);
             _framingTransposer.m_YDamping = Mathf.Lerp(startDampAmount, endDampAmount, t);
-
             yield return null;
         }
 
@@ -1091,6 +1244,11 @@ public class CameraManager : MonoBehaviour
             {
                 _defaultPanOffsetByCamera[camera] = transposer.m_TrackedObjectOffset;
             }
+        }
+
+        if (!_defaultPositionByCamera.ContainsKey(camera))
+        {
+            _defaultPositionByCamera[camera] = camera.transform.position;
         }
     }
 
@@ -1163,9 +1321,7 @@ public class CameraManager : MonoBehaviour
                 return 1f - ((1f - t) * (1f - t));
 
             case CameraEase.InOutQuad:
-                return t < 0.5f
-                    ? 2f * t * t
-                    : 1f - (Mathf.Pow(-2f * t + 2f, 2f) * 0.5f);
+                return t < 0.5f ? 2f * t * t : 1f - (Mathf.Pow(-2f * t + 2f, 2f) * 0.5f);
 
             default:
                 return t;

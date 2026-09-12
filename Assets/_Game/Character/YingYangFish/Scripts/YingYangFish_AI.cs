@@ -106,8 +106,9 @@ public class YingYangFish_AI : IEnemyController
 
     private Queue<float> playerDistanceCache = new();
 
-    private void Update()
+    public override void Update()
     {
+        base.Update();
         distanceToPlayer = Mathf.Abs(transform.position.x - player.position.x);
         healthPercentage = currentHealth / maxHealth;
         playerDistanceTimer += TimeScaleManager.GameplayDt;
