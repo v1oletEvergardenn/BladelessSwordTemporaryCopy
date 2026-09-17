@@ -38,6 +38,11 @@ public abstract class IProjectile : MonoBehaviour
     public Rigidbody2D rb;
     public GameManager gameManager;
 
+    public string formationSound = "projectile_formation";
+    public string counterAttackSound_normal = "projectile_counter";
+    public string counterAttackSound_perfect = "projectile_counter_perfect";
+    public string hitSound = "projectile_hit";
+
     public bool muteHitSound = false;
 
     public virtual void Start()
@@ -180,10 +185,12 @@ public abstract class IProjectile : MonoBehaviour
                 if (target.gameObject.layer == 14) { return; }
                 if (!isHostileToPlayer) { return; }
                 CheckHitPlayer(target);
+                SoundManager.PlaySound(hitSound);
             }
             // hit other things
             else
             {
+                SoundManager.PlaySound(hitSound);
                 vfx.SpawnHitEffect(false, GetHitPos());
                 target.Damage(attribute, transform);
                 Hit();
@@ -194,6 +201,7 @@ public abstract class IProjectile : MonoBehaviour
             (stopLayer.value & (1 << collision.gameObject.layer)) > 0)
         {
             Die();
+            SoundManager.PlaySound(hitSound);
             collided = true;
         }
     }

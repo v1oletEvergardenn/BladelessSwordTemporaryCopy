@@ -18,6 +18,8 @@ public class YYF_WaterSpear : IEnemyAction
     private Spear smallSpear1;
     private Spear smallSpear2;
 
+    public string powerUpClip = "power_up_whole";
+
     public override void Start()
     {
         base.Start();
@@ -64,6 +66,8 @@ public class YYF_WaterSpear : IEnemyAction
         //set spear
         spear = _spear;
         SetUp(_spear, trueTarget);
+
+        SoundManager.PlaySound(powerUpClip);
 
         //wait for launch
         yield return WaitForEnemy(0.5f);

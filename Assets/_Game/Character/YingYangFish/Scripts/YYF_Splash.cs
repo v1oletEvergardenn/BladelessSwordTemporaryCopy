@@ -23,6 +23,9 @@ public class YYF_Splash : IEnemyAction
 
     private Coroutine co_spawnWaterBullet2;
 
+    public string iceThronFormationClip = "ice_thorn_formation2";
+    public string waterBulletFormationClip = "water_bullet_formation";
+
     public override void Start()
     {
         base.Start();
@@ -272,6 +275,8 @@ public class YYF_Splash : IEnemyAction
 
     public IEnumerator SpawnWaterBullet(Vector3 pos, int index)
     {
+        SoundManager.PlaySound(waterBulletFormationClip);
+
         GameObject spawnEffect1 = bossAI.selfPooler.SpawnFromPool("water_bullet_spawn_effect",
             bossAI.CreateWaterLevelYAxis(pos.x + shootPositionX[index]));
 
@@ -279,6 +284,7 @@ public class YYF_Splash : IEnemyAction
            bossAI.CreateWaterLevelYAxis(pos.x - shootPositionX[index]));
         spawnEffect1.GetComponent<SelfDisactive>().SetNewDisActiveTime(spawnDelay);
         spawnEffect2.GetComponent<SelfDisactive>().SetNewDisActiveTime(spawnDelay);
+
         yield return WaitForEnemy(spawnDelay);
         IProjectile bullet = bossAI.selfPooler.SpawnFromPool("water_bullet",
             new Vector3(pos.x + shootPositionX[index],
@@ -311,6 +317,8 @@ public class YYF_Splash : IEnemyAction
 
     public void SpawnIceThorn(Vector3 pos, int index)
     {
+        SoundManager.PlaySound(iceThronFormationClip);
+
         IceThorn thorn = bossAI.selfPooler.SpawnFromPool("ice_thorn",
             new Vector3(pos.x + shootPositionX[index],
             bossAI.waterLevel.position.y, 0)).

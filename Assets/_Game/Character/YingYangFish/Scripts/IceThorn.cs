@@ -12,6 +12,8 @@ public class IceThorn : IDamagable
     private Health player;
     public Transform GFX;
 
+    public string iceThornBreakCLip = "ice_thorn_break";
+
     private void Start()
     {
         player = Health.instance;
@@ -36,6 +38,7 @@ public class IceThorn : IDamagable
         canBeCounterAttacked = false;
         yield return TimeScaleManager.WaitForChannelSeconds(1.35f, TimeChannel.Enemy);
         canDealDamage = false;
+        SoundManager.PlaySound(iceThornBreakCLip);
         yield return TimeScaleManager.WaitForChannelSeconds(0.5f, TimeChannel.Enemy);
         gameObject.SetActive(false);
         yield return null;
@@ -71,6 +74,7 @@ public class IceThorn : IDamagable
         {
             vfx.MeleeAttackEffect(melee, player, left);
             GFX.GetComponent<Animator>().Play("hit");
+            SoundManager.PlaySound(iceThornBreakCLip);
             canDealDamage = false;
             canBeCounterAttacked = false;
         }

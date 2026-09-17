@@ -242,9 +242,15 @@ MonoBehaviour:
   canInterruptDelay: 0
   collisionEnabled: 1
   delayTimer: 0
+  aiming: 0
   vfx: {fileID: 0}
   rb: {fileID: 0}
   gameManager: {fileID: 0}
+  formationSound: projectile_formation
+  counterAttackSound_normal: projectile_counter
+  counterAttackSound_perfect: projectile_counter_perfect
+  hitSound: waterBullet_hit
+  muteHitSound: 0
   anim_after_hit: water_bullet_hit
   death_delay_time_after_hit: 0.53
   isRed: 0
