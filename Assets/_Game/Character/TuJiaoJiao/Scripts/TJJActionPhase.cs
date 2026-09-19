@@ -8,11 +8,10 @@ using UnityEngine;
 /// </summary>
 public enum TJJActionType
 {
-    Action01 = 0,
-    Action02 = 1,
-    Action03 = 2,
-    Action04 = 3,
-    Action05 = 4
+    HoldHighEnough = 0,
+    Charge = 1,
+    FoxFire = 2,
+    GoldShard = 3
 }
 
 /// <summary>

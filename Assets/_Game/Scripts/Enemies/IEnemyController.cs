@@ -79,6 +79,12 @@ public abstract class IEnemyController : IDamagable
 
     #endregion PRIVATE VARIABLES
 
+    #region Events
+
+    public event Action OnDamaged;
+
+    #endregion Events
+
     #region UNITY_LifeCycle
 
     /// <summary>
@@ -350,7 +356,7 @@ public abstract class IEnemyController : IDamagable
         if (!isBossBreaking) { damageAmount *= 0.5f; }
 
         currentHealth -= damageAmount;
-
+        OnDamaged?.Invoke();
         if (!IN_COMBAT)
         {
             IN_COMBAT = true;

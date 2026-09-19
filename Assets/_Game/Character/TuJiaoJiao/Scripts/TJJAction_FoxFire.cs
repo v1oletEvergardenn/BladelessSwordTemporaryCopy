@@ -43,6 +43,9 @@ public class TJJAction_FoxFire : TJJBaseAction
         // Jump right => face left, jump left => face right.
         bool shouldFaceRight = awayFromTargetSign < 0f;
         bossAi.Face(shouldFaceRight);
+        anim.Play("foxFire");
+        yield return WaitForEnemy(0.24f);
+        //jump
         rb.AddForce(new Vector2(jumpHorizontalForce * awayFromTargetSign, jumpVerticalForce), ForceMode2D.Impulse);
         // Wait until apex (vertical speed turns downward), with timeout safety.
         while (elapsedAirTime < jumpingTime)
@@ -55,6 +58,8 @@ public class TJJAction_FoxFire : TJJBaseAction
             yield return null;
         }
         Vector3 spawnPos = firePoint != null ? firePoint.position : transform.position;
+        anim.Play("foxFireLaunch");
+        yield return WaitForEnemy(0.3f);
         FireFoxBolts(spawnPos);
 
         // Start landing.
@@ -72,7 +77,8 @@ public class TJJAction_FoxFire : TJJBaseAction
 
             yield return null;
         }
-
+        anim.Play("foxFireLand");
+        yield return WaitForEnemy(0.3f);
         OnActionEnd();
     }
 

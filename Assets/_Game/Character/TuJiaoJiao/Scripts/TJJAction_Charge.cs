@@ -8,8 +8,7 @@ public class TJJAction_Charge : TJJBaseAction
     public Transform attackPos;
 
     [Range(0f, 2f)] public float windupDuration = 0.3f;
-    [Range(0f, 2f)] public float counterAttackedRecoveryDuration = 0.5f;
-    [Range(0f, 5f)] public float hitWallRecoveryDuration = 0.5f;
+    [Range(0f, 5f)] public float counterAttackedRecoveryDuration = 0.5f;
     [Range(0f, 2f)] public float timeExcceedRecoveryDuration = 0.5f;
 
     [Range(0f, 5f)] public float chargeDuration = 1.2f;
@@ -23,9 +22,18 @@ public class TJJAction_Charge : TJJBaseAction
     private bool hitBoundary;
     private bool isCharging;
 
+    public override void CancelAct()
+    {
+        base.CancelAct();
+        bossAi.OnDamaged -= OnStop1;
+    }
+
     public override IEnumerator Act_coroutine(float factor = 0, Transform _target = null)
     {
+        bossAi.OnDamaged += OnStop1;
         // short windup, holding the sword
+        bossAi.FaceTarget();
+        anim.Play("charge");
         yield return WaitForEnemy(windupDuration);
 
         // charge forward, keep attacking while moving.
@@ -36,40 +44,56 @@ public class TJJAction_Charge : TJJBaseAction
         float attackCD = 0f;
         //moving forward
 
-        bossAi.Move(IsPlayerLeft() ? bossAi.leftBoundary : bossAi.rightBoundary, chargeSpeed);
+        float x = chargeSpeed * chargeDuration;
+        bossAi.MoveByDuration(IsPlayerLeft() ? -x : x, chargeDuration + timeExcceedRecoveryDuration);
 
-        while (elapsed < chargeDuration && !bossAi.DEAD && !wasCountered && !hitBoundary)
+        yield return WaitForEnemy(0.1f);
+        anim.Play("charge_loop_2");
+
+        while (elapsed < chargeDuration + timeExcceedRecoveryDuration && !bossAi.DEAD && !wasCountered && !hitBoundary)
         {
             elapsed += TimeScaleManager.EnemyDt;
             attackCD += TimeScaleManager.EnemyDt;
-            if (attackCD >= hitTickInterval)
+            if (elapsed >= chargeDuration)
+            {
+                Stop2();
+            }
+            else if (attackCD >= hitTickInterval)
             {
                 attackCD = 0f;
                 StartCoroutine(ApplyAttackInCircle(chargeAttackDuration, chargeRange, attackPos, chargeAttack));
             }
+
             yield return null;
         }
 
         isCharging = false;
-        bossAi.StopCurrentMove();
 
-        if (wasCountered)
+        if (wasCountered || hitBoundary)
         {
+            bossAi.StopCurrentMove();
+            float jumpingDuration = 0.96f;
+            Stop1();
             //counter attacked by player, end moving and attack.
-            yield return WaitForEnemy(counterAttackedRecoveryDuration);
-        }
-        else if (hitBoundary)
-        {
-            // if hit the boundary, stun for a period of time and end the moving and attack.
-            yield return WaitForEnemy(hitWallRecoveryDuration);
+            yield return WaitForEnemy(0.36f);
+            bossAi.Repel(0.7f, bossAi.isFacingRight);
+            yield return WaitForEnemy(0.3f);
+            bossAi.Repel(0.4f, bossAi.isFacingRight);
+            yield return WaitForEnemy(0.3f);
+            bossAi.Repel(0.2f, bossAi.isFacingRight);
+            yield return WaitForEnemy(counterAttackedRecoveryDuration - jumpingDuration - 0.5f);
+            anim.SetTrigger("stunning_end");
+            yield return WaitForEnemy(0.5f);
         }
         else
         {
             // when exceeds a certain time, brake animation and end the moving and attack.
-            yield return WaitForEnemy(timeExcceedRecoveryDuration);
+            anim.Play("charge_stop2_end");
+            yield return WaitForEnemy(0.18f);
         }
 
         OnActionEnd();
+        bossAi.OnDamaged -= OnStop1;
         yield return null;
     }
 
@@ -81,9 +105,7 @@ public class TJJAction_Charge : TJJBaseAction
         if (dealtDamage == MeleeAttackResult.Countered)
         {
             // when counterattacked by player, end moving and attack.
-            wasCountered = true;
-            vfx.MeleeAttackEffect(melee, playerIDamagable, left);
-            bossAi.Repel(2, !left);
+            OnStop1();
             return;
         }
 
@@ -91,6 +113,18 @@ public class TJJAction_Charge : TJJBaseAction
         {
             vfx.MeleeAttackEffect(melee, playerIDamagable, left);
         }
+    }
+
+    public void OnStop1()
+    {
+        if (wasCountered || hitBoundary)
+        {
+            return;
+        }
+        wasCountered = true;
+        bool left = playerIDamagable.GetHitPos().x < transform.position.x;
+        vfx.MeleeAttackEffect(chargeAttack, playerIDamagable, left);
+        bossAi.Repel(2, !left);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -102,7 +136,7 @@ public class TJJAction_Charge : TJJBaseAction
         if (collision.gameObject.layer == 18)//wall layer
         {
             hitBoundary = true;
-            bossAi.StopCurrentMove();
+            OnStop1();
             return;
         }
     }
@@ -118,5 +152,15 @@ public class TJJAction_Charge : TJJBaseAction
         Gizmos.color = new Color(0.95f, 0.55f, 0.15f, 0.9f);
         Gizmos.DrawWireSphere(attackPos.position, chargeRange);
         Gizmos.color = cachedColor;
+    }
+
+    public void Stop1()
+    {
+        anim.Play("charge_stop1");
+    }
+
+    public void Stop2()
+    {
+        anim.Play("charge_stop2");
     }
 }

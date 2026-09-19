@@ -37,10 +37,8 @@ public class TJJAction_GoldShards : TJJBaseAction
     {
         Transform trueTarget = _target != null ? _target : player != null ? player.transform : null;
         bool fromHoldHighEnough = bossAi != null && bossAi.lastAction is TJJAction_HoldHighEnough;
-
-        bossAi.FaceTarget(trueTarget);
-        yield return WaitForEnemy(windupTime);
-
+        anim.Play("idle");
+        anim.Play("goldShard");
         bossAi.FaceTarget(trueTarget);
         yield return WaitForEnemy(windupTime);
 
